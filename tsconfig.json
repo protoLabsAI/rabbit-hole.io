@@ -1,0 +1,106 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noImplicitAny": false, // Temporarily disabled for 0.0.1 - re-enable post-MVP
+    "useUnknownInCatchVariables": false, // Temporarily disabled for 0.0.1 - re-enable post-MVP
+    "noUnusedLocals": false, // Disabled to reduce noise during development
+    "noUnusedParameters": false, // Disabled to reduce noise during development
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "strictNullChecks": true,
+    "paths": {
+      "@/*": ["./apps/rabbit-hole/app/*"],
+      "@rabbit-hole/*": ["./apps/rabbit-hole/app/*"],
+      "@rabbit-hole/graph-visualizer": [
+        "./apps/rabbit-hole/app/graph-visualizer"
+      ],
+      "@rabbit-hole/graph-visualizer/*": [
+        "./apps/rabbit-hole/app/graph-visualizer/*"
+      ],
+      "@rabbit-hole/research": ["./apps/rabbit-hole/app/research"],
+      "@rabbit-hole/research/*": ["./apps/rabbit-hole/app/research/*"],
+      "@proto/types": ["./packages/types/src"],
+      "@proto/database": ["./packages/database/src"],
+      "@proto/auth": ["./packages/auth/src"],
+      "@proto/auth/client": ["./packages/auth/src/client"],
+      "@proto/assets": ["./packages/assets/src"],
+      "@proto/collab": ["./packages/collab/src"],
+      "@proto/collab/client": ["./packages/collab/src/client"],
+      "@proto/collab/server": ["./packages/collab/src/server"],
+      "@proto/llm-tools": ["./packages/proto-llm-tools/src"],
+      "@proto/utils": ["./packages/utils/src"],
+      "@proto/utils/atlas": ["./packages/utils/src/atlas"],
+      "@proto/utils/file-processing": ["./packages/utils/src/file-processing"],
+      "@proto/utils/tenancy-edge": ["./packages/utils/src/tenancy-edge"],
+      "@proto/utils/tenancy-server": ["./packages/utils/src/tenancy-server"],
+      "@proto/api-utils": ["./packages/api-utils/src"],
+      "@proto/logger": ["./packages/logger/src"],
+      "@proto/sidequest-utils": ["./packages/sidequest-utils/src"],
+      "@proto/sidequest-utils/client": [
+        "./packages/sidequest-utils/src/client"
+      ],
+      "@proto/sidequest-utils/server": [
+        "./packages/sidequest-utils/src/server"
+      ],
+      "@proto/icon-system": ["./packages/icon-system/src"],
+      "@proto/prompts": ["./packages/prompts/src"],
+      "@proto/llm-providers": ["./packages/llm-providers/src"],
+      "@proto/ui": ["./packages/ui/src"],
+      "@proto/ui/atoms": ["./packages/ui/src/atoms"],
+      "@proto/ui/molecules": ["./packages/ui/src/molecules"],
+      "@proto/ui/organisms": ["./packages/ui/src/organisms"],
+      "@proto/ui/templates": ["./packages/ui/src/templates"],
+      "@proto/ui/theme": ["./packages/ui/src/theme"],
+      "@proto/charts": ["./packages/charts/src"],
+      "@proto/charts/gantt": ["./packages/charts/src/gantt"],
+      "@proto/yjs-history": ["./packages/yjs-history/src"]
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    ".next",
+    "**/.next/**",
+    "**/coverage/**",
+    "packages/*/dist/**",
+    "packages/*/build/**",
+    "services/**",
+    "scripts/**",
+    "docs/**",
+    "public/**",
+    "agent/**",
+    "external/**",
+    "**/vitest.config.ts",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/__tests__/**"
+  ],
+  "include": [
+    "next-env.d.ts",
+    "vitest.d.ts",
+    "types/**/*.d.ts",
+    "config/**/*.ts",
+    "apps/rabbit-hole/**/*.ts",
+    "apps/rabbit-hole/**/*.tsx",
+    "packages/**/*.ts",
+    "packages/**/*.tsx"
+  ]
+}

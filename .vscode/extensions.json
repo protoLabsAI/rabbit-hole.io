@@ -1,0 +1,26 @@
+{
+  "recommendations": [
+    // Docker & Container Tools
+    "ms-azuretools.vscode-docker",
+    "exiasr.hadolint",
+
+    // TypeScript & JavaScript
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+
+    // YAML (for docker-compose files)
+    "redhat.vscode-yaml",
+
+    // Git & Version Control
+    "eamodio.gitlens",
+
+    // Markdown
+    "yzhang.markdown-all-in-one",
+
+    // General Productivity
+    "christian-kohler.path-intellisense",
+    "usernamehw.errorlens",
+    "streetsidesoftware.code-spell-checker"
+  ],
+  "unwantedRecommendations": []
+}

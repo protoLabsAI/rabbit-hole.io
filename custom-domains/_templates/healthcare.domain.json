@@ -1,0 +1,116 @@
+{
+  "$schema": "../schema.json",
+  "name": "healthcare",
+  "displayName": "Healthcare",
+  "description": "Healthcare domain for patients, providers, and medical facilities",
+  "version": "1.0.0",
+  "tags": ["healthcare", "medical", "patients"],
+  "entities": {
+    "Patient": {
+      "uidPrefix": "patient",
+      "displayName": "Patient",
+      "properties": {
+        "date_of_birth": {
+          "type": "date",
+          "required": false,
+          "format": "YYYY-MM-DD",
+          "description": "Patient date of birth"
+        },
+        "blood_type": {
+          "type": "enum",
+          "required": false,
+          "values": ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+          "description": "Blood type"
+        },
+        "allergies": {
+          "type": "array",
+          "required": false,
+          "items": "string",
+          "description": "Known allergies"
+        },
+        "emergency_contact": {
+          "type": "string",
+          "required": false,
+          "description": "Emergency contact information"
+        }
+      }
+    },
+    "Provider": {
+      "uidPrefix": "provider",
+      "displayName": "Healthcare Provider",
+      "properties": {
+        "specialty": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "General Practice",
+            "Cardiology",
+            "Neurology",
+            "Pediatrics",
+            "Surgery",
+            "Other"
+          ],
+          "description": "Medical specialty"
+        },
+        "license_number": {
+          "type": "string",
+          "required": false,
+          "description": "Medical license number"
+        },
+        "years_experience": {
+          "type": "number",
+          "required": false,
+          "integer": true,
+          "min": 0,
+          "description": "Years of medical experience"
+        }
+      }
+    },
+    "Facility": {
+      "uidPrefix": "facility",
+      "displayName": "Medical Facility",
+      "properties": {
+        "facility_type": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "Hospital",
+            "Clinic",
+            "Urgent Care",
+            "Laboratory",
+            "Pharmacy"
+          ],
+          "description": "Type of medical facility"
+        },
+        "capacity": {
+          "type": "number",
+          "required": false,
+          "integer": true,
+          "min": 1,
+          "description": "Patient capacity"
+        },
+        "emergency_services": {
+          "type": "boolean",
+          "required": false,
+          "description": "Whether facility provides emergency services"
+        }
+      }
+    }
+  },
+  "ui": {
+    "color": "#10B981",
+    "icon": "🏥",
+    "entityIcons": {
+      "Patient": "👤",
+      "Provider": "⚕️",
+      "Facility": "🏥"
+    }
+  },
+  "relationships": [
+    "TREATED_BY",
+    "WORKS_AT",
+    "ADMITTED_TO",
+    "REFERRED_TO",
+    "EMPLOYS"
+  ]
+}

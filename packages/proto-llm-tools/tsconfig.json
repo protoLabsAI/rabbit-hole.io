@@ -1,0 +1,51 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "strict": false,
+    "noImplicitAny": false,
+    "noEmitOnError": false,
+    "jsx": "react-jsx",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "paths": {
+      "@proto/ui": ["../ui/src"],
+      "@proto/ui/atoms": ["../ui/src/atoms"],
+      "@proto/ui/hooks": ["../ui/src/hooks"],
+      "@proto/sidequest-utils/client": ["../sidequest-utils/src/client"],
+      "@proto/sidequest-utils/components": [
+        "../sidequest-utils/src/components"
+      ],
+      "@proto/icon-system": ["../icon-system/src"],
+      "@proto/llm-providers": ["../llm-providers/src"],
+      "@proto/types": ["../types/src"],
+      "@proto/utils": ["../utils/src"],
+      "@proto/llm-tools/client": ["./src/client"]
+    },
+    "composite": true,
+    "incremental": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.stories.tsx"],
+  "references": [
+    {
+      "path": "../types"
+    },
+    {
+      "path": "../ui"
+    },
+    {
+      "path": "../sidequest-utils"
+    },
+    {
+      "path": "../icon-system"
+    },
+    {
+      "path": "../llm-providers"
+    },
+    {
+      "path": "../utils"
+    }
+  ]
+}

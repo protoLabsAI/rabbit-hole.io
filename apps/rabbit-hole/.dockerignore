@@ -1,0 +1,47 @@
+# Node modules (installed during build)
+node_modules
+**/node_modules
+
+# Next.js build artifacts
+.next
+out
+
+# Testing
+coverage
+__tests__
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+
+# Build artifacts
+*.tsbuildinfo
+build
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Environment files (set via Coolify/container env)
+.env
+.env*.local
+
+# Git
+.git
+.gitignore
+
+# Documentation
+*.md
+!README.md
+
+# Development files
+.vscode
+.idea
+*.swp
+*.swo
+
+# Misc
+.DS_Store
+*.pem
+

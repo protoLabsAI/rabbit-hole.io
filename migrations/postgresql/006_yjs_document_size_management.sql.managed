@@ -1,0 +1,104 @@
+-- Yjs Document Size Management & History Pruning
+-- Adds tier-based size tracking and automatic pruning metadata
+-- Database: rabbit_hole_app
+
+BEGIN;
+
+-- Add pruning metadata columns
+ALTER TABLE yjs_documents
+  ADD COLUMN IF NOT EXISTS last_pruned_at TIMESTAMP WITH TIME ZONE,
+  ADD COLUMN IF NOT EXISTS pruning_enabled BOOLEAN DEFAULT true,
+  ADD COLUMN IF NOT EXISTS history_retention_days INTEGER;
+
+-- Create index for size-based queries (monitoring large documents)
+CREATE INDEX IF NOT EXISTS idx_yjs_documents_size 
+  ON yjs_documents(size_bytes DESC) 
+  WHERE size_bytes > 5242880; -- Only index docs > 5MB
+
+-- Create index for pruning candidates
+CREATE INDEX IF NOT EXISTS idx_yjs_documents_pruning_candidates
+  ON yjs_documents(last_pruned_at NULLS FIRST, size_bytes DESC)
+  WHERE pruning_enabled = true;
+
+-- Add comments
+COMMENT ON COLUMN yjs_documents.last_pruned_at IS 
+  'Last time history pruning was performed';
+COMMENT ON COLUMN yjs_documents.pruning_enabled IS 
+  'Whether automatic history pruning is enabled (default: true)';
+COMMENT ON COLUMN yjs_documents.history_retention_days IS 
+  'Custom retention policy per document (overrides tier default if set)';
+
+-- Function: Find documents needing pruning
+CREATE OR REPLACE FUNCTION get_pruning_candidates(
+  size_threshold_mb INT DEFAULT 5,
+  age_threshold_days INT DEFAULT 7
+)
+RETURNS TABLE (
+  room_id VARCHAR(255),
+  size_mb NUMERIC,
+  days_since_pruning INT,
+  clerk_org_id VARCHAR(255)
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT 
+    d.room_id,
+    ROUND((d.size_bytes / 1048576.0)::numeric, 2) as size_mb,
+    CASE 
+      WHEN d.last_pruned_at IS NULL THEN 999
+      ELSE EXTRACT(DAY FROM NOW() - d.last_pruned_at)::INT
+    END as days_since_pruning,
+    d.clerk_org_id
+  FROM yjs_documents d
+  WHERE d.pruning_enabled = true
+    AND d.size_bytes > (size_threshold_mb * 1048576)
+    AND (
+      d.last_pruned_at IS NULL 
+      OR d.last_pruned_at < NOW() - INTERVAL '1 day' * age_threshold_days
+    )
+  ORDER BY d.size_bytes DESC;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Function: Get document size statistics
+CREATE OR REPLACE FUNCTION get_document_size_stats()
+RETURNS TABLE (
+  tier_estimate VARCHAR(50),
+  doc_count BIGINT,
+  avg_size_mb NUMERIC,
+  max_size_mb NUMERIC,
+  total_size_mb NUMERIC
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT 
+    CASE 
+      WHEN size_bytes < 10485760 THEN 'small (<10MB)'
+      WHEN size_bytes < 26214400 THEN 'medium (10-25MB)'
+      WHEN size_bytes < 104857600 THEN 'large (25-100MB)'
+      ELSE 'xlarge (>100MB)'
+    END as tier_estimate,
+    COUNT(*) as doc_count,
+    ROUND(AVG(size_bytes / 1048576.0)::numeric, 2) as avg_size_mb,
+    ROUND(MAX(size_bytes / 1048576.0)::numeric, 2) as max_size_mb,
+    ROUND(SUM(size_bytes / 1048576.0)::numeric, 2) as total_size_mb
+  FROM yjs_documents
+  GROUP BY tier_estimate
+  ORDER BY 
+    CASE tier_estimate
+      WHEN 'small (<10MB)' THEN 1
+      WHEN 'medium (10-25MB)' THEN 2
+      WHEN 'large (25-100MB)' THEN 3
+      WHEN 'xlarge (>100MB)' THEN 4
+    END;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Table comments
+COMMENT ON FUNCTION get_pruning_candidates IS 
+  'Identifies Yjs documents that need history pruning based on size and last prune date';
+COMMENT ON FUNCTION get_document_size_stats IS 
+  'Returns document size distribution statistics for monitoring';
+
+COMMIT;
+

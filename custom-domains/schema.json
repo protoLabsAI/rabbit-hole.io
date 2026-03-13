@@ -1,0 +1,379 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://rabbit-hole.io/schemas/domain-v1.json",
+  "title": "Rabbit Hole Domain Configuration",
+  "description": "JSON Schema for rabbit-hole.io domain configurations",
+  "type": "object",
+  "required": ["name", "displayName", "description", "entities", "ui"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Reference to this schema",
+      "default": "https://rabbit-hole.io/schemas/domain-v1.json"
+    },
+    "name": {
+      "type": "string",
+      "description": "Machine-readable domain name (lowercase, no spaces)",
+      "pattern": "^[a-z][a-z0-9_-]*$",
+      "examples": ["automotive", "retail", "healthcare"]
+    },
+    "displayName": {
+      "type": "string",
+      "description": "Human-readable domain name",
+      "minLength": 1,
+      "examples": ["Automotive", "Retail", "Healthcare"]
+    },
+    "description": {
+      "type": "string",
+      "description": "Full description of the domain scope and purpose",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version of the domain configuration",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "default": "1.0.0"
+    },
+    "extendsFrom": {
+      "type": "string",
+      "description": "Parent domain to inherit from",
+      "examples": ["technology", "biological", "social"]
+    },
+    "entities": {
+      "type": "object",
+      "description": "Entity type definitions",
+      "minProperties": 1,
+      "patternProperties": {
+        "^[A-Z][A-Za-z0-9_]*$": {
+          "$ref": "#/definitions/entityDefinition"
+        }
+      }
+    },
+    "ui": {
+      "type": "object",
+      "description": "UI configuration",
+      "required": ["color", "icon"],
+      "properties": {
+        "color": {
+          "type": "string",
+          "description": "Domain color in hex format",
+          "pattern": "^#[0-9A-F]{6}$",
+          "examples": ["#DC2626", "#3B82F6"]
+        },
+        "icon": {
+          "type": "string",
+          "description": "Domain icon (emoji or SVG)",
+          "minLength": 1,
+          "examples": ["🚗", "🏥", "🛒"]
+        },
+        "entityIcons": {
+          "type": "object",
+          "description": "Per-entity icon overrides",
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          }
+        },
+        "entityColors": {
+          "type": "object",
+          "description": "Per-entity color overrides",
+          "patternProperties": {
+            ".*": {
+              "type": "string",
+              "pattern": "^#[0-9A-F]{6}$"
+            }
+          }
+        }
+      }
+    },
+    "relationships": {
+      "type": "array",
+      "description": "Valid relationship types for this domain",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z_]+$"
+      },
+      "default": []
+    },
+    "author": {
+      "type": "string",
+      "description": "Domain author or maintainer"
+    },
+    "tags": {
+      "type": "array",
+      "description": "Tags for categorization",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "definitions": {
+    "entityDefinition": {
+      "type": "object",
+      "description": "Entity type definition",
+      "required": ["uidPrefix"],
+      "properties": {
+        "uidPrefix": {
+          "type": "string",
+          "description": "UID prefix for this entity type (lowercase, underscores)",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "examples": ["car_model", "product", "hospital"]
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Human-readable entity type name"
+        },
+        "properties": {
+          "type": "object",
+          "description": "Entity property definitions",
+          "patternProperties": {
+            "^[a-z][a-z0-9_]*$": {
+              "$ref": "#/definitions/propertyDefinition"
+            }
+          }
+        }
+      }
+    },
+    "propertyDefinition": {
+      "type": "object",
+      "description": "Property definition with validation rules",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "string",
+            "number",
+            "boolean",
+            "date",
+            "array",
+            "object",
+            "enum"
+          ]
+        },
+        "required": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether property is required"
+        },
+        "description": {
+          "type": "string",
+          "description": "Property description"
+        }
+      },
+      "oneOf": [
+        {
+          "$ref": "#/definitions/stringProperty"
+        },
+        {
+          "$ref": "#/definitions/numberProperty"
+        },
+        {
+          "$ref": "#/definitions/booleanProperty"
+        },
+        {
+          "$ref": "#/definitions/dateProperty"
+        },
+        {
+          "$ref": "#/definitions/arrayProperty"
+        },
+        {
+          "$ref": "#/definitions/objectProperty"
+        },
+        {
+          "$ref": "#/definitions/enumProperty"
+        }
+      ]
+    },
+    "stringProperty": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "string"
+        },
+        "minLength": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Minimum string length"
+        },
+        "maxLength": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum string length"
+        },
+        "pattern": {
+          "type": "string",
+          "description": "Regular expression pattern"
+        }
+      }
+    },
+    "numberProperty": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "number"
+        },
+        "min": {
+          "type": "number",
+          "description": "Minimum value"
+        },
+        "max": {
+          "type": "number",
+          "description": "Maximum value"
+        },
+        "integer": {
+          "type": "boolean",
+          "default": false,
+          "description": "Must be integer"
+        },
+        "positive": {
+          "type": "boolean",
+          "default": false,
+          "description": "Must be positive (> 0)"
+        },
+        "nonnegative": {
+          "type": "boolean",
+          "default": false,
+          "description": "Must be non-negative (>= 0)"
+        }
+      }
+    },
+    "booleanProperty": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "boolean"
+        }
+      }
+    },
+    "dateProperty": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "date"
+        },
+        "format": {
+          "type": "string",
+          "enum": ["YYYY-MM-DD", "ISO8601"],
+          "default": "YYYY-MM-DD",
+          "description": "Date format"
+        }
+      }
+    },
+    "arrayProperty": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "array"
+        },
+        "items": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": ["string", "number", "boolean"]
+            },
+            {
+              "type": "object",
+              "required": ["enum"],
+              "properties": {
+                "enum": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "minItems": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Minimum array length"
+        },
+        "maxItems": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum array length"
+        }
+      }
+    },
+    "objectProperty": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "object"
+        },
+        "valueType": {
+          "type": "string",
+          "enum": ["string", "number", "boolean", "any"],
+          "default": "any",
+          "description": "Type of object values"
+        }
+      }
+    },
+    "enumProperty": {
+      "type": "object",
+      "required": ["values"],
+      "properties": {
+        "type": {
+          "const": "enum"
+        },
+        "values": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          },
+          "description": "Allowed enum values"
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "$schema": "https://rabbit-hole.io/schemas/domain-v1.json",
+      "name": "automotive",
+      "displayName": "Automotive",
+      "description": "Automotive industry entities",
+      "version": "1.0.0",
+      "extendsFrom": "technology",
+      "entities": {
+        "Car_Model": {
+          "uidPrefix": "car_model",
+          "displayName": "Car Model",
+          "properties": {
+            "manufacturer": {
+              "type": "string",
+              "description": "Vehicle manufacturer"
+            },
+            "year": {
+              "type": "number",
+              "integer": true,
+              "min": 1886,
+              "max": 2100
+            },
+            "body_type": {
+              "type": "enum",
+              "values": ["sedan", "suv", "truck", "coupe", "hatchback"]
+            },
+            "msrp": {
+              "type": "number",
+              "min": 0,
+              "description": "Manufacturer's suggested retail price"
+            }
+          }
+        }
+      },
+      "ui": {
+        "color": "#DC2626",
+        "icon": "🚗",
+        "entityIcons": {
+          "Car_Model": "🚙"
+        }
+      },
+      "relationships": ["MANUFACTURED_BY", "COMPETES_WITH"]
+    }
+  ]
+}

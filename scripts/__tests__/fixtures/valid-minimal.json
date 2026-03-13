@@ -1,0 +1,15 @@
+{
+  "name": "minimal",
+  "displayName": "Minimal Domain",
+  "description": "A minimal valid domain configuration",
+  "entities": {
+    "SimpleEntity": {
+      "uidPrefix": "simple_entity"
+    }
+  },
+  "ui": {
+    "color": "#3B82F6",
+    "icon": "✅"
+  }
+}
+

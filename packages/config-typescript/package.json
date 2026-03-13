@@ -1,0 +1,15 @@
+{
+  "name": "@proto/config-typescript",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared TypeScript configurations for Proto monorepo",
+  "files": [
+    "*.json"
+  ],
+  "keywords": [
+    "typescript",
+    "config",
+    "monorepo"
+  ],
+  "type": "module"
+}

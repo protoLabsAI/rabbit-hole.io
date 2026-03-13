@@ -1,0 +1,47 @@
+#!/bin/sh
+
+set -e
+
+echo "🔍 Running pre-commit checks..."
+
+# Get list of staged files
+STAGED_FILES=$(git diff --cached --name-only)
+
+if [ -z "$STAGED_FILES" ]; then
+  echo "⚠️  No staged files detected"
+  exit 0
+fi
+
+# Run lint-staged and re-stage changes
+pnpm lint-staged
+
+# Quick dependency validation (warnings only, doesn't fail)
+.husky/validate-dependencies.sh || true
+
+# Check if Docker files changed and remind to lint
+DOCKER_FILES_CHANGED=$(echo "$STAGED_FILES" | grep -E "(Dockerfile|docker-compose.*\.yml)" || true)
+if [ -n "$DOCKER_FILES_CHANGED" ]; then
+  echo "🐳 Docker files detected"
+  echo "💡 Run 'pnpm run lint:docker' to validate (skipped in pre-commit for speed)"
+fi
+
+# Determine which packages changed
+CHANGED_PACKAGES=$(echo "$STAGED_FILES" | grep -E "^packages/[^/]+/src/" | cut -d/ -f2 | sort -u)
+APP_CHANGED=$(echo "$STAGED_FILES" | grep -q "^apps/rabbit-hole/app/" && echo "true" || echo "false")
+
+# Type-check main app if changed
+if [ "$APP_CHANGED" = "true" ]; then
+  echo "📝 Type-checking @apps/rabbit-hole..."
+  cd apps/rabbit-hole && NODE_OPTIONS='--max-old-space-size=8192' tsc --noEmit --skipLibCheck --incremental
+  cd - > /dev/null
+fi
+
+# Type-check changed packages
+if [ -n "$CHANGED_PACKAGES" ]; then
+  for pkg in $CHANGED_PACKAGES; do
+    echo "📝 Type-checking @proto/$pkg..."
+    pnpm --filter "@proto/$pkg" type-check || exit 1
+  done
+fi
+
+echo "✅ Pre-commit checks passed!"

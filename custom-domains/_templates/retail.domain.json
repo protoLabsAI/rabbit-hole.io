@@ -1,0 +1,103 @@
+{
+  "$schema": "../schema.json",
+  "name": "retail",
+  "displayName": "Retail",
+  "description": "Retail and e-commerce domain for products, categories, and brands",
+  "version": "1.0.0",
+  "tags": ["retail", "ecommerce", "products"],
+  "entities": {
+    "Product": {
+      "uidPrefix": "product",
+      "displayName": "Product",
+      "properties": {
+        "sku": {
+          "type": "string",
+          "required": false,
+          "pattern": "^[A-Z0-9-]+$",
+          "description": "Stock keeping unit"
+        },
+        "price": {
+          "type": "number",
+          "required": false,
+          "min": 0,
+          "description": "Product price"
+        },
+        "in_stock": {
+          "type": "boolean",
+          "required": false,
+          "description": "Whether product is in stock"
+        },
+        "category_name": {
+          "type": "string",
+          "required": false,
+          "description": "Product category"
+        },
+        "brand": {
+          "type": "string",
+          "required": false,
+          "description": "Product brand"
+        },
+        "rating": {
+          "type": "number",
+          "required": false,
+          "min": 0,
+          "max": 5,
+          "description": "Average customer rating"
+        }
+      }
+    },
+    "Category": {
+      "uidPrefix": "category",
+      "displayName": "Category",
+      "properties": {
+        "parent_category": {
+          "type": "string",
+          "required": false,
+          "description": "Parent category for hierarchy"
+        },
+        "level": {
+          "type": "number",
+          "required": false,
+          "integer": true,
+          "min": 1,
+          "description": "Category hierarchy level"
+        }
+      }
+    },
+    "Brand": {
+      "uidPrefix": "brand",
+      "displayName": "Brand",
+      "properties": {
+        "country": {
+          "type": "string",
+          "required": false,
+          "description": "Country of origin"
+        },
+        "founded_year": {
+          "type": "number",
+          "required": false,
+          "integer": true,
+          "min": 1800,
+          "max": 2100,
+          "description": "Year brand was founded"
+        }
+      }
+    }
+  },
+  "ui": {
+    "color": "#F59E0B",
+    "icon": "🛒",
+    "entityIcons": {
+      "Product": "📦",
+      "Category": "📁",
+      "Brand": "🏷️"
+    }
+  },
+  "relationships": [
+    "BELONGS_TO_CATEGORY",
+    "MANUFACTURED_BY",
+    "SOLD_BY",
+    "COMPETES_WITH",
+    "SUBCATEGORY_OF"
+  ]
+}

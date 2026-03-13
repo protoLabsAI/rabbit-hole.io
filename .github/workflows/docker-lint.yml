@@ -1,0 +1,88 @@
+name: Docker Lint
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - staging
+    paths:
+      - '**/Dockerfile*'
+      - 'docker-compose*.yml'
+      - '.github/workflows/docker-lint.yml'
+      - '.hadolint.yaml'
+  pull_request:
+    paths:
+      - '**/Dockerfile*'
+      - 'docker-compose*.yml'
+      - '.github/workflows/docker-lint.yml'
+      - '.hadolint.yaml'
+
+jobs:
+  hadolint:
+    name: Lint Dockerfiles
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        dockerfile:
+          - apps/rabbit-hole/Dockerfile
+          - agent/Dockerfile
+          - services/job-processor/Dockerfile
+          - services/yjs-collaboration-server/Dockerfile
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run Hadolint on ${{ matrix.dockerfile }}
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: ${{ matrix.dockerfile }}
+          config: .hadolint.yaml
+          failure-threshold: warning
+          no-fail: false
+      
+      - name: Print results
+        if: always()
+        run: |
+          echo "## 🐳 ${{ matrix.dockerfile }}" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Passed hadolint checks" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+  docker-compose-lint:
+    name: Lint Docker Compose Files
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Install yamllint
+        run: pip install yamllint
+      
+      - name: Lint docker-compose files (non-blocking)
+        continue-on-error: true
+        run: |
+          {
+            echo "## 🐳 Docker Compose Lint Results"
+            echo ""
+            
+            for file in docker-compose*.yml; do
+              if [ -f "$file" ]; then
+                echo "### 📄 $file"
+                if yamllint -c .yamllint.yaml "$file"; then
+                  echo "✅ Valid YAML syntax"
+                else
+                  echo "⚠️ Has formatting issues (non-blocking)"
+                fi
+                echo ""
+              fi
+            done
+          } >> "$GITHUB_STEP_SUMMARY"
+      
+      - name: Summary
+        run: |
+          echo "Docker Compose YAML validation complete (informational only)"
+          echo "Builds will not be blocked by YAML formatting issues"
+

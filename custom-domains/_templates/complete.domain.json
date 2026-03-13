@@ -1,0 +1,86 @@
+{
+  "$schema": "../schema.json",
+  "name": "{{DOMAIN_NAME}}",
+  "displayName": "{{DOMAIN_DISPLAY_NAME}}",
+  "description": "{{DOMAIN_DESCRIPTION}}",
+  "version": "1.0.0",
+  "author": "{{AUTHOR}}",
+  "tags": ["example", "complete", "template"],
+  "entities": {
+    "{{ENTITY_NAME}}": {
+      "uidPrefix": "{{ENTITY_PREFIX}}",
+      "displayName": "{{ENTITY_DISPLAY_NAME}}",
+      "properties": {
+        "text_field": {
+          "type": "string",
+          "required": false,
+          "minLength": 1,
+          "maxLength": 200,
+          "description": "Example text field with length constraints"
+        },
+        "email": {
+          "type": "string",
+          "required": false,
+          "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+          "description": "Email field with regex validation"
+        },
+        "number_field": {
+          "type": "number",
+          "required": false,
+          "min": 0,
+          "max": 100,
+          "description": "Number field with min/max constraints"
+        },
+        "integer_field": {
+          "type": "number",
+          "required": false,
+          "integer": true,
+          "min": 1,
+          "description": "Integer-only field"
+        },
+        "boolean_field": {
+          "type": "boolean",
+          "required": false,
+          "description": "True/false field"
+        },
+        "date_field": {
+          "type": "date",
+          "required": false,
+          "format": "YYYY-MM-DD",
+          "description": "Date field (YYYY-MM-DD format)"
+        },
+        "status": {
+          "type": "enum",
+          "required": false,
+          "values": ["draft", "active", "archived"],
+          "description": "Status enum with predefined values"
+        },
+        "tags": {
+          "type": "array",
+          "required": false,
+          "items": "string",
+          "minItems": 0,
+          "maxItems": 10,
+          "description": "Array of string tags"
+        },
+        "metadata": {
+          "type": "object",
+          "required": false,
+          "valueType": "any",
+          "description": "Key-value metadata object"
+        }
+      }
+    }
+  },
+  "ui": {
+    "color": "{{DOMAIN_COLOR}}",
+    "icon": "{{DOMAIN_ICON}}",
+    "entityIcons": {
+      "{{ENTITY_NAME}}": "{{ENTITY_ICON}}"
+    },
+    "entityColors": {
+      "{{ENTITY_NAME}}": "{{ENTITY_COLOR}}"
+    }
+  },
+  "relationships": ["RELATED_TO", "CREATED_BY", "CONTAINS"]
+}

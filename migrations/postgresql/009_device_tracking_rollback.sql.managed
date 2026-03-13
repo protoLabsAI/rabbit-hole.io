@@ -1,0 +1,13 @@
+-- Rollback Device Tracking Migration
+-- Drops user_devices and user_sessions tables
+
+-- Drop tables in reverse order of creation
+DROP TABLE IF EXISTS user_sessions CASCADE;
+DROP TABLE IF EXISTS user_devices CASCADE;
+
+-- Migration rollback complete
+-- Note: This does not delete existing device data, only removes the schema
+-- To manually cleanup data before rollback, run:
+-- DELETE FROM user_sessions;
+-- DELETE FROM user_devices;
+

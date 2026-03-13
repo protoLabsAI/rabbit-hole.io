@@ -1,0 +1,33 @@
+{
+  "name": "large_domain",
+  "displayName": "Large Domain",
+  "description": "Domain with many entities to trigger warnings",
+  "entities": {
+    "Entity_01": { "uidPrefix": "entity_01" },
+    "Entity_02": { "uidPrefix": "entity_02" },
+    "Entity_03": { "uidPrefix": "entity_03" },
+    "Entity_04": { "uidPrefix": "entity_04" },
+    "Entity_05": { "uidPrefix": "entity_05" },
+    "Entity_06": { "uidPrefix": "entity_06" },
+    "Entity_07": { "uidPrefix": "entity_07" },
+    "Entity_08": { "uidPrefix": "entity_08" },
+    "Entity_09": { "uidPrefix": "entity_09" },
+    "Entity_10": { "uidPrefix": "entity_10" },
+    "Entity_11": { "uidPrefix": "entity_11" },
+    "Entity_12": { "uidPrefix": "entity_12" },
+    "Entity_13": { "uidPrefix": "entity_13" },
+    "Entity_14": { "uidPrefix": "entity_14" },
+    "Entity_15": { "uidPrefix": "entity_15" },
+    "Entity_16": { "uidPrefix": "entity_16" },
+    "Entity_17": { "uidPrefix": "entity_17" },
+    "Entity_18": { "uidPrefix": "entity_18" },
+    "Entity_19": { "uidPrefix": "entity_19" },
+    "Entity_20": { "uidPrefix": "entity_20" },
+    "Entity_21": { "uidPrefix": "entity_21" }
+  },
+  "ui": {
+    "color": "#FF0000",
+    "icon": "📦"
+  }
+}
+

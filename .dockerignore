@@ -1,0 +1,74 @@
+# Docker Build Context Exclusions
+# Reduces context from ~1GB to ~200-300MB for faster builds and better cache hits
+
+# ============================================
+# Version Control
+# ============================================
+.git/
+.github/
+.gitignore
+.gitattributes
+
+# ============================================
+# Dependencies (rebuilt in Docker)
+# ============================================
+**/node_modules
+**/dist
+**/.next
+**/out
+**/.turbo
+**/coverage
+
+# ============================================
+# Documentation
+# ============================================
+docs/
+handoffs/
+*.md
+!README.md
+
+# ============================================
+# Development Files
+# ============================================
+**/*.log
+**/.DS_Store
+**/.env*
+!.env.example
+**/*.local
+.vscode/
+.idea/
+
+# ============================================
+# Tests
+# ============================================
+test/
+test-data/
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+cypress/
+cypress.config.js
+
+# ============================================
+# Build Artifacts (not needed in Docker context)
+# ============================================
+storybook-static/
+output/
+# migrations/ - Required by postgres Dockerfile
+monitoring/
+
+# ============================================
+# CI/CD (already in .github/)
+# ============================================
+scripts/dev-*.sh
+scripts/build-and-push*.sh
+
+# ============================================
+# Temporary Files
+# ============================================
+*.swp
+*.swo
+*~
+.tmp/
+tmp/

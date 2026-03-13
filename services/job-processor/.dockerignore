@@ -1,0 +1,44 @@
+# Node modules (installed during build)
+node_modules
+**/node_modules
+
+# Build artifacts
+dist
+*.tsbuildinfo
+build
+
+# Testing
+coverage
+__tests__
+*.test.ts
+*.spec.ts
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+logs/
+
+# Environment files (set via container env)
+.env
+.env*.local
+
+# Git
+.git
+.gitignore
+
+# Documentation
+*.md
+!README.md
+docs/
+
+# Development files
+.vscode
+.idea
+*.swp
+*.swo
+.DS_Store
+
+# Misc
+*.pem
+

@@ -1,0 +1,16 @@
+{
+  "name": "@proto/config-next",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared Next.js configuration for Proto monorepo",
+  "main": "base.config.js",
+  "files": [
+    "*.js"
+  ],
+  "keywords": [
+    "nextjs",
+    "config",
+    "monorepo"
+  ]
+}

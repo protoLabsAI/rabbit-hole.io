@@ -1,0 +1,10 @@
+-- Make clerk_org_id nullable for user-scoped workspaces
+-- User workspaces don't have an organization, only org workspaces do
+
+BEGIN;
+
+ALTER TABLE yjs_documents
+ALTER COLUMN clerk_org_id DROP NOT NULL;
+
+COMMIT;
+

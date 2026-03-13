@@ -1,0 +1,58 @@
+{
+  "$schema": "../schema.json",
+  "name": "{{DOMAIN_NAME}}",
+  "displayName": "{{DOMAIN_DISPLAY_NAME}}",
+  "description": "{{DOMAIN_DESCRIPTION}}",
+  "version": "1.0.0",
+  "entities": {
+    "{{ENTITY_1_NAME}}": {
+      "uidPrefix": "{{ENTITY_1_PREFIX}}",
+      "displayName": "{{ENTITY_1_DISPLAY_NAME}}",
+      "properties": {
+        "name": {
+          "type": "string",
+          "required": true,
+          "minLength": 1,
+          "description": "Name of the {{ENTITY_1_DISPLAY_NAME}}"
+        },
+        "description": {
+          "type": "string",
+          "required": false,
+          "description": "Description of the {{ENTITY_1_DISPLAY_NAME}}"
+        },
+        "status": {
+          "type": "enum",
+          "required": false,
+          "values": ["active", "inactive"],
+          "description": "Current status"
+        }
+      }
+    },
+    "{{ENTITY_2_NAME}}": {
+      "uidPrefix": "{{ENTITY_2_PREFIX}}",
+      "displayName": "{{ENTITY_2_DISPLAY_NAME}}",
+      "properties": {
+        "name": {
+          "type": "string",
+          "required": true,
+          "minLength": 1,
+          "description": "Name of the {{ENTITY_2_DISPLAY_NAME}}"
+        },
+        "description": {
+          "type": "string",
+          "required": false,
+          "description": "Description of the {{ENTITY_2_DISPLAY_NAME}}"
+        }
+      }
+    }
+  },
+  "ui": {
+    "color": "{{DOMAIN_COLOR}}",
+    "icon": "{{DOMAIN_ICON}}",
+    "entityIcons": {
+      "{{ENTITY_1_NAME}}": "{{ENTITY_1_ICON}}",
+      "{{ENTITY_2_NAME}}": "{{ENTITY_2_ICON}}"
+    }
+  },
+  "relationships": ["BELONGS_TO", "CONTAINS", "RELATED_TO"]
+}

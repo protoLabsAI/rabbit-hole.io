@@ -1,0 +1,23 @@
+{
+  "name": "@proto/config-tailwind",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared Tailwind CSS configuration for Proto monorepo",
+  "main": "base.config.js",
+  "files": [
+    "*.js"
+  ],
+  "dependencies": {
+    "tailwindcss-animate": "^1.0.7"
+  },
+  "peerDependencies": {
+    "tailwindcss": "^3.4.0"
+  },
+  "keywords": [
+    "tailwind",
+    "config",
+    "monorepo",
+    "design-system"
+  ]
+}

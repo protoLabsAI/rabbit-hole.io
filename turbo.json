@@ -1,0 +1,38 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": ["tsconfig.json", "tsconfig.base.json"],
+  "globalEnv": ["WORKSPACE_EXTRACTION_ENABLED"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build", "scan:domains"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**", ".generated/**"],
+      "env": ["NEXT_PUBLIC_*", "NODE_ENV"]
+    },
+    "type-check": {
+      "dependsOn": ["^build"],
+      "outputs": [],
+      "cache": true
+    },
+    "lint": {
+      "outputs": [],
+      "cache": true
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"],
+      "cache": true
+    },
+    "dev": {
+      "dependsOn": ["scan:domains"],
+      "cache": false,
+      "persistent": true
+    },
+    "scan:domains": {
+      "cache": false,
+      "outputs": [".generated/custom-domains/**"]
+    },
+    "clean": {
+      "cache": false
+    }
+  }
+}

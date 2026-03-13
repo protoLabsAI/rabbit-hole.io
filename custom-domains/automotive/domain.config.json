@@ -1,0 +1,161 @@
+{
+  "$schema": "../schema.json",
+  "name": "automotive",
+  "displayName": "Automotive",
+  "description": "Automotive industry - vehicles, manufacturers, models",
+  "version": "1.0.0",
+  "extendsFrom": "technology",
+  "entities": {
+    "Car_Model": {
+      "uidPrefix": "car_model",
+      "displayName": "Car Model",
+      "properties": {
+        "manufacturer": {
+          "type": "string",
+          "required": false,
+          "description": "Vehicle manufacturer"
+        },
+        "year": {
+          "type": "number",
+          "required": false,
+          "integer": true,
+          "min": 1886,
+          "max": 2100,
+          "description": "Model year"
+        },
+        "body_type": {
+          "type": "enum",
+          "required": false,
+          "values": ["sedan", "suv", "truck", "coupe", "hatchback"],
+          "description": "Vehicle body type"
+        },
+        "engine_type": {
+          "type": "enum",
+          "required": false,
+          "values": ["gasoline", "diesel", "electric", "hybrid"],
+          "description": "Engine/powertrain type"
+        },
+        "horsepower": {
+          "type": "number",
+          "required": false,
+          "min": 0,
+          "description": "Engine horsepower"
+        },
+        "mpg_city": {
+          "type": "number",
+          "required": false,
+          "min": 0,
+          "description": "City fuel economy (MPG)"
+        },
+        "mpg_highway": {
+          "type": "number",
+          "required": false,
+          "min": 0,
+          "description": "Highway fuel economy (MPG)"
+        },
+        "msrp": {
+          "type": "number",
+          "required": false,
+          "min": 0,
+          "description": "Manufacturer's suggested retail price"
+        },
+        "safety_rating": {
+          "type": "number",
+          "required": false,
+          "min": 0,
+          "max": 5,
+          "description": "Safety rating (0-5 stars)"
+        }
+      }
+    }
+  },
+  "enrichmentExamples": {
+    "Car_Model": {
+      "input_text": "The 2024 Tesla Model 3 is an electric sedan manufactured by Tesla. It produces 283 horsepower and achieves 132 MPG-equivalent in the city and 126 MPG-equivalent on the highway. The vehicle has an MSRP of $40,380 and received a 5-star safety rating from NHTSA.",
+      "expected_output": {
+        "manufacturer": "Tesla",
+        "year": 2024,
+        "body_type": "sedan",
+        "engine_type": "electric",
+        "horsepower": 283,
+        "mpg_city": 132,
+        "mpg_highway": 126,
+        "msrp": 40380,
+        "safety_rating": 5
+      }
+    }
+  },
+
+  "relationshipExample": {
+    "input_text": "The 2024 Tesla Model 3 is manufactured by Tesla and competes with the 2024 BMW i4 and Mercedes-Benz EQE in the luxury electric sedan segment. The Tesla Model 3 is the successor of the 2023 Model 3 and features an updated battery architecture. BMW manufactures the i4 with advanced autonomous driving capabilities. The automotive platforms used by Tesla are based on vertically integrated production. Mercedes-Benz competes with BMW in luxury vehicle development. Electric vehicles are produced by Tesla, BMW, and Mercedes as they transition from internal combustion. The 2024 Porsche Taycan competes with the Tesla Model 3 in performance metrics.",
+    "expected_output": {
+      "relationships": [
+        {
+          "source_entity": "2024 Tesla Model 3",
+          "target_entity": "Tesla",
+          "relationship_type": "MANUFACTURED_BY",
+          "confidence": 0.99
+        },
+        {
+          "source_entity": "2024 Tesla Model 3",
+          "target_entity": "2024 BMW i4",
+          "relationship_type": "COMPETES_WITH",
+          "confidence": 0.93
+        },
+        {
+          "source_entity": "2024 Tesla Model 3",
+          "target_entity": "Mercedes-Benz EQE",
+          "relationship_type": "COMPETES_WITH",
+          "confidence": 0.92
+        },
+        {
+          "source_entity": "2024 Tesla Model 3",
+          "target_entity": "2023 Tesla Model 3",
+          "relationship_type": "SUCCESSOR_OF",
+          "confidence": 0.97
+        },
+        {
+          "source_entity": "BMW i4",
+          "target_entity": "BMW",
+          "relationship_type": "MANUFACTURED_BY",
+          "confidence": 0.98
+        },
+        {
+          "source_entity": "BMW",
+          "target_entity": "Mercedes-Benz",
+          "relationship_type": "COMPETES_WITH",
+          "confidence": 0.94
+        },
+        {
+          "source_entity": "Tesla",
+          "target_entity": "vertical integration",
+          "relationship_type": "USES_PLATFORM",
+          "confidence": 0.89
+        },
+        {
+          "source_entity": "Porsche Taycan",
+          "target_entity": "Tesla Model 3",
+          "relationship_type": "COMPETES_WITH",
+          "confidence": 0.91
+        },
+        {
+          "source_entity": "Electric vehicle market",
+          "target_entity": "Tesla",
+          "relationship_type": "DOMINATED_BY",
+          "confidence": 0.90
+        }
+      ]
+    }
+  },
+
+  "ui": {
+    "color": "#DC2626",
+    "icon": "🚗",
+    "entityIcons": {
+      "Car_Model": "🚙"
+    }
+  },
+  "relationships": ["MANUFACTURED_BY", "COMPETES_WITH", "SUCCESSOR_OF"],
+  "author": "Rabbit Hole Development Team",
+  "tags": ["vehicles", "transportation", "manufacturing"]
+}

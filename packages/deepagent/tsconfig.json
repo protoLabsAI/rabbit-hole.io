@@ -1,0 +1,26 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "strict": false,
+    "noImplicitAny": false,
+    "noEmitOnError": false,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "paths": {
+      "@proto/llm-providers": ["../llm-providers/src"],
+      "@proto/llm-providers/*": ["../llm-providers/src/*"],
+      "@proto/observability": ["../observability/src"],
+      "@proto/types": ["../types/src"]
+    },
+    "composite": true,
+    "incremental": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts"],
+  "references": [
+    { "path": "../types" },
+    { "path": "../llm-providers" },
+    { "path": "../observability" }
+  ]
+}

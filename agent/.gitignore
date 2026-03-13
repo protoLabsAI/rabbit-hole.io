@@ -1,0 +1,15 @@
+venv/
+__pycache__/
+*.pyc
+.env
+.vercel
+
+# Build output
+dist/
+*.js
+*.js.map
+!scripts/**/*.js
+
+# LangGraph API
+.langgraph_api
+node_modules/

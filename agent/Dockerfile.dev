@@ -1,0 +1,33 @@
+# Development Dockerfile for LangGraph Agent Services
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apk add --no-cache libc6-compat python3 make g++ curl
+
+# Copy package files
+COPY package.json pnpm-lock.yaml ./
+
+# Install pnpm and dependencies
+RUN npm install -g pnpm@latest
+RUN pnpm install --frozen-lockfile
+
+# Copy source code
+COPY . .
+
+# Create non-root user for security
+RUN addgroup --system --gid 1001 agent
+RUN adduser --system --uid 1001 agent
+RUN chown -R agent:agent /app
+USER agent
+
+# Expose ports
+EXPOSE 8123 9230
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=20s --retries=3 \
+    CMD curl -f http://localhost:8123/docs || exit 1
+
+# Start development server
+CMD ["pnpm", "dev"]

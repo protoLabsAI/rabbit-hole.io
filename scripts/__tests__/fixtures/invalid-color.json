@@ -1,0 +1,14 @@
+{
+  "name": "invalid_color",
+  "displayName": "Invalid Color",
+  "description": "Domain with invalid color format",
+  "entities": {
+    "TestEntity": {
+      "uidPrefix": "test"
+    }
+  },
+  "ui": {
+    "color": "not-a-hex-color",
+    "icon": "❌"
+  }
+}

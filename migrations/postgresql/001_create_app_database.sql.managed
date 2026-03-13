@@ -1,0 +1,26 @@
+-- Create Application Database
+-- Note: This runs as postgres superuser in docker-entrypoint-initdb.d
+-- Primary database is rabbit_hole_app (set via POSTGRES_DB environment variable)
+
+-- Create application user with appropriate permissions
+DO
+$$
+BEGIN
+  IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'app_user') THEN
+    CREATE USER app_user WITH ENCRYPTED PASSWORD 'rabbit2024';
+  END IF;
+END
+$$;
+
+-- Create jobqueue user for job processing
+DO
+$$
+BEGIN
+  IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'jobqueue') THEN
+    CREATE USER jobqueue WITH ENCRYPTED PASSWORD 'jobs2024';
+  END IF;
+END
+$$;
+
+-- Grant database-level permissions
+GRANT ALL PRIVILEGES ON DATABASE rabbit_hole_app TO app_user;

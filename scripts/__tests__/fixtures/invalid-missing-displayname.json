@@ -1,0 +1,13 @@
+{
+  "name": "invalid_test",
+  "description": "Missing displayName field",
+  "entities": {
+    "TestEntity": {
+      "uidPrefix": "test"
+    }
+  },
+  "ui": {
+    "color": "#FF0000",
+    "icon": "❌"
+  }
+}

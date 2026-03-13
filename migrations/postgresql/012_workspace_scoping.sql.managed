@@ -1,0 +1,34 @@
+-- Workspace Scoping Migration
+-- Add scope tracking for user vs org sessions
+
+BEGIN;
+
+-- Add clerk_org_id column if it doesn't exist (for Team+ tiers)
+ALTER TABLE collaboration_sessions
+ADD COLUMN IF NOT EXISTS clerk_org_id VARCHAR(255);
+
+-- Add scope columns to collaboration_sessions
+ALTER TABLE collaboration_sessions
+ADD COLUMN IF NOT EXISTS scope_type VARCHAR(10) DEFAULT 'user' CHECK (scope_type IN ('user', 'org'));
+
+ALTER TABLE collaboration_sessions
+ADD COLUMN IF NOT EXISTS scope_id VARCHAR(255);
+
+-- Backfill existing sessions
+-- Default all existing sessions to user-scoped
+UPDATE collaboration_sessions
+SET 
+  scope_type = 'user',
+  scope_id = owner_id
+WHERE scope_id IS NULL;
+
+-- Make scope_id NOT NULL after backfill
+ALTER TABLE collaboration_sessions
+ALTER COLUMN scope_id SET NOT NULL;
+
+-- Add index for efficient scope-based queries
+CREATE INDEX IF NOT EXISTS idx_sessions_scope
+ON collaboration_sessions(scope_type, scope_id, status);
+
+COMMIT;
+

@@ -1,0 +1,53 @@
+{
+  "name": "@proto/agent",
+  "version": "0.1.8",
+  "type": "module",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "pnpm exec langgraphjs dev --port 8123",
+    "dev:nodemon": "nodemon",
+    "start:langgraph": "pnpm exec langgraphjs dev --port 8123",
+    "dev:proxy-logger": "tsx src/debug-http-logger.ts",
+    "dev:enhanced": "./scripts/dev-agent.sh",
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "test": "echo 'Agent tests placeholder'",
+    "test:person-research": "curl -X POST http://localhost:8123/person_research_agent/invoke -H 'Content-Type: application/json' -d '{\"input\":{\"targetPersonName\":\"Test Person\",\"existingPersonEntities\":[],\"existingRelationships\":[]}}'",
+    "health": "curl http://localhost:8123/docs",
+    "clean": "rm -rf dist node_modules",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@langchain/langgraph-cli": "^1.1.2",
+    "@types/html-to-text": "^9.0.4",
+    "@types/node": "^22.9.0",
+    "nodemon": "^3.1.10",
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "@copilotkit/sdk-js": "^1.9.1",
+    "@langchain/anthropic": "^1.0.0",
+    "@langchain/community": "^1.0.0",
+    "@langchain/core": "^1.0.1",
+    "@langchain/google-genai": "^1.0.0",
+    "@langchain/langgraph": "^1.0.0",
+    "@langchain/langgraph-checkpoint": "~0.0.18",
+    "@langchain/openai": "^1.0.0",
+    "@langfuse/langchain": "^4.4.2",
+    "@langfuse/otel": "^4.4.2",
+    "@opentelemetry/resources": "^2.2.0",
+    "@opentelemetry/sdk-node": "^0.208.0",
+    "@opentelemetry/semantic-conventions": "^1.38.0",
+    "@proto/deepagent": "workspace:*",
+    "@proto/llm-providers": "workspace:*",
+    "@proto/llm-tools": "workspace:*",
+    "@proto/types": "workspace:*",
+    "@proto/utils": "workspace:*",
+    "dotenv": "^17.2.3",
+    "zod": "^4.1.12"
+  }
+}

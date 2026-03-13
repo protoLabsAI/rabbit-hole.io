@@ -1,0 +1,60 @@
+{
+  "name": "@proto/auth",
+  "version": "2.0.4",
+  "private": true,
+  "description": "Authentication middleware and utilities for API routes",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./dist/client.d.ts",
+      "import": "./dist/client.js",
+      "default": "./dist/client.js"
+    },
+    "./ui": {
+      "types": "./dist/ui/index.d.ts",
+      "import": "./dist/ui/index.js",
+      "default": "./dist/ui/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "type-check": "tsc --noEmit",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage"
+  },
+  "dependencies": {
+    "@clerk/nextjs": "^6.5.0",
+    "@proto/database": "workspace:*",
+    "@proto/icon-system": "workspace:*",
+    "next": "^15.1.0"
+  },
+  "peerDependencies": {
+    "@proto/ui": "workspace:*",
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@proto/ui": "workspace:*",
+    "@types/react": "^19.0.6",
+    "tsup": "^8.0.1",
+    "typescript": "^5.5.4",
+    "vitest": "^1.6.1"
+  },
+  "keywords": [
+    "auth",
+    "authentication",
+    "middleware",
+    "clerk",
+    "proto"
+  ],
+  "files": [
+    "dist"
+  ],
+  "type": "module"
+}

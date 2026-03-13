@@ -1,0 +1,45 @@
+-- Migration: Sidequest.js Job Queue Schema
+-- Purpose: Create schema for background job processing
+-- Date: 2025-10-19
+-- Author: AI Assistant
+-- Phase: 2 - Job Processor Dockerization (RAB-64)
+--
+-- NOTE: Sidequest.js auto-creates its own tables (jobs, sidequest_queues, etc.)
+--       This migration only creates the schema and grants permissions.
+--       Tables will be created by Sidequest on first startup.
+
+-- Create sidequestjs schema
+CREATE SCHEMA IF NOT EXISTS sidequestjs;
+
+-- Set search path for this migration
+SET search_path TO sidequestjs;
+
+-- Sidequest will auto-create these tables:
+-- - jobs (main job queue table)
+-- - sidequest_queues (queue metadata)
+-- 
+-- We only need to ensure the schema exists and permissions are granted
+-- The tables below are commented out to avoid conflicts:
+--
+-- CREATE TABLE IF NOT EXISTS jobs (
+-- Tables auto-created by Sidequest - no manual creation needed
+
+-- Grant permissions to jobqueue user (for tables Sidequest will create)
+GRANT USAGE ON SCHEMA sidequestjs TO jobqueue;
+ALTER DEFAULT PRIVILEGES IN SCHEMA sidequestjs GRANT ALL ON TABLES TO jobqueue;
+ALTER DEFAULT PRIVILEGES IN SCHEMA sidequestjs GRANT ALL ON SEQUENCES TO jobqueue;
+
+-- Comments for documentation
+COMMENT ON SCHEMA sidequestjs IS 'Sidequest.js background job processing queue (tables auto-created by Sidequest)';
+
+-- Reset search path
+RESET search_path;
+
+-- Success message
+DO $$
+BEGIN
+    RAISE NOTICE 'Migration 015: Sidequest.js schema created';
+    RAISE NOTICE 'Schema: sidequestjs (tables will be auto-created by Sidequest on startup)';
+    RAISE NOTICE 'Permissions: jobqueue user granted default privileges';
+END $$;
+

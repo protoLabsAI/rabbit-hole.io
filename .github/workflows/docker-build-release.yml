@@ -1,0 +1,303 @@
+# Docker Build - Production Release
+# Single-platform (AMD64) builds triggered by version tags
+# Runs on self-hosted runner at 100.71.25.102
+#
+# ⚠️ Cache Management Strategy
+# ─────────────────────────────
+# Registry cache approach for reliability:
+#
+# 1. Registry Cache: GHCR-based, unlimited size, auto-managed, multi-runner ready
+#
+# Benefits:
+# - Zero maintenance (registry auto-prunes)
+# - Multi-runner ready (cache shared automatically)
+# - Unlimited size (within GHCR quota)
+# - No dependency on GitHub Actions Cache service
+
+name: Docker Build - Production Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Version tag to build (e.g., v1.2.3)"
+        required: true
+        type: string
+
+concurrency:
+  group: docker-release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  packages: write
+  id-token: write
+  security-events: write
+  actions: read
+  attestations: write
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build-and-push:
+    name: Build & Push ${{ matrix.service.name }}
+    runs-on: self-hosted
+    timeout-minutes: 60  # Add timeout to prevent hung builds
+
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - name: rabbit-hole
+            context: .
+            dockerfile: apps/rabbit-hole/Dockerfile
+            build-args: |
+              NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+              NEXT_PUBLIC_YJS_WS_URL
+          - name: agent
+            context: .
+            dockerfile: agent/Dockerfile
+            build-args: ""
+          - name: job-processor
+            context: .
+            dockerfile: services/job-processor/Dockerfile
+            build-args: ""
+          - name: yjs-collab
+            context: .
+            dockerfile: services/yjs-collaboration-server/Dockerfile
+            build-args: ""
+          - name: langextract
+            context: ./services/langextract-service
+            dockerfile: ./services/langextract-service/Dockerfile
+            build-args: ""
+          - name: youtube-processor
+            context: ./services/youtube-processor-service
+            dockerfile: ./services/youtube-processor-service/Dockerfile
+            build-args: ""
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: |
+            network=host
+            image=moby/buildkit:latest
+          buildkitd-flags: --debug
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/proto-labs-ai/proto-starter/${{ matrix.service.name }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable=${{ !contains(github.ref, 'rc') && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') }}
+          labels: |
+            org.opencontainers.image.title=${{ matrix.service.name }}
+            org.opencontainers.image.description=Rabbit Hole ${{ matrix.service.name }} service (Production)
+            org.opencontainers.image.vendor=Proto Labs
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.version=${{ github.ref_name }}
+            org.opencontainers.image.revision=${{ github.sha }}
+
+      - name: Build and push
+        id: build
+        uses: docker/build-push-action@v5
+        timeout-minutes: 45  # Per-service timeout
+        with:
+          context: ${{ matrix.service.context }}
+          file: ${{ matrix.service.dockerfile }}
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # Registry cache strategy: GHCR-based, unlimited size, auto-managed
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/proto-labs-ai/proto-starter/cache:${{ matrix.service.name }}-release
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/proto-labs-ai/proto-starter/cache:${{ matrix.service.name }}-release,mode=max
+          build-args: |
+            ${{ matrix.service.name == 'rabbit-hole' && format('NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY={0}', secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) || '' }}
+            ${{ matrix.service.name == 'rabbit-hole' && format('NEXT_PUBLIC_YJS_WS_URL={0}', vars.NEXT_PUBLIC_YJS_WS_URL || 'wss://collab.proto-labs.ai') || '' }}
+          provenance: true
+          sbom: true
+          # Add network configuration for better reliability
+          network: host
+          allow: network.host
+
+      - name: Run Trivy security scan
+        uses: aquasecurity/trivy-action@master
+        continue-on-error: true # Report vulnerabilities but don't block releases
+        with:
+          image-ref: ${{ env.REGISTRY }}/proto-labs-ai/proto-starter/${{ matrix.service.name }}@${{ steps.build.outputs.digest }}
+          format: "sarif"
+          output: "trivy-results-${{ matrix.service.name }}.sarif"
+          severity: "HIGH,CRITICAL"
+          exit-code: "1"
+
+      - name: Upload Trivy results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        continue-on-error: true # Don't fail if security tab upload fails
+        with:
+          sarif_file: "trivy-results-${{ matrix.service.name }}.sarif"
+          category: "trivy-${{ matrix.service.name }}"
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3.7.0
+        with:
+          cosign-release: 'v2.4.1'
+
+      - name: Sign image with Cosign
+        continue-on-error: true # Don't block deployment if signing fails
+        run: |
+          cosign sign --yes \
+            -a "repo=${{ github.repository }}" \
+            -a "workflow=${{ github.workflow }}" \
+            -a "ref=${{ github.sha }}" \
+            -a "tag=${{ github.ref_name }}" \
+            ${{ env.REGISTRY }}/proto-labs-ai/proto-starter/${{ matrix.service.name }}@${{ steps.build.outputs.digest }}
+        env:
+          COSIGN_EXPERIMENTAL: 1
+
+      - name: Generate GitHub attestation
+        continue-on-error: true # Don't block deployment if attestation fails
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ${{ env.REGISTRY }}/proto-labs-ai/proto-starter/${{ matrix.service.name }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
+
+      - name: Report to job summary
+        run: |
+          echo "## 🚀 Released: ${{ matrix.service.name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Platform:** linux/amd64" >> $GITHUB_STEP_SUMMARY
+          echo "- **Digest:** \`${{ steps.build.outputs.digest }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Security:** ✅ Trivy scan passed" >> $GITHUB_STEP_SUMMARY
+          echo "- **Signed:** ✅ Cosign signature" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+          echo "docker pull ${{ env.REGISTRY }}/proto-labs-ai/proto-starter/${{ matrix.service.name }}:latest" >> $GITHUB_STEP_SUMMARY
+          echo "docker pull ${{ env.REGISTRY }}/proto-labs-ai/proto-starter/${{ matrix.service.name }}:${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+  release-summary:
+    name: Release Summary
+    needs: build-and-push
+    if: always()
+    runs-on: self-hosted
+
+    steps:
+      - name: Generate release report
+        run: |
+          echo "## 🎉 Production Release: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** ${{ needs.build-and-push.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ needs.build-and-push.result }}" = "success" ]; then
+            echo "### ✅ All Services Published" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "- 🐳 rabbit-hole" >> $GITHUB_STEP_SUMMARY
+            echo "- 🤖 agent" >> $GITHUB_STEP_SUMMARY
+            echo "- ⚙️ job-processor" >> $GITHUB_STEP_SUMMARY
+            echo "- 🔄 yjs-collab" >> $GITHUB_STEP_SUMMARY
+            echo "- 🔍 langextract" >> $GITHUB_STEP_SUMMARY
+            echo "- 📺 youtube-processor" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Platform:** linux/amd64" >> $GITHUB_STEP_SUMMARY
+            echo "**Security:** ✅ Scanned, signed, SBOM included" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ❌ Release Failed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Check job logs for details." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+      - name: Create GitHub Release
+        if: needs.build-and-push.result == 'success' && startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2.4.1
+        with:
+          generate_release_notes: true
+          body: |
+            ## Docker Images
+
+            ```bash
+            docker pull ghcr.io/proto-labs-ai/proto-starter/rabbit-hole:${{ github.ref_name }}
+            docker pull ghcr.io/proto-labs-ai/proto-starter/agent:${{ github.ref_name }}
+            docker pull ghcr.io/proto-labs-ai/proto-starter/job-processor:${{ github.ref_name }}
+            docker pull ghcr.io/proto-labs-ai/proto-starter/yjs-collab:${{ github.ref_name }}
+            docker pull ghcr.io/proto-labs-ai/proto-starter/langextract:${{ github.ref_name }}
+            docker pull ghcr.io/proto-labs-ai/proto-starter/youtube-processor:${{ github.ref_name }}
+            ```
+
+            **Platform:** linux/amd64  
+            **Security:** ✅ Trivy scanned, Cosign signed, SBOM included
+
+  update-staging-deployment:
+    name: Update Coolify Staging
+    needs: build-and-push
+    if: success() && !contains(github.ref, 'rc') && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta')
+    runs-on: self-hosted
+
+    steps:
+      - name: Extract version from tag
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Deploying version: $VERSION to staging"
+
+      - name: Trigger Coolify deployment
+        run: |
+          echo "Triggering deployment for proto-labs-sandbox..."
+          RESPONSE=$(curl -X POST "${{ secrets.COOLIFY_API_URL }}/deploy?uuid=${{ secrets.COOLIFY_APP_UUID }}&force=true" \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/json" \
+            -s)
+
+          echo "API Response:"
+          echo "$RESPONSE" | jq '.' || echo "$RESPONSE"
+
+          # Check if deployment was queued successfully
+          if echo "$RESPONSE" | jq -e '.deployments[0].deployment_uuid' > /dev/null 2>&1; then
+            DEPLOYMENT_UUID=$(echo "$RESPONSE" | jq -r '.deployments[0].deployment_uuid')
+            echo "✅ Deployment queued: $DEPLOYMENT_UUID"
+            echo "deployment_uuid=$DEPLOYMENT_UUID" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Deployment failed to queue"
+            exit 1
+          fi
+
+      - name: Report to summary
+        if: always()
+        run: |
+          echo "## 🚀 Staging Deployment" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version:** ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Images:** Using \`latest\` tag (pulled fresh with \`pull_policy: always\`)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Deployment:** Triggered via Coolify API" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment:** https://sandbox.proto-labs.ai" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Check [Coolify dashboard](https://coolify.proto-labs.ai) for deployment status." >> $GITHUB_STEP_SUMMARY

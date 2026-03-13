@@ -1,0 +1,92 @@
+#!/bin/sh
+
+set -e
+
+echo "Running pre-push checks..."
+
+# Determine remote tracking branch with verbose fallback
+REMOTE_BRANCH=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || true)
+if [ -z "$REMOTE_BRANCH" ]; then
+  echo ""
+  echo "WARNING: No upstream tracking branch configured."
+  echo "Checking all local commits since last merge..."
+  REMOTE_BRANCH="origin/main"
+fi
+
+# Get changed files in push (between upstream and HEAD)
+CHANGED_FILES=$(git diff --name-only $REMOTE_BRANCH...HEAD 2>&1)
+DIFF_EXIT=$?
+
+if [ $DIFF_EXIT -ne 0 ]; then
+  echo ""
+  echo "ERROR: Failed to determine changed files."
+  echo "Details: $CHANGED_FILES"
+  echo ""
+  echo "Debugging info:"
+  echo "  Remote branch: $REMOTE_BRANCH"
+  echo "  Current branch: $(git rev-parse --abbrev-ref HEAD)"
+  echo "  Run 'git branch -vv' to check tracking configuration"
+  exit 1
+fi
+
+# Count changes
+CHANGE_COUNT=$(echo "$CHANGED_FILES" | grep -cv '^$')
+if [ "$CHANGE_COUNT" -eq 0 ]; then
+  echo "No files changed - skipping validation."
+  exit 0
+fi
+
+echo "Changed files: $CHANGE_COUNT files"
+echo "$CHANGED_FILES" | head -10
+if [ "$CHANGE_COUNT" -gt 10 ]; then
+  echo "... and $((CHANGE_COUNT - 10)) more"
+fi
+
+# Lint check
+echo ""
+echo "Running lint check..."
+LINT_OUTPUT=$(pnpm run lint:check 2>&1 || true)
+if echo "$LINT_OUTPUT" | grep -q "error"; then
+  echo ""
+  echo "LINT ERRORS FOUND:"
+  echo "$LINT_OUTPUT" >&2
+  exit 1
+fi
+
+# Detect scope of changes
+APP_CHANGED=$(echo "$CHANGED_FILES" | grep -q "^apps/" && echo "true" || echo "false")
+PACKAGES_CHANGED=$(echo "$CHANGED_FILES" | grep -q "^packages/" && echo "true" || echo "false")
+
+# Type-check app if changed
+if [ "$APP_CHANGED" = "true" ]; then
+  echo ""
+  echo "Type-checking app..."
+  if ! (cd apps/rabbit-hole && NODE_OPTIONS='--max-old-space-size=8192' pnpm exec tsc --noEmit --skipLibCheck --incremental); then
+    echo ""
+    echo "APP TYPE-CHECK FAILED"
+    exit 1
+  fi
+fi
+
+# Type-check packages if changed
+if [ "$PACKAGES_CHANGED" = "true" ]; then
+  echo ""
+  echo "Type-checking packages..."
+  TYPE_CHECK_OUTPUT=$(pnpm turbo run type-check --filter='./packages/*' --continue 2>&1)
+  TYPE_CHECK_EXIT=$?
+  
+  if [ $TYPE_CHECK_EXIT -ne 0 ]; then
+    echo ""
+    echo "PACKAGE TYPE-CHECK FAILED:"
+    echo "$TYPE_CHECK_OUTPUT" >&2
+    echo ""
+    echo "Common causes:"
+    echo "  • Missing workspace dependencies in package.json"
+    echo "  • Imports from packages not listed as dependencies"
+    echo "  • TypeScript errors in package source files"
+    exit 1
+  fi
+fi
+
+echo ""
+echo "Pre-push checks passed!"

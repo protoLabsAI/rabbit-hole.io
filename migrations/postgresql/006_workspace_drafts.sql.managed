@@ -1,0 +1,100 @@
+-- Workspace Drafts Migration
+-- Draft/Latest branching for workspace collaboration
+-- Database: rabbit_hole_app
+
+BEGIN;
+
+-- Workspace drafts metadata
+CREATE TABLE IF NOT EXISTS workspace_drafts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  workspace_id VARCHAR(255) NOT NULL,
+  clerk_org_id VARCHAR(255) NOT NULL,
+  draft_id VARCHAR(64) NOT NULL,
+
+  -- Draft metadata
+  name VARCHAR(255) NOT NULL DEFAULT 'Draft',
+  description TEXT,
+
+  -- Creator tracking
+  created_by VARCHAR(255) NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+  -- Lifecycle status
+  status VARCHAR(32) NOT NULL DEFAULT 'active',
+  -- Values: 'active' | 'merged' | 'abandoned'
+
+  -- Yjs room reference
+  yjs_room_id VARCHAR(255) NOT NULL UNIQUE,
+
+  -- Merge metadata
+  merged_at TIMESTAMPTZ,
+  merged_by VARCHAR(255),
+  merge_strategy VARCHAR(32),
+  -- Values: 'overwrite' | 'crdt'
+
+  -- Foreign key constraints
+  CONSTRAINT fk_draft_org
+    FOREIGN KEY (clerk_org_id)
+    REFERENCES organization_tenants(clerk_org_id)
+    ON DELETE CASCADE,
+
+  -- Unique draft per workspace
+  CONSTRAINT unique_workspace_draft
+    UNIQUE(workspace_id, draft_id)
+);
+
+-- Performance indexes
+CREATE INDEX IF NOT EXISTS idx_workspace_drafts_workspace 
+  ON workspace_drafts(workspace_id);
+
+CREATE INDEX IF NOT EXISTS idx_workspace_drafts_org 
+  ON workspace_drafts(clerk_org_id);
+
+CREATE INDEX IF NOT EXISTS idx_workspace_drafts_status 
+  ON workspace_drafts(status);
+
+CREATE INDEX IF NOT EXISTS idx_workspace_drafts_created_by 
+  ON workspace_drafts(created_by);
+
+CREATE INDEX IF NOT EXISTS idx_workspace_drafts_active 
+  ON workspace_drafts(workspace_id, status) 
+  WHERE status = 'active';
+
+-- Auto-update timestamp trigger
+CREATE OR REPLACE FUNCTION update_workspace_draft_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER workspace_draft_update
+  BEFORE UPDATE ON workspace_drafts
+  FOR EACH ROW
+  EXECUTE FUNCTION update_workspace_draft_timestamp();
+
+-- Cleanup merged drafts (run via cron/scheduler)
+CREATE OR REPLACE FUNCTION cleanup_merged_drafts(days_old INT DEFAULT 30)
+RETURNS INT AS $$
+DECLARE
+  deleted_count INT;
+BEGIN
+  DELETE FROM workspace_drafts
+  WHERE status = 'merged' 
+    AND merged_at < NOW() - INTERVAL '1 day' * days_old;
+
+  GET DIAGNOSTICS deleted_count = ROW_COUNT;
+  RETURN deleted_count;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Table comments
+COMMENT ON TABLE workspace_drafts IS 'Draft metadata for workspace draft/latest branching';
+COMMENT ON COLUMN workspace_drafts.yjs_room_id IS 'Format: org:{orgId}:workspace:{workspaceId}:draft-{draftId}';
+COMMENT ON COLUMN workspace_drafts.status IS 'active: editable, merged: published to latest, abandoned: discarded';
+COMMENT ON COLUMN workspace_drafts.merge_strategy IS 'overwrite: draft replaces latest, crdt: intelligent merge';
+
+COMMIT;
+

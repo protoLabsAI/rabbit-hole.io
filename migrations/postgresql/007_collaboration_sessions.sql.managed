@@ -1,0 +1,85 @@
+-- Collaboration Sessions for Live Share model
+-- Created: 2025-10-06
+-- Updated: 2025-10-09 (removed FK to users table)
+
+-- Collaboration sessions table
+CREATE TABLE IF NOT EXISTS collaboration_sessions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  owner_id TEXT NOT NULL,
+  owner_workspace_id TEXT NOT NULL,
+  room_id TEXT UNIQUE NOT NULL,
+
+  -- Lifecycle
+  created_at BIGINT NOT NULL,
+  last_activity_at BIGINT NOT NULL,
+  expires_at BIGINT NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('active', 'ended', 'merged')),
+
+  -- Visibility
+  visibility TEXT NOT NULL CHECK (visibility IN ('edit', 'view', 'hidden')),
+
+  -- State
+  has_unmerged_changes BOOLEAN DEFAULT false,
+  merged_at BIGINT
+);
+
+CREATE INDEX idx_sessions_owner ON collaboration_sessions(owner_id);
+CREATE INDEX idx_sessions_status ON collaboration_sessions(status);
+CREATE INDEX idx_sessions_expires ON collaboration_sessions(expires_at);
+CREATE INDEX idx_sessions_workspace ON collaboration_sessions(owner_workspace_id);
+
+-- Session participants
+CREATE TABLE IF NOT EXISTS session_participants (
+  session_id UUID NOT NULL REFERENCES collaboration_sessions(id) ON DELETE CASCADE,
+  user_id TEXT NOT NULL,
+  user_name TEXT,
+  role TEXT NOT NULL CHECK (role IN ('editor', 'viewer')),
+  joined_at BIGINT NOT NULL,
+  last_seen_at BIGINT NOT NULL,
+
+  PRIMARY KEY (session_id, user_id)
+);
+
+CREATE INDEX idx_participants_user ON session_participants(user_id);
+CREATE INDEX idx_participants_session ON session_participants(session_id);
+
+-- Activity tracking for auto-expire
+CREATE TABLE IF NOT EXISTS session_activity (
+  id BIGSERIAL PRIMARY KEY,
+  session_id UUID NOT NULL REFERENCES collaboration_sessions(id) ON DELETE CASCADE,
+  user_id TEXT NOT NULL,
+  activity_type TEXT NOT NULL CHECK (activity_type IN ('join', 'edit', 'view', 'leave')),
+  timestamp BIGINT NOT NULL
+);
+
+CREATE INDEX idx_activity_session_time ON session_activity(session_id, timestamp DESC);
+CREATE INDEX idx_activity_user ON session_activity(user_id);
+
+-- Function to update last_activity_at on session
+CREATE OR REPLACE FUNCTION update_session_activity()
+RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE collaboration_sessions
+  SET last_activity_at = NEW.timestamp
+  WHERE id = NEW.session_id;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger to auto-update session activity
+DROP TRIGGER IF EXISTS trigger_update_session_activity ON session_activity;
+CREATE TRIGGER trigger_update_session_activity
+  AFTER INSERT ON session_activity
+  FOR EACH ROW
+  EXECUTE FUNCTION update_session_activity();
+
+-- Function to cleanup expired sessions (call from cron)
+CREATE OR REPLACE FUNCTION cleanup_expired_sessions()
+RETURNS void AS $$
+BEGIN
+  UPDATE collaboration_sessions
+  SET status = 'ended'
+  WHERE status = 'active'
+    AND expires_at < EXTRACT(EPOCH FROM NOW()) * 1000;
+END;
+$$ LANGUAGE plpgsql;

@@ -1,0 +1,56 @@
+# Node modules (installed during build)
+node_modules
+**/node_modules
+
+# Build artifacts
+dist
+*.tsbuildinfo
+build
+
+# Testing
+coverage
+__tests__
+*.test.ts
+*.spec.ts
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files (set via container env)
+.env
+.env*.local
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+!README.md
+docs/
+
+# Development files
+.vscode
+.idea
+*.swp
+*.swo
+.DS_Store
+
+# CI/CD
+.github
+.gitlab-ci.yml
+
+# Misc
+*.pem
+.husky/
+nodemon.json
+scripts/dev-agent.sh
+
+# Test files
+test.md
+

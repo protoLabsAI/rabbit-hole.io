@@ -1,0 +1,119 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://rabbit-hole.io/schemas/llm-providers-v1.json",
+  "title": "LLM Providers Configuration",
+  "description": "Multi-provider LLM configuration with category-based model selection",
+  "type": "object",
+  "required": ["defaultProvider", "defaultCategory", "providers"],
+  "properties": {
+    "defaultProvider": {
+      "type": "string",
+      "description": "Default provider to use when none specified"
+    },
+    "defaultCategory": {
+      "type": "string",
+      "enum": ["fast", "smart", "reasoning", "vision", "long", "coding"],
+      "description": "Default model category to use"
+    },
+    "providers": {
+      "type": "object",
+      "description": "Provider configurations",
+      "additionalProperties": {
+        "$ref": "#/definitions/ProviderConfig"
+      }
+    }
+  },
+  "definitions": {
+    "ProviderConfig": {
+      "type": "object",
+      "required": ["enabled", "models", "metadata"],
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether this provider is enabled"
+        },
+        "baseURL": {
+          "type": "string",
+          "description": "Optional custom base URL for the provider API"
+        },
+        "models": {
+          "type": "object",
+          "description": "Model configurations by category",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/ModelConfig"
+            }
+          }
+        },
+        "metadata": {
+          "$ref": "#/definitions/ProviderMetadata"
+        }
+      }
+    },
+    "ModelConfig": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Model identifier (e.g., gpt-4o, claude-3-opus)"
+        },
+        "temperature": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 2,
+          "description": "Model temperature setting"
+        },
+        "maxTokens": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum tokens for model output"
+        },
+        "topP": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Top-p sampling parameter"
+        },
+        "frequencyPenalty": {
+          "type": "number",
+          "minimum": -2,
+          "maximum": 2,
+          "description": "Frequency penalty parameter"
+        },
+        "presencePenalty": {
+          "type": "number",
+          "minimum": -2,
+          "maximum": 2,
+          "description": "Presence penalty parameter"
+        }
+      }
+    },
+    "ProviderMetadata": {
+      "type": "object",
+      "required": ["priority"],
+      "properties": {
+        "priority": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Provider priority (lower = higher priority)"
+        },
+        "timeout": {
+          "type": "integer",
+          "minimum": 1000,
+          "description": "Request timeout in milliseconds"
+        },
+        "maxRetries": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Maximum number of retry attempts"
+        },
+        "region": {
+          "type": "string",
+          "description": "AWS region (for Bedrock provider)"
+        }
+      }
+    }
+  }
+}

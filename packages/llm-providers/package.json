@@ -1,0 +1,59 @@
+{
+  "name": "@proto/llm-providers",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Multi-provider LLM configuration system with category-based model selection",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./dist/client/index.d.ts",
+      "import": "./dist/client/index.js",
+      "default": "./dist/client/index.js"
+    },
+    "./server": {
+      "types": "./dist/server/index.d.ts",
+      "import": "./dist/server/index.js",
+      "default": "./dist/server/index.js"
+    },
+    "./testing": {
+      "types": "./dist/testing/index.d.ts",
+      "import": "./dist/testing/index.js",
+      "default": "./dist/testing/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "config"
+  ],
+  "scripts": {
+    "codegen": "tsx scripts/generate-config-types.ts",
+    "prebuild": "pnpm run codegen",
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "type-check": "tsc --noEmit",
+    "validate-models": "tsx scripts/validate-models.ts"
+  },
+  "dependencies": {
+    "@langchain/anthropic": "^1.0.0",
+    "@langchain/community": "^1.0.0",
+    "@langchain/core": "^1.0.1",
+    "@langchain/google-genai": "^1.0.0",
+    "@langchain/groq": "^1.0.0",
+    "@langchain/ollama": "^0.1.0",
+    "@langchain/openai": "^1.0.0",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.3",
+    "tsup": "^8.0.1",
+    "tsx": "^4.20.5",
+    "typescript": "^5.5.4"
+  },
+  "type": "module"
+}

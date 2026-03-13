@@ -1,0 +1,15 @@
+{
+  "name": "bad_color",
+  "displayName": "Bad Color",
+  "description": "Domain with invalid hex color",
+  "entities": {
+    "TestEntity": {
+      "uidPrefix": "test"
+    }
+  },
+  "ui": {
+    "color": "#ZZZZZZ",
+    "icon": "🎨"
+  }
+}
+

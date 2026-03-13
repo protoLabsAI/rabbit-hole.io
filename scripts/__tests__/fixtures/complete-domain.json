@@ -1,0 +1,98 @@
+{
+  "$schema": "https://rabbit-hole.io/schemas/domain-v1.json",
+  "name": "complete_test",
+  "displayName": "Complete Test Domain",
+  "description": "Domain with all optional fields",
+  "version": "2.1.0",
+  "extendsFrom": "technology",
+  "author": "Test Suite",
+  "tags": ["testing", "example", "complete"],
+  "entities": {
+    "Product": {
+      "uidPrefix": "product",
+      "displayName": "Product",
+      "properties": {
+        "name": {
+          "type": "string",
+          "required": true,
+          "minLength": 1,
+          "maxLength": 200,
+          "description": "Product name"
+        },
+        "price": {
+          "type": "number",
+          "required": true,
+          "min": 0,
+          "description": "Product price"
+        },
+        "sku": {
+          "type": "string",
+          "required": false,
+          "pattern": "^[A-Z]{3}-\\d{4}$",
+          "description": "Stock keeping unit"
+        },
+        "in_stock": {
+          "type": "boolean",
+          "required": false,
+          "description": "Is product in stock"
+        },
+        "category": {
+          "type": "enum",
+          "required": false,
+          "values": ["electronics", "clothing", "food", "other"],
+          "description": "Product category"
+        },
+        "tags": {
+          "type": "array",
+          "required": false,
+          "items": "string",
+          "description": "Product tags"
+        },
+        "specifications": {
+          "type": "object",
+          "required": false,
+          "valueType": "any",
+          "description": "Technical specifications"
+        },
+        "launch_date": {
+          "type": "date",
+          "required": false,
+          "format": "YYYY-MM-DD",
+          "description": "Product launch date"
+        }
+      }
+    },
+    "Review": {
+      "uidPrefix": "review",
+      "displayName": "Product Review",
+      "properties": {
+        "rating": {
+          "type": "number",
+          "required": true,
+          "integer": true,
+          "min": 1,
+          "max": 5,
+          "description": "Review rating"
+        },
+        "verified": {
+          "type": "boolean",
+          "required": false,
+          "description": "Verified purchase"
+        }
+      }
+    }
+  },
+  "ui": {
+    "color": "#3B82F6",
+    "icon": "🛒",
+    "entityIcons": {
+      "Product": "📦",
+      "Review": "⭐"
+    },
+    "entityColors": {
+      "Product": "#10B981",
+      "Review": "#F59E0B"
+    }
+  },
+  "relationships": ["REVIEWED_BY", "BELONGS_TO_CATEGORY", "RELATED_PRODUCT"]
+}

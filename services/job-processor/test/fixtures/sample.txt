@@ -1,0 +1,4 @@
+Hello World
+This is a sample text file used for testing.
+It contains three lines of plain text content.
+Words: Hello World sample text file testing contains three lines plain content

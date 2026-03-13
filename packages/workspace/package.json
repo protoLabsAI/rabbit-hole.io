@@ -1,0 +1,42 @@
+{
+  "name": "@proto/workspace",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Multi-tab collaborative workspace framework with Yjs persistence",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "type-check": "tsc --noEmit",
+    "test": "vitest",
+    "clean": "rm -rf dist .turbo node_modules"
+  },
+  "dependencies": {
+    "@proto/icon-system": "workspace:*"
+  },
+  "peerDependencies": {
+    "@clerk/nextjs": "^6.x",
+    "@hocuspocus/provider": "^3.x",
+    "react": "^18.0.0 || ^19.0.0",
+    "yjs": "^13.6.x"
+  },
+  "devDependencies": {
+    "@proto/config-typescript": "workspace:*",
+    "@types/react": "^19.0.0",
+    "tsup": "^8.0.1",
+    "typescript": "^5.6.3",
+    "vitest": "^3.2.4"
+  }
+}

@@ -1,0 +1,53 @@
+import { defineConfig } from "tsup";
+
+export default defineConfig({
+  entry: {
+    index: "src/index.ts",
+    "atoms/index": "src/atoms/index.ts",
+    "molecules/index": "src/molecules/index.ts",
+    "organisms/index": "src/organisms/index.ts",
+    "organisms/data-table/index": "src/organisms/data-table/index.ts",
+    "templates/index": "src/templates/index.ts",
+    "theme/index": "src/theme/index.ts",
+    "hooks/index": "src/hooks/index.ts",
+    "lib/index": "src/lib/index.ts",
+  },
+  format: ["esm"],
+  dts: {
+    compilerOptions: {
+      composite: false,
+      incremental: false,
+      lib: ["ES2020", "DOM", "DOM.Iterable"],
+      moduleResolution: "bundler",
+      module: "esnext",
+      skipLibCheck: true,
+    },
+  },
+  clean: true,
+  splitting: false,
+  sourcemap: true,
+  minify: false,
+  external: [
+    "react",
+    "react-dom",
+    "@tanstack/react-query",
+    "nuqs",
+    "@radix-ui/*",
+    "class-variance-authority",
+    "clsx",
+    "tailwind-merge",
+    "react-resizable-panels",
+    "lucide-react",
+    "zod",
+    "@proto/auth",
+    "@proto/utils",
+    "@proto/types",
+    "shiki",
+    "@shikijs/transformers",
+  ],
+  banner: {
+    js: "/* @proto/ui - Shared UI components, hooks, and utilities */",
+  },
+  outDir: "dist",
+  target: "es2020",
+});

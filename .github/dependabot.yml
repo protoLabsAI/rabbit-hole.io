@@ -1,0 +1,250 @@
+# Dependabot Configuration - 2025 Best Practices
+# Optimized for pnpm monorepo with Python services and Docker
+
+version: 2
+
+# Enable grouped updates to reduce PR noise
+enable-beta-ecosystems: true
+
+updates:
+  # ==================== NPM/PNPM ====================
+
+  # Root workspace
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    groups:
+      # Group all non-major updates together
+      production-dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Separate group for dev dependencies
+      development-dependencies:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+    # Allow all updates (remove tinacms restriction)
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "npm"
+      - "root"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+
+  # Agent directory (separate npm project)
+  - package-ecosystem: "npm"
+    directory: "/agent"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    groups:
+      agent-dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "npm"
+      - "agent"
+    commit-message:
+      prefix: "chore(deps-agent)"
+
+  # YJS Collaboration Service
+  - package-ecosystem: "npm"
+    directory: "/services/yjs-collaboration-server"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "09:00"
+    groups:
+      yjs-service-dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "npm"
+      - "services"
+      - "yjs"
+    commit-message:
+      prefix: "chore(deps-yjs)"
+
+  # ==================== PYTHON ====================
+
+  # LangExtract Service
+  - package-ecosystem: "pip"
+    directory: "/services/langextract-service"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+      time: "09:00"
+    groups:
+      python-langextract:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "python"
+      - "services"
+      - "langextract"
+    commit-message:
+      prefix: "chore(deps-langextract)"
+
+  # YouTube Processor Service
+  - package-ecosystem: "pip"
+    directory: "/services/youtube-processor-service"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+      time: "09:00"
+    groups:
+      python-youtube:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "python"
+      - "services"
+      - "youtube"
+    commit-message:
+      prefix: "chore(deps-youtube)"
+
+  # ==================== DOCKER ====================
+
+  # Main Docker Compose files
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "thursday"
+      time: "09:00"
+    groups:
+      docker-images:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "docker"
+    commit-message:
+      prefix: "chore(deps-docker)"
+
+  # Agent Dockerfiles
+  - package-ecosystem: "docker"
+    directory: "/agent"
+    schedule:
+      interval: "weekly"
+      day: "thursday"
+      time: "09:00"
+    groups:
+      docker-agent:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 2
+    labels:
+      - "dependencies"
+      - "docker"
+      - "agent"
+    commit-message:
+      prefix: "chore(deps-docker-agent)"
+
+  # LangExtract Service Docker
+  - package-ecosystem: "docker"
+    directory: "/services/langextract-service"
+    schedule:
+      interval: "weekly"
+      day: "thursday"
+      time: "09:00"
+    groups:
+      docker-langextract:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 2
+    labels:
+      - "dependencies"
+      - "docker"
+      - "services"
+    commit-message:
+      prefix: "chore(deps-docker-langextract)"
+
+  # YouTube Processor Service Docker
+  - package-ecosystem: "docker"
+    directory: "/services/youtube-processor-service"
+    schedule:
+      interval: "weekly"
+      day: "thursday"
+      time: "09:00"
+    groups:
+      docker-youtube:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 2
+    labels:
+      - "dependencies"
+      - "docker"
+      - "services"
+    commit-message:
+      prefix: "chore(deps-docker-youtube)"
+
+  # YJS Service Docker
+  - package-ecosystem: "docker"
+    directory: "/services/yjs-collaboration-server"
+    schedule:
+      interval: "weekly"
+      day: "thursday"
+      time: "09:00"
+    groups:
+      docker-yjs:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 2
+    labels:
+      - "dependencies"
+      - "docker"
+      - "yjs"
+    commit-message:
+      prefix: "chore(deps-docker-yjs)"
+
+  # ==================== GITHUB ACTIONS ====================
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      day: "monday"
+      time: "09:00"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "github-actions"
+      - "ci"
+    commit-message:
+      prefix: "chore(deps-ci)"

@@ -1,0 +1,427 @@
+{
+  "$schema": "../schema.json",
+  "name": "langchain",
+  "displayName": "LangChain/LangGraph",
+  "description": "LangChain agent systems, graphs, tools, and execution components",
+  "version": "1.0.0",
+  "tags": ["ai", "agents", "langchain", "langgraph", "ml"],
+  "entities": {
+    "Agent": {
+      "uidPrefix": "agent",
+      "displayName": "Agent",
+      "properties": {
+        "agent_type": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "coordinator",
+            "subagent",
+            "standalone",
+            "react",
+            "function_calling"
+          ],
+          "description": "Type of agent architecture"
+        },
+        "category": {
+          "type": "enum",
+          "required": false,
+          "values": ["research", "data-processing", "analysis", "generation"],
+          "description": "Agent functional category"
+        },
+        "version": {
+          "type": "string",
+          "required": false,
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "Agent version (semantic)"
+        },
+        "prompt_template": {
+          "type": "string",
+          "required": false,
+          "description": "System prompt or template"
+        },
+        "max_tokens": {
+          "type": "number",
+          "required": false,
+          "integer": true,
+          "min": 100,
+          "max": 200000,
+          "description": "Maximum token limit"
+        },
+        "temperature": {
+          "type": "number",
+          "required": false,
+          "min": 0,
+          "max": 2,
+          "description": "Model temperature setting"
+        },
+        "recursion_limit": {
+          "type": "number",
+          "required": false,
+          "integer": true,
+          "min": 1,
+          "max": 1000,
+          "description": "Maximum recursion depth"
+        },
+        "config_path": {
+          "type": "string",
+          "required": false,
+          "description": "Path to config file (for JSON-configured agents)"
+        }
+      }
+    },
+    "Graph": {
+      "uidPrefix": "graph",
+      "displayName": "StateGraph",
+      "properties": {
+        "graph_type": {
+          "type": "enum",
+          "required": false,
+          "values": ["state_graph", "message_graph", "workflow"],
+          "description": "Type of graph structure"
+        },
+        "compiled": {
+          "type": "boolean",
+          "required": false,
+          "description": "Whether graph is compiled"
+        },
+        "node_count": {
+          "type": "number",
+          "required": false,
+          "integer": true,
+          "min": 0,
+          "description": "Number of nodes in graph"
+        },
+        "edge_count": {
+          "type": "number",
+          "required": false,
+          "integer": true,
+          "min": 0,
+          "description": "Number of edges in graph"
+        }
+      }
+    },
+    "Node": {
+      "uidPrefix": "node",
+      "displayName": "Graph Node",
+      "properties": {
+        "node_type": {
+          "type": "enum",
+          "required": false,
+          "values": ["agent", "tool", "function", "router", "start", "end"],
+          "description": "Type of node"
+        },
+        "is_entry_point": {
+          "type": "boolean",
+          "required": false,
+          "description": "Whether this is graph entry point"
+        },
+        "is_terminal": {
+          "type": "boolean",
+          "required": false,
+          "description": "Whether this is terminal node"
+        }
+      }
+    },
+    "Tool": {
+      "uidPrefix": "tool",
+      "displayName": "LangChain Tool",
+      "properties": {
+        "tool_type": {
+          "type": "enum",
+          "required": false,
+          "values": ["builtin", "custom", "task", "retrieval", "api"],
+          "description": "Tool category"
+        },
+        "is_async": {
+          "type": "boolean",
+          "required": false,
+          "description": "Whether tool is asynchronous"
+        },
+        "requires_approval": {
+          "type": "boolean",
+          "required": false,
+          "description": "Whether tool requires human approval"
+        },
+        "schema_definition": {
+          "type": "string",
+          "required": false,
+          "description": "Zod schema definition"
+        }
+      }
+    },
+    "State": {
+      "uidPrefix": "state",
+      "displayName": "Agent State",
+      "properties": {
+        "state_type": {
+          "type": "enum",
+          "required": false,
+          "values": ["annotation", "messages", "custom"],
+          "description": "State definition type"
+        },
+        "field_count": {
+          "type": "number",
+          "required": false,
+          "integer": true,
+          "min": 0,
+          "description": "Number of state fields"
+        },
+        "has_reducers": {
+          "type": "boolean",
+          "required": false,
+          "description": "Whether state uses custom reducers"
+        }
+      }
+    },
+    "Model": {
+      "uidPrefix": "model",
+      "displayName": "LLM Model",
+      "properties": {
+        "provider": {
+          "type": "enum",
+          "required": false,
+          "values": ["openai", "anthropic", "groq", "google", "ollama"],
+          "description": "LLM provider"
+        },
+        "model_name": {
+          "type": "string",
+          "required": false,
+          "description": "Specific model identifier"
+        },
+        "supports_streaming": {
+          "type": "boolean",
+          "required": false,
+          "description": "Whether model supports streaming"
+        },
+        "supports_tools": {
+          "type": "boolean",
+          "required": false,
+          "description": "Whether model supports function calling"
+        },
+        "context_window": {
+          "type": "number",
+          "required": false,
+          "integer": true,
+          "min": 1000,
+          "max": 2000000,
+          "description": "Maximum context window size"
+        }
+      }
+    },
+    "StateField": {
+      "uidPrefix": "state_field",
+      "displayName": "State Field",
+      "properties": {
+        "field_type": {
+          "type": "enum",
+          "required": false,
+          "values": ["string", "number", "array", "object", "messages"],
+          "description": "Field data type"
+        },
+        "reducer_type": {
+          "type": "enum",
+          "required": false,
+          "values": ["merge", "replace", "append", "custom"],
+          "description": "State reducer strategy"
+        },
+        "has_default": {
+          "type": "boolean",
+          "required": false,
+          "description": "Whether field has default value"
+        }
+      }
+    },
+    "Checkpointer": {
+      "uidPrefix": "checkpointer",
+      "displayName": "State Checkpointer",
+      "properties": {
+        "checkpointer_type": {
+          "type": "enum",
+          "required": false,
+          "values": ["memory", "postgres", "sqlite", "custom"],
+          "description": "Persistence mechanism"
+        },
+        "supports_branching": {
+          "type": "boolean",
+          "required": false,
+          "description": "Whether supports state branching"
+        }
+      }
+    }
+  },
+  "enrichmentExamples": {
+    "Agent": {
+      "input_text": "The Deep Agent Researcher is a coordinator agent for entity research with version 1.0.0. It orchestrates research workflows by delegating specialized tasks to subagents. The agent uses a maximum of 4096 tokens with a temperature of 0.7 and has a recursion limit of 25.",
+      "expected_output": {
+        "agent_type": "coordinator",
+        "category": "research",
+        "version": "1.0.0",
+        "max_tokens": 4096,
+        "temperature": 0.7,
+        "recursion_limit": 25
+      }
+    },
+    "Graph": {
+      "input_text": "The Deep Agent Graph is a compiled state graph with 8 nodes and 14 edges. It implements a multi-agent subgraph pattern and is used in production.",
+      "expected_output": {
+        "graph_type": "state_graph",
+        "compiled": true,
+        "node_count": 8,
+        "edge_count": 14
+      }
+    },
+    "Node": {
+      "input_text": "The Coordinator Node is an agent-type node that serves as the entry point for the graph. It is not a terminal node and handles delegation tasks.",
+      "expected_output": {
+        "node_type": "agent",
+        "is_entry_point": true,
+        "is_terminal": false
+      }
+    },
+    "Tool": {
+      "input_text": "The Wikipedia Fetch Tool is a retrieval tool that fetches data from Wikipedia. It is asynchronous, does not require approval, and uses a schema with a query string parameter.",
+      "expected_output": {
+        "tool_type": "retrieval",
+        "is_async": true,
+        "requires_approval": false
+      }
+    },
+    "State": {
+      "input_text": "The DeepAgentState is an annotation-based state definition with 15 fields. It uses custom reducers and supports streaming for CopilotKit integration.",
+      "expected_output": {
+        "state_type": "annotation",
+        "field_count": 15,
+        "has_reducers": true
+      }
+    },
+    "Model": {
+      "input_text": "Claude 3.5 Sonnet is an LLM from Anthropic with model identifier claude-3-5-sonnet-20241022. It supports streaming and function calling with a context window of 200,000 tokens.",
+      "expected_output": {
+        "provider": "anthropic",
+        "model_name": "claude-3-5-sonnet-20241022",
+        "supports_streaming": true,
+        "supports_tools": true,
+        "context_window": 200000
+      }
+    },
+    "StateField": {
+      "input_text": "The messages field is an array-type state field that uses an append reducer strategy. It has a default value of an empty array.",
+      "expected_output": {
+        "field_type": "array",
+        "reducer_type": "append",
+        "has_default": true
+      }
+    },
+    "Checkpointer": {
+      "input_text": "The Memory Saver Checkpointer is an in-memory persistence mechanism used for development. It does not support state branching.",
+      "expected_output": {
+        "checkpointer_type": "memory",
+        "supports_branching": false
+      }
+    }
+  },
+
+  "relationshipExample": {
+    "input_text": "The Deep Agent Researcher is a coordinator agent with version 1.0.0 that has a compiled state graph containing 8 nodes and 14 edges. The graph has an entry point Coordinator Node that uses the Wikipedia Fetch Tool for research retrieval and delegates to Research Subagent through connected nodes. The system uses Claude 3.5 Sonnet LLM model with a context window of 200,000 tokens. The agent state uses an annotation-based definition with 15 fields and custom reducers. The agent delegates to subagents through message passing on the graph edges. The Memory Saver Checkpointer persists state in memory and does not support branching. The Research Subagent uses the Google Search Tool and extends the coordinator state.",
+    "expected_output": {
+      "relationships": [
+        {
+          "source_entity": "Deep Agent Researcher",
+          "target_entity": "Deep Agent Graph",
+          "relationship_type": "HAS_GRAPH",
+          "confidence": 0.97
+        },
+        {
+          "source_entity": "Deep Agent Graph",
+          "target_entity": "Coordinator Node",
+          "relationship_type": "CONTAINS_NODE",
+          "confidence": 0.98
+        },
+        {
+          "source_entity": "Coordinator Node",
+          "target_entity": "Wikipedia Fetch Tool",
+          "relationship_type": "USES_TOOL",
+          "confidence": 0.96
+        },
+        {
+          "source_entity": "Coordinator Node",
+          "target_entity": "Research Subagent",
+          "relationship_type": "CONNECTED_TO",
+          "confidence": 0.94
+        },
+        {
+          "source_entity": "Deep Agent Researcher",
+          "target_entity": "Claude 3.5 Sonnet",
+          "relationship_type": "USES_MODEL",
+          "confidence": 0.97
+        },
+        {
+          "source_entity": "Deep Agent Researcher",
+          "target_entity": "DeepAgentState",
+          "relationship_type": "HAS_STATE",
+          "confidence": 0.96
+        },
+        {
+          "source_entity": "Coordinator Node",
+          "target_entity": "Research Subagent",
+          "relationship_type": "DELEGATES_TO",
+          "confidence": 0.95
+        },
+        {
+          "source_entity": "DeepAgentState",
+          "target_entity": "messages field",
+          "relationship_type": "HAS_FIELD",
+          "confidence": 0.93
+        },
+        {
+          "source_entity": "Deep Agent Researcher",
+          "target_entity": "Memory Saver Checkpointer",
+          "relationship_type": "USES_CHECKPOINTER",
+          "confidence": 0.94
+        },
+        {
+          "source_entity": "Research Subagent",
+          "target_entity": "DeepAgentState",
+          "relationship_type": "EXTENDS_STATE",
+          "confidence": 0.91
+        },
+        {
+          "source_entity": "Research Subagent",
+          "target_entity": "Google Search Tool",
+          "relationship_type": "USES_TOOL",
+          "confidence": 0.95
+        }
+      ]
+    }
+  },
+
+  "ui": {
+    "color": "#10B981",
+    "icon": "🦜",
+    "entityIcons": {
+      "Agent": "🤖",
+      "Graph": "🕸️",
+      "Node": "⚙️",
+      "Tool": "🔧",
+      "State": "📊",
+      "Model": "🧠",
+      "StateField": "📝",
+      "Checkpointer": "💾"
+    }
+  },
+  "relationships": [
+    "HAS_GRAPH",
+    "CONTAINS_NODE",
+    "CONNECTED_TO",
+    "USES_TOOL",
+    "USES_MODEL",
+    "HAS_STATE",
+    "DELEGATES_TO",
+    "HAS_FIELD",
+    "USES_CHECKPOINTER",
+    "EXTENDS_STATE",
+    "WRAPS_SUBGRAPH"
+  ],
+  "author": "Proto Labs",
+  "extendsFrom": "technology"
+}

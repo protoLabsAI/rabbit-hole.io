@@ -1,0 +1,33 @@
+# Fast Dockerfile for rabbit-hole
+# Assumes you've already built locally: pnpm run build
+
+FROM node:20-alpine AS production
+
+RUN apk add --no-cache curl
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_OPTIONS="--enable-source-maps"
+
+# Copy pre-built standalone output (build locally first!)
+COPY apps/rabbit-hole/.next/standalone ./
+COPY apps/rabbit-hole/.next/static ./apps/rabbit-hole/.next/static
+COPY apps/rabbit-hole/public ./apps/rabbit-hole/public
+
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs && \
+    chown -R nextjs:nodejs /app
+
+USER nextjs
+
+EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:3000/api/health || exit 1
+
+CMD ["node", "apps/rabbit-hole/server.js"]
+

@@ -1,0 +1,14 @@
+{
+  "name": "minimal_test",
+  "displayName": "Minimal Test",
+  "description": "Minimal valid domain configuration",
+  "entities": {
+    "MinimalEntity": {
+      "uidPrefix": "minimal"
+    }
+  },
+  "ui": {
+    "color": "#000000",
+    "icon": "📦"
+  }
+}

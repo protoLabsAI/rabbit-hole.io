@@ -1,0 +1,16 @@
+{
+  "name": "circular_a",
+  "displayName": "Circular A",
+  "description": "Domain with circular dependency",
+  "extendsFrom": "circular_b",
+  "entities": {
+    "TestEntity": {
+      "uidPrefix": "test"
+    }
+  },
+  "ui": {
+    "color": "#FF0000",
+    "icon": "🔄"
+  }
+}
+

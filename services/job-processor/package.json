@@ -1,0 +1,31 @@
+{
+  "name": "@services/job-processor",
+  "version": "0.1.6",
+  "private": true,
+  "type": "module",
+  "description": "Background job processor for YouTube, transcription, and file processing",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/server.ts",
+    "start": "node dist/server.js",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@proto/database": "workspace:*",
+    "@proto/sidequest-utils": "workspace:*",
+    "@proto/types": "workspace:*",
+    "@proto/utils": "workspace:*",
+    "@sidequest/postgres-backend": "1.7.1",
+    "busboy": "^1.6.0",
+    "mammoth": "^1.11.0",
+    "sidequest": "1.7.1",
+    "unpdf": "^1.4.0"
+  },
+  "devDependencies": {
+    "@types/busboy": "^1.5.4",
+    "@types/node": "^22.16.5",
+    "tsx": "^4.20.5",
+    "typescript": "^5.5.4"
+  }
+}

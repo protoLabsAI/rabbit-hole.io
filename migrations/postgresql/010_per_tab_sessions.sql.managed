@@ -1,0 +1,32 @@
+-- Per-Tab Collaboration Sessions Migration
+-- Enables tab-specific collaboration with ephemeral Guest access
+
+-- Add tab_id to collaboration_sessions
+ALTER TABLE collaboration_sessions
+  ADD COLUMN IF NOT EXISTS tab_id TEXT;
+
+CREATE INDEX IF NOT EXISTS idx_sessions_tab ON collaboration_sessions(tab_id);
+
+COMMENT ON COLUMN collaboration_sessions.tab_id IS 'Specific tab for per-tab collaboration (null = workspace-level)';
+
+-- Session invitations table
+CREATE TABLE IF NOT EXISTS session_invitations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  session_id UUID NOT NULL REFERENCES collaboration_sessions(id) ON DELETE CASCADE,
+  inviter_id TEXT NOT NULL,
+  invitee_id TEXT,
+  invitee_email TEXT,
+  role TEXT NOT NULL CHECK (role IN ('editor', 'viewer')),
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'revoked')),
+  created_at BIGINT NOT NULL,
+  expires_at BIGINT NOT NULL,
+  
+  UNIQUE(session_id, invitee_id)
+);
+
+CREATE INDEX idx_invitations_session ON session_invitations(session_id);
+CREATE INDEX idx_invitations_invitee ON session_invitations(invitee_id);
+CREATE INDEX idx_invitations_status ON session_invitations(status) WHERE status = 'pending';
+
+COMMENT ON TABLE session_invitations IS 'Invitation tracking for collaboration sessions';
+

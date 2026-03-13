@@ -1,0 +1,66 @@
+-- Share Tokens Table Migration
+-- For revokable timeline share links system
+-- Database: rabbit_hole_app (separate from sidequest)
+-- Note: This will be executed in rabbit_hole_app database context
+
+BEGIN;
+
+-- Create share_tokens table for managing public share links
+CREATE TABLE IF NOT EXISTS share_tokens (
+  token UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_by VARCHAR(255) NOT NULL, -- user_id from auth
+  entity_uid VARCHAR(255) NOT NULL, -- what we're sharing
+  share_type VARCHAR(50) NOT NULL DEFAULT 'timeline', -- 'timeline' | 'graph' | 'entity'
+  parameters JSONB NOT NULL, -- time window, filters, etc.
+  expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  revoked_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,
+  view_count INTEGER DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  cache_duration INTEGER DEFAULT 604800, -- seconds, 1 week default
+  title VARCHAR(255), -- custom title for social sharing
+  description TEXT -- custom description for social sharing
+);
+
+-- Performance indexes
+CREATE INDEX IF NOT EXISTS idx_share_tokens_token ON share_tokens(token);
+CREATE INDEX IF NOT EXISTS idx_share_tokens_created_by ON share_tokens(created_by);
+CREATE INDEX IF NOT EXISTS idx_share_tokens_expires_at ON share_tokens(expires_at);
+CREATE INDEX IF NOT EXISTS idx_share_tokens_entity_uid ON share_tokens(entity_uid);
+-- Note: Partial index for active tokens would require IMMUTABLE functions
+-- CREATE INDEX IF NOT EXISTS idx_share_tokens_active ON share_tokens(token) WHERE revoked_at IS NULL AND expires_at > NOW();
+
+-- Add constraints
+ALTER TABLE share_tokens 
+ADD CONSTRAINT check_share_type CHECK (share_type IN ('timeline', 'graph', 'entity'));
+
+ALTER TABLE share_tokens 
+ADD CONSTRAINT check_expires_future CHECK (expires_at > created_at);
+
+ALTER TABLE share_tokens 
+ADD CONSTRAINT check_cache_duration_positive CHECK (cache_duration > 0);
+
+-- Add comment for documentation
+COMMENT ON TABLE share_tokens IS 'Secure tokens for sharing timeline visualizations with configurable expiration';
+COMMENT ON COLUMN share_tokens.token IS 'UUID token used in public share URLs';
+COMMENT ON COLUMN share_tokens.parameters IS 'JSON configuration for timeline rendering (time window, filters, etc.)';
+COMMENT ON COLUMN share_tokens.cache_duration IS 'CDN cache duration in seconds';
+
+-- Create cleanup function for expired tokens
+CREATE OR REPLACE FUNCTION cleanup_expired_share_tokens()
+RETURNS INTEGER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    deleted_count INTEGER;
+BEGIN
+    DELETE FROM share_tokens 
+    WHERE expires_at < NOW() OR revoked_at IS NOT NULL AND revoked_at < NOW() - INTERVAL '30 days';
+    
+    GET DIAGNOSTICS deleted_count = ROW_COUNT;
+    RETURN deleted_count;
+END;
+$$;
+
+COMMENT ON FUNCTION cleanup_expired_share_tokens() IS 'Cleanup function to remove expired and old revoked tokens';
+
+COMMIT;

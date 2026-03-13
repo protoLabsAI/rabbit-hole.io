@@ -1,0 +1,62 @@
+-- Device Tracking Migration
+-- Enables multi-device sync with tier-based limits
+
+-- User Devices Table
+CREATE TABLE IF NOT EXISTS user_devices (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id TEXT NOT NULL,
+  
+  -- Device identification
+  device_id TEXT NOT NULL,
+  device_name TEXT NOT NULL,
+  device_type TEXT NOT NULL DEFAULT 'web',
+  
+  -- Session tracking
+  last_seen_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  last_ip TEXT,
+  last_user_agent TEXT,
+  
+  -- Metadata
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  
+  -- Constraints
+  UNIQUE(user_id, device_id),
+  CHECK (device_type IN ('web', 'mobile', 'desktop'))
+);
+
+CREATE INDEX idx_user_devices_user 
+  ON user_devices(user_id, last_seen_at DESC);
+
+CREATE INDEX idx_user_devices_cleanup 
+  ON user_devices(last_seen_at);
+
+COMMENT ON TABLE user_devices IS 'Tracks user devices for multi-device sync limits';
+
+-- Active Sessions Table
+CREATE TABLE IF NOT EXISTS user_sessions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id TEXT NOT NULL,
+  device_id UUID REFERENCES user_devices(id) ON DELETE CASCADE,
+  
+  -- Session details
+  workspace_id TEXT,
+  connection_id TEXT NOT NULL,
+  
+  -- Status
+  connected_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  last_heartbeat_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  disconnected_at TIMESTAMP,
+  
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_user_sessions_active 
+  ON user_sessions(user_id, workspace_id, disconnected_at) 
+  WHERE disconnected_at IS NULL;
+
+CREATE INDEX idx_user_sessions_cleanup 
+  ON user_sessions(disconnected_at);
+
+COMMENT ON TABLE user_sessions IS 'Active WebSocket sessions for concurrent connection tracking';
+

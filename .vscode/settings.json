@@ -1,0 +1,49 @@
+{
+  // Docker Settings
+  "docker.languageserver.formatter.ignoreMultilineInstructions": true,
+
+  // Hadolint Integration
+  "hadolint.hadolintPath": "hadolint",
+  "hadolint.cliOptions": ["--config", "${workspaceFolder}/.hadolint.yaml"],
+
+  // YAML for docker-compose
+  "yaml.schemas": {
+    "https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": [
+      "docker-compose*.yml",
+      "docker-compose*.yaml"
+    ]
+  },
+  "yaml.customTags": ["!reference sequence"],
+
+  // File Associations
+  "files.associations": {
+    "Dockerfile*": "dockerfile",
+    "docker-compose*.yml": "dockercompose",
+    "docker-compose*.yaml": "dockercompose",
+    ".hadolint.yaml": "yaml",
+    ".yamllint.yaml": "yaml"
+  },
+
+  // Editor
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+
+  // Files to exclude from search
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/.next": true,
+    "**/.turbo": true,
+    "**/coverage": true
+  },
+
+  // Files to watch
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "**/.next/**": true,
+    "**/.turbo/**": true
+  }
+}

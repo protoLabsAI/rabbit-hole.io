@@ -1,0 +1,17 @@
+{
+  "$schema": "../schema.json",
+  "name": "{{DOMAIN_NAME}}",
+  "displayName": "{{DOMAIN_DISPLAY_NAME}}",
+  "description": "{{DOMAIN_DESCRIPTION}}",
+  "version": "1.0.0",
+  "entities": {
+    "{{ENTITY_NAME}}": {
+      "uidPrefix": "{{ENTITY_PREFIX}}",
+      "displayName": "{{ENTITY_DISPLAY_NAME}}"
+    }
+  },
+  "ui": {
+    "color": "{{DOMAIN_COLOR}}",
+    "icon": "{{DOMAIN_ICON}}"
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "extends": "../../packages/config-typescript/nextjs.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "jsx": "preserve",
+    "paths": {
+      "@/*": ["./app/*"],
+      "@proto/types": ["../../packages/types/src"],
+      "@proto/database": ["../../packages/database/src"],
+      "@proto/auth": ["../../packages/auth/src"],
+      "@proto/auth/client": ["../../packages/auth/src/client"],
+      "@proto/assets": ["../../packages/assets/src"],
+      "@proto/collab": ["../../packages/collab/src"],
+      "@proto/collab/client": ["../../packages/collab/src/client"],
+      "@proto/collab/server": ["../../packages/collab/src/server"],
+      "@proto/utils": ["../../packages/utils/src"],
+      "@proto/utils/atlas": ["../../packages/utils/src/atlas"],
+      "@proto/utils/file-processing": [
+        "../../packages/utils/src/file-processing"
+      ],
+      "@proto/utils/tenancy-edge": ["../../packages/utils/src/tenancy-edge"],
+      "@proto/utils/tenancy-server": [
+        "../../packages/utils/src/tenancy-server"
+      ],
+      "@proto/api-utils": ["../../packages/api-utils/src"],
+      "@proto/logger": ["../../packages/logger/src"],
+      "@proto/sidequest-utils": ["../../packages/sidequest-utils/src"],
+      "@proto/sidequest-utils/client": [
+        "../../packages/sidequest-utils/src/client"
+      ],
+      "@proto/sidequest-utils/server": [
+        "../../packages/sidequest-utils/src/server"
+      ],
+      "@proto/icon-system": ["../../packages/icon-system/src"],
+      "@proto/prompts": ["../../packages/prompts/src"],
+      "@proto/llm-providers": ["../../packages/llm-providers/src"],
+      "@proto/ui": ["../../packages/ui/src"],
+      "@proto/ui/atoms": ["../../packages/ui/src/atoms"],
+      "@proto/ui/molecules": ["../../packages/ui/src/molecules"],
+      "@proto/ui/organisms": ["../../packages/ui/src/organisms"],
+      "@proto/ui/templates": ["../../packages/ui/src/templates"],
+      "@proto/ui/theme": ["../../packages/ui/src/theme"],
+      "@proto/charts": ["../../packages/charts/src"],
+      "@proto/charts/gantt": ["../../packages/charts/src/gantt"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "app/**/*.ts",
+    "app/**/*.tsx",
+    ".next/types/**/*.ts",
+    "../../config/**/*.ts",
+    "../../custom-domains/**/*.ts",
+    "../../.generated/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    ".next",
+    "**/__tests__/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx"
+  ],
+  "references": [
+    { "path": "../../packages/types" },
+    { "path": "../../packages/database" },
+    { "path": "../../packages/auth" },
+    { "path": "../../packages/ui" },
+    { "path": "../../packages/utils" },
+    { "path": "../../packages/api-utils" },
+    { "path": "../../packages/logger" },
+    { "path": "../../packages/icon-system" },
+    { "path": "../../packages/proto-llm-tools" },
+    { "path": "../../packages/llm-providers" },
+    { "path": "../../packages/sidequest-utils" },
+    { "path": "../../packages/charts" },
+    { "path": "../../packages/collab" },
+    { "path": "../../packages/assets" },
+    { "path": "../../packages/prompts" }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "name": "@proto/yjs-history",
+  "version": "0.1.2",
+  "description": "Advanced undo/redo and versioning system for Yjs with React Flow integration",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "yjs": "^13.6.21"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/react-hooks": "^8.0.1",
+    "@types/react": "^19.0.0",
+    "@vitest/ui": "^4.0.6",
+    "happy-dom": "^20.0.10",
+    "jsdom": "^26.1.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.6.3",
+    "vitest": "^4.0.6",
+    "yjs": "^13.6.21"
+  },
+  "keywords": [
+    "yjs",
+    "crdt",
+    "undo",
+    "redo",
+    "versioning",
+    "history",
+    "react-flow",
+    "collaboration"
+  ]
+}

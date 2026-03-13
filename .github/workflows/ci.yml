@@ -1,0 +1,348 @@
+# CI Workflow
+#
+# Job Flow: validate → build-packages → [build-app, test] (parallel)
+#
+# Cache Strategy:
+# - packages-${{ github.sha }}: Ensures cache consistency within a PR
+# - restore-keys: Enables cross-PR cache reuse for faster builds
+# - Next.js cache: Uses lock file hash for dependency-based caching
+#
+# Monitoring:
+# - notify-failure: Auto-creates issues for failures on main/develop branches
+
+name: CI
+
+"on":
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches:
+      - main
+      - develop
+      - "changeset-release/**"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: read
+  issues: read
+
+jobs:
+  validate:
+    name: Validate Code
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check for circular dependencies
+        run: pnpm run check:circular-deps
+
+      - name: Lint
+        run: pnpm run lint:check
+
+  build-packages:
+    name: Build Packages
+    runs-on: self-hosted
+    timeout-minutes: 10
+    needs: validate
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate domain configurations
+        run: pnpm run validate:domains
+
+      - name: Lint domain configurations
+        run: pnpm run lint:domains
+
+      - name: Scan and generate domain TypeScript
+        run: pnpm run scan:domains
+
+      - name: Type check packages (before build)
+        run: pnpm run type-check:packages
+
+      - name: Clean package dist directories
+        run: rm -rf packages/*/dist
+
+      - name: Build packages
+        run: pnpm run build:libs
+
+      - name: Type check app (strict)
+        run: cd apps/rabbit-hole && pnpm exec tsc --noEmit --skipLibCheck
+        env:
+          NODE_OPTIONS: "--max_old_space_size=8192"
+
+      - name: Cache build artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            packages/*/dist
+          key: packages-${{ hashFiles('packages/*/package.json', 'packages/*/src/**/*', 'packages/*/tsconfig.json') }}-${{ github.sha }}
+          restore-keys: |
+            packages-${{ hashFiles('packages/*/package.json', 'packages/*/src/**/*', 'packages/*/tsconfig.json') }}-
+
+  build-app:
+    name: Build Next.js App
+    runs-on: self-hosted
+    timeout-minutes: 15
+    needs: build-packages
+    env:
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+      SKIP_ENV_VALIDATION: "true"
+      NEXT_TELEMETRY_DISABLED: "1"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Scan and generate domain TypeScript
+        run: pnpm run scan:domains
+
+      - name: Restore package builds
+        id: cache-packages-app
+        uses: actions/cache@v4
+        with:
+          path: |
+            packages/*/dist
+          key: packages-${{ hashFiles('packages/*/package.json', 'packages/*/src/**/*', 'packages/*/tsconfig.json') }}-${{ github.sha }}
+          restore-keys: |
+            packages-${{ hashFiles('packages/*/package.json', 'packages/*/src/**/*', 'packages/*/tsconfig.json') }}-
+        continue-on-error: true
+
+      - name: Rebuild packages if cache miss
+        if: steps.cache-packages-app.outputs.cache-hit != 'true'
+        run: |
+          echo "⚠️ Package cache miss - rebuilding packages"
+          pnpm run build:libs
+
+      - name: Verify package types generated
+        run: |
+          MISSING=0
+          for pkg_dir in packages/*/; do
+            pkg_name=$(basename "$pkg_dir")
+            
+            # Check if package should emit declarations
+            SHOULD_EMIT=false
+            
+            # Check tsconfig.json for "declaration": true using jq
+            if [ -f "$pkg_dir/tsconfig.json" ]; then
+              if jq -e '.compilerOptions.declaration == true' "$pkg_dir/tsconfig.json" >/dev/null 2>&1; then
+                SHOULD_EMIT=true
+              fi
+            fi
+            
+            # Check if tsconfig extends base (which has declaration: true)
+            if [ -f "$pkg_dir/tsconfig.json" ] && [ "$SHOULD_EMIT" = false ]; then
+              if jq -e '.extends' "$pkg_dir/tsconfig.json" | grep -q 'tsconfig\.base\.json' 2>/dev/null; then
+                # Base config has declaration: true, so inherit it unless overridden
+                if ! jq -e '.compilerOptions.declaration == false' "$pkg_dir/tsconfig.json" >/dev/null 2>&1; then
+                  SHOULD_EMIT=true
+                fi
+              fi
+            fi
+            
+            # Check tsup.config.ts for dts option
+            # Note: This simple pattern match assumes tsup configs follow a predictable structure.
+            # Occasional false positives from comments or strings are acceptable for CI simplicity.
+            if [ -f "$pkg_dir/tsup.config.ts" ] && [ "$SHOULD_EMIT" = false ]; then
+              if grep -q 'dts[[:space:]]*:' "$pkg_dir/tsup.config.ts"; then
+                SHOULD_EMIT=true
+              fi
+            fi
+            
+            # Only verify if package should emit declarations
+            if [ "$SHOULD_EMIT" = true ]; then
+              if [ -d "$pkg_dir/dist" ]; then
+                # Use find to detect declaration files (handles special chars and edge cases)
+                if ! find "$pkg_dir/dist" -maxdepth 1 \( -name "*.d.ts" -o -name "*.d.mts" \) -quit > /dev/null 2>&1; then
+                  echo "❌ No .d.ts files in $pkg_name (expected declarations)"
+                  MISSING=1
+                else
+                  echo "✅ $pkg_name - declarations present"
+                fi
+              else
+                echo "❌ $pkg_name - dist directory not found (expected declarations)"
+                MISSING=1
+              fi
+            else
+              echo "⏭️  $pkg_name - skipped (not configured to emit declarations)"
+            fi
+          done
+
+          if [ $MISSING -eq 1 ]; then
+            echo ""
+            echo "Some packages expected to generate .d.ts files did not."
+            exit 1
+          fi
+          echo ""
+          echo "✅ All packages with declaration settings generated types successfully"
+
+      - name: Restore Next.js build cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            apps/rabbit-hole/.next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            nextjs-${{ runner.os }}-
+
+      - name: Build Next.js app
+        run: cd apps/rabbit-hole && pnpm run build
+        env:
+          NODE_OPTIONS: "--max_old_space_size=8192"
+
+      - name: Check build output
+        run: |
+          ls -la apps/rabbit-hole/.next/
+          test -d apps/rabbit-hole/.next/standalone || (echo "Standalone output missing" && exit 1)
+
+  test:
+    name: Run Tests
+    runs-on: self-hosted
+    timeout-minutes: 10
+    needs: build-packages
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Restore package builds
+        id: cache-packages-test
+        uses: actions/cache@v4
+        with:
+          path: |
+            packages/*/dist
+          key: packages-${{ hashFiles('packages/*/package.json', 'packages/*/src/**/*', 'packages/*/tsconfig.json') }}-${{ github.sha }}
+          restore-keys: |
+            packages-${{ hashFiles('packages/*/package.json', 'packages/*/src/**/*', 'packages/*/tsconfig.json') }}-
+        continue-on-error: true
+
+      - name: Rebuild packages if cache miss
+        if: steps.cache-packages-test.outputs.cache-hit != 'true'
+        run: |
+          echo "⚠️ Package cache miss - rebuilding packages"
+          pnpm run build:libs
+
+      - name: Run tests
+        run: pnpm run test
+
+  changeset-check:
+    name: Check Changesets
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check for changesets
+        run: |
+          pnpm run release:status || echo "⚠️ No changesets found - version won't be bumped"
+
+  notify-failure:
+    name: Notify on Failure
+    runs-on: ubuntu-latest
+    if: failure() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    needs: [validate, build-packages, build-app, test, changeset-check]
+    permissions:
+      issues: write
+
+    steps:
+      - name: Send notification
+        run: |
+          echo "::notice::CI pipeline failed on ${{ github.ref_name }} branch"
+          echo "::notice::Failed jobs: See workflow run at ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+      - name: Create issue on failure (main/develop only)
+        if: github.event_name == 'push'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `CI Failure on ${context.ref.replace('refs/heads/', '')} - ${new Date().toISOString().split('T')[0]}`,
+              body: `## CI Pipeline Failed
+
+              **Branch:** \`${context.ref.replace('refs/heads/', '')}\`
+              **Commit:** ${context.sha}
+              **Workflow:** [View Run](${context.payload.repository.html_url}/actions/runs/${context.runId})
+              **Triggered by:** @${context.actor}
+
+              Please investigate and fix the failing tests/builds.
+
+              ### Failed Jobs
+              Check the [workflow run](${context.payload.repository.html_url}/actions/runs/${context.runId}) for details.`,
+              labels: ['ci-failure', 'bug']
+            });

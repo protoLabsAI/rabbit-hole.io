@@ -1,0 +1,134 @@
+{
+  "$schema": "../schema.json",
+  "name": "education",
+  "displayName": "Education",
+  "description": "Education domain for students, courses, and instructors",
+  "version": "1.0.0",
+  "tags": ["education", "academic", "learning"],
+  "entities": {
+    "Student": {
+      "uidPrefix": "student",
+      "displayName": "Student",
+      "properties": {
+        "student_id": {
+          "type": "string",
+          "required": false,
+          "pattern": "^[A-Z0-9]+$",
+          "description": "Student identification number"
+        },
+        "grade_level": {
+          "type": "enum",
+          "required": false,
+          "values": ["Freshman", "Sophomore", "Junior", "Senior", "Graduate"],
+          "description": "Current grade level"
+        },
+        "gpa": {
+          "type": "number",
+          "required": false,
+          "min": 0.0,
+          "max": 4.0,
+          "description": "Grade point average"
+        },
+        "enrollment_date": {
+          "type": "date",
+          "required": false,
+          "format": "YYYY-MM-DD",
+          "description": "Enrollment date"
+        },
+        "major": {
+          "type": "string",
+          "required": false,
+          "description": "Field of study"
+        }
+      }
+    },
+    "Course": {
+      "uidPrefix": "course",
+      "displayName": "Course",
+      "properties": {
+        "course_code": {
+          "type": "string",
+          "required": false,
+          "pattern": "^[A-Z]+ [0-9]+$",
+          "description": "Course code (e.g. CS 101)"
+        },
+        "credits": {
+          "type": "number",
+          "required": false,
+          "integer": true,
+          "min": 1,
+          "max": 6,
+          "description": "Credit hours"
+        },
+        "semester": {
+          "type": "enum",
+          "required": false,
+          "values": ["Fall", "Spring", "Summer"],
+          "description": "Semester offered"
+        },
+        "capacity": {
+          "type": "number",
+          "required": false,
+          "integer": true,
+          "min": 1,
+          "description": "Maximum enrollment capacity"
+        },
+        "prerequisites": {
+          "type": "array",
+          "required": false,
+          "items": "string",
+          "description": "Prerequisite courses"
+        }
+      }
+    },
+    "Instructor": {
+      "uidPrefix": "instructor",
+      "displayName": "Instructor",
+      "properties": {
+        "department": {
+          "type": "string",
+          "required": false,
+          "description": "Academic department"
+        },
+        "rank": {
+          "type": "enum",
+          "required": false,
+          "values": [
+            "Adjunct",
+            "Assistant Professor",
+            "Associate Professor",
+            "Full Professor"
+          ],
+          "description": "Academic rank"
+        },
+        "office_hours": {
+          "type": "string",
+          "required": false,
+          "description": "Office hours schedule"
+        },
+        "research_areas": {
+          "type": "array",
+          "required": false,
+          "items": "string",
+          "description": "Areas of research"
+        }
+      }
+    }
+  },
+  "ui": {
+    "color": "#3B82F6",
+    "icon": "🎓",
+    "entityIcons": {
+      "Student": "👨‍🎓",
+      "Course": "📚",
+      "Instructor": "👨‍🏫"
+    }
+  },
+  "relationships": [
+    "ENROLLED_IN",
+    "TEACHES",
+    "PREREQUISITE_FOR",
+    "ADVISED_BY",
+    "COMPLETED"
+  ]
+}

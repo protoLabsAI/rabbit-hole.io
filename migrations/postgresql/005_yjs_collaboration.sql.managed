@@ -1,0 +1,80 @@
+-- Yjs Collaboration Tables Migration
+-- Real-time collaborative editing with PostgreSQL persistence
+-- Database: rabbit_hole_app
+
+BEGIN;
+
+-- Yjs document storage (CRDT updates)
+CREATE TABLE IF NOT EXISTS yjs_documents (
+  room_id VARCHAR(255) PRIMARY KEY,
+  clerk_org_id VARCHAR(255) NOT NULL,
+  document_name VARCHAR(255) NOT NULL,
+  state_vector BYTEA,
+  document BYTEA NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  last_accessed_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+
+  -- Org scoping with cascade delete
+  CONSTRAINT fk_yjs_org
+    FOREIGN KEY (clerk_org_id)
+    REFERENCES organization_tenants(clerk_org_id)
+    ON DELETE CASCADE
+);
+
+-- Snapshots for faster loading (periodic saves)
+CREATE TABLE IF NOT EXISTS yjs_snapshots (
+  id SERIAL PRIMARY KEY,
+  room_id VARCHAR(255) NOT NULL,
+  snapshot BYTEA NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+
+  CONSTRAINT fk_yjs_snapshot_room
+    FOREIGN KEY (room_id)
+    REFERENCES yjs_documents(room_id)
+    ON DELETE CASCADE
+);
+
+-- Performance indexes
+CREATE INDEX IF NOT EXISTS idx_yjs_documents_org ON yjs_documents(clerk_org_id);
+CREATE INDEX IF NOT EXISTS idx_yjs_documents_accessed ON yjs_documents(last_accessed_at);
+CREATE INDEX IF NOT EXISTS idx_yjs_snapshots_room ON yjs_snapshots(room_id, created_at DESC);
+
+-- Auto-update timestamp trigger
+CREATE OR REPLACE FUNCTION update_yjs_document_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  NEW.last_accessed_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER yjs_document_update
+  BEFORE UPDATE ON yjs_documents
+  FOR EACH ROW
+  EXECUTE FUNCTION update_yjs_document_timestamp();
+
+-- Cleanup old inactive documents (run via cron/scheduler)
+CREATE OR REPLACE FUNCTION cleanup_inactive_yjs_documents(days_inactive INT DEFAULT 30)
+RETURNS INT AS $$
+DECLARE
+  deleted_count INT;
+BEGIN
+  DELETE FROM yjs_documents
+  WHERE last_accessed_at < NOW() - INTERVAL '1 day' * days_inactive;
+
+  GET DIAGNOSTICS deleted_count = ROW_COUNT;
+  RETURN deleted_count;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Table comments
+COMMENT ON TABLE yjs_documents IS 'Real-time collaboration documents using Yjs CRDTs';
+COMMENT ON TABLE yjs_snapshots IS 'Periodic snapshots for faster document loading';
+COMMENT ON COLUMN yjs_documents.room_id IS 'Format: org:{orgId}:research:{sessionId}';
+COMMENT ON COLUMN yjs_documents.document IS 'Binary Yjs document state (CRDT updates)';
+COMMENT ON COLUMN yjs_documents.state_vector IS 'Yjs state vector for efficient syncing';
+
+COMMIT;
+

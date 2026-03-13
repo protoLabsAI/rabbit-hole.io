@@ -1,0 +1,66 @@
+-- Yjs Documents Table Enhancements
+-- Adds size tracking and monitoring indexes
+
+-- Add size_bytes column for monitoring
+ALTER TABLE yjs_documents 
+  ADD COLUMN IF NOT EXISTS size_bytes INTEGER;
+
+-- Add pruning metadata columns
+ALTER TABLE yjs_documents
+  ADD COLUMN IF NOT EXISTS last_pruned_at TIMESTAMP WITH TIME ZONE,
+  ADD COLUMN IF NOT EXISTS pruning_enabled BOOLEAN DEFAULT true,
+  ADD COLUMN IF NOT EXISTS history_retention_days INTEGER;
+
+-- Update existing documents with calculated size
+UPDATE yjs_documents 
+  SET size_bytes = length(document) 
+  WHERE size_bytes IS NULL;
+
+-- Add index for size-based queries (largest documents)
+CREATE INDEX IF NOT EXISTS idx_yjs_documents_size 
+  ON yjs_documents(size_bytes DESC);
+
+-- Add index for cleanup queries (oldest access)
+CREATE INDEX IF NOT EXISTS idx_yjs_documents_last_accessed 
+  ON yjs_documents(last_accessed_at);
+
+-- Create view for org-level monitoring
+CREATE OR REPLACE VIEW v_yjs_document_stats AS
+SELECT 
+  clerk_org_id,
+  COUNT(*) as document_count,
+  SUM(size_bytes) as total_bytes,
+  ROUND(AVG(size_bytes)) as avg_bytes,
+  MAX(size_bytes) as max_bytes,
+  MAX(updated_at) as last_updated,
+  MIN(last_accessed_at) as oldest_access
+FROM yjs_documents
+GROUP BY clerk_org_id
+ORDER BY total_bytes DESC;
+
+-- Create function to identify large documents
+CREATE OR REPLACE FUNCTION find_large_documents(min_size_mb INTEGER DEFAULT 1)
+RETURNS TABLE (
+  room_id TEXT,
+  org_id TEXT,
+  size_mb NUMERIC,
+  last_accessed TIMESTAMP,
+  age_days INTEGER
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT 
+    yd.room_id,
+    yd.clerk_org_id,
+    ROUND((yd.size_bytes / 1024.0 / 1024.0)::numeric, 2) as size_mb,
+    yd.last_accessed_at,
+    EXTRACT(DAY FROM NOW() - yd.last_accessed_at)::INTEGER as age_days
+  FROM yjs_documents yd
+  WHERE yd.size_bytes > (min_size_mb * 1024 * 1024)
+  ORDER BY yd.size_bytes DESC;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Grant permissions
+GRANT SELECT ON v_yjs_document_stats TO app_user;
+

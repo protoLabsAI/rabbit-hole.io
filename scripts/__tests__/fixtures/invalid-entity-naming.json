@@ -1,0 +1,23 @@
+{
+  "name": "bad_naming",
+  "displayName": "Bad Naming",
+  "description": "Domain with incorrect naming conventions",
+  "entities": {
+    "lowercase_entity": {
+      "uidPrefix": "test",
+      "properties": {
+        "camelCase": {
+          "type": "string"
+        },
+        "ALLCAPS": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "ui": {
+    "color": "#FF0000",
+    "icon": "❌"
+  }
+}
+

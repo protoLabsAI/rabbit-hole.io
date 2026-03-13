@@ -1,0 +1,130 @@
+{
+  "name": "@proto/utils",
+  "version": "0.3.0",
+  "description": "Design token utilities and color manipulation tools for Proto project",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./atlas": {
+      "types": "./dist/atlas/index.d.ts",
+      "import": "./dist/atlas/index.js",
+      "default": "./dist/atlas/index.js"
+    },
+    "./file-processing": {
+      "types": "./dist/file-processing/index.d.ts",
+      "import": "./dist/file-processing/index.js",
+      "default": "./dist/file-processing/index.js"
+    },
+    "./storage": {
+      "types": "./dist/storage/index.d.ts",
+      "import": "./dist/storage/index.js",
+      "default": "./dist/storage/index.js"
+    },
+    "./tenancy-edge": {
+      "types": "./dist/tenancy-edge/index.d.ts",
+      "import": "./dist/tenancy-edge/index.js",
+      "default": "./dist/tenancy-edge/index.js"
+    },
+    "./tenancy-server": {
+      "types": "./dist/tenancy-server/index.d.ts",
+      "import": "./dist/tenancy-server/index.js",
+      "default": "./dist/tenancy-server/index.js"
+    },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "import": "./dist/react/index.js",
+      "default": "./dist/react/index.js"
+    },
+    "./react/lazy-loading": {
+      "types": "./dist/react/lazy-loading/index.d.ts",
+      "import": "./dist/react/lazy-loading/index.js",
+      "default": "./dist/react/lazy-loading/index.js"
+    },
+    "./security-server": {
+      "types": "./dist/security/sanitize-svg.server.d.ts",
+      "import": "./dist/security/sanitize-svg.server.js",
+      "default": "./dist/security/sanitize-svg.server.js"
+    },
+    "./security-client": {
+      "types": "./dist/security-client/index.d.ts",
+      "import": "./dist/security-client/index.js",
+      "default": "./dist/security-client/index.js"
+    },
+    "./export-client": {
+      "types": "./dist/export-client/index.d.ts",
+      "import": "./dist/export-client/index.js",
+      "default": "./dist/export-client/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@proto/database": "workspace:*",
+    "@proto/types": "workspace:*",
+    "chroma-js": "^3.1.2",
+    "client-only": "^0.0.1",
+    "dompurify": "^3.2.4",
+    "html2canvas": "^1.4.1",
+    "isomorphic-dompurify": "^2.19.0",
+    "jsdom": "^27.3.0",
+    "minio": "^8.0.6"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@proto/auth": {
+      "optional": true
+    },
+    "@proto/icon-system": {
+      "optional": true
+    },
+    "@proto/ui": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@proto/auth": "workspace:*",
+    "@proto/icon-system": "workspace:*",
+    "@proto/ui": "workspace:*",
+    "@types/chroma-js": "^3.1.1",
+    "@types/dompurify": "^3.2.0",
+    "@types/jsdom": "^21.1.7",
+    "@types/node": "^22.18.3",
+    "@vitest/coverage-v8": "^1.6.1",
+    "eslint-plugin-react-hooks": "6.0.0-rc.2",
+    "tsup": "^8.0.1",
+    "typescript": "^5.5.4",
+    "vitest": "^1.6.1"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "design-tokens",
+    "color-manipulation",
+    "chroma-js",
+    "accessibility",
+    "proto",
+    "typescript"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/your-org/proto.git",
+    "directory": "packages/utils"
+  },
+  "license": "MIT",
+  "type": "module"
+}

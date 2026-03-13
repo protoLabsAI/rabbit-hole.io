@@ -1,0 +1,43 @@
+{
+  "name": "@proto/database",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Database client and utilities for Neo4j and file-based storage",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "type-check": "tsc --noEmit",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage"
+  },
+  "dependencies": {
+    "@proto/types": "workspace:*",
+    "neo4j-driver": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.3",
+    "tsup": "^8.0.1",
+    "typescript": "^5.5.4",
+    "vitest": "^1.6.1"
+  },
+  "keywords": [
+    "database",
+    "neo4j",
+    "graph-database",
+    "client",
+    "proto"
+  ],
+  "files": [
+    "dist"
+  ],
+  "type": "module"
+}

@@ -1,0 +1,72 @@
+{
+  "name": "@proto/deepagent",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Deep agent entity researcher for knowledge graph construction",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./graph": {
+      "types": "./dist/graph/index.d.ts",
+      "import": "./dist/graph/index.js",
+      "default": "./dist/graph/index.js"
+    },
+    "./prompts": {
+      "types": "./dist/prompts/index.d.ts",
+      "import": "./dist/prompts/index.js",
+      "default": "./dist/prompts/index.js"
+    },
+    "./subagents": {
+      "types": "./dist/subagents/index.d.ts",
+      "import": "./dist/subagents/index.js",
+      "default": "./dist/subagents/index.js"
+    },
+    "./tools": {
+      "types": "./dist/tools/index.d.ts",
+      "import": "./dist/tools/index.js",
+      "default": "./dist/tools/index.js"
+    },
+    "./state": {
+      "types": "./dist/state.d.ts",
+      "import": "./dist/state.js",
+      "default": "./dist/state.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "type-check": "tsc --noEmit",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@copilotkit/sdk-js": "^1.9.1",
+    "@langchain/core": "^1.0.1",
+    "@langchain/langgraph": "^1.0.0",
+    "@proto/llm-providers": "workspace:*",
+    "@proto/observability": "workspace:*",
+    "@proto/types": "workspace:*",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.3",
+    "langfuse": "^3.38.1",
+    "tsup": "^8.0.1",
+    "typescript": "^5.5.4",
+    "vitest": "^3.2.4"
+  },
+  "keywords": [
+    "deepagent",
+    "langgraph",
+    "entity-research",
+    "knowledge-graph"
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "name": "complete_test",
+  "displayName": "Complete Test Domain",
+  "description": "A complete domain configuration with all features",
+  "version": "1.0.0",
+  "author": "Test Author",
+  "tags": ["test", "complete"],
+  "entities": {
+    "Test_Entity": {
+      "uidPrefix": "test_entity",
+      "displayName": "Test Entity",
+      "properties": {
+        "text_field": {
+          "type": "string",
+          "required": true,
+          "description": "A text field",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "number_field": {
+          "type": "number",
+          "description": "A number field",
+          "min": 0,
+          "max": 100
+        },
+        "status": {
+          "type": "enum",
+          "values": ["active", "inactive", "pending"],
+          "description": "Entity status"
+        }
+      }
+    }
+  },
+  "ui": {
+    "color": "#10B981",
+    "icon": "✅",
+    "entityIcons": {
+      "Test_Entity": "🧪"
+    }
+  },
+  "relationships": ["RELATED_TO"]
+}
+

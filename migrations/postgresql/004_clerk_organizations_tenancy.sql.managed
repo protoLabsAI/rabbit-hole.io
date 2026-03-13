@@ -1,0 +1,260 @@
+-- Multi-Tenancy Infrastructure with Clerk Organizations
+-- Phase 1: Organization-based tenancy with storage quotas
+-- Database: rabbit_hole_app
+
+BEGIN;
+
+-- ====================
+-- Organization Tenants
+-- ====================
+-- Maps Clerk organizations to tenant workspaces with URL identifiers
+
+CREATE TABLE organization_tenants (
+  -- Primary identification
+  clerk_org_id VARCHAR(255) PRIMARY KEY,           -- org_xxxxx from Clerk
+  tenant_hash VARCHAR(64) NOT NULL UNIQUE,         -- Auto-generated hash for URLs
+  tenant_slug VARCHAR(255) UNIQUE,                 -- User-chosen slug (Pro+) for subdomains
+  
+  -- Neo4j data isolation
+  neo4j_namespace VARCHAR(64) NOT NULL UNIQUE,     -- Namespace for graph data scoping
+  
+  -- Cached Clerk metadata (for performance)
+  org_name VARCHAR(255),
+  org_slug VARCHAR(255),                           -- Clerk's org slug (different from our tenant_slug)
+  
+  -- Timestamps
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  
+  -- Constraints
+  CONSTRAINT tenant_hash_format CHECK (tenant_hash ~ '^[a-f0-9]{12}$'),
+  CONSTRAINT tenant_slug_format CHECK (
+    tenant_slug IS NULL OR 
+    (tenant_slug ~ '^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$' AND LENGTH(tenant_slug) >= 3)
+  )
+);
+
+-- Indexes for fast lookups
+CREATE INDEX idx_org_tenants_hash ON organization_tenants(tenant_hash);
+CREATE INDEX idx_org_tenants_slug ON organization_tenants(tenant_slug) WHERE tenant_slug IS NOT NULL;
+CREATE INDEX idx_org_tenants_namespace ON organization_tenants(neo4j_namespace);
+
+COMMENT ON TABLE organization_tenants IS 'Maps Clerk organizations to multi-tenant workspaces with URL identifiers';
+COMMENT ON COLUMN organization_tenants.tenant_hash IS 'Auto-generated 12-char hash for free tier URLs';
+COMMENT ON COLUMN organization_tenants.tenant_slug IS 'User-chosen slug for Pro+ subdomains (null for free tier)';
+COMMENT ON COLUMN organization_tenants.neo4j_namespace IS 'Namespace label for Neo4j data isolation';
+
+
+-- ====================
+-- Organization Quotas & Usage Tracking
+-- ====================
+-- Track resource usage and enforce plan limits
+
+CREATE TABLE organization_quotas (
+  clerk_org_id VARCHAR(255) PRIMARY KEY REFERENCES organization_tenants(clerk_org_id) ON DELETE CASCADE,
+  
+  -- Current usage (updated by application)
+  entities_count INTEGER DEFAULT 0 CHECK (entities_count >= 0),
+  share_tokens_count INTEGER DEFAULT 0 CHECK (share_tokens_count >= 0),
+  storage_used_bytes BIGINT DEFAULT 0 CHECK (storage_used_bytes >= 0),
+  api_calls_this_hour INTEGER DEFAULT 0 CHECK (api_calls_this_hour >= 0),
+  
+  -- Limits (set based on Clerk plan - free/pro/enterprise)
+  max_entities INTEGER DEFAULT 1000,
+  max_share_tokens INTEGER DEFAULT 10,
+  max_storage_bytes BIGINT DEFAULT 1073741824,  -- 1 GB default (1024^3)
+  max_api_calls_per_hour INTEGER DEFAULT 100,
+  
+  -- Rate limit reset tracking
+  api_rate_limit_reset_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  
+  -- Timestamps
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  
+  -- Constraints
+  CONSTRAINT positive_limits CHECK (
+    max_entities > 0 AND 
+    max_share_tokens > 0 AND 
+    max_storage_bytes > 0 AND 
+    max_api_calls_per_hour > 0
+  )
+);
+
+CREATE INDEX idx_org_quotas_usage ON organization_quotas(entities_count, max_entities);
+CREATE INDEX idx_org_quotas_storage ON organization_quotas(storage_used_bytes, max_storage_bytes);
+
+COMMENT ON TABLE organization_quotas IS 'Resource usage tracking and plan-based quota enforcement';
+COMMENT ON COLUMN organization_quotas.storage_used_bytes IS 'Total bytes used in MinIO/S3 storage by this organization';
+
+
+-- ====================
+-- Organization Storage Tracking
+-- ====================
+-- Track individual files for accurate storage quota calculation
+
+CREATE TABLE organization_files (
+  file_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  clerk_org_id VARCHAR(255) NOT NULL REFERENCES organization_tenants(clerk_org_id) ON DELETE CASCADE,
+  
+  -- File metadata
+  object_key VARCHAR(512) NOT NULL,                -- MinIO/S3 object key
+  file_name VARCHAR(255) NOT NULL,
+  file_size_bytes BIGINT NOT NULL CHECK (file_size_bytes >= 0),
+  mime_type VARCHAR(127),
+  content_hash VARCHAR(64),                        -- SHA-256 for deduplication
+  
+  -- Upload metadata
+  uploaded_by VARCHAR(255) NOT NULL,               -- Clerk user_id
+  uploaded_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  
+  -- Neo4j entity reference (optional)
+  entity_uid VARCHAR(255),                         -- Link to entity if file is evidence
+  
+  -- Soft delete
+  deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,
+  
+  CONSTRAINT unique_org_object_key UNIQUE (clerk_org_id, object_key)
+);
+
+CREATE INDEX idx_org_files_org ON organization_files(clerk_org_id);
+CREATE INDEX idx_org_files_entity ON organization_files(entity_uid) WHERE entity_uid IS NOT NULL;
+CREATE INDEX idx_org_files_hash ON organization_files(content_hash);
+CREATE INDEX idx_org_files_active ON organization_files(clerk_org_id, deleted_at) WHERE deleted_at IS NULL;
+
+COMMENT ON TABLE organization_files IS 'Track uploaded files for storage quota calculation and management';
+
+
+-- ====================
+-- Custom Domains (Enterprise Feature)
+-- ====================
+-- Allow enterprise customers to map custom domains to their workspace
+
+CREATE TABLE organization_domains (
+  domain_name VARCHAR(255) PRIMARY KEY,
+  clerk_org_id VARCHAR(255) NOT NULL REFERENCES organization_tenants(clerk_org_id) ON DELETE CASCADE,
+  
+  -- Verification
+  verification_token VARCHAR(64) NOT NULL,
+  verified_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,
+  
+  -- SSL/TLS
+  ssl_enabled BOOLEAN DEFAULT false,
+  ssl_provisioned_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,
+  
+  -- Timestamps
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  
+  -- Constraints
+  CONSTRAINT domain_format CHECK (domain_name ~ '^[a-z0-9][a-z0-9.-]+[a-z0-9]$')
+);
+
+CREATE INDEX idx_org_domains_org ON organization_domains(clerk_org_id);
+CREATE INDEX idx_org_domains_verified ON organization_domains(verified_at) WHERE verified_at IS NOT NULL;
+
+COMMENT ON TABLE organization_domains IS 'Custom domain mapping for Enterprise tier (Phase 2 feature)';
+
+
+-- ====================
+-- Update Share Tokens for Multi-Tenancy
+-- ====================
+-- Add organization context and privacy controls
+
+ALTER TABLE share_tokens 
+  ADD COLUMN IF NOT EXISTS clerk_org_id VARCHAR(255) REFERENCES organization_tenants(clerk_org_id) ON DELETE CASCADE,
+  ADD COLUMN IF NOT EXISTS privacy_level VARCHAR(50) DEFAULT 'public';
+
+-- Create index for org-scoped queries
+CREATE INDEX IF NOT EXISTS idx_share_tokens_org ON share_tokens(clerk_org_id);
+CREATE INDEX IF NOT EXISTS idx_share_tokens_privacy ON share_tokens(privacy_level);
+
+-- Add privacy level constraint
+ALTER TABLE share_tokens DROP CONSTRAINT IF EXISTS check_privacy_level;
+ALTER TABLE share_tokens
+  ADD CONSTRAINT check_privacy_level 
+  CHECK (privacy_level IN ('public', 'organization', 'authenticated'));
+
+-- Make clerk_org_id NOT NULL for new records (allow NULL for migration)
+-- In production, after backfilling: ALTER TABLE share_tokens ALTER COLUMN clerk_org_id SET NOT NULL;
+
+COMMENT ON COLUMN share_tokens.clerk_org_id IS 'Organization that owns this share token';
+COMMENT ON COLUMN share_tokens.privacy_level IS 'Access control: public (anyone), organization (org members only), authenticated (any logged-in user)';
+
+
+-- ====================
+-- Helper Functions
+-- ====================
+
+-- Function to increment quota usage atomically
+CREATE OR REPLACE FUNCTION increment_quota_usage(
+  p_clerk_org_id VARCHAR(255),
+  p_entities_delta INTEGER DEFAULT 0,
+  p_share_tokens_delta INTEGER DEFAULT 0,
+  p_storage_delta BIGINT DEFAULT 0
+) RETURNS BOOLEAN AS $$
+BEGIN
+  UPDATE organization_quotas
+  SET 
+    entities_count = entities_count + p_entities_delta,
+    share_tokens_count = share_tokens_count + p_share_tokens_delta,
+    storage_used_bytes = storage_used_bytes + p_storage_delta,
+    updated_at = NOW()
+  WHERE clerk_org_id = p_clerk_org_id;
+  
+  RETURN FOUND;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Function to check if quota would be exceeded
+CREATE OR REPLACE FUNCTION check_quota_available(
+  p_clerk_org_id VARCHAR(255),
+  p_quota_type VARCHAR(50),
+  p_amount INTEGER DEFAULT 1
+) RETURNS BOOLEAN AS $$
+DECLARE
+  v_current INTEGER;
+  v_limit INTEGER;
+BEGIN
+  SELECT 
+    CASE p_quota_type
+      WHEN 'entities' THEN entities_count
+      WHEN 'share_tokens' THEN share_tokens_count
+      WHEN 'api_calls' THEN api_calls_this_hour
+    END,
+    CASE p_quota_type
+      WHEN 'entities' THEN max_entities
+      WHEN 'share_tokens' THEN max_share_tokens
+      WHEN 'api_calls' THEN max_api_calls_per_hour
+    END
+  INTO v_current, v_limit
+  FROM organization_quotas
+  WHERE clerk_org_id = p_clerk_org_id;
+  
+  RETURN (v_current + p_amount) <= v_limit;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Function to reset hourly API rate limits (call from cron or application)
+CREATE OR REPLACE FUNCTION reset_expired_api_quotas() RETURNS INTEGER AS $$
+DECLARE
+  v_reset_count INTEGER;
+BEGIN
+  UPDATE organization_quotas
+  SET 
+    api_calls_this_hour = 0,
+    api_rate_limit_reset_at = NOW(),
+    updated_at = NOW()
+  WHERE api_rate_limit_reset_at < NOW() - INTERVAL '1 hour';
+  
+  GET DIAGNOSTICS v_reset_count = ROW_COUNT;
+  RETURN v_reset_count;
+END;
+$$ LANGUAGE plpgsql;
+
+COMMENT ON FUNCTION increment_quota_usage IS 'Atomically increment organization quota usage counters';
+COMMENT ON FUNCTION check_quota_available IS 'Check if adding N resources would exceed quota limits';
+COMMENT ON FUNCTION reset_expired_api_quotas IS 'Reset hourly API call counters (run via cron)';
+
+COMMIT;
+

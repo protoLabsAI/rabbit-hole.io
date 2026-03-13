@@ -1,0 +1,260 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================================
+   PURE DYNAMIC THEME SYSTEM
+   ============================================================================ */
+/* All theme tokens are injected dynamically by ThemeProvider */
+/* NO static theme variables - everything handled at runtime */
+
+/* ============================================================================
+   BASE STYLES (non-theme related)
+   ============================================================================ */
+
+/* Ensure smooth transitions for theme changes */
+*,
+*::before,
+*::after {
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+/* Prevent layout shift */
+* {
+  box-sizing: border-box;
+}
+
+/* Loading state optimization - prevents flash animations during theme switch */
+.theme-loading * {
+  animation-duration: 0.01ms !important;
+  animation-delay: -0.01ms !important;
+  animation-iteration-count: 1 !important;
+  background-attachment: initial !important;
+  scroll-behavior: auto !important;
+}
+
+/* Theme ready state */
+.theme-loaded {
+  opacity: 1;
+}
+
+/* ============================================================================
+   ACCESSIBILITY ENHANCEMENTS
+   ============================================================================ */
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    /* Enhanced border visibility in high contrast */
+    --enhanced-border-opacity: 0.6;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --enhanced-border-opacity: 0.8;
+    }
+  }
+}
+
+/* ============================================================================
+   WHITELABEL DOMAIN TOOLTIP STYLES
+   ============================================================================ */
+
+/* Domain tooltip base styles that respect whitelabel theme tokens */
+.atlas-tooltip.domain-tooltip {
+  background-color: rgb(var(--card)) !important;
+  color: hsl(var(--foreground)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  position: absolute;
+  z-index: 9999;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  min-width: 200px;
+  max-width: 280px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease-in-out;
+}
+
+/* Dark mode support via both class and attribute selector */
+.dark .atlas-tooltip.domain-tooltip,
+[data-color-scheme="dark"] .atlas-tooltip.domain-tooltip {
+  background-color: rgb(var(--card)) !important;
+  color: hsl(var(--foreground)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+}
+
+.tooltip-header {
+  margin-bottom: 8px;
+}
+
+.tooltip-header-content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.tooltip-icon {
+  font-size: 16px;
+}
+
+.tooltip-title-group {
+  flex: 1;
+}
+
+.tooltip-title {
+  font-weight: 600;
+  color: hsl(var(--foreground)) !important;
+  font-size: 12px;
+}
+
+.tooltip-subtitle {
+  font-size: 10px;
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+.tooltip-property-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  font-size: 11px;
+}
+
+.tooltip-property-label {
+  color: hsl(var(--muted-foreground)) !important;
+  font-weight: 500;
+}
+
+.tooltip-property-value {
+  color: hsl(var(--foreground)) !important;
+  margin-left: 8px;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tooltip-scientific-name {
+  font-style: italic;
+  color: hsl(var(--foreground)) !important;
+  margin-bottom: 6px;
+  font-size: 11px;
+}
+
+.tooltip-bio {
+  margin-top: 6px;
+  font-size: 11px;
+  color: hsl(var(--muted-foreground)) !important;
+  line-height: 1.3;
+}
+
+.tooltip-uid {
+  font-size: 10px;
+  color: hsl(var(--muted-foreground)) !important;
+  font-family:
+    ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas,
+    "DejaVu Sans Mono", monospace;
+  margin-bottom: 6px;
+}
+
+.tooltip-notice {
+  margin-top: 6px;
+  font-size: 10px;
+  color: hsl(var(--muted-foreground)) !important;
+  font-style: italic;
+}
+
+/* ============================================================================
+   LANDING PAGE DECORATIVE PATTERNS
+   ============================================================================ */
+
+/* Subtle grid pattern for hero backgrounds */
+.bg-grid-pattern {
+  background-image:
+    linear-gradient(to right, hsl(var(--border) / 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, hsl(var(--border) / 0.1) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ============================================================================
+   MARQUEE ANIMATIONS
+   ============================================================================ */
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* ============================================================================
+   REACT FLOW OVERRIDES
+   ============================================================================ */
+
+/* Controls - theme-aware styling */
+.react-flow__controls {
+  background-color: hsl(var(--card)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+}
+
+.react-flow__controls-button {
+  background-color: hsl(var(--card)) !important;
+  border-bottom: 1px solid hsl(var(--border)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+.react-flow__controls-button:hover {
+  background-color: hsl(var(--accent)) !important;
+}
+
+.react-flow__controls-button svg {
+  fill: hsl(var(--foreground)) !important;
+}
+
+/* Smooth minimap interactions - reduces sensitivity and jitteriness */
+.smooth-minimap .react-flow__minimap-mask {
+  /* Smooth transitions for viewport rectangle movement during pan/zoom */
+  /* Longer duration = slower, more controlled movement */
+  transition:
+    transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    width 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    height 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+.smooth-minimap svg {
+  /* Smooth node rendering during zoom operations */
+  transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Increase cursor area on minimap mask for better control */
+.smooth-minimap .react-flow__minimap-mask {
+  cursor: grab;
+}
+
+.smooth-minimap .react-flow__minimap-mask:active {
+  cursor: grabbing;
+}
+

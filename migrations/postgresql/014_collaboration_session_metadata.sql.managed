@@ -1,0 +1,20 @@
+-- Collaboration Session Metadata
+-- Created: 2025-10-10
+-- Stores initial canvas state and metadata for collaboration sessions
+
+CREATE TABLE IF NOT EXISTS collaboration_sessions_metadata (
+  session_id UUID PRIMARY KEY REFERENCES collaboration_sessions(id) ON DELETE CASCADE,
+  metadata JSONB NOT NULL,
+  created_at BIGINT NOT NULL,
+  updated_at BIGINT NOT NULL
+);
+
+CREATE INDEX idx_session_metadata_session ON collaboration_sessions_metadata(session_id);
+CREATE INDEX idx_session_metadata_updated ON collaboration_sessions_metadata(updated_at);
+
+-- Add GIN index for JSONB queries (if needed in future)
+CREATE INDEX idx_session_metadata_jsonb ON collaboration_sessions_metadata USING gin(metadata);
+
+-- Grant permissions to app_user
+GRANT ALL PRIVILEGES ON TABLE collaboration_sessions_metadata TO app_user;
+

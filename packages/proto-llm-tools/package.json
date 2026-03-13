@@ -1,0 +1,114 @@
+{
+  "name": "@proto/llm-tools",
+  "version": "0.1.7",
+  "private": true,
+  "description": "LLM workflow tools and graph operations for Proto project",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./dist/client.d.ts",
+      "import": "./dist/client.js",
+      "default": "./dist/client.js"
+    },
+    "./playgrounds": {
+      "types": "./dist/playgrounds/index.d.ts",
+      "import": "./dist/playgrounds/index.js",
+      "default": "./dist/playgrounds/index.js"
+    },
+    "./playgrounds/entity-research-playground": {
+      "types": "./dist/playgrounds/entity-research-playground/index.d.ts",
+      "import": "./dist/playgrounds/entity-research-playground/index.js",
+      "default": "./dist/playgrounds/entity-research-playground/index.js"
+    },
+    "./playgrounds/*": {
+      "types": "./dist/playgrounds/*/index.d.ts",
+      "import": "./dist/playgrounds/*/index.js",
+      "default": "./dist/playgrounds/*/index.js"
+    },
+    "./research-agent-tools": {
+      "types": "./dist/tools/research-agent-tools/index.d.ts",
+      "import": "./dist/tools/research-agent-tools/index.js",
+      "default": "./dist/tools/research-agent-tools/index.js"
+    },
+    "./tools/entity-extraction-basic": {
+      "types": "./dist/tools/entity-extraction-basic/index.d.ts",
+      "import": "./dist/tools/entity-extraction-basic/index.js",
+      "default": "./dist/tools/entity-extraction-basic/index.js"
+    },
+    "./tools/writing-agent-tools/graph": {
+      "types": "./dist/tools/writing-agent-tools/graph/index.d.ts",
+      "import": "./dist/tools/writing-agent-tools/graph/index.js",
+      "default": "./dist/tools/writing-agent-tools/graph/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "NODE_OPTIONS='--max-old-space-size=4096' tsup",
+    "dev": "tsup --watch",
+    "type-check": "tsc --noEmit",
+    "test": "vitest",
+    "test:extraction": "tsx test.ts",
+    "test:human-loop": "tsx test-human-loop.ts",
+    "test:coverage": "vitest --coverage",
+    "test:tools": "tsx ./test.ts"
+  },
+  "dependencies": {
+    "@copilotkit/sdk-js": "^1.9.1",
+    "@langchain/community": "^1.0.0",
+    "@langchain/core": "^1.0.1",
+    "@langchain/langgraph": "^1.0.0",
+    "@langchain/textsplitters": "^1.0.0",
+    "@proto/deepagent": "workspace:*",
+    "@proto/icon-system": "workspace:*",
+    "@proto/llm-providers": "workspace:*",
+    "@proto/sidequest-utils": "workspace:*",
+    "@proto/types": "workspace:*",
+    "@proto/ui": "workspace:*",
+    "@proto/utils": "workspace:*",
+    "@tiptap/core": "^3.10.5",
+    "@tiptap/pm": "^3.10.5",
+    "@tiptap/react": "^3.10.5",
+    "@tiptap/starter-kit": "^3.10.5",
+    "deepagents": "^1.3.0",
+    "dotenv": "^17.2.3",
+    "langchain": "^1.0.1",
+    "lucide-react": "^0.544.0",
+    "zod": "^4.1.12"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": "^5.0.0",
+    "@uidotdev/usehooks": "^2.0.0",
+    "nuqs": "^2.0.0",
+    "react": "^18.0.0 || ^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@tanstack/react-query": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.3",
+    "tsup": "^8.0.1",
+    "typescript": "^5.5.4",
+    "vitest": "^3.2.4"
+  },
+  "keywords": [
+    "llm",
+    "langgraph",
+    "workflow",
+    "person-research",
+    "proto"
+  ],
+  "type": "module"
+}

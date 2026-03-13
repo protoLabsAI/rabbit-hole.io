@@ -1,0 +1,104 @@
+# dependencies
+node_modules
+.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# testing
+coverage
+.nyc_output
+
+# next.js
+.next/
+out/
+dist
+build
+
+# generated files
+.generated
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+!.well-known/**/*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# env files
+.env
+.env*.local
+.env.research
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# turbo
+.turbo
+
+# cypress
+cypress/downloads
+cypress/screenshots
+cypress/videos
+
+# SSL certificates (local dev only)
+/certs/
+*.pem
+*.key
+*.crt
+
+# IDEs
+.idea
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# OS files
+Thumbs.db
+
+# Observability
+prometheus_data/
+grafana_data/
+loki_data/
+
+# Docker
+docker-compose.override.yml
+
+# Logs
+logs
+*.log
+pino-*
+
+# Test
+test-results/
+playwright-report/
+
+# Temporary
+tmp/
+temp/
+output/youtube/jNQXAC9IVRw.mp3
+output/youtube/jNQXAC9IVRw.mp4
+api-health-report.json
+
+# TinaCMS generated files
+apps/curious-minds/tina/__generated__/
+apps/torin-stephens/tina/__generated__/
+external/
+apps/builder/.clerk/.tmp/
+*storybook.log
+storybook-static
