@@ -105,9 +105,30 @@ export function createAnalyzeQueryNode(
 
     const depthInstruction = getDepthInstruction(depth);
 
+    // Extract entity info from state or from chat messages
+    let entityName = state.entityName;
+    let entityType = state.entityType;
+
+    if (!entityName && state.messages?.length > 0) {
+      // Find the last user message to extract the research subject
+      const lastUserMsg = [...state.messages].reverse().find(
+        (m: any) => m.role === "user" || m._getType?.() === "human"
+      );
+      if (lastUserMsg) {
+        const content = typeof lastUserMsg.content === "string"
+          ? lastUserMsg.content
+          : String(lastUserMsg.content);
+        entityName = content;
+        entityType = "research topic";
+      }
+    }
+
+    entityName = entityName || "unknown entity";
+    entityType = entityType || "general";
+
     const userMessage = `Research target:
-- Entity Name: ${state.entityName}
-- Entity Type: ${state.entityType}
+- Entity Name: ${entityName}
+- Entity Type: ${entityType}
 - ${depthInstruction}
 
 Generate a research brief and sub-questions for investigating this entity.`;
@@ -133,12 +154,12 @@ Generate a research brief and sub-questions for investigating this entity.`;
       });
       // Fallback: create minimal scoping from the query itself
       result = {
-        brief: `Research ${state.entityName} (${state.entityType}) to understand its key attributes, relationships, and significance.`,
+        brief: `Research ${entityName} (${entityType}) to understand its key attributes, relationships, and significance.`,
         subQuestions: [
-          `What is ${state.entityName} and what are its defining characteristics?`,
-          `What are the key relationships and connections of ${state.entityName}?`,
+          `What is ${entityName} and what are its defining characteristics?`,
+          `What are the key relationships and connections of ${entityName}?`,
         ],
-        identifiedEntityTypes: [state.entityType],
+        identifiedEntityTypes: [entityType],
       };
     }
 
