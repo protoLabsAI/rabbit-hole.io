@@ -122,9 +122,18 @@ export function ResearchChatInterface({
 
   const { messages, sendMessage, isLoading } = useCopilotChatHeadless_c();
 
-  const { state: agentState } = useCoAgent({
+  const { state: agentState, setState: setAgentState } = useCoAgent({
     name: "research_agent",
   });
+
+  // Sync sessionConfig to agent state whenever it changes so the agent
+  // can apply the correct depth / iteration limits during research.
+  useEffect(() => {
+    setAgentState((prev: Record<string, unknown>) => ({
+      ...prev,
+      sessionConfig: config,
+    }));
+  }, [config, setAgentState]);
 
   useCopilotAction({
     name: "push_entities_to_canvas",
@@ -581,6 +590,30 @@ export function ResearchChatInterface({
         onSubmit={handleSend}
         isLoading={isLoading}
       >
+        {/* Depth selector row — quick access without opening full settings */}
+        <div className="flex items-center gap-1 px-1 pb-1">
+          <span className="text-xs text-muted-foreground mr-1">Depth:</span>
+          {(
+            [
+              { value: "basic", label: "Shallow" },
+              { value: "detailed", label: "Standard" },
+              { value: "comprehensive", label: "Deep" },
+            ] as const
+          ).map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => onConfigChange({ ...config, depth: opt.value })}
+              className={`px-2 py-0.5 rounded text-xs font-medium transition-colors ${
+                config.depth === opt.value
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
         <div className="flex items-end gap-2">
           <PromptInputTextarea
             placeholder={placeholder}
