@@ -57,23 +57,7 @@ export const POST = async (req: NextRequest) => {
     );
   }
 
-  // Check user tier and AI chat access
-  const userTier = getUserTier(user);
-  const tierLimits = getTierLimits(userTier);
-
-  if (!tierLimits.hasAIChatAccess) {
-    return NextResponse.json(
-      {
-        error: "Upgrade Required",
-        message:
-          "AI chat requires Basic tier or higher. Upgrade at /pricing to unlock AI-powered research assistance.",
-        currentTier: userTier,
-        requiredTier: "basic",
-        upgradeUrl: "/pricing",
-      },
-      { status: 403 }
-    );
-  }
+  // Self-hosted: all users have AI chat access
 
   // User has access - proceed with CopilotKit
   const { handleRequest } = copilotRuntimeNextJSAppRouterEndpoint({
