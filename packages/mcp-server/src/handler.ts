@@ -251,9 +251,35 @@ async function extractEntities(
 ${focusEntity ? `Focus on entities related to: ${focusEntity}` : ""}
 ${entityTypes ? `Look for these entity types: ${entityTypes.join(", ")}` : "Extract all entity types."}
 
+CRITICAL UID FORMAT RULES:
+1. Entity UIDs MUST use format: {type_prefix}:{snake_case_name}
+   - Use the lowercase snake_case version of the entity name after the colon
+   - The prefix must match the entity type:
+     * Person → "person:{name}" (e.g., person:nicole_forsgren)
+     * Organization → "org:{name}" (e.g., org:google)
+     * Technology/Software → "software:{name}" (e.g., software:kubernetes)
+     * Framework → "framework:{name}" (e.g., framework:dora_metrics)
+     * Concept/Research → "research:{name}" (e.g., research:change_lead_time)
+     * Platform → "platform:{name}" (e.g., platform:github)
+     * Event → "event:{name}" (e.g., event:devops_enterprise_summit)
+     * Country → "country:{name}" (e.g., country:united_states)
+     * Company → "company:{name}" (e.g., company:google)
+     * Publication → "publication:{name}" (e.g., publication:accelerate_book)
+     * Other types → "{type}:{snake_case_name}"
+2. Relationship UIDs MUST use format: rel:{source_name}_{type}_{target_name}
+   - Use snake_case for all parts
+   - Example: rel:dora_metrics_includes_change_lead_time
+   - Example: rel:nicole_forsgren_authored_accelerate
+
 Return a JSON object with:
 - entities: array of {uid, name, type, properties: {}, tags: [], aliases: []}
 - relationships: array of {uid, type, source, target, properties: {}}
+
+Where:
+- entity uid: MUST be "{type_prefix}:{snake_case_name}" format
+- relationship uid: MUST start with "rel:" prefix
+- relationship source and target: MUST be valid entity UIDs from the entities array
+- relationship type: use UPPERCASE verb like "INCLUDES", "AUTHORED", "FOUNDED", "WORKS_AT", "PART_OF", "RELATED_TO"
 
 Text:
 ${text.slice(0, 12000)}
@@ -343,6 +369,30 @@ function validateBundle(bundle: Record<string, unknown>): unknown {
 
 // ─── Full Research Pipeline ─────────────────────────────────────────
 
+/**
+ * Convert a query string to a URL-safe slug for use in evidence UIDs.
+ */
+function toSlug(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+}
+
+/**
+ * Get today's date as YYYY-MM-DD string.
+ */
+function todayDate(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+/**
+ * Get current ISO datetime string.
+ */
+function nowIso(): string {
+  return new Date().toISOString().replace(/(\.\d{3})Z$/, ".000Z");
+}
+
 async function researchEntity(
   query: string,
   depth: string,
@@ -350,36 +400,175 @@ async function researchEntity(
   config: HandlerConfig
 ): Promise<unknown> {
   const results: Record<string, unknown> = { query, depth };
+  const evidenceNodes: Array<Record<string, unknown>> = [];
+  const entityCitations: Record<string, Array<Record<string, unknown>>> = {};
 
   // Step 1: Search Wikipedia
-  const wiki = await wikipediaSearch(query);
+  const wiki = (await wikipediaSearch(query)) as Record<string, unknown>;
   results.wikipedia = wiki;
 
+  // Build Wikipedia evidence node
+  if (wiki && !wiki.error && wiki.url) {
+    const querySlug = toSlug(query);
+    const wikiEvidenceUid = `evidence:wikipedia_${querySlug}`;
+    evidenceNodes.push({
+      uid: wikiEvidenceUid,
+      kind: "research",
+      title: (wiki.title as string) ?? `Wikipedia: ${query}`,
+      publisher: "Wikipedia",
+      date: todayDate(),
+      url: wiki.url as string,
+      retrieved_at: nowIso(),
+      reliability: 0.7,
+      notes: `Wikipedia article on "${query}"`,
+    });
+    results._wikiEvidenceUid = wikiEvidenceUid;
+  }
+
   // Step 2: Web search for additional context
-  const webResults = await duckduckgoSearch(query);
+  const webResults = (await duckduckgoSearch(query)) as Record<string, unknown>;
   results.webSearch = webResults;
 
+  // Build web search evidence nodes from DuckDuckGo results
+  const webResultItems =
+    (webResults?.results as Array<Record<string, unknown>>) ?? [];
+  for (let i = 0; i < Math.min(webResultItems.length, 3); i++) {
+    const item = webResultItems[i];
+    if (
+      item?.url &&
+      typeof item.url === "string" &&
+      item.url.startsWith("http")
+    ) {
+      const slug = toSlug((item.title as string) ?? `web_result_${i}`);
+      evidenceNodes.push({
+        uid: `evidence:web_${slug}_${i}`,
+        kind: "major_media",
+        title: (item.title as string) ?? `Web result ${i + 1}`,
+        publisher: new URL(item.url).hostname.replace(/^www\./, ""),
+        date: todayDate(),
+        url: item.url,
+        retrieved_at: nowIso(),
+        reliability: 0.5,
+      });
+    }
+  }
+
   // Step 3: Tavily search if available
+  let tavilyResults: Array<Record<string, unknown>> = [];
   if (config.tavilyApiKey) {
-    const tavily = await tavilySearch(query, 5, config.tavilyApiKey);
+    const tavily = (await tavilySearch(
+      query,
+      5,
+      config.tavilyApiKey
+    )) as Record<string, unknown>;
     results.tavilySearch = tavily;
+
+    // Build Tavily evidence nodes
+    tavilyResults = (tavily?.results as Array<Record<string, unknown>>) ?? [];
+    for (let i = 0; i < tavilyResults.length; i++) {
+      const item = tavilyResults[i];
+      if (
+        item?.url &&
+        typeof item.url === "string" &&
+        item.url.startsWith("http")
+      ) {
+        const slug = toSlug((item.title as string) ?? `tavily_result_${i}`);
+        evidenceNodes.push({
+          uid: `evidence:tavily_${slug}_${i}`,
+          kind: "major_media",
+          title: (item.title as string) ?? `Tavily result ${i + 1}`,
+          publisher: new URL(item.url).hostname.replace(/^www\./, ""),
+          date: todayDate(),
+          url: item.url,
+          retrieved_at: nowIso(),
+          reliability:
+            typeof item.score === "number" ? Math.min(item.score, 1) : 0.6,
+        });
+      }
+    }
   }
 
   // Step 4: Extract entities from Wikipedia text
-  if (config.anthropicApiKey && (wiki as Record<string, unknown>).text) {
-    const entities = await extractEntities(
-      (wiki as Record<string, unknown>).text as string,
+  if (config.anthropicApiKey && wiki.text) {
+    const extraction = await extractEntities(
+      wiki.text as string,
       entityType ? [entityType] : undefined,
       query,
       config.anthropicApiKey
     );
-    results.extraction = entities;
+    results.extraction = extraction;
 
-    // Step 5: Validate if we got a bundle
-    if (entities && typeof entities === "object" && "entities" in entities) {
-      results.validation = validateBundle(entities as Record<string, unknown>);
+    // Step 5: Build entity citations mapping entities to evidence sources
+    if (
+      extraction &&
+      typeof extraction === "object" &&
+      "entities" in extraction
+    ) {
+      const extractedEntities = (extraction as Record<string, unknown>)
+        .entities as Array<Record<string, unknown>>;
+
+      if (Array.isArray(extractedEntities)) {
+        for (const entity of extractedEntities) {
+          const entityUid = entity.uid as string;
+          if (!entityUid) continue;
+
+          const citations: Array<Record<string, unknown>> = [];
+
+          // Cite Wikipedia as source for every extracted entity
+          if (results._wikiEvidenceUid && wiki.url) {
+            citations.push({
+              claimText: `Entity "${entity.name}" extracted from Wikipedia article on "${query}"`,
+              sourceUrl: wiki.url as string,
+              excerpt: (wiki.text as string).slice(0, 200),
+              confidence: 0.7,
+              sourceTitle: (wiki.title as string) ?? `Wikipedia: ${query}`,
+            });
+          }
+
+          // Cite Tavily results that mention the entity name
+          if (entity.name && typeof entity.name === "string") {
+            const entityNameLower = (entity.name as string).toLowerCase();
+            for (let i = 0; i < tavilyResults.length; i++) {
+              const item = tavilyResults[i];
+              const content = ((item.content as string) ?? "").toLowerCase();
+              if (content.includes(entityNameLower) && item.url) {
+                citations.push({
+                  claimText: `Entity "${entity.name}" mentioned in Tavily search result`,
+                  sourceUrl: item.url as string,
+                  excerpt: (item.content as string)?.slice(0, 200) ?? "",
+                  confidence:
+                    typeof item.score === "number"
+                      ? Math.min(item.score, 1)
+                      : 0.6,
+                  sourceTitle: (item.title as string) ?? "",
+                });
+              }
+            }
+          }
+
+          if (citations.length > 0) {
+            entityCitations[entityUid] = citations;
+          }
+        }
+      }
+
+      results.bundle = {
+        evidence: evidenceNodes,
+        entities: extractedEntities ?? [],
+        relationships:
+          (extraction as Record<string, unknown>).relationships ?? [],
+        entityCitations,
+      };
+
+      results.validation = validateBundle(
+        results.bundle as Record<string, unknown>
+      );
     }
   }
+
+  // Always include evidence and entityCitations in results
+  results.evidence = evidenceNodes;
+  results.entityCitations = entityCitations;
 
   return results;
 }
