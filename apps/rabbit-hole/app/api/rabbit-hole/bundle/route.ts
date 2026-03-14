@@ -5,7 +5,6 @@
  * and returns entities and relationships to the frontend canvas.
  */
 
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import {
@@ -15,18 +14,6 @@ import {
 } from "@proto/types";
 
 export async function POST(request: NextRequest) {
-  const { userId } = await auth();
-
-  if (!userId) {
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Authentication required",
-      },
-      { status: 401 }
-    );
-  }
-
   let body: unknown;
   try {
     body = await request.json();
