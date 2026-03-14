@@ -384,6 +384,104 @@ export function ResearchEditor({
     };
   }, [zoomIn, zoomOut, fitView, setCenter, getAnimationDuration]);
 
+  // Handle entity bundles pushed via CopilotKit action
+  React.useEffect(() => {
+    const handlePushBundle = (event: Event) => {
+      const detail = (event as CustomEvent).detail;
+      if (!detail || !graph) return;
+
+      const {
+        entities = [],
+        relationships = [],
+        entityCitations = {},
+      } = detail as {
+        entities: Array<{
+          uid: string;
+          name: string;
+          type: string;
+          properties?: Record<string, unknown>;
+          tags?: string[];
+          aliases?: string[];
+        }>;
+        relationships: Array<{
+          uid?: string;
+          type: string;
+          source: string;
+          target: string;
+          properties?: Record<string, unknown>;
+        }>;
+        entityCitations: Record<string, string[]>;
+      };
+
+      let entitiesAdded = 0;
+
+      // Import entities (merge mode — skip duplicates)
+      for (const entity of entities) {
+        if (!entity.uid) continue;
+        if (graph.hasNode(entity.uid)) continue;
+
+        graph.addNode(entity.uid, {
+          uid: entity.uid,
+          name: entity.name || entity.uid,
+          type: entity.type || "Entity",
+          x: Math.random() * 800,
+          y: Math.random() * 600,
+          color: getEntityColor(entity.type || "Entity"),
+          icon: getEntityImage(entity.type || "Entity"),
+          size: 10,
+          properties: {
+            ...(entity.properties || {}),
+            // Preserve citations on the node
+            citations: entityCitations[entity.uid] ?? [],
+          },
+          tags: entity.tags || [],
+          aliases: entity.aliases || [],
+        });
+        entitiesAdded++;
+      }
+
+      // Import relationships (merge mode — skip duplicates)
+      for (const rel of relationships) {
+        if (!rel.source || !rel.target) continue;
+        if (!graph.hasNode(rel.source) || !graph.hasNode(rel.target)) continue;
+
+        const edgeKey = rel.uid || `${rel.source}-${rel.type}-${rel.target}`;
+        // Skip if this edge key already exists
+        if (graph.hasEdge(edgeKey)) continue;
+
+        try {
+          graph.addEdgeWithKey(edgeKey, rel.source, rel.target, {
+            uid: edgeKey,
+            type: rel.type || "RELATED_TO",
+            source: rel.source,
+            target: rel.target,
+            confidence:
+              (rel.properties?.confidence as number | undefined) ?? 1.0,
+            properties: rel.properties || {},
+          });
+        } catch {
+          // Edge may already exist under a different key; skip silently
+        }
+      }
+
+      if (entitiesAdded > 0) {
+        onGraphChange(graph);
+        // Fit view to show newly added entities
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent("research:canvas:fit-view"));
+        }, 100);
+      }
+    };
+
+    window.addEventListener("research:canvas:push-bundle", handlePushBundle);
+    return () => {
+      window.removeEventListener(
+        "research:canvas:push-bundle",
+        handlePushBundle
+      );
+    };
+  }, [graph, onGraphChange]);
+
   // Track cursor in flow coordinates (world space, not screen space)
   // Throttled to 100ms (10 updates/sec) - reduced from 60/sec for performance
   useEffect(() => {
