@@ -22,9 +22,11 @@ interface UtilityPanelProps {
   layoutId: string;
 }
 
+const EMPTY_TABS: UtilityTab[] = [];
+
 export function UtilityPanel({
-  universalTabs = [],
-  canvasTabs = [],
+  universalTabs = EMPTY_TABS,
+  canvasTabs = EMPTY_TABS,
   layoutId,
 }: UtilityPanelProps) {
   // Combine universal and canvas-specific tabs (memoized to prevent unnecessary effect re-runs)

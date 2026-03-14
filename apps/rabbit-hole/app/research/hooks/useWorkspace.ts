@@ -227,9 +227,17 @@ export function useWorkspace(
         usesYMap: isYMapWorkspace(ydoc),
       });
 
+      // Heal missing fields in existing workspace
+      if (!yWorkspace.get("id")) {
+        ydoc.transact(() => {
+          yWorkspace.set("id", workspaceId);
+          if (!yWorkspace.get("name")) yWorkspace.set("name", "Research Workspace");
+        }, userId);
+      }
+
       const ws: Workspace = {
-        id: yWorkspace.get("id") as string,
-        name: yWorkspace.get("name") as string,
+        id: (yWorkspace.get("id") as string) || workspaceId,
+        name: (yWorkspace.get("name") as string) || "Research Workspace",
         tabs,
         activeTabId: activeTabId,
         metadata: (yWorkspace.get("metadata") as Workspace["metadata"]) || {
