@@ -7,8 +7,6 @@
 
 "use client";
 
-import { useUser } from "@clerk/nextjs";
-
 import { getUserRoleClient, hasMinimumRole, type UserRole } from "../client";
 
 interface ClientRoleGuardProps {
@@ -22,7 +20,16 @@ export function ClientRoleGuard({
   children,
   fallback = null,
 }: ClientRoleGuardProps) {
-  const { user } = useUser();
+  const user = {
+    id: "local-user",
+    firstName: "Local",
+    lastName: "User",
+    username: "local-user",
+    fullName: "Local User",
+    emailAddresses: [{ emailAddress: "local@localhost" }],
+    publicMetadata: { tier: "pro", role: "super_admin" },
+    privateMetadata: { stats: {} },
+  };
 
   if (!user) return <>{fallback}</>;
 

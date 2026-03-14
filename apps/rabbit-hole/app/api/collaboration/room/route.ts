@@ -5,7 +5,6 @@
  * Enterprise tier only (with super admin override).
  */
 
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import { CreateRoomRequestSchema } from "@proto/collab";
@@ -19,7 +18,10 @@ export const runtime = "nodejs";
 export async function POST(request: NextRequest) {
   try {
     // Authenticate with Clerk
-    const { userId, orgId } = await auth();
+    const { userId, orgId } = {
+      userId: "local-user",
+      orgId: null as string | null,
+    };
 
     if (!userId || !orgId) {
       return NextResponse.json(
@@ -53,9 +55,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user info for JWT
-    const { clerkClient } = await import("@clerk/nextjs/server");
-    const client = await clerkClient();
-    const user = await client.users.getUser(userId);
+    const user = {
+      id: userId,
+      publicMetadata: { tier: "pro" },
+      privateMetadata: { stats: {} },
+    };
 
     // Create room with JWT token
     const roomConfig = await createCollaborationRoom(

@@ -5,7 +5,6 @@
  * Handles loading states, errors, and optional preloading.
  */
 
-import { useUser } from "@clerk/nextjs";
 import { useEffect, useState, useCallback } from "react";
 
 import type { UserTierLimits } from "@proto/auth";
@@ -33,7 +32,17 @@ export function useTierAwareLazyLoad<T>({
   preload = false,
   onError,
 }: UseTierAwareLazyLoadOptions<T>): LazyLoadState<T> {
-  const { user } = useUser();
+  const user = {
+    id: "local-user",
+    firstName: "Local",
+    lastName: "User",
+    username: "local-user",
+    fullName: "Local User",
+    emailAddresses: [{ emailAddress: "local@localhost" }],
+    publicMetadata: { tier: "pro" },
+    privateMetadata: { stats: {} },
+    isSignedIn: true,
+  };
   const [Component, setComponent] = useState<T | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);

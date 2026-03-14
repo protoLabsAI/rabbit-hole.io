@@ -1,4 +1,3 @@
-import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import { getUserTier, getTierLimits } from "@proto/auth";
@@ -7,7 +6,16 @@ import { getRelationshipTypesForDomains } from "@proto/types";
 export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
-  const user = await currentUser();
+  const user = {
+    id: "local-user",
+    firstName: "Local",
+    lastName: "User",
+    username: "local-user",
+    fullName: "Local User",
+    emailAddresses: [{ emailAddress: "local@localhost" }],
+    publicMetadata: { tier: "pro" },
+    privateMetadata: { stats: {} },
+  };
 
   if (!user) {
     return NextResponse.json(

@@ -77,8 +77,6 @@
     { "path": "../../packages/llm-providers" },
     { "path": "../../packages/sidequest-utils" },
     { "path": "../../packages/charts" },
-    { "path": "../../packages/collab" },
-    { "path": "../../packages/assets" },
-    { "path": "../../packages/prompts" }
+    { "path": "../../packages/collab" }
   ]
 }

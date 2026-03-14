@@ -1,6 +1,5 @@
 "use client";
 
-import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import { CopilotChat } from "@copilotkit/react-ui";
 import { useState } from "react";
 
@@ -23,63 +22,44 @@ export function CopilotChatInterface({
 
   return (
     <div className={`copilot-chat-container ${className}`}>
-      {/* Authenticated Users: Show AI Chat */}
-      <SignedIn>
-        {/* Chat toggle button */}
-        <Button
-          onClick={() => setIsOpen(!isOpen)}
-          size="icon"
-          className="fixed bottom-4 right-4 h-12 w-12 rounded-full shadow-lg z-50"
-          title="Open AI Research Assistant"
-        >
-          <span className="text-xl">🤖</span>
-        </Button>
+      {/* Chat toggle button */}
+      <Button
+        onClick={() => setIsOpen(!isOpen)}
+        size="icon"
+        className="fixed bottom-4 right-4 h-12 w-12 rounded-full shadow-lg z-50"
+        title="Open AI Research Assistant"
+      >
+        <span className="text-xl">🤖</span>
+      </Button>
 
-        {/* Chat interface */}
-        {isOpen && (
-          <Card className="fixed bottom-20 right-4 w-96 h-96 shadow-xl z-40">
-            <CardHeader className="flex flex-row items-center justify-between p-3 border-b">
-              <h3 className="text-lg font-semibold">AI Research Assistant</h3>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsOpen(false)}
-                className="h-auto p-1"
-              >
-                ✕
-              </Button>
-            </CardHeader>
-
-            <CardContent className="h-80 p-0">
-              <CopilotChat
-                labels={{
-                  title: "Rabbit Hole AI Assistant",
-                  initial:
-                    "Hello! I can help you research entities and analyze the knowledge graph. Try asking me to research a person, organization, or movement.",
-                  placeholder: placeholder,
-                }}
-                className="h-full"
-              />
-            </CardContent>
-          </Card>
-        )}
-      </SignedIn>
-
-      {/* Unauthenticated Users: Show Sign In Button */}
-      <SignedOut>
-        <div className="fixed bottom-4 right-4 z-50">
-          <SignInButton mode="modal">
+      {/* Chat interface */}
+      {isOpen && (
+        <Card className="fixed bottom-20 right-4 w-96 h-96 shadow-xl z-40">
+          <CardHeader className="flex flex-row items-center justify-between p-3 border-b">
+            <h3 className="text-lg font-semibold">AI Research Assistant</h3>
             <Button
-              variant="outline"
-              className="rounded-full shadow-lg gap-2"
-              title="Sign in to access AI Research Assistant"
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsOpen(false)}
+              className="h-auto p-1"
             >
-              <span className="text-xl">🔒</span>
-              <span className="text-sm font-medium">Sign In for AI</span>
+              ✕
             </Button>
-          </SignInButton>
-        </div>
-      </SignedOut>
+          </CardHeader>
+
+          <CardContent className="h-80 p-0">
+            <CopilotChat
+              labels={{
+                title: "Rabbit Hole AI Assistant",
+                initial:
+                  "Hello! I can help you research entities and analyze the knowledge graph. Try asking me to research a person, organization, or movement.",
+                placeholder: placeholder,
+              }}
+              className="h-full"
+            />
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

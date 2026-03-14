@@ -1,6 +1,5 @@
 "use client";
 
-import { useAuth, useOrganization, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -19,9 +18,19 @@ interface HostSessionClientProps {
 export default function HostSessionClient({
   sessionId,
 }: HostSessionClientProps) {
-  const { userId } = useAuth();
-  const { user } = useUser();
-  const { organization } = useOrganization();
+  const userId = "local-user";
+  const user = {
+    id: "local-user",
+    firstName: "Local",
+    lastName: "User",
+    username: "local-user",
+    fullName: "Local User",
+    emailAddresses: [{ emailAddress: "local@localhost" }],
+    publicMetadata: { tier: "pro" },
+    privateMetadata: { stats: {} },
+    isSignedIn: true,
+  };
+  /* useOrganization removed - Clerk removed */
   const router = useRouter();
   const { toast } = useToast();
 

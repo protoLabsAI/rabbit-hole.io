@@ -1,4 +1,3 @@
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import { getGlobalPostgresPool } from "@proto/database";
@@ -8,7 +7,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = await auth();
+    const { userId } = { userId: "local-user" };
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

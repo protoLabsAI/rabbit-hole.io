@@ -17,7 +17,6 @@ export default defineConfig({
     "react",
     "react-dom",
     "next",
-    "@clerk/nextjs",
     "yjs",
     "@hocuspocus/provider",
     "@tanstack/react-query",

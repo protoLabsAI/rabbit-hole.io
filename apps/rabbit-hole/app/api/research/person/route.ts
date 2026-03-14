@@ -12,7 +12,6 @@
 // @ts-nocheck - Disabled route with preserved code
 /* eslint-disable */
 
-import { auth, clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import { enforceEntityLimit, TierLimitError } from "@proto/auth";
@@ -37,7 +36,10 @@ export async function POST(request: NextRequest) {
   );
 
   // Check authentication
-  const { userId, orgId } = await auth();
+  const { userId, orgId } = {
+    userId: "local-user",
+    orgId: null as string | null,
+  };
 
   if (!userId) {
     return NextResponse.json(
@@ -51,8 +53,11 @@ export async function POST(request: NextRequest) {
 
   // Get organization ID and user for tier enforcement
   const clerkOrgId = orgId || request.headers.get("x-clerk-org-id") || "public";
-  const client = await clerkClient();
-  const user = await client.users.getUser(userId);
+  const user = {
+    id: userId,
+    publicMetadata: { tier: "pro" },
+    privateMetadata: { stats: {} },
+  };
 
   // ENFORCE ENTITY LIMIT BEFORE RESEARCH
   try {

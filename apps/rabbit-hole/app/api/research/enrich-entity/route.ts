@@ -5,7 +5,6 @@
  * Returns enriched properties for frontend to merge into local graph.
  */
 
-import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -27,7 +26,16 @@ const LangExtractResponseSchema = z
 
 export async function POST(request: NextRequest) {
   // 1. Authentication
-  const user = await currentUser();
+  const user = {
+    id: "local-user",
+    firstName: "Local",
+    lastName: "User",
+    username: "local-user",
+    fullName: "Local User",
+    emailAddresses: [{ emailAddress: "local@localhost" }],
+    publicMetadata: { tier: "pro" },
+    privateMetadata: { stats: {} },
+  };
   if (!user) {
     return NextResponse.json(
       { error: "Unauthorized", message: "Authentication required" },

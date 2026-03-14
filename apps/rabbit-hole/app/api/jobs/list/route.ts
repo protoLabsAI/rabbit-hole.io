@@ -7,7 +7,6 @@
  * Useful for monitoring and debugging the job queue.
  */
 
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import { validatePaginationParams, PAGINATION_LIMITS } from "@proto/api-utils";
@@ -17,7 +16,7 @@ import { listJobs } from "@proto/sidequest-utils/server";
 export async function GET(request: NextRequest) {
   try {
     // Authenticate user
-    const { userId } = await auth();
+    const { userId } = { userId: "local-user" };
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
