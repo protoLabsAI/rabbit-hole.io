@@ -81,6 +81,13 @@ cytoscape.use(cise);
 cytoscape.use(cola);
 cytoscape.use(cytoscapePopper(createFloatingUIPopperFactory()));
 
+// Register layout-utilities (accesses window, must be dynamic)
+if (typeof window !== "undefined") {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const layoutUtilities = require("cytoscape-layout-utilities");
+  cytoscape.use(layoutUtilities);
+}
+
 export default function AtlasClient() {
   const user = {
     id: "local-user",
@@ -456,8 +463,8 @@ export default function AtlasClient() {
     }
   }, [apiService]);
 
-  // Subscribe to live graph updates via SSE
-  useGraphUpdates(refreshGraphData);
+  // Subscribe to live graph updates via SSE — incrementally adds nodes/edges to Cytoscape
+  useGraphUpdates(cyRef);
 
   // Handle form submissions
   const handleEntityAdded = useCallback(

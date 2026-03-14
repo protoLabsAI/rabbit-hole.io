@@ -219,6 +219,7 @@
     "cytoscape": "^3.33.1",
     "cytoscape-cise": "^2.0.1",
     "cytoscape-cola": "^2.5.1",
+    "cytoscape-layout-utilities": "^1.1.1",
     "cytoscape-popper": "^4.0.1",
     "d3-force": "^3.0.0",
     "dagre": "^0.8.5",

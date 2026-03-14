@@ -24,7 +24,9 @@ import {
 
 import {
   graphUpdateEmitter,
-  type GraphUpdateEvent,
+  type GraphEntityEvent,
+  type GraphRelationshipEvent,
+  type GraphBundleCompleteEvent,
 } from "../atlas/graph-updates/emitter";
 
 // Initialize domains for API route context (serverless function)
@@ -337,8 +339,11 @@ const handleBundleIngest = async (
             uid: entity.uid,
             name: entity.name,
             entityType: entity.type,
+            properties: entity.properties,
+            tags: entity.tags,
+            aliases: entity.aliases,
             timestamp: new Date().toISOString(),
-          } satisfies GraphUpdateEvent);
+          } satisfies GraphEntityEvent);
         }
 
         summary.mergeResults.push(mergeResult);
@@ -431,8 +436,9 @@ const handleBundleIngest = async (
           relationshipType: relationship.type,
           source: relationship.source,
           target: relationship.target,
+          properties: relationship.properties,
           timestamp: new Date().toISOString(),
-        } satisfies GraphUpdateEvent);
+        } satisfies GraphRelationshipEvent);
 
         summary.relationshipsCreated++;
       }
@@ -443,12 +449,14 @@ const handleBundleIngest = async (
 
     const totalMs = Date.now() - startTime;
 
-    // Emit bundle_complete so Atlas can do a final refresh
+    // Emit bundle_complete so Atlas can sync state
     graphUpdateEmitter.emit("graph-update", {
       type: "bundle_complete",
       uid: `bundle-${Date.now()}`,
+      entitiesCreated: summary.entitiesCreated,
+      relationshipsCreated: summary.relationshipsCreated,
       timestamp: new Date().toISOString(),
-    } satisfies GraphUpdateEvent);
+    } satisfies GraphBundleCompleteEvent);
 
     console.log(`🎉 Bundle ingest completed in ${totalMs}ms`);
     console.log(`📈 Phase timings:`, phaseTimings);

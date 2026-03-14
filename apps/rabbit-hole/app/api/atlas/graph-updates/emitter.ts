@@ -21,13 +21,36 @@ if (!globalForEmitter.__graphUpdateEmitter) {
 
 export const graphUpdateEmitter = globalForEmitter.__graphUpdateEmitter;
 
-export interface GraphUpdateEvent {
-  type: "entity_created" | "relationship_created" | "bundle_complete";
+export interface GraphEntityEvent {
+  type: "entity_created";
   uid: string;
-  name?: string;
-  entityType?: string;
-  source?: string;
-  target?: string;
-  relationshipType?: string;
+  name: string;
+  entityType: string;
+  properties?: Record<string, unknown>;
+  tags?: string[];
+  aliases?: string[];
   timestamp: string;
 }
+
+export interface GraphRelationshipEvent {
+  type: "relationship_created";
+  uid: string;
+  relationshipType: string;
+  source: string;
+  target: string;
+  properties?: Record<string, unknown>;
+  timestamp: string;
+}
+
+export interface GraphBundleCompleteEvent {
+  type: "bundle_complete";
+  uid: string;
+  entitiesCreated: number;
+  relationshipsCreated: number;
+  timestamp: string;
+}
+
+export type GraphUpdateEvent =
+  | GraphEntityEvent
+  | GraphRelationshipEvent
+  | GraphBundleCompleteEvent;
