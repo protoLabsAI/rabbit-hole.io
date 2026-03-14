@@ -6,6 +6,8 @@
 - Feature branches are created from `dev` and PR back to `dev`
 - Promote to production: merge `dev` → `main` via PR
 - No staging branch
+- **Never commit unresolved merge conflicts** — pre-commit hook blocks `<<<<<<` markers
+- When merging branches, always verify zero conflict markers before committing
 
 ## Code Conventions
 

@@ -190,11 +190,7 @@ export async function GET(request: NextRequest) {
   // Authenticate request to prevent DoS on expensive image generation
   // Bypass in development for Storybook and local testing
   if (process.env.NODE_ENV !== "development") {
-<<<<<<< HEAD
     const userId = "local-user";
-=======
-    const { userId } = { userId: "local-user" };
->>>>>>> origin/main
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

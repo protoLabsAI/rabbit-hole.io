@@ -88,21 +88,6 @@ export function useWorkspace(
   options?: UseWorkspaceOptions
 ): UseWorkspaceReturn {
   const userId = "local-user";
-<<<<<<< HEAD
-=======
-  const user = {
-    id: "local-user",
-    firstName: "Local",
-    lastName: "User",
-    username: "local-user",
-    fullName: "Local User",
-    emailAddresses: [{ emailAddress: "local@localhost" }],
-    publicMetadata: { tier: "pro" },
-    privateMetadata: { stats: {} },
-    isSignedIn: true,
-  };
-  /* useOrganization removed - Clerk removed */
->>>>>>> origin/main
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [users, setUsers] = useState<Map<string, UserPresence>>(new Map());
   const [followMode, setFollowMode] = useState<{
@@ -242,17 +227,9 @@ export function useWorkspace(
         usesYMap: isYMapWorkspace(ydoc),
       });
 
-      // Heal missing fields in existing workspace
-      if (!yWorkspace.get("id")) {
-        ydoc.transact(() => {
-          yWorkspace.set("id", workspaceId);
-          if (!yWorkspace.get("name")) yWorkspace.set("name", "Research Workspace");
-        }, userId);
-      }
-
       const ws: Workspace = {
-        id: (yWorkspace.get("id") as string) || workspaceId,
-        name: (yWorkspace.get("name") as string) || "Research Workspace",
+        id: yWorkspace.get("id") as string,
+        name: yWorkspace.get("name") as string,
         tabs,
         activeTabId: activeTabId,
         metadata: (yWorkspace.get("metadata") as Workspace["metadata"]) || {

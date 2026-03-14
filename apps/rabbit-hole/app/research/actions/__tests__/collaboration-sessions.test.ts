@@ -13,11 +13,7 @@ import {
   deleteCollaborationSession,
 } from "../collaboration-sessions";
 
-<<<<<<< HEAD
 // Clerk mock removed - auth is now hardcoded to local-user
-=======
-// Mock dependencies (Clerk removed - auth is now local)
->>>>>>> origin/main
 
 vi.mock("@proto/auth", () => ({
   getUserTier: vi.fn(),
@@ -49,21 +45,21 @@ vi.mock("pg", () => ({
 }));
 
 describe("createCollaborationSession", () => {
+  let mockAuth: any;
   let mockAuthFns: any;
   let Pool: any;
 
   beforeEach(async () => {
     vi.clearAllMocks();
-<<<<<<< HEAD
     mockAuth = {} as any; // Clerk removed
-=======
->>>>>>> origin/main
     mockAuthFns = await import("@proto/auth");
     const pg = await import("pg");
     Pool = pg.Pool;
   });
 
   it("should reject unauthorized users", async () => {
+    mockAuth.auth.mockResolvedValue({ userId: null, orgId: null });
+
     const result = await createCollaborationSession({
       name: "Test Session",
       workspaceId: "workspace-123",
@@ -74,6 +70,15 @@ describe("createCollaborationSession", () => {
   });
 
   it("should reject free tier users", async () => {
+    mockAuth.auth.mockResolvedValue({
+      userId: "user-123",
+      orgId: null,
+    });
+    mockAuth.currentUser.mockResolvedValue({
+      id: "user-123",
+      firstName: "Test",
+    } as any);
+
     mockAuthFns.getUserTier.mockReturnValue("free");
     mockAuthFns.getTierLimits.mockReturnValue({
       maxActiveSessions: 0,
@@ -91,6 +96,14 @@ describe("createCollaborationSession", () => {
 
   // TODO: Setup test PostgreSQL database for integration tests
   it.skip("should enforce session limits", async () => {
+    mockAuth.auth.mockResolvedValue({
+      userId: "user-123",
+      orgId: null,
+    });
+    mockAuth.currentUser.mockResolvedValue({
+      id: "user-123",
+    } as any);
+
     mockAuthFns.getUserTier.mockReturnValue("basic");
     mockAuthFns.getTierLimits.mockReturnValue({
       maxActiveSessions: 1,
@@ -123,6 +136,14 @@ describe("createCollaborationSession", () => {
 
   // TODO: Setup test PostgreSQL database for integration tests
   it.skip("should create session successfully for basic tier", async () => {
+    mockAuth.auth.mockResolvedValue({
+      userId: "user-123",
+      orgId: null,
+    });
+    mockAuth.currentUser.mockResolvedValue({
+      id: "user-123",
+    } as any);
+
     mockAuthFns.getUserTier.mockReturnValue("basic");
     mockAuthFns.getTierLimits.mockReturnValue({
       maxActiveSessions: 1,
@@ -166,20 +187,20 @@ describe("createCollaborationSession", () => {
 });
 
 describe("endCollaborationSession", () => {
+  let mockAuth: any;
   let Pool: any;
 
   beforeEach(async () => {
     vi.clearAllMocks();
-<<<<<<< HEAD
     mockAuth = {} as any; // Clerk removed
-=======
->>>>>>> origin/main
     const pg = await import("pg");
     Pool = pg.Pool;
   });
 
   // TODO: Setup test PostgreSQL database for integration tests
   it.skip("should reject unauthorized users", async () => {
+    mockAuth.auth.mockResolvedValue({ userId: null, orgId: null });
+
     const result = await endCollaborationSession({
       sessionId: "session-123",
     });
@@ -190,6 +211,11 @@ describe("endCollaborationSession", () => {
 
   // TODO: Setup test PostgreSQL database for integration tests
   it.skip("should reject non-owners", async () => {
+    mockAuth.auth.mockResolvedValue({
+      userId: "user-123",
+      orgId: null,
+    });
+
     const mockPool = new (Pool as any)();
     mockPool.query.mockResolvedValueOnce({
       rows: [{ owner_id: "other-user" }],
@@ -205,6 +231,11 @@ describe("endCollaborationSession", () => {
 
   // TODO: Setup test PostgreSQL database for integration tests
   it.skip("should return 404 for nonexistent session", async () => {
+    mockAuth.auth.mockResolvedValue({
+      userId: "user-123",
+      orgId: null,
+    });
+
     const mockPool = new (Pool as any)();
     mockPool.query.mockResolvedValueOnce({ rows: [] });
 
@@ -218,6 +249,11 @@ describe("endCollaborationSession", () => {
 
   // TODO: Setup test PostgreSQL database for integration tests
   it.skip("should end session successfully", async () => {
+    mockAuth.auth.mockResolvedValue({
+      userId: "user-123",
+      orgId: null,
+    });
+
     const mockPool = new (Pool as any)();
     mockPool.query
       .mockResolvedValueOnce({
@@ -237,19 +273,19 @@ describe("endCollaborationSession", () => {
 });
 
 describe("deleteCollaborationSession", () => {
+  let mockAuth: any;
   let Pool: any;
 
   beforeEach(async () => {
     vi.clearAllMocks();
-<<<<<<< HEAD
     mockAuth = {} as any; // Clerk removed
-=======
->>>>>>> origin/main
     const pg = await import("pg");
     Pool = pg.Pool;
   });
 
   it("should reject unauthorized users", async () => {
+    mockAuth.auth.mockResolvedValue({ userId: null, orgId: null });
+
     const result = await deleteCollaborationSession({
       sessionId: "550e8400-e29b-41d4-a716-446655440000",
     });
@@ -259,6 +295,11 @@ describe("deleteCollaborationSession", () => {
 
   // TODO: Setup test PostgreSQL database for integration tests
   it.skip("should reject non-owners", async () => {
+    mockAuth.auth.mockResolvedValue({
+      userId: "user-123",
+      orgId: null,
+    });
+
     const mockPool = new (Pool as any)();
     mockPool.query.mockResolvedValueOnce({
       rows: [{ owner_id: "other-user", status: "ended" }],
@@ -273,6 +314,11 @@ describe("deleteCollaborationSession", () => {
 
   // TODO: Setup test PostgreSQL database for integration tests
   it.skip("should delete session successfully", async () => {
+    mockAuth.auth.mockResolvedValue({
+      userId: "user-123",
+      orgId: null,
+    });
+
     const mockPool = new (Pool as any)();
     mockPool.query
       .mockResolvedValueOnce({
@@ -290,19 +336,22 @@ describe("deleteCollaborationSession", () => {
 });
 
 describe("initializeSessionData", () => {
+  let mockAuth: any;
   let Pool: any;
 
   beforeEach(async () => {
     vi.clearAllMocks();
-<<<<<<< HEAD
     mockAuth = {} as any; // Clerk removed
-=======
->>>>>>> origin/main
     const pg = await import("pg");
     Pool = pg.Pool;
   });
 
   it("should validate input schema", async () => {
+    mockAuth.auth.mockResolvedValue({
+      userId: "user-123",
+      orgId: null,
+    });
+
     const result = await initializeSessionData({
       sessionId: "not-a-uuid", // Invalid UUID
       tabId: "tab-123",
@@ -316,6 +365,11 @@ describe("initializeSessionData", () => {
 
   // TODO: Setup test PostgreSQL database for integration tests
   it.skip("should reject non-owners", async () => {
+    mockAuth.auth.mockResolvedValue({
+      userId: "user-123",
+      orgId: null,
+    });
+
     const mockPool = new (Pool as any)();
     mockPool.query.mockResolvedValueOnce({
       rows: [{ owner_id: "other-user" }],
@@ -333,6 +387,11 @@ describe("initializeSessionData", () => {
 
   // TODO: Setup test PostgreSQL database for integration tests
   it.skip("should initialize session successfully", async () => {
+    mockAuth.auth.mockResolvedValue({
+      userId: "user-123",
+      orgId: null,
+    });
+
     const mockPool = new (Pool as any)();
     mockPool.query
       .mockResolvedValueOnce({

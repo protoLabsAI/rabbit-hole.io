@@ -26,21 +26,16 @@ import {
 import { dashboardPanelConfig } from "./registry/dashboard-panels";
 
 export default function DashboardClient() {
-<<<<<<< HEAD
-  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
-=======
   const user = {
     id: "local-user",
     firstName: "Local",
     lastName: "User",
-    username: "local-user",
     fullName: "Local User",
+    imageUrl: "",
+    publicMetadata: { tier: "free", role: "admin" },
     emailAddresses: [{ emailAddress: "local@localhost" }],
-    publicMetadata: { tier: "pro" },
-    privateMetadata: { stats: {} },
-    isSignedIn: true,
-  };
->>>>>>> origin/main
+    primaryEmailAddress: { emailAddress: "local@localhost" },
+  } as any;
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -97,26 +92,6 @@ export default function DashboardClient() {
   return (
     <div className="min-h-screen bg-background">
       <PanelHub
-<<<<<<< HEAD
-          config={dashboardPanelConfig}
-          defaultPanelId={defaultPanelId}
-          title={isAdmin ? "System Management" : "Workspace Dashboard"}
-          subtitle={
-            workspaceId && !isAdmin ? `Workspace: ${workspaceId}` : undefined
-          }
-          filterPanel={filterPanel}
-          panelProps={{ workspaceId }}
-          ui={{
-            Badge,
-            Card,
-            CardContent,
-            CardHeader,
-            CardTitle,
-            Input,
-            Icon,
-          }}
-        />
-=======
         config={dashboardPanelConfig}
         defaultPanelId={defaultPanelId}
         title={isAdmin ? "System Management" : "Workspace Dashboard"}
@@ -135,7 +110,6 @@ export default function DashboardClient() {
           Icon,
         }}
       />
->>>>>>> origin/main
     </div>
   );
 }

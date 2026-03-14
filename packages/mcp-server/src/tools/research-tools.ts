@@ -100,6 +100,22 @@ export const researchTools: Tool[] = [
     },
   },
   {
+    name: "ingest_bundle",
+    description:
+      "Ingest a RabbitHoleBundleData object into the Rabbit Hole knowledge graph. POSTs the bundle to the rabbit-hole API and returns the import summary with created/kept counts for entities, relationships, evidence, files, and content.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        bundle: {
+          type: "object",
+          description:
+            "RabbitHoleBundleData JSON object with fields: entities, relationships, evidence, content, files",
+        },
+      },
+      required: ["bundle"],
+    },
+  },
+  {
     name: "research_entity",
     description:
       "Run the full research pipeline for an entity. Searches multiple sources, extracts entities and relationships, and assembles a complete knowledge graph bundle. This is the high-level orchestration tool — use individual tools for more control.",
@@ -122,6 +138,12 @@ export const researchTools: Tool[] = [
           type: "string",
           description:
             "Optional entity type hint (e.g., 'company', 'person', 'technology')",
+        },
+        persist: {
+          type: "boolean",
+          description:
+            "Whether to automatically persist the research bundle to the knowledge graph after a successful run (default: true)",
+          default: true,
         },
       },
       required: ["query"],

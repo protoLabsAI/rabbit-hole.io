@@ -39,23 +39,17 @@ interface ShareToken {
 }
 
 export function ShareLinksManagementTab() {
-<<<<<<< HEAD
-  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
-  const getToken = async (_opts?: any) => "mock-token";
-=======
   const user = {
     id: "local-user",
     firstName: "Local",
     lastName: "User",
-    username: "local-user",
     fullName: "Local User",
+    imageUrl: "",
+    publicMetadata: { tier: "free", role: "admin" },
     emailAddresses: [{ emailAddress: "local@localhost" }],
-    publicMetadata: { tier: "pro" },
-    privateMetadata: { stats: {} },
-    isSignedIn: true,
-  };
-  const getToken = async (_?: any) => null;
->>>>>>> origin/main
+    primaryEmailAddress: { emailAddress: "local@localhost" },
+  } as any;
+  const getToken = async (_opts?: any) => "mock-token";
   const { toast } = useToast();
   const [shareTokens, setShareTokens] = useState<ShareToken[]>([]);
   const [loading, setLoading] = useState(true);
@@ -68,7 +62,7 @@ export function ShareLinksManagementTab() {
     if (!user?.id) return;
 
     try {
-      const token = null; /* getToken removed */
+      const token = await getToken();
       if (!token) return;
 
       // Try to access admin endpoint to check admin status
@@ -94,7 +88,7 @@ export function ShareLinksManagementTab() {
       setError(null);
 
       // Get Clerk session token for authentication
-      const token = null; /* getToken removed */
+      const token = await getToken();
       if (!token) {
         setError("Authentication token not available");
         return;
@@ -128,7 +122,7 @@ export function ShareLinksManagementTab() {
   const revokeToken = async (token: string) => {
     try {
       // Get Clerk session token for authentication
-      const authToken = null; /* getToken removed */
+      const authToken = await getToken();
       if (!authToken) {
         toast({
           title: "Authentication Error",

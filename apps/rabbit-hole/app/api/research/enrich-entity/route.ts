@@ -26,20 +26,15 @@ const LangExtractResponseSchema = z
 
 export async function POST(request: NextRequest) {
   // 1. Authentication
-<<<<<<< HEAD
-  const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
-=======
   const user = {
     id: "local-user",
+    publicMetadata: { tier: "free", role: "admin" },
+    emailAddresses: [{ emailAddress: "local@localhost" }],
     firstName: "Local",
     lastName: "User",
-    username: "local-user",
     fullName: "Local User",
-    emailAddresses: [{ emailAddress: "local@localhost" }],
-    publicMetadata: { tier: "pro" },
-    privateMetadata: { stats: {} },
-  };
->>>>>>> origin/main
+    imageUrl: "",
+  } as any;
   if (!user) {
     return NextResponse.json(
       { error: "Unauthorized", message: "Authentication required" },

@@ -1,19 +1,27 @@
 /**
  * Organization Required Component
  *
- * Clerk removed - organizations are no longer required.
- * This component always returns null (no-op).
+ * Shows when Team/Enterprise tier user isn't in an organization context.
+ * Free/Basic users don't need organizations (user workspaces only).
  */
 
 "use client";
 
-<<<<<<< HEAD
 import { useEffect, useState } from "react";
 
 import { getUserTierClient } from "@proto/auth/client";
 
 export function OrganizationRequired() {
-  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
+  const user = {
+    id: "local-user",
+    firstName: "Local",
+    lastName: "User",
+    fullName: "Local User",
+    imageUrl: "",
+    publicMetadata: { tier: "free", role: "admin" },
+    emailAddresses: [{ emailAddress: "local@localhost" }],
+    primaryEmailAddress: { emailAddress: "local@localhost" },
+  } as any;
   const tier = getUserTierClient(user || null);
   const needsOrg = tier === "team" || tier === "enterprise";
 
@@ -22,7 +30,10 @@ export function OrganizationRequired() {
     return null;
   }
 
-  const orgList = { userMemberships: { data: [], count: 0, isLoading: false }, setActive: async (_: any) => {} } as any;
+  const orgList = {
+    userMemberships: { data: [], count: 0, isLoading: false },
+    setActive: async (_: any) => {},
+  } as any;
   const [attempting, setAttempting] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -137,9 +148,4 @@ export function OrganizationRequired() {
       </div>
     </div>
   );
-=======
-export function OrganizationRequired() {
-  // Clerk removed - no organization checks needed in local mode
-  return null;
->>>>>>> origin/main
 }

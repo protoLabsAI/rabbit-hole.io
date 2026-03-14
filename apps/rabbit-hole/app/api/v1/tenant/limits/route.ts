@@ -52,15 +52,8 @@ export async function GET(
   request: NextRequest
 ): Promise<NextResponse<LimitsResponse>> {
   try {
-<<<<<<< HEAD
     const userId = "local-user";
-  const orgId = "local-org";
-=======
-    const { userId, orgId } = {
-      userId: "local-user",
-      orgId: null as string | null,
-    };
->>>>>>> origin/main
+    const orgId = "local-org";
 
     if (!userId) {
       return NextResponse.json(
@@ -77,16 +70,8 @@ export async function GET(
       orgId || request.headers.get("x-clerk-org-id") || "public";
 
     // Get user and tier info
-<<<<<<< HEAD
     // clerkClient removed - using local user
     // getUser removed - using local user
-=======
-    const user = {
-      id: userId,
-      publicMetadata: { tier: "pro" },
-      privateMetadata: { stats: {} },
-    };
->>>>>>> origin/main
     const tier = getUserTier(user);
     const limits = getTierLimits(tier);
 

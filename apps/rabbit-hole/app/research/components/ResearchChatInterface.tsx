@@ -1,14 +1,10 @@
 "use client";
 
-<<<<<<< HEAD
 import {
   useCopilotChatHeadless_c,
   useCoAgent,
   useCopilotAction,
 } from "@copilotkit/react-core";
-=======
-import { useCopilotChatHeadless_c, useCoAgent } from "@copilotkit/react-core";
->>>>>>> origin/main
 import { useState, useEffect } from "react";
 
 import { Icon } from "@proto/icon-system";
@@ -114,20 +110,6 @@ export function ResearchChatInterface({
   );
   const config = externalConfig ?? internalConfig;
   const onConfigChange = externalOnChange ?? setInternalConfig;
-<<<<<<< HEAD
-=======
-  const user = {
-    id: "local-user",
-    firstName: "Local",
-    lastName: "User",
-    username: "local-user",
-    fullName: "Local User",
-    emailAddresses: [{ emailAddress: "local@localhost" }],
-    publicMetadata: { tier: "pro" },
-    privateMetadata: { stats: {} },
-    isSignedIn: true,
-  };
->>>>>>> origin/main
   const { contextFiles, addContextFromJob, removeContext } =
     useResearchContext();
   const { jobs, ingestFile, ingestUrl, dismissJob } = useMediaIngestion({

@@ -9,11 +9,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-<<<<<<< HEAD
     const userId = "local-user";
-=======
-    const { userId } = { userId: "local-user" };
->>>>>>> origin/main
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

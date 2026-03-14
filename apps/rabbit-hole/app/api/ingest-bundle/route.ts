@@ -22,6 +22,11 @@ import {
   type MergeResult,
 } from "@proto/types";
 
+import {
+  graphUpdateEmitter,
+  type GraphUpdateEvent,
+} from "../atlas/graph-updates/emitter";
+
 // Initialize domains for API route context (serverless function)
 // Server instrumentation.ts doesn't apply to API routes in Next.js 15
 import { initializeDomains } from "../../domain-loader";
@@ -325,6 +330,15 @@ const handleBundleIngest = async (
         // Execute query if we have one
         if (entityQuery) {
           await client.executeWrite(entityQuery, queryParams);
+
+          // Emit live update event for connected Atlas clients
+          graphUpdateEmitter.emit("graph-update", {
+            type: "entity_created",
+            uid: entity.uid,
+            name: entity.name,
+            entityType: entity.type,
+            timestamp: new Date().toISOString(),
+          } satisfies GraphUpdateEvent);
         }
 
         summary.mergeResults.push(mergeResult);
@@ -410,6 +424,16 @@ const handleBundleIngest = async (
           orgId: orgId,
         });
 
+        // Emit live update event for connected Atlas clients
+        graphUpdateEmitter.emit("graph-update", {
+          type: "relationship_created",
+          uid: relationship.uid,
+          relationshipType: relationship.type,
+          source: relationship.source,
+          target: relationship.target,
+          timestamp: new Date().toISOString(),
+        } satisfies GraphUpdateEvent);
+
         summary.relationshipsCreated++;
       }
 
@@ -418,6 +442,13 @@ const handleBundleIngest = async (
     }
 
     const totalMs = Date.now() - startTime;
+
+    // Emit bundle_complete so Atlas can do a final refresh
+    graphUpdateEmitter.emit("graph-update", {
+      type: "bundle_complete",
+      uid: `bundle-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+    } satisfies GraphUpdateEvent);
 
     console.log(`🎉 Bundle ingest completed in ${totalMs}ms`);
     console.log(`📈 Phase timings:`, phaseTimings);
@@ -459,15 +490,9 @@ const handleBundleIngest = async (
 // ==================== Route Export ====================
 
 export async function POST(request: NextRequest) {
-<<<<<<< HEAD
-  const userId = "local-user"; const orgId = "local-org"; const has = () => true;
-=======
-  const { userId, orgId, has } = {
-    userId: "local-user",
-    orgId: null as string | null,
-    has: (_: any) => false,
-  };
->>>>>>> origin/main
+  const userId = "local-user";
+  const orgId = "local-org";
+  const has = () => true;
 
   if (!userId) {
     return NextResponse.json(

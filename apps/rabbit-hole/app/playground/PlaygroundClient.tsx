@@ -13,21 +13,16 @@ import { PlaygroundHub } from "./components/playground-hub";
 
 export default function PlaygroundClient() {
   const userId = "local-user";
-<<<<<<< HEAD
-  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
-=======
   const user = {
     id: "local-user",
     firstName: "Local",
     lastName: "User",
-    username: "local-user",
     fullName: "Local User",
+    imageUrl: "",
+    publicMetadata: { tier: "free", role: "admin" },
     emailAddresses: [{ emailAddress: "local@localhost" }],
-    publicMetadata: { tier: "pro" },
-    privateMetadata: { stats: {} },
-    isSignedIn: true,
-  };
->>>>>>> origin/main
+    primaryEmailAddress: { emailAddress: "local@localhost" },
+  } as any;
   const isLoaded = true;
 
   // Wait for user data to load
@@ -52,18 +47,10 @@ export default function PlaygroundClient() {
           <p className="text-muted-foreground mb-4">
             Sign in to access the playground testing environment.
           </p>
-<<<<<<< HEAD
-          
-            <button className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 font-medium">
-              Sign In
-            </button>
-          
-=======
 
           <button className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 font-medium">
             Sign In
           </button>
->>>>>>> origin/main
         </div>
       </div>
     );

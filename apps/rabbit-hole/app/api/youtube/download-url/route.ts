@@ -21,11 +21,7 @@ export const POST = withAuthAndLogging("download video from URL")(async (
   { userId }: { userId: string }
 ): Promise<NextResponse> => {
   try {
-<<<<<<< HEAD
     const orgId = "local-org";
-=======
-    const { orgId } = { orgId: null as string | null };
->>>>>>> origin/main
     const body: DownloadURLBody = await request.json();
 
     // Validate URL presence and type

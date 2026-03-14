@@ -56,14 +56,9 @@ export function BulkImportPanel({
   const [importScope, setImportScope] = useState<"tenant" | "public">("tenant");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Check if user is admin
-<<<<<<< HEAD
+  // Clerk removed — all users are admin in local mode
   const organization = { id: "local-org", name: "Local Org" } as any;
-=======
-  /* useOrganization removed - Clerk removed */
->>>>>>> origin/main
-  const isAdmin =
-    membership?.role === "org:admin" || membership?.role === "org:owner";
+  const isAdmin = true;
 
   const handleFileSelect = async (
     event: React.ChangeEvent<HTMLInputElement>

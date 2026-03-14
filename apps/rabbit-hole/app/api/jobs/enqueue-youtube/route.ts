@@ -26,15 +26,8 @@ const EnqueueYouTubeSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     // Authenticate user
-<<<<<<< HEAD
     const userId = "local-user";
-  const orgId = "local-org";
-=======
-    const { userId, orgId } = {
-      userId: "local-user",
-      orgId: null as string | null,
-    };
->>>>>>> origin/main
+    const orgId = "local-org";
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

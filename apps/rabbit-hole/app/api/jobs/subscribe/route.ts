@@ -17,11 +17,7 @@ export const runtime = "nodejs";
 
 export async function GET(request: NextRequest) {
   try {
-<<<<<<< HEAD
     const userId = "local-user";
-=======
-    const { userId } = { userId: "local-user" };
->>>>>>> origin/main
 
     if (!userId) {
       return new Response("Unauthorized", { status: 401 });

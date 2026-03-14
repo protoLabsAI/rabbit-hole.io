@@ -1,8 +1,7 @@
 /**
  * Authentication Guards for API Routes
  *
- * Reusable auth checks for different access levels.
- * Clerk has been removed — always uses local-user context.
+ * Reusable auth checks for different access levels
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -24,25 +23,21 @@ export interface AuthResult {
   };
 }
 
-const LOCAL_USER = {
-  id: "local-user",
-  firstName: "Local",
-  lastName: "User",
-  username: "local-user",
-  fullName: "Local User",
-  emailAddresses: [{ emailAddress: "local@localhost" }],
-  publicMetadata: { tier: "pro", role: "super_admin" },
-  privateMetadata: { stats: {} },
-};
-
 /**
  * Require super admin role for API route
  */
 export async function requireSuperAdmin(
   request: NextRequest
 ): Promise<AuthResult> {
-<<<<<<< HEAD
-  const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
+  const user = {
+    id: "local-user",
+    publicMetadata: { tier: "free", role: "admin" },
+    emailAddresses: [{ emailAddress: "local@localhost" }],
+    firstName: "Local",
+    lastName: "User",
+    fullName: "Local User",
+    imageUrl: "",
+  } as any;
 
   if (!user) {
     return {
@@ -54,9 +49,6 @@ export async function requireSuperAdmin(
     };
   }
 
-=======
-  const user = LOCAL_USER;
->>>>>>> origin/main
   const userRole = getUserRole(user);
   const isSuperAdmin = hasMinimumRole(userRole, USER_ROLES.SUPER_ADMIN);
 
@@ -86,8 +78,15 @@ export async function requireSuperAdmin(
 export async function requireAuthenticated(
   request: NextRequest
 ): Promise<AuthResult> {
-<<<<<<< HEAD
-  const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
+  const user = {
+    id: "local-user",
+    publicMetadata: { tier: "free", role: "admin" },
+    emailAddresses: [{ emailAddress: "local@localhost" }],
+    firstName: "Local",
+    lastName: "User",
+    fullName: "Local User",
+    imageUrl: "",
+  } as any;
 
   if (!user) {
     return {
@@ -99,9 +98,6 @@ export async function requireAuthenticated(
     };
   }
 
-=======
-  const user = LOCAL_USER;
->>>>>>> origin/main
   const userRole = getUserRole(user);
 
   return {

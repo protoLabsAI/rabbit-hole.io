@@ -62,6 +62,7 @@ import { ResearchModeImportDialog } from "./components/ResearchModeImportDialog"
 import { TimelineChart } from "./components/TimelineChart";
 import { useAtlasState } from "./hooks/useAtlasState";
 import { useGraphTilesNuqs } from "./hooks/useGraphTilesNuqs";
+import { useGraphUpdates } from "./hooks/useGraphUpdates";
 import { useTimeSliceAggregation } from "./hooks/useTimeSliceAggregation";
 import { AtlasApiService } from "./services/AtlasApiService";
 import {
@@ -81,22 +82,17 @@ cytoscape.use(cola);
 cytoscape.use(cytoscapePopper(createFloatingUIPopperFactory()));
 
 export default function AtlasClient() {
-<<<<<<< HEAD
-  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
-  const isSignedIn = true;
-=======
-  const isSignedIn = true;
   const user = {
     id: "local-user",
     firstName: "Local",
     lastName: "User",
-    username: "local-user",
     fullName: "Local User",
+    imageUrl: "",
+    publicMetadata: { tier: "free", role: "admin" },
     emailAddresses: [{ emailAddress: "local@localhost" }],
-    publicMetadata: { tier: "pro" },
-    privateMetadata: { stats: {} },
-  };
->>>>>>> origin/main
+    primaryEmailAddress: { emailAddress: "local@localhost" },
+  } as any;
+  const isSignedIn = true;
   const containerRef = useRef<HTMLDivElement>(null);
   const cyRef = useRef<cytoscape.Core | null>(null);
   const apiService = useRef(new AtlasApiService()).current;
@@ -459,6 +455,9 @@ export default function AtlasClient() {
       atlasState.finishLoading();
     }
   }, [apiService]);
+
+  // Subscribe to live graph updates via SSE
+  useGraphUpdates(refreshGraphData);
 
   // Handle form submissions
   const handleEntityAdded = useCallback(

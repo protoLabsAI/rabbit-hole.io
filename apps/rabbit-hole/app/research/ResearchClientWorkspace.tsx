@@ -8,12 +8,11 @@
  * - Canvas support (Graph, Map, Timeline, etc.)
  * - Real-time collaboration with follow mode
  * - CopilotKit integration (chat panel)
- * Clerk has been removed — uses local user context.
  */
 
 import { useState, useCallback, useEffect, useMemo } from "react";
 
-import { getTierLimitsClient } from "@proto/auth/client";
+import { getUserTierClient, getTierLimitsClient } from "@proto/auth/client";
 import { logPageView, logWorkspaceOperation } from "@proto/logger";
 import { ResizableChatLayout } from "@proto/ui/templates";
 import type { CanvasType } from "@proto/workspace";
@@ -29,20 +28,24 @@ import { QueryProvider } from "./providers";
 // Register context menu items for research routes
 import "../context-menu/registry/researchMenus.direct";
 
-const LOCAL_USER_ID = "local-user";
-
 export default function ResearchClientWorkspace() {
-<<<<<<< HEAD
   const userId = "local-user";
-  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
-=======
-  const userId = LOCAL_USER_ID;
->>>>>>> origin/main
+  const user = {
+    id: "local-user",
+    firstName: "Local",
+    lastName: "User",
+    fullName: "Local User",
+    imageUrl: "",
+    publicMetadata: { tier: "free", role: "admin" },
+    emailAddresses: [{ emailAddress: "local@localhost" }],
+    primaryEmailAddress: { emailAddress: "local@localhost" },
+  } as any;
   const research = useResearchPageState();
   const [mounted, setMounted] = useState(false);
 
-  // Always use pro tier limits in local mode
-  const tierLimits = getTierLimitsClient("pro");
+  // Check tier for AI chat access
+  const userTier = getUserTierClient(user || null);
+  const tierLimits = getTierLimitsClient(userTier);
   const canUseAIChat = tierLimits.hasAIChatAccess;
 
   // Prepare pending import from URL parameters (memoized to prevent re-render loops)
@@ -101,9 +104,9 @@ export default function ResearchClientWorkspace() {
     setMounted(true);
   }, []);
 
-  // Update workspace ID when mounted
+  // Update workspace ID when userId becomes available
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (!userId || typeof window === "undefined") return;
 
     // Check URL first
     const urlParams = new URLSearchParams(window.location.search);
@@ -134,6 +137,7 @@ export default function ResearchClientWorkspace() {
       logPageView({
         page: "/research",
         userId,
+        tier: (user?.publicMetadata?.tier as string) || undefined,
         sessionId,
         referrer: document.referrer,
         userAgent: navigator.userAgent,
@@ -143,9 +147,10 @@ export default function ResearchClientWorkspace() {
         operation: "load",
         workspaceId,
         userId,
+        tier: (user?.publicMetadata?.tier as string) || undefined,
       });
     }
-  }, [userId, workspaceId, mounted]);
+  }, [userId, workspaceId, mounted, user?.publicMetadata?.tier]);
 
   const handleChatCollapseChange = useCallback(
     (collapsed: boolean) => {

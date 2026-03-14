@@ -83,11 +83,7 @@ export async function POST(
   { params }: { params: { path: string[] } }
 ) {
   // Check authentication
-<<<<<<< HEAD
   const userId = "local-user";
-=======
-  const { userId } = { userId: "local-user" };
->>>>>>> origin/main
 
   if (!userId) {
     return NextResponse.json(

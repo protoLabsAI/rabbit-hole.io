@@ -10,11 +10,7 @@ import { getGlobalPostgresPool } from "@proto/database";
 
 export async function GET(request: NextRequest) {
   try {
-<<<<<<< HEAD
     const userId = "local-user";
-=======
-    const { userId } = { userId: "local-user" };
->>>>>>> origin/main
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -59,11 +55,7 @@ export async function GET(request: NextRequest) {
 // Cleanup endpoint
 export async function DELETE(request: NextRequest) {
   try {
-<<<<<<< HEAD
     const userId = "local-user";
-=======
-    const { userId } = { userId: "local-user" };
->>>>>>> origin/main
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
