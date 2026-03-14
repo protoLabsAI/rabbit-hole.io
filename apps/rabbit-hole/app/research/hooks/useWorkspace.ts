@@ -5,16 +5,10 @@
  * Supports main tab + collaboration session tabs.
  */
 
-import { useAuth, useOrganization, useUser } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
 import { useState, useEffect, useCallback, useMemo } from "react";
 
-import { getUserTierClient } from "@proto/auth/client";
 import { logUserAction } from "@proto/logger";
-import {
-  buildWorkspaceRoomId,
-  getSyncStrategy,
-  type WorkspaceRoomType,
-} from "@proto/utils";
 import type {
   Workspace,
   UserPresence,
@@ -27,7 +21,6 @@ import {
   type VersionMetadata,
 } from "@proto/yjs-history";
 
-import { useHocuspocusYjs, type OtherUser } from "@/hooks/useHocuspocusYjs";
 import { useLocalYjs } from "@/hooks/useLocalYjs";
 
 import { getCanvasRenderer } from "../components/workspace/canvas/CanvasRegistry";
@@ -44,6 +37,14 @@ import {
   initializeYMapTabs,
   tabExistsInYMap,
 } from "./useWorkspaceYMapHelpers";
+
+export interface OtherUser {
+  clientId: number;
+  userId: string;
+  name?: string;
+  color?: string;
+  cursor?: { x: number; y: number } | null;
+}
 
 export interface UseWorkspaceOptions {
   mode?: "viewing" | "editing";
@@ -88,8 +89,6 @@ export function useWorkspace(
   options?: UseWorkspaceOptions
 ): UseWorkspaceReturn {
   const { userId } = useAuth();
-  const { user } = useUser();
-  const { organization } = useOrganization();
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [users, setUsers] = useState<Map<string, UserPresence>>(new Map());
   const [followMode, setFollowMode] = useState<{
@@ -97,36 +96,12 @@ export function useWorkspace(
     followingUserId: string | null;
   }>({ enabled: false, followingUserId: null });
 
-  // Determine room type based on mode
-  const mode = options?.mode || "viewing";
-  const roomType: WorkspaceRoomType = mode === "editing" ? "draft" : "latest";
-  const draftId = options?.draftId;
-
-  // Generate USER-SCOPED room ID (workspaces are private per user)
-  const roomId = userId
-    ? buildWorkspaceRoomId(userId, workspaceId, roomType, draftId)
-    : "";
-
-  // Tier-based provider selection (memoized to prevent reconnection loops)
-  const userTier = getUserTierClient(user || null);
-  const syncStrategy = useMemo(() => getSyncStrategy(userTier), [userTier]);
-
-  // Local-only provider (Free tier)
-  const localYjs = useLocalYjs({
+  // Local-only provider (IndexedDB)
+  const { ydoc, ready, others, error, updateCursor } = useLocalYjs({
     workspaceId,
     userId: userId || "",
-    enabled: !syncStrategy.usesHocuspocus && !!userId,
+    enabled: !!userId,
   });
-
-  // Hocuspocus provider (Basic+ tier)
-  const hocusYjs = useHocuspocusYjs({
-    roomId,
-    enabled: syncStrategy.usesHocuspocus && !!userId,
-  });
-
-  // Choose provider based on tier
-  const { ydoc, ready, others, error, updateCursor } =
-    syncStrategy.usesHocuspocus ? hocusYjs : localYjs;
 
   // Initialize undo manager and version history (only in editing mode)
   const yWorkspace = ydoc?.getMap("workspace");
@@ -163,7 +138,6 @@ export function useWorkspace(
       ydoc: !!ydoc,
       userId: !!userId,
       ready,
-      roomId,
       workspaceId,
     });
 
@@ -328,7 +302,7 @@ export function useWorkspace(
       if (!userId) return;
       const presence: UserPresence = {
         userId,
-        userName: "User", // TODO: Get from Clerk
+        userName: "User", // TODO: Get from user profile
         userColor: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
         lastSeen: Date.now(),
         isFollowing: followMode.followingUserId,
@@ -351,7 +325,6 @@ export function useWorkspace(
     userId,
     ready, // Keep ready - effect must run when connection becomes ready to load workspace
     workspaceId,
-    roomId,
     followMode.followingUserId,
     options?.canvasType,
   ]);
@@ -435,7 +408,7 @@ export function useWorkspace(
         type: sessionId ? "session" : "main",
         canvasType,
         canvasData: renderer.createDefaultData(),
-        roomId: sessionId ? `session:${sessionId}` : roomId,
+        roomId: sessionId ? `session:${sessionId}` : workspaceId,
         visibility: "edit",
         sessionId,
         metadata: {
@@ -454,7 +427,7 @@ export function useWorkspace(
         yWorkspace.set("activeTabId", newTab.id);
       }, userId);
     },
-    [ydoc, userId, roomId]
+    [ydoc, userId, workspaceId]
   );
 
   // Reorder tabs
