@@ -41,7 +41,21 @@ export function TabBar({
   onTabReorder,
   onNewTab,
 }: TabBarProps) {
+<<<<<<< HEAD
   const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
+=======
+  const user = {
+    id: "local-user",
+    firstName: "Local",
+    lastName: "User",
+    username: "local-user",
+    fullName: "Local User",
+    emailAddresses: [{ emailAddress: "local@localhost" }],
+    publicMetadata: { tier: "pro" },
+    privateMetadata: { stats: {} },
+    isSignedIn: true,
+  };
+>>>>>>> origin/main
   const { toast } = useToast();
   const tier = getUserTierClient(user || null);
   const limits = getTierLimitsClient(tier);

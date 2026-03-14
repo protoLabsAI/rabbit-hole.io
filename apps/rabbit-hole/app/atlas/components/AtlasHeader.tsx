@@ -95,6 +95,17 @@ export function AtlasHeader({
             {/* Authentication UI */}
             <div className="border-l border-border pl-4 flex items-center">
               <ClientOnlyAuthSection>
+<<<<<<< HEAD
+=======
+                {
+                  /* SignedOut: removed */
+
+                  <button className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-colors">
+                    <span>Sign In</span>
+                  </button>
+                }
+
+>>>>>>> origin/main
                 <div className="flex items-center gap-3">
                   <Link href="/dashboard">
                     <Button

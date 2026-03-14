@@ -30,7 +30,6 @@ export default defineConfig({
     "react-dom",
     "use-sync-external-store",
     "swr",
-    "@clerk/nextjs",
     "@proto/types",
     "@proto/database",
     "@proto/auth",

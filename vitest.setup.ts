@@ -1,5 +1,4 @@
 import "@testing-library/jest-dom";
-import type { ReactNode } from "react";
 import { beforeEach, vi } from "vitest";
 
 // Store original console methods for restoration
@@ -132,27 +131,7 @@ if (typeof window !== "undefined") {
   });
 }
 
-// Mock Clerk components
-vi.mock("@clerk/nextjs", () => ({
-  ClerkProvider: ({ children }: { children: ReactNode }) => children,
-  SignedIn: ({ children }: { children: ReactNode }) => children,
-  SignedOut: ({ children }: { children: ReactNode }) => children,
-  SignInButton: ({ children, mode }: { children: ReactNode; mode?: string }) =>
-    children,
-  UserButton: () => vi.fn(),
-  useAuth: () => ({
-    isSignedIn: true,
-    userId: "test-user-id",
-  }),
-  useUser: () => ({
-    user: {
-      id: "test-user-id",
-      firstName: "Test",
-      lastName: "User",
-      emailAddresses: [{ emailAddress: "test@example.com" }],
-    },
-  }),
-}));
+// Clerk has been removed — no mock needed
 
 // Global window object enhancements (only in jsdom environment)
 if (typeof window !== "undefined") {

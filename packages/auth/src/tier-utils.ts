@@ -4,6 +4,7 @@
  * Provides server-only tier checking and limit utilities.
  */
 
+<<<<<<< HEAD
 // Inline User type (replaces external auth dependency)
 interface User {
   id: string;
@@ -13,6 +14,8 @@ interface User {
   lastName?: string | null;
 }
 
+=======
+>>>>>>> origin/main
 import { TIER_LIMITS, type UserTierLimits, isUnlimited } from "./tier-limits";
 import { USER_TIERS, type UserTier, isValidUserTier } from "./types";
 
@@ -32,7 +35,7 @@ const TIER_HIERARCHY: Record<UserTier, number> = {
  * Extract user tier from Clerk user object (server-side)
  * Falls back to FREE tier if none set
  */
-export function getUserTier(user: User | null): UserTier {
+export function getUserTier(user: any | null): UserTier {
   if (!user) return USER_TIERS.FREE;
 
   const tierFromMetadata = user.publicMetadata?.tier as string;

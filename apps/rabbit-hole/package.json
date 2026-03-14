@@ -29,6 +29,7 @@
     "@proto/auth": "workspace:*",
     "@proto/charts": "workspace:*",
     "@proto/database": "workspace:*",
+    "@proto/forms": "workspace:*",
     "@proto/icon-system": "workspace:*",
     "@proto/llm-providers": "workspace:*",
     "@proto/llm-tools": "workspace:*",

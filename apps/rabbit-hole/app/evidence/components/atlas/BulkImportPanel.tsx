@@ -57,7 +57,11 @@ export function BulkImportPanel({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Check if user is admin
+<<<<<<< HEAD
   const organization = { id: "local-org", name: "Local Org" } as any;
+=======
+  /* useOrganization removed - Clerk removed */
+>>>>>>> origin/main
   const isAdmin =
     membership?.role === "org:admin" || membership?.role === "org:owner";
 

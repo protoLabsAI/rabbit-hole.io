@@ -35,7 +35,11 @@ export const POST = withAuthAndLogging("generate signed download URL")(async (
   { userId }
 ): Promise<NextResponse<SignGetResponse>> => {
   try {
+<<<<<<< HEAD
     const orgId = "local-org";
+=======
+    const { orgId } = { orgId: null as string | null };
+>>>>>>> origin/main
     const config = getObjectStoreConfig();
     const validation = validateConfig(config);
 

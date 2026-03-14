@@ -88,6 +88,21 @@ export function useWorkspace(
   options?: UseWorkspaceOptions
 ): UseWorkspaceReturn {
   const userId = "local-user";
+<<<<<<< HEAD
+=======
+  const user = {
+    id: "local-user",
+    firstName: "Local",
+    lastName: "User",
+    username: "local-user",
+    fullName: "Local User",
+    emailAddresses: [{ emailAddress: "local@localhost" }],
+    publicMetadata: { tier: "pro" },
+    privateMetadata: { stats: {} },
+    isSignedIn: true,
+  };
+  /* useOrganization removed - Clerk removed */
+>>>>>>> origin/main
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [users, setUsers] = useState<Map<string, UserPresence>>(new Map());
   const [followMode, setFollowMode] = useState<{

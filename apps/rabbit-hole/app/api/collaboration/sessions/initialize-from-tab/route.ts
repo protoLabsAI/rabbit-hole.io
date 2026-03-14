@@ -6,7 +6,11 @@ import { getHocuspocusPostgresPool } from "@/lib/hocuspocus-db";
 
 export async function POST(request: NextRequest) {
   try {
+<<<<<<< HEAD
     const userId = "local-user";
+=======
+    const { userId } = { userId: "local-user" };
+>>>>>>> origin/main
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

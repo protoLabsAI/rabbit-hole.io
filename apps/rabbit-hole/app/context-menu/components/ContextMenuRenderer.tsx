@@ -29,8 +29,22 @@ import { contextMenuRegistry } from "../registry";
 export function ContextMenuRenderer() {
   const contextMenuHook = useContextMenu();
   const { contextMenu, closeContextMenu } = contextMenuHook;
+<<<<<<< HEAD
   const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
   const isSignedIn = true;
+=======
+  const isSignedIn = true;
+  const user = {
+    id: "local-user",
+    firstName: "Local",
+    lastName: "User",
+    username: "local-user",
+    fullName: "Local User",
+    emailAddresses: [{ emailAddress: "local@localhost" }],
+    publicMetadata: { tier: "pro" },
+    privateMetadata: { stats: {} },
+  };
+>>>>>>> origin/main
   const router = useRouter();
   const pathname = usePathname();
   const { toast } = useToast();
@@ -211,12 +225,19 @@ export function ContextMenuRenderer() {
         </span>
       </DropdownMenuItem>
       <DropdownMenuItem onClick={closeContextMenu}>
+<<<<<<< HEAD
         
           <span className="flex items-center space-x-2 text-primary cursor-pointer">
             <span>🔐</span>
             <span>Sign In</span>
           </span>
         
+=======
+        <span className="flex items-center space-x-2 text-primary cursor-pointer">
+          <span>🔐</span>
+          <span>Sign In</span>
+        </span>
+>>>>>>> origin/main
       </DropdownMenuItem>
     </>
   );

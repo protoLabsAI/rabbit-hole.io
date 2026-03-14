@@ -36,7 +36,20 @@ export function withTierAwareLazy<P extends object>(
   } = options;
 
   return function TierAwareLazyWrapper(props: P) {
+<<<<<<< HEAD
     const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
+=======
+    const user = {
+      id: "local-user",
+      firstName: "Local",
+      lastName: "User",
+      username: "local-user",
+      fullName: "Local User",
+      emailAddresses: [{ emailAddress: "local@localhost" }],
+      publicMetadata: { tier: "pro", role: "super_admin" },
+      privateMetadata: { stats: {} },
+    };
+>>>>>>> origin/main
     const userTier = getUserTierClient(user || null);
     const tierLimits = getTierLimitsClient(userTier);
     const featureValue = tierLimits[featureFlag as keyof typeof tierLimits];

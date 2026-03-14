@@ -1,12 +1,13 @@
 /**
  * Organization Required Component
  *
- * Shows when Team/Enterprise tier user isn't in an organization context.
- * Free/Basic users don't need organizations (user workspaces only).
+ * Clerk removed - organizations are no longer required.
+ * This component always returns null (no-op).
  */
 
 "use client";
 
+<<<<<<< HEAD
 import { useEffect, useState } from "react";
 
 import { getUserTierClient } from "@proto/auth/client";
@@ -136,4 +137,9 @@ export function OrganizationRequired() {
       </div>
     </div>
   );
+=======
+export function OrganizationRequired() {
+  // Clerk removed - no organization checks needed in local mode
+  return null;
+>>>>>>> origin/main
 }

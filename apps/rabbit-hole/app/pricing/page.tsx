@@ -217,13 +217,34 @@ function PricingCard({ plan }: { plan: PricingPlan }) {
             <Link href="/dashboard?tab=billing">{plan.cta}</Link>
           </Button>
         </PlanAction>
+<<<<<<< HEAD
+=======
+
+        {
+          /* SignedOut: removed */
+          <PlanAction planId={plan.id} planName={plan.name} action="sign_up">
+            <Button
+              asChild
+              className="w-full"
+              size="lg"
+              variant={plan.highlighted ? "default" : "outline"}
+            >
+              <Link href="/sign-up">{plan.cta}</Link>
+            </Button>
+          </PlanAction>
+        }
+>>>>>>> origin/main
       </CardFooter>
     </Card>
   );
 }
 
 export default async function PricingPage() {
+<<<<<<< HEAD
   const userId = "local-user";
+=======
+  const { userId } = { userId: "local-user" };
+>>>>>>> origin/main
 
   return (
     <div className="min-h-screen bg-background">

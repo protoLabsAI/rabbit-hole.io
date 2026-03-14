@@ -21,7 +21,11 @@ interface ExportFilters {
 
 export async function GET(request: NextRequest) {
   // Check authentication
+<<<<<<< HEAD
   const userId = "local-user";
+=======
+  const { userId } = { userId: "local-user" };
+>>>>>>> origin/main
 
   if (!userId) {
     return NextResponse.json(

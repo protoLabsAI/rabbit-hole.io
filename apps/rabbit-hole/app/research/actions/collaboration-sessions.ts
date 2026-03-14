@@ -79,9 +79,23 @@ export async function createCollaborationSession(
     } = parsed.data;
 
     // Auth check
+<<<<<<< HEAD
     const userId = "local-user";
   const orgId = "local-org";
     const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
+=======
+    const { userId, orgId } = {
+      userId: "local-user",
+      orgId: null as string | null,
+    };
+    const user = {
+      id: "local-user",
+      firstName: "Local",
+      lastName: "User",
+      fullName: "Local User",
+      publicMetadata: { tier: "pro" },
+    };
+>>>>>>> origin/main
 
     if (!userId || !user) {
       return {
@@ -256,9 +270,23 @@ export async function createTabSession(
     } = parsed.data;
 
     // Auth check
+<<<<<<< HEAD
     const userId = "local-user";
   const orgId = "local-org";
     const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
+=======
+    const { userId, orgId } = {
+      userId: "local-user",
+      orgId: null as string | null,
+    };
+    const user = {
+      id: "local-user",
+      firstName: "Local",
+      lastName: "User",
+      fullName: "Local User",
+      publicMetadata: { tier: "pro" },
+    };
+>>>>>>> origin/main
 
     if (!userId || !user) {
       return {
@@ -433,7 +461,11 @@ export async function initializeSessionData(
       canvasType = "graph",
     } = parsed.data;
 
+<<<<<<< HEAD
     const userId = "local-user";
+=======
+    const { userId } = { userId: "local-user" };
+>>>>>>> origin/main
     if (!userId) {
       return {
         error: "Unauthorized",
@@ -531,7 +563,11 @@ export async function endCollaborationSession(
 
     const { sessionId } = parsed.data;
 
+<<<<<<< HEAD
     const userId = "local-user";
+=======
+    const { userId } = { userId: "local-user" };
+>>>>>>> origin/main
     if (!userId) {
       return {
         error: "Unauthorized",
@@ -623,7 +659,11 @@ export async function deleteCollaborationSession(
 
     const { sessionId } = parsed.data;
 
+<<<<<<< HEAD
     const userId = "local-user";
+=======
+    const { userId } = { userId: "local-user" };
+>>>>>>> origin/main
     if (!userId) {
       return {
         error: "Unauthorized",

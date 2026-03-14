@@ -15,7 +15,11 @@ interface UserStats {
  */
 export async function PATCH(request: NextRequest) {
   try {
+<<<<<<< HEAD
     const userId = "local-user";
+=======
+    const { userId } = { userId: "local-user" };
+>>>>>>> origin/main
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -32,8 +36,16 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Get current user to read existing stats
+<<<<<<< HEAD
     // clerkClient removed - using local user
     // getUser removed - using local user
+=======
+    const user = {
+      id: userId,
+      publicMetadata: { tier: "pro" },
+      privateMetadata: { stats: {} },
+    };
+>>>>>>> origin/main
     const currentStats = (user.privateMetadata?.stats as UserStats) || {};
 
     // Merge updates with existing stats
@@ -43,7 +55,11 @@ export async function PATCH(request: NextRequest) {
     };
 
     // Update user metadata
+<<<<<<< HEAD
     // updateUserMetadata removed
+=======
+    /* Clerk user metadata update skipped (local mode) */
+>>>>>>> origin/main
 
     return NextResponse.json({
       success: true,
@@ -65,14 +81,26 @@ export async function PATCH(request: NextRequest) {
  */
 export async function GET() {
   try {
+<<<<<<< HEAD
     const userId = "local-user";
+=======
+    const { userId } = { userId: "local-user" };
+>>>>>>> origin/main
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+<<<<<<< HEAD
     // clerkClient removed - using local user
     // getUser removed - using local user
+=======
+    const user = {
+      id: userId,
+      publicMetadata: { tier: "pro" },
+      privateMetadata: { stats: {} },
+    };
+>>>>>>> origin/main
     const stats = (user.privateMetadata?.stats as UserStats) || {
       entitiesViewed: 0,
       lastVisited: null,

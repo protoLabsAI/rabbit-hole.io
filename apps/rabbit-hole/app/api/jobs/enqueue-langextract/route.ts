@@ -37,8 +37,15 @@ const EnqueueLangExtractSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     // 1. Authentication
+<<<<<<< HEAD
     const userId = "local-user";
   const orgId = "local-org";
+=======
+    const { userId, orgId } = {
+      userId: "local-user",
+      orgId: null as string | null,
+    };
+>>>>>>> origin/main
     if (!userId) {
       return NextResponse.json(
         { error: "Unauthorized", message: "Authentication required" },

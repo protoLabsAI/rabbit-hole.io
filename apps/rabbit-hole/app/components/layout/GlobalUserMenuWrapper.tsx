@@ -3,7 +3,7 @@
  *
  * Client component wrapper for the global user menu.
  * Positioned to match research workspace TabBar placement (top-right of tab bar area).
- * Visible on all pages for authenticated users.
+ * Visible on all pages. Clerk has been removed.
  */
 
 "use client";

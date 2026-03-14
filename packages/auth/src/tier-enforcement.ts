@@ -11,6 +11,7 @@
  * User workspaces are local-first (Yjs + IndexedDB) and should be validated client-side.
  */
 
+<<<<<<< HEAD
 // Inline User type (replaces external auth dependency)
 interface User {
   id: string;
@@ -20,6 +21,8 @@ interface User {
   lastName?: string | null;
 }
 
+=======
+>>>>>>> origin/main
 import { getEntityCount, getRelationshipCount } from "@proto/database";
 
 import { getUserTier, getTierLimits } from "./tier-utils";
@@ -62,7 +65,7 @@ export class TierLimitError extends Error {
  * @throws TierLimitError if limit exceeded
  */
 export async function enforceEntityLimit(
-  user: User,
+  user: any,
   clerkOrgId: string
 ): Promise<void> {
   const tier = getUserTier(user);
@@ -96,7 +99,7 @@ export async function enforceEntityLimit(
  * @returns Validation result with current/max counts
  */
 export async function checkEntityLimitBulk(
-  user: User,
+  user: any,
   clerkOrgId: string,
   additionalCount: number
 ): Promise<{
@@ -148,7 +151,7 @@ export async function checkEntityLimitBulk(
  * @throws TierLimitError if limit exceeded
  */
 export async function enforceEntityLimitBulk(
-  user: User,
+  user: any,
   clerkOrgId: string,
   additionalCount: number
 ): Promise<void> {
@@ -175,7 +178,7 @@ export async function enforceEntityLimitBulk(
  * @throws TierLimitError if limit exceeded
  */
 export async function enforceRelationshipLimit(
-  user: User,
+  user: any,
   clerkOrgId: string
 ): Promise<void> {
   const tier = getUserTier(user);
@@ -208,7 +211,7 @@ export async function enforceRelationshipLimit(
  * @returns Validation result
  */
 export async function checkRelationshipLimitBulk(
-  user: User,
+  user: any,
   clerkOrgId: string,
   additionalCount: number
 ): Promise<{
@@ -260,7 +263,7 @@ export async function checkRelationshipLimitBulk(
  * @throws TierLimitError if limit exceeded
  */
 export async function enforceRelationshipLimitBulk(
-  user: User,
+  user: any,
   clerkOrgId: string,
   additionalCount: number
 ): Promise<void> {
@@ -291,7 +294,7 @@ export async function enforceRelationshipLimitBulk(
  * @throws TierLimitError if file exceeds tier's max file size
  */
 export async function enforceFileSizeLimit(
-  user: User,
+  user: any,
   fileSize: number
 ): Promise<void> {
   const tier = getUserTier(user);
@@ -325,7 +328,7 @@ export async function enforceFileSizeLimit(
  * @throws TierLimitError if would exceed storage limit
  */
 export async function enforceStorageLimit(
-  user: User,
+  user: any,
   clerkOrgId: string,
   additionalSize: number
 ): Promise<void> {
@@ -366,7 +369,7 @@ export async function enforceStorageLimit(
  * @param userId - User ID for workspace counting
  */
 export async function enforceWorkspaceLimit(
-  user: User,
+  user: any,
   userId: string
 ): Promise<void> {
   // TODO: Implement when workspace registry is available

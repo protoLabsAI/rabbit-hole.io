@@ -14,7 +14,11 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ jobId: string }> }
 ) {
+<<<<<<< HEAD
   const userId = "local-user";
+=======
+  const { userId } = { userId: "local-user" };
+>>>>>>> origin/main
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -22,9 +26,7 @@ export async function GET(
   const { jobId } = await params;
 
   try {
-    const response = await fetch(
-      `${JOB_PROCESSOR_URL}/ingest/${jobId}/result`
-    );
+    const response = await fetch(`${JOB_PROCESSOR_URL}/ingest/${jobId}/result`);
 
     if (!response.ok) {
       return NextResponse.json(
