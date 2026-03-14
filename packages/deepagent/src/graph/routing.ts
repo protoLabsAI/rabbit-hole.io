@@ -9,6 +9,8 @@
 
 import { END } from "@langchain/langgraph";
 
+import { DEFAULT_RESEARCH_SESSION_CONFIG } from "@proto/types";
+
 import type { EntityResearchAgentStateType } from "../state";
 import { log } from "../utils/logger";
 
@@ -21,8 +23,27 @@ const SUBAGENT_TYPES = [
   "bundle-assembler",
 ] as const;
 
-// Max coordinator iterations before forced termination
-const MAX_COORDINATOR_ITERATIONS = 25;
+/**
+ * Compute max coordinator iterations based on research depth.
+ *
+ * Depth mapping:
+ * - basic (shallow):        8 iterations  — 1 pass through subagent pipeline
+ * - detailed (standard):   16 iterations  — 2–3 passes with gap-fill
+ * - comprehensive (deep):  30 iterations  — 5+ passes with recursive expansion
+ */
+function getMaxIterations(state: EntityResearchAgentStateType): number {
+  const depth =
+    state.sessionConfig?.depth ?? DEFAULT_RESEARCH_SESSION_CONFIG.depth;
+  switch (depth) {
+    case "basic":
+      return 8;
+    case "comprehensive":
+      return 30;
+    case "detailed":
+    default:
+      return 16;
+  }
+}
 
 // Track iterations per thread (reset on new thread)
 const iterationCounts = new Map<string, number>();
@@ -88,14 +109,15 @@ export function routeFromCoordinator(
   state: EntityResearchAgentStateType
 ): string {
   const threadId = getThreadId(state);
+  const maxIterations = getMaxIterations(state);
 
   // Increment and check iteration count
   const currentCount = (iterationCounts.get(threadId) || 0) + 1;
   iterationCounts.set(threadId, currentCount);
 
-  if (currentCount > MAX_COORDINATOR_ITERATIONS) {
+  if (currentCount > maxIterations) {
     log.warn(
-      `Max iterations (${MAX_COORDINATOR_ITERATIONS}) reached - forcing termination`
+      `Max iterations (${maxIterations}) reached for depth=${state.sessionConfig?.depth ?? "detailed"} - forcing termination`
     );
     iterationCounts.delete(threadId); // Reset for next run
     return END;
