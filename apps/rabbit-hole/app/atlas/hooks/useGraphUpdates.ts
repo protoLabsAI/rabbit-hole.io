@@ -40,10 +40,10 @@ type GraphUpdateEvent =
 
 /**
  * Subscribe to real-time graph updates via SSE and incrementally
- * add nodes/edges to Cytoscape without full refresh.
+ * add nodes/edges to Cytoscape using layout-utilities for smart positioning.
  *
- * @param cyRef - Ref to the Cytoscape instance
- * @param onBundleComplete - Optional callback after a bundle finishes (e.g. to sync React state)
+ * New nodes are placed near their connected neighbors using quadrant scoring
+ * from cytoscape-layout-utilities, so the graph stays readable at scale.
  */
 export function useGraphUpdates(
   cyRef: React.RefObject<any>,
@@ -51,6 +51,51 @@ export function useGraphUpdates(
 ) {
   const onBundleCompleteRef = useRef(onBundleComplete);
   onBundleCompleteRef.current = onBundleComplete;
+
+  // Batch new nodes added during a bundle for a single placeNewNodes call
+  const pendingNodesRef = useRef<string[]>([]);
+  const placeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const placeNewNodes = useCallback(() => {
+    const cy = cyRef.current;
+    if (!cy || cy.destroyed() || pendingNodesRef.current.length === 0) return;
+
+    try {
+      const layoutUtils = cy.layoutUtilities({
+        idealEdgeLength: 100,
+        offset: 30,
+      });
+
+      // Collect the pending nodes as a Cytoscape collection
+      const newNodes = cy.collection();
+      for (const uid of pendingNodesRef.current) {
+        const node = cy.getElementById(uid);
+        if (node.length > 0) {
+          newNodes.merge(node);
+        }
+      }
+
+      if (newNodes.length > 0) {
+        layoutUtils.placeNewNodes(newNodes);
+        console.log(
+          `📍 Positioned ${newNodes.length} new nodes via layout-utilities`
+        );
+      }
+    } catch (err) {
+      // Fallback: if layout-utilities isn't registered, skip positioning
+      console.warn("Layout utilities not available, skipping placement:", err);
+    }
+
+    pendingNodesRef.current = [];
+  }, [cyRef]);
+
+  const schedulePlacement = useCallback(() => {
+    // Debounce: wait 200ms after last node add before placing all at once
+    if (placeTimeoutRef.current) {
+      clearTimeout(placeTimeoutRef.current);
+    }
+    placeTimeoutRef.current = setTimeout(placeNewNodes, 200);
+  }, [placeNewNodes]);
 
   const addEntityToGraph = useCallback(
     (event: GraphEntityEvent) => {
@@ -64,7 +109,7 @@ export function useGraphUpdates(
       const image = getEntityImage(event.entityType);
 
       cy.add({
-        group: "nodes",
+        group: "nodes" as const,
         data: {
           id: event.uid,
           label: event.name,
@@ -77,11 +122,15 @@ export function useGraphUpdates(
         classes: `entity-${event.entityType}`,
       });
 
+      // Queue for smart positioning
+      pendingNodesRef.current.push(event.uid);
+      schedulePlacement();
+
       console.log(
         `🟢 Live: +node ${event.name} (${event.entityType})`
       );
     },
-    [cyRef]
+    [cyRef, schedulePlacement]
   );
 
   const addRelationshipToGraph = useCallback(
@@ -101,7 +150,7 @@ export function useGraphUpdates(
       }
 
       cy.add({
-        group: "edges",
+        group: "edges" as const,
         data: {
           id: event.uid,
           source: event.source,
@@ -138,7 +187,8 @@ export function useGraphUpdates(
             console.log(
               `📦 Live: bundle complete (+${data.entitiesCreated} entities, +${data.relationshipsCreated} relationships)`
             );
-            // Optional: sync React state in background without visual disruption
+            // Trigger final placement for any remaining nodes
+            placeNewNodes();
             onBundleCompleteRef.current?.();
             break;
         }
@@ -153,6 +203,9 @@ export function useGraphUpdates(
 
     return () => {
       es.close();
+      if (placeTimeoutRef.current) {
+        clearTimeout(placeTimeoutRef.current);
+      }
     };
-  }, [addEntityToGraph, addRelationshipToGraph]);
+  }, [addEntityToGraph, addRelationshipToGraph, placeNewNodes]);
 }

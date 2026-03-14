@@ -12,6 +12,7 @@ export const dynamic = "force-dynamic";
 import cytoscape from "cytoscape";
 import cise from "cytoscape-cise";
 import cola from "cytoscape-cola";
+import layoutUtilities from "cytoscape-layout-utilities";
 import cytoscapePopper from "cytoscape-popper";
 import React, {
   useEffect,
@@ -79,6 +80,7 @@ import {
 // Register layout algorithms
 cytoscape.use(cise);
 cytoscape.use(cola);
+cytoscape.use(layoutUtilities);
 cytoscape.use(cytoscapePopper(createFloatingUIPopperFactory()));
 
 export default function AtlasClient() {
