@@ -1,7 +1,10 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
-import { useCopilotChatHeadless_c, useCoAgent } from "@copilotkit/react-core";
+import {
+  useCopilotChatHeadless_c,
+  useCoAgent,
+  useCopilotAction,
+} from "@copilotkit/react-core";
 import { useState, useEffect } from "react";
 
 import { Icon } from "@proto/icon-system";
@@ -107,7 +110,6 @@ export function ResearchChatInterface({
   );
   const config = externalConfig ?? internalConfig;
   const onConfigChange = externalOnChange ?? setInternalConfig;
-  const { user } = useUser();
   const { contextFiles, addContextFromJob, removeContext } =
     useResearchContext();
   const { jobs, ingestFile, ingestUrl, dismissJob } = useMediaIngestion({
@@ -122,6 +124,77 @@ export function ResearchChatInterface({
 
   const { state: agentState } = useCoAgent({
     name: "research_agent",
+  });
+
+  useCopilotAction({
+    name: "push_entities_to_canvas",
+    description:
+      "Push entity bundles produced during research to the canvas graph for visualization",
+    parameters: [
+      {
+        name: "entities",
+        type: "object[]",
+        description:
+          "Array of entity objects with uid, name, type, properties, tags, aliases, and optional citations",
+        required: true,
+      },
+      {
+        name: "relationships",
+        type: "object[]",
+        description:
+          "Array of relationship objects with uid, type, source, target, and optional properties",
+        required: false,
+      },
+      {
+        name: "entityCitations",
+        type: "object",
+        description:
+          "Map of entityUid to array of citation strings, preserving source references",
+        required: false,
+      },
+      {
+        name: "relationshipCitations",
+        type: "object",
+        description: "Map of relationshipUid to array of citation strings",
+        required: false,
+      },
+      {
+        name: "phase",
+        type: "string",
+        description: "Research phase that produced these entities",
+        required: false,
+      },
+      {
+        name: "isComplete",
+        type: "boolean",
+        description: "Whether the research is complete",
+        required: false,
+      },
+    ],
+    handler: async ({
+      entities,
+      relationships,
+      entityCitations,
+      relationshipCitations,
+      phase,
+      isComplete,
+    }) => {
+      window.dispatchEvent(
+        new CustomEvent("research:canvas:push-bundle", {
+          detail: {
+            entities: entities ?? [],
+            relationships: relationships ?? [],
+            entityCitations: entityCitations ?? {},
+            relationshipCitations: relationshipCitations ?? {},
+            phase,
+            isComplete,
+          },
+        })
+      );
+      const entityCount = entities?.length ?? 0;
+      const relCount = relationships?.length ?? 0;
+      return `Pushed ${entityCount} entities and ${relCount} relationships to canvas.`;
+    },
   });
 
   const [todoOpen, setTodoOpen] = useState(true);
@@ -199,18 +272,12 @@ export function ResearchChatInterface({
           {displayMessages.map((message) => (
             <Message key={message.id} role={message.role}>
               <MessageAvatar
-                src={message.role === "user" ? user?.imageUrl : undefined}
-                name={
-                  message.role === "user"
-                    ? user?.fullName || "You"
-                    : "Research Agent"
-                }
+                src={message.role === "user" ? undefined : undefined}
+                name={message.role === "user" ? "You" : "Research Agent"}
               />
               <MessageContent>
                 <MessageHeader>
-                  {message.role === "user"
-                    ? user?.fullName || "You"
-                    : "Research Agent"}
+                  {message.role === "user" ? "You" : "Research Agent"}
                   {message.timestamp && (
                     <>
                       {" · "}
