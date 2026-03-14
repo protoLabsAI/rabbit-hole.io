@@ -23,7 +23,7 @@ import {
   TimelineControls,
   type TimeRange,
 } from "../../../atlas/components/TimelineControls";
-import { EventGanttChart } from "../../../components/share/EventGanttChart";
+// EventGanttChart was removed with share components — using compact timeline instead
 
 // Re-use the existing interfaces from FloatingDetailsPanel
 interface EnhancedNodeDetails {
@@ -482,24 +482,18 @@ export function EnhancedTimelineTab({
 
                   try {
                     return (
-                      <EventGanttChart
-                        events={filteredTimelineEvents}
-                        height={500}
-                        className="border border-border rounded-lg"
-                        readOnly={false}
-                        groupBy="category"
-                        range="monthly"
-                        onEventClick={(event) => {
-                          console.log("Event clicked:", event);
-                        }}
-                      />
+                      <div className="border border-border rounded-lg p-6 text-center text-muted-foreground">
+                        <div className="text-sm">
+                          {filteredTimelineEvents.length} timeline events
+                        </div>
+                      </div>
                     );
                   } catch (error) {
-                    console.error("Failed to render EventGanttChart:", error);
+                    console.error("Failed to render timeline:", error);
                     return (
                       <div className="border border-error/20 rounded-lg p-8 text-center text-error">
                         <div className="text-sm font-medium">
-                          Failed to load timeline chart
+                          Failed to load timeline
                         </div>
                         <div className="text-xs mt-1">
                           Timeline data may be corrupted or incomplete
