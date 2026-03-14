@@ -44,6 +44,9 @@ export async function handleToolCall(
     case "validate_bundle":
       return validateBundle(args.bundle as Record<string, unknown>);
 
+    case "ingest_bundle":
+      return await ingestBundle(args.bundle as Record<string, unknown>);
+
     case "research_entity":
       return await researchEntity(
         args.query as string,
@@ -58,10 +61,7 @@ export async function handleToolCall(
       return await ingestUrl(args.url as string, config.jobProcessorUrl);
 
     case "ingest_file":
-      return await ingestFile(
-        args.filePath as string,
-        config.jobProcessorUrl
-      );
+      return await ingestFile(args.filePath as string, config.jobProcessorUrl);
 
     case "transcribe_audio":
       return await ingestUrl(args.source as string, config.jobProcessorUrl);
@@ -376,18 +376,60 @@ async function researchEntity(
     results.extraction = entities;
 
     // Step 5: Validate if we got a bundle
-    if (
-      entities &&
-      typeof entities === "object" &&
-      "entities" in entities
-    ) {
-      results.validation = validateBundle(
-        entities as Record<string, unknown>
-      );
+    if (entities && typeof entities === "object" && "entities" in entities) {
+      results.validation = validateBundle(entities as Record<string, unknown>);
     }
   }
 
   return results;
+}
+
+// ─── Bundle Ingest ──────────────────────────────────────────────────
+
+async function ingestBundle(bundle: Record<string, unknown>): Promise<unknown> {
+  const rabbitHoleUrl = process.env.RABBIT_HOLE_URL || "http://localhost:3000";
+
+  const res = await fetch(`${rabbitHoleUrl}/api/ingest-bundle`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(bundle),
+  });
+
+  if (!res.ok) {
+    return {
+      error: `Ingest bundle API error: ${res.status} ${res.statusText}`,
+    };
+  }
+
+  const data = (await res.json()) as {
+    success: boolean;
+    data?: {
+      summary?: {
+        evidenceCreated?: number;
+        evidenceKept?: number;
+        filesCreated?: number;
+        filesKept?: number;
+        contentCreated?: number;
+        contentKept?: number;
+        entitiesCreated?: number;
+        entitiesKept?: number;
+        relationshipsCreated?: number;
+        relationshipsKept?: number;
+      };
+      timing?: Record<string, unknown>;
+    };
+    error?: string;
+  };
+
+  if (!data.success) {
+    return { error: data.error ?? "Bundle ingest failed" };
+  }
+
+  return {
+    success: true,
+    summary: data.data?.summary,
+    timing: data.data?.timing,
+  };
 }
 
 // ─── Media Ingestion ────────────────────────────────────────────────
@@ -424,9 +466,7 @@ async function ingestUrl(
   while (Date.now() - start < maxWait) {
     await new Promise((r) => setTimeout(r, pollInterval));
 
-    const statusRes = await fetch(
-      `${jobProcessorUrl}/ingest/${jobId}/status`
-    );
+    const statusRes = await fetch(`${jobProcessorUrl}/ingest/${jobId}/status`);
     if (!statusRes.ok) continue;
 
     const status = (await statusRes.json()) as {
@@ -490,9 +530,7 @@ async function ingestFile(
   while (Date.now() - start < maxWait) {
     await new Promise((r) => setTimeout(r, pollInterval));
 
-    const statusRes = await fetch(
-      `${jobProcessorUrl}/ingest/${jobId}/status`
-    );
+    const statusRes = await fetch(`${jobProcessorUrl}/ingest/${jobId}/status`);
     if (!statusRes.ok) continue;
 
     const status = (await statusRes.json()) as {
