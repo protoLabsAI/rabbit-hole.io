@@ -214,6 +214,16 @@ export function ResearchChatInterface({
     setMounted(true);
   }, []);
 
+  // Notify the canvas when the agent starts/stops working so it can show
+  // a loading indicator while entities are being streamed.
+  useEffect(() => {
+    if (isLoading) {
+      window.dispatchEvent(new CustomEvent("research:canvas:agent-start"));
+    } else {
+      window.dispatchEvent(new CustomEvent("research:canvas:agent-stop"));
+    }
+  }, [isLoading]);
+
   const handleSend = () => {
     if (input.trim() && !isLoading) {
       sendMessage({
