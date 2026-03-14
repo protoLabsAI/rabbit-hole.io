@@ -112,7 +112,6 @@ export default defineConfig({
       "@proto/utils": path.resolve(__dirname, "./packages/utils/src"),
       "@proto/database": path.resolve(__dirname, "./packages/database/src"),
       "@proto/auth": path.resolve(__dirname, "./packages/auth/src"),
-      "@proto/assets": path.resolve(__dirname, "./packages/assets/src"),
       // @proto/deepagent subpaths
       "@proto/deepagent/tools": path.resolve(
         __dirname,
