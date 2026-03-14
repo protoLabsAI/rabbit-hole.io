@@ -152,13 +152,20 @@ function deduplicateEntitiesBySimilarity(entities: any[]): any[] {
 }
 
 export async function POST(request: NextRequest) {
+<<<<<<< HEAD
+  const userId = "local-user";
+=======
   const { userId } = { userId: "local-user" };
+>>>>>>> origin/main
 
   if (!userId) {
     return new Response("Unauthorized", { status: 401 });
   }
 
   // Tier enforcement (must check before starting stream)
+<<<<<<< HEAD
+  const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
+=======
   const user = {
     id: "local-user",
     firstName: "Local",
@@ -169,6 +176,7 @@ export async function POST(request: NextRequest) {
     publicMetadata: { tier: "pro" },
     privateMetadata: { stats: {} },
   };
+>>>>>>> origin/main
   if (!user) {
     return new Response("Unauthorized", { status: 401 });
   }

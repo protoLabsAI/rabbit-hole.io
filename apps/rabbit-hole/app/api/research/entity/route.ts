@@ -35,10 +35,15 @@ import { getKnowledgeGraphContext } from "@proto/utils";
 
 export async function POST(request: NextRequest) {
   // Check authentication
+<<<<<<< HEAD
+  const userId = "local-user";
+  const orgId = "local-org";
+=======
   const { userId, orgId } = {
     userId: "local-user",
     orgId: null as string | null,
   };
+>>>>>>> origin/main
 
   if (!userId) {
     return NextResponse.json(
@@ -52,11 +57,16 @@ export async function POST(request: NextRequest) {
 
   // Get organization ID and user for tier enforcement
   const clerkOrgId = orgId || request.headers.get("x-clerk-org-id") || "public";
+<<<<<<< HEAD
+  // clerkClient removed - using local user
+  // getUser removed - using local user
+=======
   const user = {
     id: userId,
     publicMetadata: { tier: "pro" },
     privateMetadata: { stats: {} },
   };
+>>>>>>> origin/main
 
   // ENFORCE ENTITY LIMIT BEFORE RESEARCH
   try {

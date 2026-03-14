@@ -4,6 +4,18 @@
  * Provides server-only tier checking and limit utilities.
  */
 
+<<<<<<< HEAD
+// Inline User type (replaces external auth dependency)
+interface User {
+  id: string;
+  publicMetadata: Record<string, unknown>;
+  emailAddresses: Array<{ emailAddress: string }>;
+  firstName?: string | null;
+  lastName?: string | null;
+}
+
+=======
+>>>>>>> origin/main
 import { TIER_LIMITS, type UserTierLimits, isUnlimited } from "./tier-limits";
 import { USER_TIERS, type UserTier, isValidUserTier } from "./types";
 

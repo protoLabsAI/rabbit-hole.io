@@ -41,7 +41,22 @@ const LOCAL_USER = {
 export async function requireSuperAdmin(
   request: NextRequest
 ): Promise<AuthResult> {
+<<<<<<< HEAD
+  const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
+
+  if (!user) {
+    return {
+      authorized: false,
+      error: {
+        message: "Authentication required",
+        status: 401,
+      },
+    };
+  }
+
+=======
   const user = LOCAL_USER;
+>>>>>>> origin/main
   const userRole = getUserRole(user);
   const isSuperAdmin = hasMinimumRole(userRole, USER_ROLES.SUPER_ADMIN);
 
@@ -71,7 +86,22 @@ export async function requireSuperAdmin(
 export async function requireAuthenticated(
   request: NextRequest
 ): Promise<AuthResult> {
+<<<<<<< HEAD
+  const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
+
+  if (!user) {
+    return {
+      authorized: false,
+      error: {
+        message: "Authentication required",
+        status: 401,
+      },
+    };
+  }
+
+=======
   const user = LOCAL_USER;
+>>>>>>> origin/main
   const userRole = getUserRole(user);
 
   return {

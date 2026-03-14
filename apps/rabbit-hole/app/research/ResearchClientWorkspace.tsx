@@ -32,7 +32,12 @@ import "../context-menu/registry/researchMenus.direct";
 const LOCAL_USER_ID = "local-user";
 
 export default function ResearchClientWorkspace() {
+<<<<<<< HEAD
+  const userId = "local-user";
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
+=======
   const userId = LOCAL_USER_ID;
+>>>>>>> origin/main
   const research = useResearchPageState();
   const [mounted, setMounted] = useState(false);
 

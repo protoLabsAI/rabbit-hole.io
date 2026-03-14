@@ -41,7 +41,11 @@ export function WorkspaceContainer({
   pendingImport = null,
 }: WorkspaceContainerProps) {
   const userId = "local-user";
+<<<<<<< HEAD
+  const organization = { id: "local-org", name: "Local Org" } as any;
+=======
   /* useOrganization removed - Clerk removed */
+>>>>>>> origin/main
 
   // Collaboration settings (persisted to localStorage)
   const { showPresence } = useCollaborationSettings();
@@ -56,10 +60,18 @@ export function WorkspaceContainer({
           <p className="text-muted-foreground mb-4">
             Sign in to access your workspace.
           </p>
+<<<<<<< HEAD
+          
+            <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90">
+              Sign In
+            </button>
+          
+=======
 
           <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90">
             Sign In
           </button>
+>>>>>>> origin/main
         </div>
       </div>
     );
@@ -110,6 +122,9 @@ function WorkspaceContent({
   pendingImport = null,
 }: WorkspaceContentProps) {
   const userId = "local-user";
+<<<<<<< HEAD
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
+=======
   const user = {
     id: "local-user",
     firstName: "Local",
@@ -121,6 +136,7 @@ function WorkspaceContent({
     privateMetadata: { stats: {} },
     isSignedIn: true,
   };
+>>>>>>> origin/main
   const { toast } = useToast();
   const [isViewMode, setIsViewMode] = React.useState(false);
 

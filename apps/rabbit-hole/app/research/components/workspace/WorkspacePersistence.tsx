@@ -53,6 +53,9 @@ export function WorkspacePersistence({
   canvasType = "graph",
   children,
 }: WorkspacePersistenceProps) {
+<<<<<<< HEAD
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
+=======
   const user = {
     id: "local-user",
     firstName: "Local",
@@ -64,6 +67,7 @@ export function WorkspacePersistence({
     privateMetadata: { stats: {} },
     isSignedIn: true,
   };
+>>>>>>> origin/main
   const workspace = useWorkspace(workspaceId, {
     mode: "editing",
     canvasType,

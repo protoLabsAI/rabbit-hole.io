@@ -19,6 +19,10 @@ export default function ViewSessionClient({
   sessionId,
 }: ViewSessionClientProps) {
   const userId = "local-user";
+<<<<<<< HEAD
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
+  const organization = { id: "local-org", name: "Local Org" } as any;
+=======
   const user = {
     id: "local-user",
     firstName: "Local",
@@ -31,6 +35,7 @@ export default function ViewSessionClient({
     isSignedIn: true,
   };
   /* useOrganization removed - Clerk removed */
+>>>>>>> origin/main
   const router = useRouter();
   const { toast } = useToast();
   const [role, setRole] = useState<"guest" | "viewer">("guest");

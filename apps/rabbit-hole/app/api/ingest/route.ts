@@ -13,7 +13,11 @@ const JOB_PROCESSOR_URL =
   process.env.JOB_PROCESSOR_URL || "http://localhost:8680";
 
 export async function POST(req: NextRequest) {
+<<<<<<< HEAD
+  const userId = "local-user";
+=======
   const { userId } = { userId: "local-user" };
+>>>>>>> origin/main
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

@@ -89,6 +89,7 @@ interface ResearchEditorProps {
   isInteractionLocked?: boolean;
   isDraggingEnabled?: boolean; // Enable/disable node dragging (for computed layouts)
   graphVersion?: number; // Version counter to force re-render on layout changes
+  isAgentWorking?: boolean; // Show loading overlay while agent is streaming entities
   onGraphChange: (
     graph: Graph<GraphNodeAttributes, GraphEdgeAttributes>
   ) => void;
@@ -143,6 +144,7 @@ export function ResearchEditor({
   isInteractionLocked = false,
   isDraggingEnabled = true,
   graphVersion = 0,
+  isAgentWorking = false,
   onGraphChange,
   onNodeClick,
   onNodeDoubleClick,
@@ -172,6 +174,27 @@ export function ResearchEditor({
 }: ResearchEditorProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
+
+  // Track whether the agent is currently working so we can show a loading overlay.
+  // This state is driven by either the prop OR by window events dispatched from
+  // ResearchChatInterface, whichever is most convenient for the parent.
+  const [agentWorking, setAgentWorking] = useState(isAgentWorking);
+  React.useEffect(() => {
+    setAgentWorking(isAgentWorking);
+  }, [isAgentWorking]);
+  React.useEffect(() => {
+    const handleAgentStart = () => setAgentWorking(true);
+    const handleAgentStop = () => setAgentWorking(false);
+    window.addEventListener("research:canvas:agent-start", handleAgentStart);
+    window.addEventListener("research:canvas:agent-stop", handleAgentStop);
+    return () => {
+      window.removeEventListener(
+        "research:canvas:agent-start",
+        handleAgentStart
+      );
+      window.removeEventListener("research:canvas:agent-stop", handleAgentStop);
+    };
+  }, []);
 
   // Edge type selector state (node-to-node connection)
   const [pendingConnection, setPendingConnection] = useState<{
@@ -383,6 +406,162 @@ export function ResearchEditor({
       );
     };
   }, [zoomIn, zoomOut, fitView, setCenter, getAnimationDuration]);
+
+  // Handle entity bundles pushed via CopilotKit action — streams entities one-by-one
+  const onGraphChangeRef = React.useRef(onGraphChange);
+  React.useEffect(() => {
+    onGraphChangeRef.current = onGraphChange;
+  }, [onGraphChange]);
+
+  React.useEffect(() => {
+    // Track active streaming timers so cleanup can cancel them
+    const activeTimers: ReturnType<typeof setTimeout>[] = [];
+
+    const handlePushBundle = (event: Event) => {
+      const detail = (event as CustomEvent).detail;
+      if (!detail || !graph) return;
+
+      const {
+        entities = [],
+        relationships = [],
+        entityCitations = {},
+      } = detail as {
+        entities: Array<{
+          uid: string;
+          name: string;
+          type: string;
+          properties?: Record<string, unknown>;
+          tags?: string[];
+          aliases?: string[];
+        }>;
+        relationships: Array<{
+          uid?: string;
+          type: string;
+          source: string;
+          target: string;
+          properties?: Record<string, unknown>;
+        }>;
+        entityCitations: Record<string, string[]>;
+      };
+
+      // Filter to only new (non-duplicate) entities by uid
+      const newEntities = entities.filter(
+        (entity) => entity.uid && !graph.hasNode(entity.uid)
+      );
+
+      if (newEntities.length === 0 && relationships.length === 0) return;
+
+      // Stream entities incrementally — add one every 120ms so they
+      // appear on the canvas as the agent finds them rather than all at once.
+      const STREAM_INTERVAL_MS = 120;
+
+      newEntities.forEach((entity, index) => {
+        const timer = setTimeout(() => {
+          // Guard: skip if entity was added by a concurrent event
+          if (!entity.uid || graph.hasNode(entity.uid)) return;
+
+          graph.addNode(entity.uid, {
+            uid: entity.uid,
+            name: entity.name || entity.uid,
+            type: entity.type || "Entity",
+            x: Math.random() * 800,
+            y: Math.random() * 600,
+            color: getEntityColor(entity.type || "Entity"),
+            icon: getEntityImage(entity.type || "Entity"),
+            size: 10,
+            properties: {
+              ...(entity.properties || {}),
+              // Preserve citations on the node
+              citations: entityCitations[entity.uid] ?? [],
+            },
+            tags: entity.tags || [],
+            aliases: entity.aliases || [],
+          });
+
+          // Notify graph listeners after each entity so the canvas updates live
+          onGraphChangeRef.current(graph);
+
+          // Auto-fit view after the last entity arrives
+          if (index === newEntities.length - 1) {
+            const fitTimer = setTimeout(() => {
+              window.dispatchEvent(new CustomEvent("research:canvas:fit-view"));
+            }, 150);
+            activeTimers.push(fitTimer);
+
+            // After all entities are added, import relationships
+            for (const rel of relationships) {
+              if (!rel.source || !rel.target) continue;
+              if (!graph.hasNode(rel.source) || !graph.hasNode(rel.target))
+                continue;
+
+              const edgeKey =
+                rel.uid || `${rel.source}-${rel.type}-${rel.target}`;
+              if (graph.hasEdge(edgeKey)) continue;
+
+              try {
+                graph.addEdgeWithKey(edgeKey, rel.source, rel.target, {
+                  uid: edgeKey,
+                  type: rel.type || "RELATED_TO",
+                  source: rel.source,
+                  target: rel.target,
+                  confidence:
+                    (rel.properties?.confidence as number | undefined) ?? 1.0,
+                  properties: rel.properties || {},
+                });
+              } catch {
+                // Edge may already exist under a different key; skip silently
+              }
+            }
+
+            onGraphChangeRef.current(graph);
+          }
+        }, index * STREAM_INTERVAL_MS);
+
+        activeTimers.push(timer);
+      });
+
+      // If only relationships were pushed (no new entities), import them immediately
+      if (newEntities.length === 0 && relationships.length > 0) {
+        for (const rel of relationships) {
+          if (!rel.source || !rel.target) continue;
+          if (!graph.hasNode(rel.source) || !graph.hasNode(rel.target))
+            continue;
+
+          const edgeKey = rel.uid || `${rel.source}-${rel.type}-${rel.target}`;
+          if (graph.hasEdge(edgeKey)) continue;
+
+          try {
+            graph.addEdgeWithKey(edgeKey, rel.source, rel.target, {
+              uid: edgeKey,
+              type: rel.type || "RELATED_TO",
+              source: rel.source,
+              target: rel.target,
+              confidence:
+                (rel.properties?.confidence as number | undefined) ?? 1.0,
+              properties: rel.properties || {},
+            });
+          } catch {
+            // Edge may already exist under a different key; skip silently
+          }
+        }
+        onGraphChangeRef.current(graph);
+        const fitTimer = setTimeout(() => {
+          window.dispatchEvent(new CustomEvent("research:canvas:fit-view"));
+        }, 150);
+        activeTimers.push(fitTimer);
+      }
+    };
+
+    window.addEventListener("research:canvas:push-bundle", handlePushBundle);
+    return () => {
+      window.removeEventListener(
+        "research:canvas:push-bundle",
+        handlePushBundle
+      );
+      // Cancel any pending streaming timers on unmount / re-render
+      activeTimers.forEach(clearTimeout);
+    };
+  }, [graph]);
 
   // Track cursor in flow coordinates (world space, not screen space)
   // Throttled to 100ms (10 updates/sec) - reduced from 60/sec for performance
@@ -1161,6 +1340,19 @@ export function ResearchEditor({
           onSelect={handleEdgeDropEntitySelect}
           anchorPosition={edgeDropState.screenPosition}
         />
+      )}
+
+      {/* Agent Working Indicator — pulsing badge in top-right corner of canvas */}
+      {agentWorking && (
+        <div className="absolute top-3 right-3 z-10 flex items-center gap-2 rounded-full bg-background/90 border border-border px-3 py-1.5 shadow-sm backdrop-blur-sm pointer-events-none">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+          </span>
+          <span className="text-xs font-medium text-muted-foreground">
+            Agent is working…
+          </span>
+        </div>
       )}
     </div>
   );

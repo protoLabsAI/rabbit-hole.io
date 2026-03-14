@@ -1,6 +1,14 @@
 "use client";
 
+<<<<<<< HEAD
+import {
+  useCopilotChatHeadless_c,
+  useCoAgent,
+  useCopilotAction,
+} from "@copilotkit/react-core";
+=======
 import { useCopilotChatHeadless_c, useCoAgent } from "@copilotkit/react-core";
+>>>>>>> origin/main
 import { useState, useEffect } from "react";
 
 import { Icon } from "@proto/icon-system";
@@ -106,6 +114,8 @@ export function ResearchChatInterface({
   );
   const config = externalConfig ?? internalConfig;
   const onConfigChange = externalOnChange ?? setInternalConfig;
+<<<<<<< HEAD
+=======
   const user = {
     id: "local-user",
     firstName: "Local",
@@ -117,6 +127,7 @@ export function ResearchChatInterface({
     privateMetadata: { stats: {} },
     isSignedIn: true,
   };
+>>>>>>> origin/main
   const { contextFiles, addContextFromJob, removeContext } =
     useResearchContext();
   const { jobs, ingestFile, ingestUrl, dismissJob } = useMediaIngestion({
@@ -129,8 +140,88 @@ export function ResearchChatInterface({
 
   const { messages, sendMessage, isLoading } = useCopilotChatHeadless_c();
 
-  const { state: agentState } = useCoAgent({
+  const { state: agentState, setState: setAgentState } = useCoAgent({
     name: "research_agent",
+  });
+
+  // Sync sessionConfig to agent state whenever it changes so the agent
+  // can apply the correct depth / iteration limits during research.
+  useEffect(() => {
+    setAgentState((prev: Record<string, unknown>) => ({
+      ...prev,
+      sessionConfig: config,
+    }));
+  }, [config, setAgentState]);
+
+  useCopilotAction({
+    name: "push_entities_to_canvas",
+    description:
+      "Push entity bundles produced during research to the canvas graph for visualization",
+    parameters: [
+      {
+        name: "entities",
+        type: "object[]",
+        description:
+          "Array of entity objects with uid, name, type, properties, tags, aliases, and optional citations",
+        required: true,
+      },
+      {
+        name: "relationships",
+        type: "object[]",
+        description:
+          "Array of relationship objects with uid, type, source, target, and optional properties",
+        required: false,
+      },
+      {
+        name: "entityCitations",
+        type: "object",
+        description:
+          "Map of entityUid to array of citation strings, preserving source references",
+        required: false,
+      },
+      {
+        name: "relationshipCitations",
+        type: "object",
+        description: "Map of relationshipUid to array of citation strings",
+        required: false,
+      },
+      {
+        name: "phase",
+        type: "string",
+        description: "Research phase that produced these entities",
+        required: false,
+      },
+      {
+        name: "isComplete",
+        type: "boolean",
+        description: "Whether the research is complete",
+        required: false,
+      },
+    ],
+    handler: async ({
+      entities,
+      relationships,
+      entityCitations,
+      relationshipCitations,
+      phase,
+      isComplete,
+    }) => {
+      window.dispatchEvent(
+        new CustomEvent("research:canvas:push-bundle", {
+          detail: {
+            entities: entities ?? [],
+            relationships: relationships ?? [],
+            entityCitations: entityCitations ?? {},
+            relationshipCitations: relationshipCitations ?? {},
+            phase,
+            isComplete,
+          },
+        })
+      );
+      const entityCount = entities?.length ?? 0;
+      const relCount = relationships?.length ?? 0;
+      return `Pushed ${entityCount} entities and ${relCount} relationships to canvas.`;
+    },
   });
 
   const [todoOpen, setTodoOpen] = useState(true);
@@ -149,6 +240,16 @@ export function ResearchChatInterface({
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Notify the canvas when the agent starts/stops working so it can show
+  // a loading indicator while entities are being streamed.
+  useEffect(() => {
+    if (isLoading) {
+      window.dispatchEvent(new CustomEvent("research:canvas:agent-start"));
+    } else {
+      window.dispatchEvent(new CustomEvent("research:canvas:agent-stop"));
+    }
+  }, [isLoading]);
 
   const handleSend = () => {
     if (input.trim() && !isLoading) {
@@ -208,18 +309,12 @@ export function ResearchChatInterface({
           {displayMessages.map((message) => (
             <Message key={message.id} role={message.role}>
               <MessageAvatar
-                src={message.role === "user" ? user?.imageUrl : undefined}
-                name={
-                  message.role === "user"
-                    ? user?.fullName || "You"
-                    : "Research Agent"
-                }
+                src={message.role === "user" ? undefined : undefined}
+                name={message.role === "user" ? "You" : "Research Agent"}
               />
               <MessageContent>
                 <MessageHeader>
-                  {message.role === "user"
-                    ? user?.fullName || "You"
-                    : "Research Agent"}
+                  {message.role === "user" ? "You" : "Research Agent"}
                   {message.timestamp && (
                     <>
                       {" · "}
@@ -513,6 +608,30 @@ export function ResearchChatInterface({
         onSubmit={handleSend}
         isLoading={isLoading}
       >
+        {/* Depth selector row — quick access without opening full settings */}
+        <div className="flex items-center gap-1 px-1 pb-1">
+          <span className="text-xs text-muted-foreground mr-1">Depth:</span>
+          {(
+            [
+              { value: "basic", label: "Shallow" },
+              { value: "detailed", label: "Standard" },
+              { value: "comprehensive", label: "Deep" },
+            ] as const
+          ).map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => onConfigChange({ ...config, depth: opt.value })}
+              className={`px-2 py-0.5 rounded text-xs font-medium transition-colors ${
+                config.depth === opt.value
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
         <div className="flex items-end gap-2">
           <PromptInputTextarea
             placeholder={placeholder}

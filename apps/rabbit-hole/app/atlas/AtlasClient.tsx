@@ -81,6 +81,10 @@ cytoscape.use(cola);
 cytoscape.use(cytoscapePopper(createFloatingUIPopperFactory()));
 
 export default function AtlasClient() {
+<<<<<<< HEAD
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
+  const isSignedIn = true;
+=======
   const isSignedIn = true;
   const user = {
     id: "local-user",
@@ -92,6 +96,7 @@ export default function AtlasClient() {
     publicMetadata: { tier: "pro" },
     privateMetadata: { stats: {} },
   };
+>>>>>>> origin/main
   const containerRef = useRef<HTMLDivElement>(null);
   const cyRef = useRef<cytoscape.Core | null>(null);
   const apiService = useRef(new AtlasApiService()).current;

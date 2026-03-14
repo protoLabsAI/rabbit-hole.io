@@ -12,6 +12,10 @@ import { logger } from "@proto/logger";
 
 export async function POST(request: NextRequest) {
   try {
+<<<<<<< HEAD
+    const userId = "local-user";
+    const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
+=======
     const { userId } = { userId: "local-user" };
     const user = {
       id: "local-user",
@@ -23,6 +27,7 @@ export async function POST(request: NextRequest) {
       publicMetadata: { tier: "pro" },
       privateMetadata: { stats: {} },
     };
+>>>>>>> origin/main
 
     if (!userId || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -109,7 +114,11 @@ export async function POST(request: NextRequest) {
 // GET endpoint to check session status
 export async function GET(request: NextRequest) {
   try {
+<<<<<<< HEAD
+    const userId = "local-user";
+=======
     const { userId } = { userId: "local-user" };
+>>>>>>> origin/main
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

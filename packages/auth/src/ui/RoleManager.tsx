@@ -28,6 +28,9 @@ export function RoleManager({
   showRoleSelector = false,
   className = "",
 }: RoleManagerProps) {
+<<<<<<< HEAD
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
+=======
   const user = {
     id: "local-user",
     firstName: "Local",
@@ -38,6 +41,7 @@ export function RoleManager({
     publicMetadata: { tier: "pro", role: "super_admin" },
     privateMetadata: { stats: {} },
   };
+>>>>>>> origin/main
   const isSignedIn = true;
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
 
@@ -162,6 +166,9 @@ export function RoleManager({
  * Quick role indicator for header/navigation
  */
 export function RoleIndicator({ className = "" }: { className?: string }) {
+<<<<<<< HEAD
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
+=======
   const user = {
     id: "local-user",
     firstName: "Local",
@@ -172,6 +179,7 @@ export function RoleIndicator({ className = "" }: { className?: string }) {
     publicMetadata: { tier: "pro", role: "super_admin" },
     privateMetadata: { stats: {} },
   };
+>>>>>>> origin/main
   const isSignedIn = true;
 
   if (!isSignedIn || !user) {
@@ -204,6 +212,9 @@ export function RoleFeature({
   children,
   fallback = null,
 }: RoleFeatureProps) {
+<<<<<<< HEAD
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
+=======
   const user = {
     id: "local-user",
     firstName: "Local",
@@ -214,6 +225,7 @@ export function RoleFeature({
     publicMetadata: { tier: "pro", role: "super_admin" },
     privateMetadata: { stats: {} },
   };
+>>>>>>> origin/main
   const isSignedIn = true;
 
   if (!isSignedIn || !user) {
@@ -242,6 +254,9 @@ export function RoleGuard({
   fallback = null,
   showFallback = true,
 }: RoleGuardProps) {
+<<<<<<< HEAD
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
+=======
   const user = {
     id: "local-user",
     firstName: "Local",
@@ -252,6 +267,7 @@ export function RoleGuard({
     publicMetadata: { tier: "pro", role: "super_admin" },
     privateMetadata: { stats: {} },
   };
+>>>>>>> origin/main
   const isSignedIn = true;
 
   if (!isSignedIn || !user) {

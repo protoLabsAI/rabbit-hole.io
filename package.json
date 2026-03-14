@@ -158,7 +158,6 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.901.0",
     "@aws-sdk/s3-request-presigner": "^3.901.0",
-    "@clerk/nextjs": "^6.32.0",
     "@copilotkit/react-core": "^1.10.4",
     "@copilotkit/react-ui": "^1.10.4",
     "@copilotkit/runtime": "^1.9.3",
@@ -173,7 +172,6 @@
     "@langchain/core": "^1.0.1",
     "@langchain/langgraph": "^1.0.0",
     "@proto/api-utils": "workspace:*",
-    "@proto/assets": "workspace:*",
     "@proto/auth": "workspace:*",
     "@proto/database": "workspace:*",
     "@proto/icon-system": "workspace:*",

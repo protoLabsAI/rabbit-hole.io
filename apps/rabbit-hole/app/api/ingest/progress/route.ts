@@ -21,7 +21,11 @@ function releaseClient(client: PoolClient | null) {
 }
 
 export async function GET(req: NextRequest) {
+<<<<<<< HEAD
+  const userId = "local-user";
+=======
   const { userId } = { userId: "local-user" };
+>>>>>>> origin/main
   if (!userId) {
     return new Response("Unauthorized", { status: 401 });
   }

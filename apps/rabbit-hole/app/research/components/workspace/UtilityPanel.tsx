@@ -22,9 +22,11 @@ interface UtilityPanelProps {
   layoutId: string;
 }
 
+const EMPTY_TABS: UtilityTab[] = [];
+
 export function UtilityPanel({
-  universalTabs = [],
-  canvasTabs = [],
+  universalTabs = EMPTY_TABS,
+  canvasTabs = EMPTY_TABS,
   layoutId,
 }: UtilityPanelProps) {
   // Combine universal and canvas-specific tabs (memoized to prevent unnecessary effect re-runs)
@@ -40,29 +42,23 @@ export function UtilityPanel({
   // Get current active tab
   const currentTab = allTabs.find((tab) => tab.id === activeTab);
 
-  // Restore active tab from localStorage on mount and when tabs change
+  // Restore active tab from localStorage on mount only
   useEffect(() => {
-    // No tabs available - clear active tab
-    if (allTabs.length === 0) {
-      setActiveTab("");
-      return;
-    }
+    if (allTabs.length === 0) return;
 
     try {
       const savedTab = localStorage.getItem(`${layoutId}-tab`);
-      if (savedTab && allTabs.some((t) => t.id === savedTab)) {
+      if (savedTab) {
         setActiveTab(savedTab);
         return;
       }
-    } catch (e) {
-      console.warn("Failed to restore panel state:", e);
+    } catch {
+      // localStorage unavailable
     }
 
-    // Fallback: ensure activeTab points to a valid tab
-    setActiveTab((prev) =>
-      allTabs.some((t) => t.id === prev) ? prev : allTabs[0].id
-    );
-  }, [layoutId, allTabs]);
+    setActiveTab(allTabs[0].id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [layoutId]);
 
   // Save tab to localStorage when it changes
   useEffect(() => {

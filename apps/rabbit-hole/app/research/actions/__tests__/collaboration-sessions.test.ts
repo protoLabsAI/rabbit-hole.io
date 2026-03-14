@@ -13,7 +13,11 @@ import {
   deleteCollaborationSession,
 } from "../collaboration-sessions";
 
+<<<<<<< HEAD
+// Clerk mock removed - auth is now hardcoded to local-user
+=======
 // Mock dependencies (Clerk removed - auth is now local)
+>>>>>>> origin/main
 
 vi.mock("@proto/auth", () => ({
   getUserTier: vi.fn(),
@@ -50,6 +54,10 @@ describe("createCollaborationSession", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
+<<<<<<< HEAD
+    mockAuth = {} as any; // Clerk removed
+=======
+>>>>>>> origin/main
     mockAuthFns = await import("@proto/auth");
     const pg = await import("pg");
     Pool = pg.Pool;
@@ -162,6 +170,10 @@ describe("endCollaborationSession", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
+<<<<<<< HEAD
+    mockAuth = {} as any; // Clerk removed
+=======
+>>>>>>> origin/main
     const pg = await import("pg");
     Pool = pg.Pool;
   });
@@ -229,6 +241,10 @@ describe("deleteCollaborationSession", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
+<<<<<<< HEAD
+    mockAuth = {} as any; // Clerk removed
+=======
+>>>>>>> origin/main
     const pg = await import("pg");
     Pool = pg.Pool;
   });
@@ -278,6 +294,10 @@ describe("initializeSessionData", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
+<<<<<<< HEAD
+    mockAuth = {} as any; // Clerk removed
+=======
+>>>>>>> origin/main
     const pg = await import("pg");
     Pool = pg.Pool;
   });

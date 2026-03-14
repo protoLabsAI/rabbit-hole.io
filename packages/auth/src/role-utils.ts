@@ -1,9 +1,21 @@
 /**
- * Server-side role utility functions for Clerk-based authentication
+ * Server-side role utility functions
  *
  * Provides server-only role checking and utilities.
  */
 
+<<<<<<< HEAD
+// Inline User type (replaces external auth dependency)
+interface User {
+  id: string;
+  publicMetadata: Record<string, unknown>;
+  emailAddresses: Array<{ emailAddress: string }>;
+  firstName?: string | null;
+  lastName?: string | null;
+}
+
+=======
+>>>>>>> origin/main
 import {
   USER_ROLES,
   ROLE_HIERARCHY,

@@ -8,6 +8,10 @@ import { getHocuspocusPostgresPool } from "@/lib/hocuspocus-db";
 
 export async function POST(request: NextRequest) {
   try {
+<<<<<<< HEAD
+    const userId = "local-user";
+    const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
+=======
     const { userId } = { userId: "local-user" };
     const user = {
       id: "local-user",
@@ -19,6 +23,7 @@ export async function POST(request: NextRequest) {
       publicMetadata: { tier: "pro" },
       privateMetadata: { stats: {} },
     };
+>>>>>>> origin/main
 
     if (!userId || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

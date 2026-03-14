@@ -209,6 +209,10 @@ export function useRoleBasedDialog<T extends Record<string, unknown>>(
   requiredRole: string,
   customMessage?: string
 ) {
+<<<<<<< HEAD
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
+  const isSignedIn = true;
+=======
   const isSignedIn = true;
   const user = {
     id: "local-user",
@@ -220,6 +224,7 @@ export function useRoleBasedDialog<T extends Record<string, unknown>>(
     publicMetadata: { tier: "pro" },
     privateMetadata: { stats: {} },
   };
+>>>>>>> origin/main
   const userRole = user?.publicMetadata?.role as string;
 
   return useConditionalDialog(baseDialogHook, {
@@ -243,6 +248,10 @@ export function useRoleRequiredDialog<T extends Record<string, unknown>>(
   requiredRole: UserRole,
   customMessage?: string
 ) {
+<<<<<<< HEAD
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
+  const isSignedIn = true;
+=======
   const isSignedIn = true;
   const user = {
     id: "local-user",
@@ -254,6 +263,7 @@ export function useRoleRequiredDialog<T extends Record<string, unknown>>(
     publicMetadata: { tier: "pro" },
     privateMetadata: { stats: {} },
   };
+>>>>>>> origin/main
   const userRole = user ? getUserRoleClient(user) : undefined;
 
   return useConditionalDialog(baseDialogHook, {

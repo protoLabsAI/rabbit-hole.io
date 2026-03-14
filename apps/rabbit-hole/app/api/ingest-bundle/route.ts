@@ -459,11 +459,15 @@ const handleBundleIngest = async (
 // ==================== Route Export ====================
 
 export async function POST(request: NextRequest) {
+<<<<<<< HEAD
+  const userId = "local-user"; const orgId = "local-org"; const has = () => true;
+=======
   const { userId, orgId, has } = {
     userId: "local-user",
     orgId: null as string | null,
     has: (_: any) => false,
   };
+>>>>>>> origin/main
 
   if (!userId) {
     return NextResponse.json(

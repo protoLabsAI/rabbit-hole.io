@@ -77,6 +77,9 @@ export function useGraphContextActions({
 }: UseGraphContextActionsOptions): ResearchMenuActions {
   const { toast } = useToast();
   const { confirm: confirmDialog } = useConfirmDialog();
+<<<<<<< HEAD
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
+=======
   const user = {
     id: "local-user",
     firstName: "Local",
@@ -88,6 +91,7 @@ export function useGraphContextActions({
     privateMetadata: { stats: {} },
     isSignedIn: true,
   };
+>>>>>>> origin/main
 
   const onAddEntity = useCallback(
     (context?: { flowX?: number; flowY?: number; x?: number; y?: number }) => {

@@ -243,12 +243,21 @@ export const GET = withAuthAndLogging("list entities for management")(async (
     if (workspaceId) {
       try {
         // Get Clerk user to access tier and org info
+<<<<<<< HEAD
+        const userId = "local-user";
+=======
         const { userId } = { userId: "local-user" };
+>>>>>>> origin/main
         if (!userId) {
           throw new Error("User not found");
         }
 
+<<<<<<< HEAD
+        // clerkClient removed - using local user
+        // getUser removed - using local user
+=======
         const clerkUser = await client.users.getUser(userId);
+>>>>>>> origin/main
         const tier = getUserTier(clerkUser);
         const limits = getTierLimits(tier);
 

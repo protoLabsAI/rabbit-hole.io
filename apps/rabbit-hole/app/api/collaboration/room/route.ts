@@ -18,10 +18,15 @@ export const runtime = "nodejs";
 export async function POST(request: NextRequest) {
   try {
     // Authenticate with Clerk
+<<<<<<< HEAD
+    const userId = "local-user";
+  const orgId = "local-org";
+=======
     const { userId, orgId } = {
       userId: "local-user",
       orgId: null as string | null,
     };
+>>>>>>> origin/main
 
     if (!userId || !orgId) {
       return NextResponse.json(
@@ -54,12 +59,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+<<<<<<< HEAD
+    // Get user info for JWT (Clerk removed - using local user)
+=======
     // Get user info for JWT
     const user = {
       id: userId,
       publicMetadata: { tier: "pro" },
       privateMetadata: { stats: {} },
     };
+>>>>>>> origin/main
 
     // Create room with JWT token
     const roomConfig = await createCollaborationRoom(

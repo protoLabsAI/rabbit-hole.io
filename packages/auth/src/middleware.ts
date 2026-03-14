@@ -49,6 +49,11 @@ export function withAuth<T = any>(
         });
       }
 
+<<<<<<< HEAD
+      // Local user - no auth required
+      const userId = "local-user";
+      const clerkUser = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
+=======
       // Check authentication
       const { userId } = { userId: "local-user" };
 
@@ -73,6 +78,7 @@ export function withAuth<T = any>(
         publicMetadata: { tier: "pro", role: "super_admin" },
         privateMetadata: { stats: {} },
       };
+>>>>>>> origin/main
 
       // Get user role and tier
       const userRole = getUserRole(clerkUser);

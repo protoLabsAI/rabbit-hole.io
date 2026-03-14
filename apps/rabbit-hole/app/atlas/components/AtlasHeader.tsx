@@ -95,6 +95,8 @@ export function AtlasHeader({
             {/* Authentication UI */}
             <div className="border-l border-border pl-4 flex items-center">
               <ClientOnlyAuthSection>
+<<<<<<< HEAD
+=======
                 {
                   /* SignedOut: removed */
 
@@ -103,6 +105,7 @@ export function AtlasHeader({
                   </button>
                 }
 
+>>>>>>> origin/main
                 <div className="flex items-center gap-3">
                   <Link href="/dashboard">
                     <Button

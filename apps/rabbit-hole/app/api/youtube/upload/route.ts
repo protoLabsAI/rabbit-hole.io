@@ -17,7 +17,11 @@ export const POST = withAuthAndLogging("upload video file")(async (
   { userId }: { userId: string }
 ): Promise<NextResponse> => {
   try {
+<<<<<<< HEAD
+    const orgId = "local-org";
+=======
     const { orgId } = { orgId: null as string | null };
+>>>>>>> origin/main
 
     // Get multipart form data
     const formData = await request.formData();

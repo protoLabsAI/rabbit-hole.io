@@ -62,6 +62,9 @@ export function ControlButtons({
   onResetView,
   onFitToScreen,
 }: ControlButtonsProps) {
+<<<<<<< HEAD
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
+=======
   const user = {
     id: "local-user",
     firstName: "Local",
@@ -73,6 +76,7 @@ export function ControlButtons({
     privateMetadata: { stats: {} },
     isSignedIn: true,
   };
+>>>>>>> origin/main
   const router = useRouter();
   const userRole = user ? getUserRoleClient(user) : null;
   const isSuperAdmin = userRole
@@ -129,6 +133,8 @@ export function ControlButtons({
             AI Research →
           </Button>
         </div>
+<<<<<<< HEAD
+=======
 
         {/* Unauthenticated Users: Show Login button */}
         {
@@ -139,6 +145,7 @@ export function ControlButtons({
             <span>Sign In for Research Tools</span>
           </Button>
         }
+>>>>>>> origin/main
       </ClientOnlyAuthSection>
 
       {/* Graph Controls */}

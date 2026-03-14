@@ -13,7 +13,11 @@ import {
   isValidUserRole,
 } from "./types";
 
+<<<<<<< HEAD
+// Define user type inline (no external auth dependency)
+=======
 // Define user type inline (Clerk has been removed)
+>>>>>>> origin/main
 interface UserResource {
   id: string;
   emailAddresses: Array<{ emailAddress: string }>;

@@ -72,7 +72,11 @@ export async function mergeResearchToNeo4j(bundle: ResearchBundle): Promise<
 > {
   try {
     // Auth check
+<<<<<<< HEAD
+    const userId = "local-user";
+=======
     const { userId } = { userId: "local-user" };
+>>>>>>> origin/main
     if (!userId) {
       return {
         error: "Unauthorized",

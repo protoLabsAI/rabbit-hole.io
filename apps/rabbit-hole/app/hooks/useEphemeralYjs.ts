@@ -39,8 +39,12 @@ export function useEphemeralYjs({
   enabled = true,
   fallbackToLocal = true,
 }: UseEphemeralYjsOptions) {
+<<<<<<< HEAD
+  const userId = "local-user"; const getToken = async (_opts?: any) => "mock-token";
+=======
   const userId = "local-user";
   const getToken = async (_?: any) => null;
+>>>>>>> origin/main
   const { toast } = useToast();
   const [ydoc] = useState(() => new Y.Doc());
   const [provider, setProvider] = useState<HocuspocusProvider | null>(null);

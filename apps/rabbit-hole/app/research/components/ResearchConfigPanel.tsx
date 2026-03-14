@@ -12,7 +12,6 @@ import { useState } from "react";
 
 import { Icon } from "@proto/icon-system";
 import type { ResearchDepth, ResearchSessionConfig } from "@proto/types";
-import { DEFAULT_RESEARCH_SESSION_CONFIG } from "@proto/types";
 import {
   Button,
   Collapsible,
@@ -28,10 +27,26 @@ import {
   SelectValue,
 } from "@proto/ui/atoms";
 
-const DEPTH_OPTIONS: { value: ResearchDepth; label: string; description: string }[] = [
-  { value: "basic", label: "Basic", description: "Quick single-pass research" },
-  { value: "detailed", label: "Detailed", description: "Gap-filling with iterative refinement" },
-  { value: "comprehensive", label: "Comprehensive", description: "Deep recursive research tree" },
+const DEPTH_OPTIONS: {
+  value: ResearchDepth;
+  label: string;
+  description: string;
+}[] = [
+  {
+    value: "basic",
+    label: "Shallow",
+    description: "Single-pass research — fastest results",
+  },
+  {
+    value: "detailed",
+    label: "Standard",
+    description: "2–3 passes with gap-filling (default)",
+  },
+  {
+    value: "comprehensive",
+    label: "Deep",
+    description: "5+ passes with recursive entity expansion",
+  },
 ];
 
 const SEARCH_PROVIDERS = [
@@ -66,7 +81,11 @@ export function ResearchConfigPanel({
   };
 
   return (
-    <Collapsible open={open} onOpenChange={setOpen} className="border-t border-border">
+    <Collapsible
+      open={open}
+      onOpenChange={setOpen}
+      className="border-t border-border"
+    >
       <CollapsibleTrigger asChild>
         <Button
           variant="ghost"
@@ -75,11 +94,15 @@ export function ResearchConfigPanel({
         >
           <div className="flex items-center gap-2">
             <Icon name="settings" size={16} className="text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">Research Settings</span>
+            <span className="text-sm text-muted-foreground">
+              Research Settings
+            </span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground capitalize">
-              {config.depth} · {config.maxEntities} entities
+            <span className="text-xs text-muted-foreground">
+              {DEPTH_OPTIONS.find((o) => o.value === config.depth)?.label ??
+                config.depth}{" "}
+              · {config.maxEntities} entities
             </span>
             <Icon
               name="chevron-down"
@@ -95,7 +118,9 @@ export function ResearchConfigPanel({
           <Label className="text-xs font-medium">Research Depth</Label>
           <Select
             value={config.depth}
-            onValueChange={(value: ResearchDepth) => updateConfig({ depth: value })}
+            onValueChange={(value: ResearchDepth) =>
+              updateConfig({ depth: value })
+            }
           >
             <SelectTrigger className="h-8 text-sm">
               <SelectValue />
@@ -105,7 +130,9 @@ export function ResearchConfigPanel({
                 <SelectItem key={opt.value} value={opt.value}>
                   <div className="flex flex-col">
                     <span>{opt.label}</span>
-                    <span className="text-xs text-muted-foreground">{opt.description}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {opt.description}
+                    </span>
                   </div>
                 </SelectItem>
               ))}
@@ -117,7 +144,9 @@ export function ResearchConfigPanel({
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <Label className="text-xs font-medium">Max Entities</Label>
-            <span className="text-xs text-muted-foreground">{config.maxEntities}</span>
+            <span className="text-xs text-muted-foreground">
+              {config.maxEntities}
+            </span>
           </div>
           <Slider
             value={[config.maxEntities]}
@@ -134,7 +163,9 @@ export function ResearchConfigPanel({
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <Label className="text-xs font-medium">Max Depth</Label>
-              <span className="text-xs text-muted-foreground">{config.maxDepth}</span>
+              <span className="text-xs text-muted-foreground">
+                {config.maxDepth}
+              </span>
             </div>
             <Slider
               value={[config.maxDepth]}
@@ -152,7 +183,10 @@ export function ResearchConfigPanel({
           <Label className="text-xs font-medium">Search Providers</Label>
           <div className="space-y-2">
             {SEARCH_PROVIDERS.map((provider) => (
-              <div key={provider.id} className="flex items-center justify-between">
+              <div
+                key={provider.id}
+                className="flex items-center justify-between"
+              >
                 <Label className="text-xs" htmlFor={`provider-${provider.id}`}>
                   {provider.label}
                 </Label>

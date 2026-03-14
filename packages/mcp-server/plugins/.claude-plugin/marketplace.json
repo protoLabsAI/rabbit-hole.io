@@ -1,0 +1,20 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "rabbit-hole-plugins",
+  "description": "Rabbit Hole research and media processing plugins for Claude Code",
+  "owner": {
+    "name": "Proto Labs AI",
+    "email": "support@protolabs.ai"
+  },
+  "plugins": [
+    {
+      "name": "rabbit-hole",
+      "description": "Deep research and media processing tools. Search the web, extract entities, build knowledge graphs, ingest PDFs/audio/video — all from your CLI.",
+      "author": {
+        "name": "Proto Labs AI"
+      },
+      "source": "./rabbit-hole",
+      "category": "research"
+    }
+  ]
+}

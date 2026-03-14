@@ -1,0 +1,57 @@
+{
+  "name": "rabbit-hole",
+  "description": "Rabbit Hole — Deep research and media processing tools. Search the web, extract entities, build knowledge graphs, and ingest any media format.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Proto Labs AI"
+  },
+  "repository": "https://github.com/protoLabsAI/rabbit-hole.io",
+  "mcpServers": {
+    "rabbit-hole": {
+      "command": "bash",
+      "args": [
+        "${CLAUDE_PLUGIN_ROOT}/hooks/start-mcp.sh"
+      ],
+      "env": {
+        "RABBIT_HOLE_ROOT": "${RABBIT_HOLE_ROOT}",
+        "JOB_PROCESSOR_URL": "${JOB_PROCESSOR_URL:-http://localhost:8680}",
+        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}",
+        "TAVILY_API_KEY": "${TAVILY_API_KEY}",
+        "GROQ_API_KEY": "${GROQ_API_KEY}"
+      }
+    }
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/check-mcp-health.sh\""
+          }
+        ]
+      },
+      {
+        "matcher": "resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/check-mcp-health.sh\""
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/block-dangerous.sh\""
+          }
+        ]
+      }
+    ]
+  }
+}

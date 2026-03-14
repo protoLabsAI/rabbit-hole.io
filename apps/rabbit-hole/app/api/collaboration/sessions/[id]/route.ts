@@ -15,6 +15,9 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+<<<<<<< HEAD
+    const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
+=======
     const user = {
       id: "local-user",
       firstName: "Local",
@@ -25,6 +28,7 @@ export async function GET(
       publicMetadata: { tier: "pro" },
       privateMetadata: { stats: {} },
     };
+>>>>>>> origin/main
     const { id } = await params;
 
     const pool = getGlobalPostgresPool();
@@ -79,6 +83,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+<<<<<<< HEAD
+    const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
+=======
     const user = {
       id: "local-user",
       firstName: "Local",
@@ -89,6 +96,7 @@ export async function DELETE(
       publicMetadata: { tier: "pro" },
       privateMetadata: { stats: {} },
     };
+>>>>>>> origin/main
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

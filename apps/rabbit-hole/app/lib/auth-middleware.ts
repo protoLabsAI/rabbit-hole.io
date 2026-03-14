@@ -29,7 +29,22 @@ export function withAuth<T = any>(
 ) {
   return async (request: NextRequest): Promise<NextResponse<T>> => {
     try {
+<<<<<<< HEAD
+      // Check authentication
       const userId = "local-user";
+
+      if (!userId) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: options.errorMessage || "Authentication required",
+          },
+          { status: 401 }
+        ) as NextResponse<T>;
+      }
+=======
+      const userId = "local-user";
+>>>>>>> origin/main
 
       // Log authenticated request if action specified
       if (options.logAction) {

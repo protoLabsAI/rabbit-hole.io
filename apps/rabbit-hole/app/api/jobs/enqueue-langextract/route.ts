@@ -37,10 +37,15 @@ const EnqueueLangExtractSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     // 1. Authentication
+<<<<<<< HEAD
+    const userId = "local-user";
+  const orgId = "local-org";
+=======
     const { userId, orgId } = {
       userId: "local-user",
       orgId: null as string | null,
     };
+>>>>>>> origin/main
     if (!userId) {
       return NextResponse.json(
         { error: "Unauthorized", message: "Authentication required" },
@@ -48,10 +53,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 2. Tier enforcement
-    const user = await clerkClient().then((client) =>
-      client.users.getUser(userId)
-    );
+    // 2. Tier enforcement (Clerk removed - using local user)
+    const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }] } as any;
     const userTier = getUserTier(user);
     const tierLimits = getTierLimits(userTier);
 

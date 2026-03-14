@@ -20,7 +20,11 @@ global.fetch = vi.fn(() =>
   })
 ) as any;
 
+<<<<<<< HEAD
+// Clerk mock removed - useAuth replaced with local-user stub
+=======
 // Clerk removed - useAuth is no longer used in the hook
+>>>>>>> origin/main
 
 // Mock toast
 vi.mock("@/components/hooks/use-toast", () => ({

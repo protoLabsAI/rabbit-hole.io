@@ -29,6 +29,9 @@ const PRELOAD_CONFIG: PreloadConfig[] = [
 ];
 
 export function useFeaturePreloader() {
+<<<<<<< HEAD
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
+=======
   const user = {
     id: "local-user",
     firstName: "Local",
@@ -40,6 +43,7 @@ export function useFeaturePreloader() {
     privateMetadata: { stats: {} },
     isSignedIn: true,
   };
+>>>>>>> origin/main
   const userTier = getUserTierClient(user || null);
   const tierLimits = getTierLimitsClient(userTier);
 

@@ -1,18 +1,18 @@
 /**
- * Research Page - Server Component Entry Point
+ * Research Page - Minimal POC
  *
- * Multi-tab collaborative workspace with Yjs persistence.
- * Replaces single-graph mode and IndexedDB with Yjs.
+ * Single canvas + chat. No workspace management, no collaboration,
+ * no utility panels. Just the core research flow.
  */
 
 import { Suspense } from "react";
 
-import ResearchClientWorkspace from "./ResearchClientWorkspace";
+import ResearchPOC from "./ResearchPOC";
 
 export default function ResearchPage() {
   return (
     <Suspense fallback={<ResearchPageSkeleton />}>
-      <ResearchClientWorkspace />
+      <ResearchPOC />
     </Suspense>
   );
 }
@@ -23,12 +23,7 @@ function ResearchPageSkeleton() {
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
-          <div className="text-lg font-medium">
-            Loading Research Environment...
-          </div>
-          <div className="text-sm text-muted-foreground mt-2">
-            Initializing graph editor and AI assistant
-          </div>
+          <div className="text-lg font-medium">Loading Research...</div>
         </div>
       </div>
     </div>

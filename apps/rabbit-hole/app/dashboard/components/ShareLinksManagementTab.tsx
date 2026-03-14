@@ -39,6 +39,10 @@ interface ShareToken {
 }
 
 export function ShareLinksManagementTab() {
+<<<<<<< HEAD
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
+  const getToken = async (_opts?: any) => "mock-token";
+=======
   const user = {
     id: "local-user",
     firstName: "Local",
@@ -51,6 +55,7 @@ export function ShareLinksManagementTab() {
     isSignedIn: true,
   };
   const getToken = async (_?: any) => null;
+>>>>>>> origin/main
   const { toast } = useToast();
   const [shareTokens, setShareTokens] = useState<ShareToken[]>([]);
   const [loading, setLoading] = useState(true);

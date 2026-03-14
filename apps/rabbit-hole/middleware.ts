@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { extractTenantIdentifiers } from "@proto/utils/tenancy-edge";
 
+<<<<<<< HEAD
+export default function middleware(request: NextRequest) {
+=======
 /**
  * Next.js Middleware
  *
@@ -9,13 +12,17 @@ import { extractTenantIdentifiers } from "@proto/utils/tenancy-edge";
  * Tenant header injection and security headers are preserved.
  */
 export default async function middleware(request: NextRequest) {
+>>>>>>> origin/main
   // Extract tenant identifiers from URL (no database calls - edge compatible)
   const tenantIds = extractTenantIdentifiers(request);
 
   // Get the response
   const response = NextResponse.next();
 
+<<<<<<< HEAD
+=======
   // Add tenant identifier headers for API routes to validate
+>>>>>>> origin/main
   if (tenantIds.hash) {
     response.headers.set("x-tenant-hash", tenantIds.hash);
   }

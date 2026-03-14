@@ -22,6 +22,10 @@ export const POST = withAuthAndLogging("process YouTube video")(async (
   { userId }: { userId: string }
 ): Promise<NextResponse> => {
   try {
+<<<<<<< HEAD
+    const orgId = "local-org";
+    const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
+=======
     const { orgId } = { orgId: null as string | null };
     const user = {
       id: "local-user",
@@ -33,6 +37,7 @@ export const POST = withAuthAndLogging("process YouTube video")(async (
       publicMetadata: { tier: "pro" },
       privateMetadata: { stats: {} },
     };
+>>>>>>> origin/main
     const body: ProcessYouTubeRequest = await request.json();
 
     // Validate request
@@ -159,7 +164,11 @@ export const POST = withAuthAndLogging("enqueue YouTube processing")(async (
   { userId }: { userId: string }
 ): Promise<NextResponse<ProcessYouTubeResponse>> => {
   try {
+<<<<<<< HEAD
+    const orgId = "local-org";
+=======
     const { orgId } = { orgId: null as string | null };
+>>>>>>> origin/main
     const body: ProcessYouTubeRequest = await request.json();
 
     // 1. Validate request
@@ -198,7 +207,11 @@ export const POST = withAuthAndLogging("enqueue YouTube processing")(async (
     }
 
     // 3. Determine quality based on user tier
+<<<<<<< HEAD
+    const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
+=======
     const user = { id: "local-user", firstName: "Local", lastName: "User", username: "local-user", fullName: "Local User", emailAddresses: [{ emailAddress: "local@localhost" }], publicMetadata: { tier: "pro" }, privateMetadata: { stats: {} } };
+>>>>>>> origin/main
     const tier = getUserTier(user);
     const quality = tier === "free" ? "720p" : "1080p";
 

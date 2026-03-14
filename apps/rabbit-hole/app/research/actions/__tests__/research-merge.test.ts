@@ -9,7 +9,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ResearchBundle } from "../../lib/bundle-validator";
 import { mergeResearchToNeo4j } from "../research-merge";
 
+<<<<<<< HEAD
+// Mock dependencies
+// Clerk mock removed - auth is now hardcoded to local-user
+=======
 // Mock dependencies (Clerk removed - auth is now local)
+>>>>>>> origin/main
 
 vi.mock("@proto/database", () => ({
   getGlobalNeo4jClient: vi.fn(() => ({
@@ -37,6 +42,10 @@ describe("mergeResearchToNeo4j", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
+<<<<<<< HEAD
+    mockAuth = {} as any; // Clerk removed
+=======
+>>>>>>> origin/main
     mockDatabase = await import("@proto/database");
   });
 

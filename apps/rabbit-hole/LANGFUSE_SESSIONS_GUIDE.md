@@ -149,7 +149,7 @@ const sessionId = request.headers.get("x-session-id");
 ### Clerk Authentication
 
 ```typescript
-import { auth } from "@clerk/nextjs/server";
+// auth import removed (Clerk removed)
 
 const { userId } = await auth();
 // Returns: "user_xyz..." or null

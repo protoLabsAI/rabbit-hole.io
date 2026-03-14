@@ -20,6 +20,9 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+<<<<<<< HEAD
+    const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
+=======
     const user = {
       id: "local-user",
       firstName: "Local",
@@ -30,6 +33,7 @@ export async function POST(
       publicMetadata: { tier: "pro" },
       privateMetadata: { stats: {} },
     };
+>>>>>>> origin/main
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -67,6 +71,10 @@ export async function POST(
     }
 
     // Get owner's tier limits from Clerk
+<<<<<<< HEAD
+    // clerkClient removed - using local user
+=======
+>>>>>>> origin/main
     const ownerUser = await client.users.getUser(sessionRow.owner_id);
     const ownerTier = getUserTier(ownerUser);
     const limits = getTierLimits(ownerTier);

@@ -116,3 +116,9 @@ export {
 
 // File access control utilities
 export { verifyFileAccess, type FileAccessResult } from "./file-access";
+
+// Local auth provider (replaces Clerk for local development)
+export {
+  LocalAuthProvider,
+  type LocalAuthSession,
+} from "./local-auth-provider";

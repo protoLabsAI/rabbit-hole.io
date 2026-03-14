@@ -2,26 +2,35 @@
 
 import React from "react";
 
+<<<<<<< HEAD
+=======
 import { toast } from "@proto/ui/atoms";
 import { useTheme } from "@proto/ui/theme";
 
 import { getUserTierClient, getTierLimitsClient } from "../client";
 
+>>>>>>> origin/main
 interface ThemedUserButtonProps {
   afterSignOutUrl?: string;
   className?: string;
 }
 
 /**
- * Themed UserButton Component
+ * ThemedUserButton Component (Clerk removed)
  *
- * Wraps Clerk's UserButton with theme-aware styling and custom theme menu.
- * Automatically syncs with the application's theme system.
+ * Simple avatar placeholder replacing Clerk's UserButton.
  */
 export function ThemedUserButton({
   afterSignOutUrl = "/atlas",
   className = "",
 }: ThemedUserButtonProps) {
+<<<<<<< HEAD
+  return (
+    <div className={className}>
+      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+        <span className="text-xs font-semibold text-primary">LU</span>
+      </div>
+=======
   const { colorScheme } = useTheme();
   const user = {
     id: "local-user",
@@ -198,6 +207,7 @@ export function ThemedUserButton({
       <button className={className} type="button">
         Local User
       </button>
+>>>>>>> origin/main
     </div>
   );
 }

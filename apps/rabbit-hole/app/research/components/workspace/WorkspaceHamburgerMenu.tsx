@@ -58,6 +58,10 @@ export function WorkspaceHamburgerMenu({
   isOwner,
   className = "",
 }: WorkspaceHamburgerMenuProps) {
+<<<<<<< HEAD
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
+  const signOut = async () => {}; const openUserProfile = () => {};
+=======
   const user = {
     id: "local-user",
     firstName: "Local",
@@ -71,6 +75,7 @@ export function WorkspaceHamburgerMenu({
   };
   const signOut = async () => {};
   const openUserProfile = () => {};
+>>>>>>> origin/main
   const { branding } = useTheme();
   const [showThemeDialog, setShowThemeDialog] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
