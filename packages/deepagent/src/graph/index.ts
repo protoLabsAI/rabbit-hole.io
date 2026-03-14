@@ -12,7 +12,7 @@ import { z } from "zod";
 
 import { getModel } from "@proto/llm-providers/server";
 import { mergePartialBundle, createEmptyPartialBundle } from "@proto/types";
-import type { PartialBundle, ResearchPhase } from "@proto/types";
+import type { ResearchPhase } from "@proto/types";
 
 import {
   EntityResearchAgentStateAnnotation,
@@ -24,6 +24,8 @@ import {
   writeFile,
   ls,
   wikipediaFetchTool,
+  duckduckgoSearchTool,
+  tavilySearchTool,
   langextractWrapperTool,
   batchFieldMappingLookupTool,
   validateBundleTool,
@@ -134,7 +136,10 @@ function extractPartialBundleUpdate(
               .map((content: unknown) => {
                 try {
                   const parsed = JSON.parse(content as string);
-                  return parsed.createdEntities || (parsed.entity ? [parsed.entity] : []);
+                  return (
+                    parsed.createdEntities ||
+                    (parsed.entity ? [parsed.entity] : [])
+                  );
                 } catch {
                   return [];
                 }
@@ -261,6 +266,9 @@ export function buildDeepAgentGraph(options?: {
   const subagentBuiltinTools = [readFile];
   const customTools: StructuredTool[] = [
     wikipediaFetchTool,
+    duckduckgoSearchTool,
+    // tavilySearchTool is null when TAVILY_API_KEY is not set — filter it out below
+    ...(tavilySearchTool ? [tavilySearchTool] : []),
     langextractWrapperTool,
     batchFieldMappingLookupTool,
     validateBundleTool,
