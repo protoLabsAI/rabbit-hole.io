@@ -55,10 +55,13 @@ import { GraphDataStandardizer } from "../lib/graph-data-standardizer";
 import Toast from "../lib/toast";
 import type { CanonicalGraphData } from "../types/canonical-graph";
 
+import { AtlasHeader } from "./components/AtlasHeader";
 import { AtlasSettingsPanel } from "./components/AtlasSettingsPanel";
 import { LegendV2 } from "./components/LegendV2";
+import { LiveIndicator } from "./components/LiveIndicator";
 import { LoadingOverlay } from "./components/LoadingOverlay";
 import { ResearchModeImportDialog } from "./components/ResearchModeImportDialog";
+import { SearchBar } from "./components/SearchBar";
 import { TimelineChart } from "./components/TimelineChart";
 import { useAtlasState } from "./hooks/useAtlasState";
 import { useGraphTilesNuqs } from "./hooks/useGraphTilesNuqs";
@@ -464,7 +467,7 @@ export default function AtlasClient() {
   }, [apiService]);
 
   // Subscribe to live graph updates via SSE — incrementally adds nodes/edges to Cytoscape
-  useGraphUpdates(cyRef);
+  const graphUpdatesState = useGraphUpdates(cyRef);
 
   // Handle form submissions
   const handleEntityAdded = useCallback(
@@ -1591,12 +1594,40 @@ export default function AtlasClient() {
     }
   }, [showLabels, graphTiles.viewMode]); // Include viewMode for dynamic updates
 
+  const handleSearchEntitySelect = useCallback(
+    (uid: string) => {
+      graphTiles.setCenterEntity(uid);
+      graphTiles.setViewMode("ego");
+    },
+    [graphTiles]
+  );
+
+  const handleResearchRequest = useCallback((query: string) => {
+    Toast.info(`Researching: ${query}`, "This may take a moment...");
+  }, []);
+
   return (
     <div className="h-screen bg-background flex flex-col">
+      <AtlasHeader
+        onLogoClick={handleResetView}
+        entityCount={graphData?.nodes.length}
+        relationshipCount={graphData?.edges.length}
+      />
+
       {/* Main Content Area */}
       <div className="flex-1 flex overflow-hidden">
         {/* Graph Visualization Area */}
         <div className="flex-1 relative overflow-hidden">
+          <SearchBar
+            onEntitySelect={handleSearchEntitySelect}
+            onResearchRequest={handleResearchRequest}
+          />
+
+          <LiveIndicator
+            connected={graphUpdatesState.connected}
+            recentEntityCount={graphUpdatesState.recentEntityCount}
+          />
+
           {/* Loading Overlay */}
           <LoadingOverlay
             isLoading={atlasState.isLoading}

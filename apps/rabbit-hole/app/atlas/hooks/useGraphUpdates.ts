@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 
 import { getEntityColor, getEntityImage } from "@proto/utils/atlas";
 
@@ -38,21 +38,21 @@ type GraphUpdateEvent =
   | GraphRelationshipEvent
   | GraphBundleCompleteEvent;
 
-/**
- * Subscribe to real-time graph updates via SSE and incrementally
- * add nodes/edges to Cytoscape using layout-utilities for smart positioning.
- *
- * New nodes are placed near their connected neighbors using quadrant scoring
- * from cytoscape-layout-utilities, so the graph stays readable at scale.
- */
+export interface GraphUpdatesState {
+  connected: boolean;
+  recentEntityCount: number;
+}
+
 export function useGraphUpdates(
   cyRef: React.RefObject<any>,
   onBundleComplete?: () => void
-) {
+): GraphUpdatesState {
   const onBundleCompleteRef = useRef(onBundleComplete);
   onBundleCompleteRef.current = onBundleComplete;
 
-  // Batch new nodes added during a bundle for a single placeNewNodes call
+  const [connected, setConnected] = useState(false);
+  const [recentEntityCount, setRecentEntityCount] = useState(0);
+
   const pendingNodesRef = useRef<string[]>([]);
   const placeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -66,7 +66,6 @@ export function useGraphUpdates(
         offset: 30,
       });
 
-      // Collect the pending nodes as a Cytoscape collection
       const newNodes = cy.collection();
       for (const uid of pendingNodesRef.current) {
         const node = cy.getElementById(uid);
@@ -78,11 +77,10 @@ export function useGraphUpdates(
       if (newNodes.length > 0) {
         layoutUtils.placeNewNodes(newNodes);
         console.log(
-          `📍 Positioned ${newNodes.length} new nodes via layout-utilities`
+          `Positioned ${newNodes.length} new nodes via layout-utilities`
         );
       }
     } catch (err) {
-      // Fallback: if layout-utilities isn't registered, skip positioning
       console.warn("Layout utilities not available, skipping placement:", err);
     }
 
@@ -90,7 +88,6 @@ export function useGraphUpdates(
   }, [cyRef]);
 
   const schedulePlacement = useCallback(() => {
-    // Debounce: wait 200ms after last node add before placing all at once
     if (placeTimeoutRef.current) {
       clearTimeout(placeTimeoutRef.current);
     }
@@ -102,7 +99,6 @@ export function useGraphUpdates(
       const cy = cyRef.current;
       if (!cy || cy.destroyed()) return;
 
-      // Skip if node already exists
       if (cy.getElementById(event.uid).length > 0) return;
 
       const color = getEntityColor(event.entityType);
@@ -122,13 +118,8 @@ export function useGraphUpdates(
         classes: `entity-${event.entityType}`,
       });
 
-      // Queue for smart positioning
       pendingNodesRef.current.push(event.uid);
       schedulePlacement();
-
-      console.log(
-        `🟢 Live: +node ${event.name} (${event.entityType})`
-      );
     },
     [cyRef, schedulePlacement]
   );
@@ -138,10 +129,8 @@ export function useGraphUpdates(
       const cy = cyRef.current;
       if (!cy || cy.destroyed()) return;
 
-      // Skip if edge already exists
       if (cy.getElementById(event.uid).length > 0) return;
 
-      // Only add if both source and target exist
       if (
         cy.getElementById(event.source).length === 0 ||
         cy.getElementById(event.target).length === 0
@@ -161,16 +150,16 @@ export function useGraphUpdates(
           sentiment: "neutral",
         },
       });
-
-      console.log(
-        `🔗 Live: +edge ${event.source} -[${event.relationshipType}]-> ${event.target}`
-      );
     },
     [cyRef]
   );
 
   useEffect(() => {
     const es = new EventSource("/api/atlas/graph-updates");
+
+    es.onopen = () => {
+      setConnected(true);
+    };
 
     es.onmessage = (messageEvent) => {
       try {
@@ -179,16 +168,14 @@ export function useGraphUpdates(
         switch (data.type) {
           case "entity_created":
             addEntityToGraph(data);
+            setRecentEntityCount((prev) => prev + 1);
             break;
           case "relationship_created":
             addRelationshipToGraph(data);
             break;
           case "bundle_complete":
-            console.log(
-              `📦 Live: bundle complete (+${data.entitiesCreated} entities, +${data.relationshipsCreated} relationships)`
-            );
-            // Trigger final placement for any remaining nodes
             placeNewNodes();
+            setRecentEntityCount(data.entitiesCreated);
             onBundleCompleteRef.current?.();
             break;
         }
@@ -198,14 +185,17 @@ export function useGraphUpdates(
     };
 
     es.onerror = () => {
-      console.log("⚡ Graph updates: reconnecting...");
+      setConnected(false);
     };
 
     return () => {
       es.close();
+      setConnected(false);
       if (placeTimeoutRef.current) {
         clearTimeout(placeTimeoutRef.current);
       }
     };
   }, [addEntityToGraph, addRelationshipToGraph, placeNewNodes]);
+
+  return { connected, recentEntityCount };
 }
