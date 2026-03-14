@@ -139,6 +139,12 @@ export const researchTools: Tool[] = [
           description:
             "Optional entity type hint (e.g., 'company', 'person', 'technology')",
         },
+        persist: {
+          type: "boolean",
+          description:
+            "Whether to automatically persist the research bundle to the knowledge graph after a successful run (default: true)",
+          default: true,
+        },
       },
       required: ["query"],
     },
