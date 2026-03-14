@@ -5,7 +5,6 @@
  * with evidence-first design and multi-source aggregation.
  */
 
-import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import { getUserTier, getTierLimits } from "@proto/auth";
@@ -144,7 +143,16 @@ export async function POST(request: NextRequest) {
   const startTime = Date.now();
 
   // 1. Authentication
-  const user = await currentUser();
+  const user = {
+    id: "local-user",
+    firstName: "Local",
+    lastName: "User",
+    username: "local-user",
+    fullName: "Local User",
+    emailAddresses: [{ emailAddress: "local@localhost" }],
+    publicMetadata: { tier: "pro" },
+    privateMetadata: { stats: {} },
+  };
   if (!user) {
     return NextResponse.json(
       { error: "Unauthorized", message: "Authentication required" },

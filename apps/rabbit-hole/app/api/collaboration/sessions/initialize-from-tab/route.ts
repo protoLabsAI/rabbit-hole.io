@@ -1,4 +1,3 @@
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import { logger } from "@proto/logger";
@@ -7,7 +6,7 @@ import { getHocuspocusPostgresPool } from "@/lib/hocuspocus-db";
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth();
+    const { userId } = { userId: "local-user" };
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

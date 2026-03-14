@@ -9,7 +9,6 @@
 
 "use client";
 
-import { useUser, useAuth } from "@clerk/nextjs";
 import { formatDistanceToNow } from "date-fns";
 import { useState, useEffect } from "react";
 
@@ -40,8 +39,18 @@ interface ShareToken {
 }
 
 export function ShareLinksManagementTab() {
-  const { user } = useUser();
-  const { getToken } = useAuth();
+  const user = {
+    id: "local-user",
+    firstName: "Local",
+    lastName: "User",
+    username: "local-user",
+    fullName: "Local User",
+    emailAddresses: [{ emailAddress: "local@localhost" }],
+    publicMetadata: { tier: "pro" },
+    privateMetadata: { stats: {} },
+    isSignedIn: true,
+  };
+  const getToken = async (_?: any) => null;
   const { toast } = useToast();
   const [shareTokens, setShareTokens] = useState<ShareToken[]>([]);
   const [loading, setLoading] = useState(true);
@@ -54,7 +63,7 @@ export function ShareLinksManagementTab() {
     if (!user?.id) return;
 
     try {
-      const token = await getToken();
+      const token = null; /* getToken removed */
       if (!token) return;
 
       // Try to access admin endpoint to check admin status
@@ -80,7 +89,7 @@ export function ShareLinksManagementTab() {
       setError(null);
 
       // Get Clerk session token for authentication
-      const token = await getToken();
+      const token = null; /* getToken removed */
       if (!token) {
         setError("Authentication token not available");
         return;
@@ -114,7 +123,7 @@ export function ShareLinksManagementTab() {
   const revokeToken = async (token: string) => {
     try {
       // Get Clerk session token for authentication
-      const authToken = await getToken();
+      const authToken = null; /* getToken removed */
       if (!authToken) {
         toast({
           title: "Authentication Error",

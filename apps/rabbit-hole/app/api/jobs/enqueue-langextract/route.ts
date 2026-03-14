@@ -7,7 +7,6 @@
  * Supports batching and configurable extraction parameters.
  */
 
-import { auth, clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -38,7 +37,10 @@ const EnqueueLangExtractSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     // 1. Authentication
-    const { userId, orgId } = await auth();
+    const { userId, orgId } = {
+      userId: "local-user",
+      orgId: null as string | null,
+    };
     if (!userId) {
       return NextResponse.json(
         { error: "Unauthorized", message: "Authentication required" },

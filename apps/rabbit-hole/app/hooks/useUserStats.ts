@@ -1,4 +1,3 @@
-import { useUser } from "@clerk/nextjs";
 import { useCallback, useState } from "react";
 
 export interface UserStats {
@@ -30,7 +29,18 @@ const DEFAULT_STATS: UserStats = {
  * ```
  */
 export function useUserStats() {
-  const { user, isLoaded } = useUser();
+  const user = {
+    id: "local-user",
+    firstName: "Local",
+    lastName: "User",
+    username: "local-user",
+    fullName: "Local User",
+    emailAddresses: [{ emailAddress: "local@localhost" }],
+    publicMetadata: { tier: "pro" },
+    privateMetadata: { stats: {} },
+    isSignedIn: true,
+  };
+  const isLoaded = true;
   const [isUpdating, setIsUpdating] = useState(false);
 
   // Extract stats from privateMetadata

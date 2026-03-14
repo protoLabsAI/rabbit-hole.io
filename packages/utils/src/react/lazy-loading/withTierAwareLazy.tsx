@@ -7,7 +7,6 @@
  * Combines error boundary, loading states, and tier checks in one reusable pattern.
  */
 
-import { useUser } from "@clerk/nextjs";
 import React, { Suspense, ComponentType } from "react";
 
 import type { UserTierLimits } from "@proto/auth";
@@ -37,7 +36,16 @@ export function withTierAwareLazy<P extends object>(
   } = options;
 
   return function TierAwareLazyWrapper(props: P) {
-    const { user } = useUser();
+    const user = {
+      id: "local-user",
+      firstName: "Local",
+      lastName: "User",
+      username: "local-user",
+      fullName: "Local User",
+      emailAddresses: [{ emailAddress: "local@localhost" }],
+      publicMetadata: { tier: "pro", role: "super_admin" },
+      privateMetadata: { stats: {} },
+    };
     const userTier = getUserTierClient(user || null);
     const tierLimits = getTierLimitsClient(userTier);
     const featureValue = tierLimits[featureFlag as keyof typeof tierLimits];

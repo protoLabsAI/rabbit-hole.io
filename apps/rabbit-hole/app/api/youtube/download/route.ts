@@ -5,7 +5,6 @@
 
 import { Readable } from "stream";
 
-import { auth } from "@clerk/nextjs/server";
 import archiver from "archiver";
 import { Client as MinIOClient } from "minio";
 import { NextRequest, NextResponse } from "next/server";
@@ -56,7 +55,7 @@ export const POST = withAuthAndLogging("download YouTube files")(async (
   { userId }: { userId: string }
 ): Promise<NextResponse> => {
   try {
-    const { orgId } = await auth();
+    const { orgId } = { orgId: null as string | null };
     const body: DownloadRequest = await request.json();
 
     // Validate request - check for presence and non-empty strings

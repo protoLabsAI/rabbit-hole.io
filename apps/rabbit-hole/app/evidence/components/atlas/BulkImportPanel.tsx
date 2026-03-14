@@ -7,7 +7,6 @@
 
 "use client";
 
-import { useOrganization } from "@clerk/nextjs";
 import React, { useState, useRef } from "react";
 
 import { validateRabbitHoleBundle } from "@proto/types";
@@ -58,7 +57,7 @@ export function BulkImportPanel({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Check if user is admin
-  const { membership } = useOrganization();
+  /* useOrganization removed - Clerk removed */
   const isAdmin =
     membership?.role === "org:admin" || membership?.role === "org:owner";
 

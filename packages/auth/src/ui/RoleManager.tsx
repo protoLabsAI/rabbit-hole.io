@@ -7,7 +7,6 @@
 
 "use client";
 
-import { useUser } from "@clerk/nextjs";
 import React, { useState } from "react";
 
 import {
@@ -29,7 +28,17 @@ export function RoleManager({
   showRoleSelector = false,
   className = "",
 }: RoleManagerProps) {
-  const { user, isSignedIn } = useUser();
+  const user = {
+    id: "local-user",
+    firstName: "Local",
+    lastName: "User",
+    username: "local-user",
+    fullName: "Local User",
+    emailAddresses: [{ emailAddress: "local@localhost" }],
+    publicMetadata: { tier: "pro", role: "super_admin" },
+    privateMetadata: { stats: {} },
+  };
+  const isSignedIn = true;
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
 
   if (!isSignedIn || !user) {
@@ -153,7 +162,17 @@ export function RoleManager({
  * Quick role indicator for header/navigation
  */
 export function RoleIndicator({ className = "" }: { className?: string }) {
-  const { user, isSignedIn } = useUser();
+  const user = {
+    id: "local-user",
+    firstName: "Local",
+    lastName: "User",
+    username: "local-user",
+    fullName: "Local User",
+    emailAddresses: [{ emailAddress: "local@localhost" }],
+    publicMetadata: { tier: "pro", role: "super_admin" },
+    privateMetadata: { stats: {} },
+  };
+  const isSignedIn = true;
 
   if (!isSignedIn || !user) {
     return null;
@@ -185,7 +204,17 @@ export function RoleFeature({
   children,
   fallback = null,
 }: RoleFeatureProps) {
-  const { user, isSignedIn } = useUser();
+  const user = {
+    id: "local-user",
+    firstName: "Local",
+    lastName: "User",
+    username: "local-user",
+    fullName: "Local User",
+    emailAddresses: [{ emailAddress: "local@localhost" }],
+    publicMetadata: { tier: "pro", role: "super_admin" },
+    privateMetadata: { stats: {} },
+  };
+  const isSignedIn = true;
 
   if (!isSignedIn || !user) {
     return <>{fallback}</>;
@@ -213,7 +242,17 @@ export function RoleGuard({
   fallback = null,
   showFallback = true,
 }: RoleGuardProps) {
-  const { user, isSignedIn } = useUser();
+  const user = {
+    id: "local-user",
+    firstName: "Local",
+    lastName: "User",
+    username: "local-user",
+    fullName: "Local User",
+    emailAddresses: [{ emailAddress: "local@localhost" }],
+    publicMetadata: { tier: "pro", role: "super_admin" },
+    privateMetadata: { stats: {} },
+  };
+  const isSignedIn = true;
 
   if (!isSignedIn || !user) {
     return showFallback ? <>{fallback}</> : null;

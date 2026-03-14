@@ -17,14 +17,7 @@ export default defineConfig({
   splitting: false,
   sourcemap: true,
   minify: false,
-  external: [
-    "@clerk/nextjs",
-    "next",
-    "react",
-    "react-dom",
-    "@proto/ui",
-    "@proto/icon-system",
-  ],
+  external: ["next", "react", "react-dom", "@proto/ui", "@proto/icon-system"],
   outDir: "dist",
   target: "es2020",
 });

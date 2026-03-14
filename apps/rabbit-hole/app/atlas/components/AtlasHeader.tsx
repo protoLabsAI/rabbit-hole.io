@@ -7,7 +7,6 @@
 
 "use client";
 
-import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -96,28 +95,27 @@ export function AtlasHeader({
             {/* Authentication UI */}
             <div className="border-l border-border pl-4 flex items-center">
               <ClientOnlyAuthSection>
-                <SignedOut>
-                  <SignInButton mode="modal">
-                    <button className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-colors">
-                      <span>Sign In</span>
-                    </button>
-                  </SignInButton>
-                </SignedOut>
-                <SignedIn>
-                  <div className="flex items-center gap-3">
-                    <Link href="/dashboard">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        title="Development Dashboard"
-                        className="text-muted-foreground hover:text-foreground"
-                      >
-                        🛠️
-                      </Button>
-                    </Link>
-                    <ThemedUserButton afterSignOutUrl="/atlas" />
-                  </div>
-                </SignedIn>
+                {
+                  /* SignedOut: removed */
+
+                  <button className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-colors">
+                    <span>Sign In</span>
+                  </button>
+                }
+
+                <div className="flex items-center gap-3">
+                  <Link href="/dashboard">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      title="Development Dashboard"
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      🛠️
+                    </Button>
+                  </Link>
+                  <ThemedUserButton afterSignOutUrl="/atlas" />
+                </div>
               </ClientOnlyAuthSection>
             </div>
           </div>

@@ -9,7 +9,6 @@ import { randomUUID } from "crypto";
 
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { auth, clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import {
@@ -52,7 +51,7 @@ export const POST = withAuthAndLogging("generate signed upload URL")(async (
 ): Promise<NextResponse<SignPutResponse>> => {
   try {
     // Get orgId from Clerk auth context
-    const { orgId } = await auth();
+    const { orgId } = { orgId: null as string | null };
 
     const config = getObjectStoreConfig();
     const validation = validateConfig(config);
@@ -112,8 +111,11 @@ export const POST = withAuthAndLogging("generate signed upload URL")(async (
     }
 
     // TIER ENFORCEMENT: Check file size and storage limits
-    const client = await clerkClient();
-    const user = await client.users.getUser(userId);
+    const user = {
+      id: userId,
+      publicMetadata: { tier: "pro" },
+      privateMetadata: { stats: {} },
+    };
     const clerkOrgId = orgId || "public";
 
     try {

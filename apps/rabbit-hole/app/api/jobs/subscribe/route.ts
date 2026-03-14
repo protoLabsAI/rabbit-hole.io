@@ -8,7 +8,6 @@
  * User authentication is obtained from Clerk's auth() function.
  */
 
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest } from "next/server";
 
 import { getJobQueuePool } from "@proto/database";
@@ -18,7 +17,7 @@ export const runtime = "nodejs";
 
 export async function GET(request: NextRequest) {
   try {
-    const { userId } = await auth();
+    const { userId } = { userId: "local-user" };
 
     if (!userId) {
       return new Response("Unauthorized", { status: 401 });

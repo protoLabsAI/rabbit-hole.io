@@ -3,9 +3,9 @@
  *
  * Shared authentication wrapper for API routes to eliminate duplication.
  * Provides consistent auth checking and error responses.
+ * Clerk has been removed — uses local-user context.
  */
 
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export interface AuthenticatedUser {
@@ -29,18 +29,7 @@ export function withAuth<T = any>(
 ) {
   return async (request: NextRequest): Promise<NextResponse<T>> => {
     try {
-      // Check authentication
-      const { userId } = await auth();
-
-      if (!userId) {
-        return NextResponse.json(
-          {
-            success: false,
-            error: options.errorMessage || "Authentication required",
-          },
-          { status: 401 }
-        ) as NextResponse<T>;
-      }
+      const userId = "local-user";
 
       // Log authenticated request if action specified
       if (options.logAction) {

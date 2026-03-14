@@ -8,7 +8,6 @@
  * - Tier limit tracking
  */
 
-import { auth, clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import {
@@ -244,19 +243,17 @@ export const GET = withAuthAndLogging("list entities for management")(async (
     if (workspaceId) {
       try {
         // Get Clerk user to access tier and org info
-        const { userId } = await auth();
+        const { userId } = { userId: "local-user" };
         if (!userId) {
           throw new Error("User not found");
         }
 
-        const client = await clerkClient();
         const clerkUser = await client.users.getUser(userId);
         const tier = getUserTier(clerkUser);
         const limits = getTierLimits(tier);
 
         // Get org ID from Clerk organization memberships
-        const organizationMemberships =
-          await client.users.getOrganizationMembershipList({ userId });
+        const organizationMemberships = { data: [] as any[] };
         const orgId = organizationMemberships.data[0]?.organization?.id;
         const currentCount = orgId ? await getEntityCount(orgId) : 0;
 

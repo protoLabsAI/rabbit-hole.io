@@ -1,4 +1,3 @@
-import { auth, clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 interface UserStats {
@@ -16,7 +15,7 @@ interface UserStats {
  */
 export async function PATCH(request: NextRequest) {
   try {
-    const { userId } = await auth();
+    const { userId } = { userId: "local-user" };
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -33,8 +32,11 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Get current user to read existing stats
-    const client = await clerkClient();
-    const user = await client.users.getUser(userId);
+    const user = {
+      id: userId,
+      publicMetadata: { tier: "pro" },
+      privateMetadata: { stats: {} },
+    };
     const currentStats = (user.privateMetadata?.stats as UserStats) || {};
 
     // Merge updates with existing stats
@@ -44,12 +46,7 @@ export async function PATCH(request: NextRequest) {
     };
 
     // Update user metadata
-    await client.users.updateUserMetadata(userId, {
-      privateMetadata: {
-        ...user.privateMetadata,
-        stats: newStats,
-      },
-    });
+    /* Clerk user metadata update skipped (local mode) */
 
     return NextResponse.json({
       success: true,
@@ -71,14 +68,17 @@ export async function PATCH(request: NextRequest) {
  */
 export async function GET() {
   try {
-    const { userId } = await auth();
+    const { userId } = { userId: "local-user" };
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const client = await clerkClient();
-    const user = await client.users.getUser(userId);
+    const user = {
+      id: userId,
+      publicMetadata: { tier: "pro" },
+      privateMetadata: { stats: {} },
+    };
     const stats = (user.privateMetadata?.stats as UserStats) || {
       entitiesViewed: 0,
       lastVisited: null,

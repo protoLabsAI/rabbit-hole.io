@@ -6,8 +6,6 @@
  * Uses shadcn/ui components and respects whitelabel theming
  */
 
-import { SignedIn, SignedOut } from "@clerk/nextjs";
-import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 
 import { Icon } from "@proto/icon-system";
@@ -205,24 +203,23 @@ function PricingCard({ plan }: { plan: PricingPlan }) {
       </CardContent>
 
       <CardFooter>
-        <SignedIn>
-          <PlanAction
-            planId={plan.id}
-            planName={plan.name}
-            action="dashboard_billing"
+        <PlanAction
+          planId={plan.id}
+          planName={plan.name}
+          action="dashboard_billing"
+        >
+          <Button
+            asChild
+            className="w-full"
+            size="lg"
+            variant={plan.highlighted ? "default" : "outline"}
           >
-            <Button
-              asChild
-              className="w-full"
-              size="lg"
-              variant={plan.highlighted ? "default" : "outline"}
-            >
-              <Link href="/dashboard?tab=billing">{plan.cta}</Link>
-            </Button>
-          </PlanAction>
-        </SignedIn>
+            <Link href="/dashboard?tab=billing">{plan.cta}</Link>
+          </Button>
+        </PlanAction>
 
-        <SignedOut>
+        {
+          /* SignedOut: removed */
           <PlanAction planId={plan.id} planName={plan.name} action="sign_up">
             <Button
               asChild
@@ -233,14 +230,14 @@ function PricingCard({ plan }: { plan: PricingPlan }) {
               <Link href="/sign-up">{plan.cta}</Link>
             </Button>
           </PlanAction>
-        </SignedOut>
+        }
       </CardFooter>
     </Card>
   );
 }
 
 export default async function PricingPage() {
-  const { userId } = await auth();
+  const { userId } = { userId: "local-user" };
 
   return (
     <div className="min-h-screen bg-background">

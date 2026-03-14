@@ -5,7 +5,6 @@
  * and forwards matching events to the client.
  */
 
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest } from "next/server";
 import type { PoolClient } from "pg";
 
@@ -22,7 +21,7 @@ function releaseClient(client: PoolClient | null) {
 }
 
 export async function GET(req: NextRequest) {
-  const { userId } = await auth();
+  const { userId } = { userId: "local-user" };
   if (!userId) {
     return new Response("Unauthorized", { status: 401 });
   }

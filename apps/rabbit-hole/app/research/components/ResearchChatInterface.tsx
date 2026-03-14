@@ -1,6 +1,5 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
 import { useCopilotChatHeadless_c, useCoAgent } from "@copilotkit/react-core";
 import { useState, useEffect } from "react";
 
@@ -107,7 +106,17 @@ export function ResearchChatInterface({
   );
   const config = externalConfig ?? internalConfig;
   const onConfigChange = externalOnChange ?? setInternalConfig;
-  const { user } = useUser();
+  const user = {
+    id: "local-user",
+    firstName: "Local",
+    lastName: "User",
+    username: "local-user",
+    fullName: "Local User",
+    emailAddresses: [{ emailAddress: "local@localhost" }],
+    publicMetadata: { tier: "pro" },
+    privateMetadata: { stats: {} },
+    isSignedIn: true,
+  };
   const { contextFiles, addContextFromJob, removeContext } =
     useResearchContext();
   const { jobs, ingestFile, ingestUrl, dismissJob } = useMediaIngestion({

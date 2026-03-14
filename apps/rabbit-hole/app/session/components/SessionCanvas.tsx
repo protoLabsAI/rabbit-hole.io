@@ -19,7 +19,6 @@
  * 4. Remote user writes → Server broadcasts (origin: HocuspocusProvider) → accepted (>500ms since our write)
  */
 
-import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef, useCallback } from "react";
 
@@ -50,7 +49,17 @@ export function SessionCanvas({
   onParticipantCountChange,
 }: SessionCanvasProps) {
   const router = useRouter();
-  const { user } = useUser();
+  const user = {
+    id: "local-user",
+    firstName: "Local",
+    lastName: "User",
+    username: "local-user",
+    fullName: "Local User",
+    emailAddresses: [{ emailAddress: "local@localhost" }],
+    publicMetadata: { tier: "pro" },
+    privateMetadata: { stats: {} },
+    isSignedIn: true,
+  };
   const userId = user?.id || "anonymous";
 
   const {

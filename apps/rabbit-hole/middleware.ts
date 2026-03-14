@@ -2,13 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { extractTenantIdentifiers } from "@proto/utils/tenancy-edge";
 
-export default function middleware(request: NextRequest) {
+/**
+ * Next.js Middleware
+ *
+ * Clerk has been removed. All routes are accessible without authentication.
+ * Tenant header injection and security headers are preserved.
+ */
+export default async function middleware(request: NextRequest) {
   // Extract tenant identifiers from URL (no database calls - edge compatible)
   const tenantIds = extractTenantIdentifiers(request);
 
   // Get the response
   const response = NextResponse.next();
 
+  // Add tenant identifier headers for API routes to validate
   if (tenantIds.hash) {
     response.headers.set("x-tenant-hash", tenantIds.hash);
   }

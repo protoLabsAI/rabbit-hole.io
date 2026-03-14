@@ -4,7 +4,6 @@
  * Consolidated authentication wrapper for API routes with enhanced role-based access control.
  */
 
-import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import { getUserRole, isAdmin, canPerformAction } from "./role-utils";
@@ -51,7 +50,7 @@ export function withAuth<T = any>(
       }
 
       // Check authentication
-      const { userId } = await auth();
+      const { userId } = { userId: "local-user" };
 
       if (!userId) {
         return NextResponse.json(
@@ -63,18 +62,17 @@ export function withAuth<T = any>(
         ) as NextResponse<T>;
       }
 
-      // Get full user details for role checking
-      const clerkUser = await currentUser();
-
-      if (!clerkUser) {
-        return NextResponse.json(
-          {
-            success: false,
-            error: "User details not found",
-          },
-          { status: 401 }
-        ) as NextResponse<T>;
-      }
+      // Get full user details for role checking (local mode - Clerk removed)
+      const clerkUser = {
+        id: "local-user",
+        firstName: "Local",
+        lastName: "User",
+        username: "local-user",
+        fullName: "Local User",
+        emailAddresses: [{ emailAddress: "local@localhost" }],
+        publicMetadata: { tier: "pro", role: "super_admin" },
+        privateMetadata: { stats: {} },
+      };
 
       // Get user role and tier
       const userRole = getUserRole(clerkUser);

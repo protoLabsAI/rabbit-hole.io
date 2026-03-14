@@ -1,15 +1,11 @@
 "use client";
 
-import { UserButton, useUser, useAuth } from "@clerk/nextjs";
 import React from "react";
 
-import { Icon } from "@proto/icon-system";
 import { toast } from "@proto/ui/atoms";
-import { ThemeSelector, useTheme } from "@proto/ui/theme";
+import { useTheme } from "@proto/ui/theme";
 
 import { getUserTierClient, getTierLimitsClient } from "../client";
-
-import { UserStatsPage } from "./UserStatsPage";
 
 interface ThemedUserButtonProps {
   afterSignOutUrl?: string;
@@ -27,8 +23,17 @@ export function ThemedUserButton({
   className = "",
 }: ThemedUserButtonProps) {
   const { colorScheme } = useTheme();
-  const { user } = useUser();
-  const { getToken } = useAuth();
+  const user = {
+    id: "local-user",
+    firstName: "Local",
+    lastName: "User",
+    username: "local-user",
+    fullName: "Local User",
+    emailAddresses: [{ emailAddress: "local@localhost" }],
+    publicMetadata: { tier: "pro", role: "super_admin" },
+    privateMetadata: { stats: {} },
+  };
+  const getToken = async (_?: any) => null;
   const userTier = getUserTierClient(user || null);
   const tierLimits = getTierLimitsClient(userTier);
   const canCustomizeThemes = tierLimits.hasCustomThemes;
@@ -190,53 +195,9 @@ export function ThemedUserButton({
 
   return (
     <div className={className}>
-      <UserButton
-        afterSignOutUrl={afterSignOutUrl}
-        appearance={appearance as any}
-      >
-        {/* Add custom menu items */}
-        <UserButton.MenuItems>
-          <UserButton.Action
-            label="Stats"
-            labelIcon={<Icon name="BarChart3" className="w-4 h-4" />}
-            open="stats"
-          />
-          <UserButton.Action
-            label="Refresh Session"
-            labelIcon={<Icon name="RefreshCw" className="w-4 h-4" />}
-            onClick={handleRefreshSession}
-          />
-          {canCustomizeThemes && (
-            <UserButton.Action
-              label="Theme Settings"
-              labelIcon={<Icon name="Palette" className="w-4 h-4" />}
-              open="theme"
-            />
-          )}
-        </UserButton.MenuItems>
-
-        {/* Add custom page for stats */}
-        <UserButton.UserProfilePage
-          label="Stats"
-          labelIcon={<Icon name="BarChart3" className="w-4 h-4" />}
-          url="stats"
-        >
-          <UserStatsPage />
-        </UserButton.UserProfilePage>
-
-        {/* Add custom page for theme settings - only for paid tiers */}
-        {canCustomizeThemes && (
-          <UserButton.UserProfilePage
-            label="Theme Settings"
-            labelIcon={<Icon name="Palette" className="w-4 h-4" />}
-            url="theme"
-          >
-            <div className="p-6">
-              <ThemeSelector showColorSchemeToggle={true} />
-            </div>
-          </UserButton.UserProfilePage>
-        )}
-      </UserButton>
+      <button className={className} type="button">
+        Local User
+      </button>
     </div>
   );
 }
