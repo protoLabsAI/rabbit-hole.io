@@ -421,6 +421,11 @@ export default function AtlasClient() {
   // Refresh graph data after adding entities/relationships
   const refreshGraphData = useCallback(async () => {
     console.log("🔄 refreshGraphData: Starting...");
+
+    // Save current viewport so live updates don't reset the view
+    const savedZoom = cyRef.current?.zoom();
+    const savedPan = cyRef.current?.pan();
+
     atlasState.startLoading();
     try {
       console.log("🔍 refreshGraphData: Calling API service...");
@@ -439,6 +444,16 @@ export default function AtlasClient() {
 
         console.log("🔍 refreshGraphData: Calling setGraphData...");
         setGraphData(result.data);
+
+        // Restore viewport after a tick so Cytoscape has time to render
+        if (savedZoom !== undefined && savedPan !== undefined) {
+          setTimeout(() => {
+            if (cyRef.current && !cyRef.current.destroyed()) {
+              cyRef.current.zoom(savedZoom);
+              cyRef.current.pan(savedPan);
+            }
+          }, 100);
+        }
 
         console.log("🔍 refreshGraphData: Updating existing entities...");
         atlasState.updateExistingEntitiesFromGraphData(result.data);
