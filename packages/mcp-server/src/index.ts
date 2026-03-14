@@ -12,6 +12,7 @@
  *
  * Environment variables:
  *   JOB_PROCESSOR_URL  - Job processor API URL (default: http://localhost:8680)
+ *   RABBIT_HOLE_URL    - Rabbit Hole app URL for bundle ingest (default: http://localhost:3000)
  *   TAVILY_API_KEY     - Tavily API key for premium search (optional)
  *   GROQ_API_KEY       - Groq API key for free audio transcription (optional)
  *   ANTHROPIC_API_KEY  - Anthropic API key for entity extraction (optional)
@@ -24,9 +25,9 @@ import {
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 
-import { researchTools } from "./tools/research-tools.js";
-import { mediaTools } from "./tools/media-tools.js";
 import { handleToolCall } from "./handler.js";
+import { mediaTools } from "./tools/media-tools.js";
+import { researchTools } from "./tools/research-tools.js";
 
 // Configuration
 const JOB_PROCESSOR_URL =
@@ -70,13 +71,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         {
           type: "text" as const,
           text:
-            typeof result === "string" ? result : JSON.stringify(result, null, 2),
+            typeof result === "string"
+              ? result
+              : JSON.stringify(result, null, 2),
         },
       ],
     };
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : String(error);
+    const message = error instanceof Error ? error.message : String(error);
     return {
       content: [{ type: "text" as const, text: `Error: ${message}` }],
       isError: true,
