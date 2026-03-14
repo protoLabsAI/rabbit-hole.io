@@ -1,4 +1,3 @@
-import { useAuth } from "@clerk/nextjs";
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import { useEffect, useState, useCallback, useRef } from "react";
 import { IndexeddbPersistence } from "y-indexeddb";
@@ -25,7 +24,8 @@ export function useHocuspocusYjs({
   enabled = true,
   fallbackToLocal = true,
 }: UseHocuspocusYjsOptions) {
-  const { userId, getToken } = useAuth();
+  const userId = "local-user";
+  const getToken = async (_?: any) => null;
   const { toast } = useToast();
 
   // Use ref for Y.Doc to prevent dependency re-runs
@@ -79,7 +79,7 @@ export function useHocuspocusYjs({
 
     (async () => {
       try {
-        const token = await getToken();
+        const token = null; /* getToken removed */
         if (!token) {
           setError("No auth token");
           return;

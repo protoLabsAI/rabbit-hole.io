@@ -1,4 +1,3 @@
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -62,7 +61,7 @@ type RequestBody = z.infer<typeof RequestSchema>;
 export async function POST(request: NextRequest) {
   try {
     // Get user authentication
-    const { userId } = await auth();
+    const { userId } = { userId: "local-user" };
 
     // Validate request body with Zod
     const parseResult = RequestSchema.safeParse(await request.json());

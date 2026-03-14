@@ -5,7 +5,6 @@
  * Can be called manually or via cron job.
  */
 
-import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import { getGlobalPostgresPool } from "@proto/database";
@@ -13,8 +12,17 @@ import { logger } from "@proto/logger";
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth();
-    const user = await currentUser();
+    const { userId } = { userId: "local-user" };
+    const user = {
+      id: "local-user",
+      firstName: "Local",
+      lastName: "User",
+      username: "local-user",
+      fullName: "Local User",
+      emailAddresses: [{ emailAddress: "local@localhost" }],
+      publicMetadata: { tier: "pro" },
+      privateMetadata: { stats: {} },
+    };
 
     if (!userId || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -101,7 +109,7 @@ export async function POST(request: NextRequest) {
 // GET endpoint to check session status
 export async function GET(request: NextRequest) {
   try {
-    const { userId } = await auth();
+    const { userId } = { userId: "local-user" };
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

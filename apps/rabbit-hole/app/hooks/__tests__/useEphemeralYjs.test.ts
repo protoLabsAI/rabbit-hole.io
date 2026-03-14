@@ -20,13 +20,7 @@ global.fetch = vi.fn(() =>
   })
 ) as any;
 
-// Mock Clerk
-vi.mock("@clerk/nextjs", () => ({
-  useAuth: () => ({
-    userId: "test-user-123",
-    getToken: async () => "mock-token",
-  }),
-}));
+// Clerk removed - useAuth is no longer used in the hook
 
 // Mock toast
 vi.mock("@/components/hooks/use-toast", () => ({

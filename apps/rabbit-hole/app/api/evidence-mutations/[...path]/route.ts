@@ -13,7 +13,6 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import { join, dirname } from "path";
 
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import { Neo4jService } from "../../../evidence/services/Neo4jService";
@@ -84,7 +83,7 @@ export async function POST(
   { params }: { params: { path: string[] } }
 ) {
   // Check authentication
-  const { userId } = await auth();
+  const { userId } = { userId: "local-user" };
 
   if (!userId) {
     return NextResponse.json(

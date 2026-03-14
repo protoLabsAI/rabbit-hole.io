@@ -1,10 +1,10 @@
 /**
  * Authentication Guards for API Routes
  *
- * Reusable auth checks for different access levels
+ * Reusable auth checks for different access levels.
+ * Clerk has been removed — always uses local-user context.
  */
 
-import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import {
@@ -24,24 +24,24 @@ export interface AuthResult {
   };
 }
 
+const LOCAL_USER = {
+  id: "local-user",
+  firstName: "Local",
+  lastName: "User",
+  username: "local-user",
+  fullName: "Local User",
+  emailAddresses: [{ emailAddress: "local@localhost" }],
+  publicMetadata: { tier: "pro", role: "super_admin" },
+  privateMetadata: { stats: {} },
+};
+
 /**
  * Require super admin role for API route
  */
 export async function requireSuperAdmin(
   request: NextRequest
 ): Promise<AuthResult> {
-  const user = await currentUser();
-
-  if (!user) {
-    return {
-      authorized: false,
-      error: {
-        message: "Authentication required",
-        status: 401,
-      },
-    };
-  }
-
+  const user = LOCAL_USER;
   const userRole = getUserRole(user);
   const isSuperAdmin = hasMinimumRole(userRole, USER_ROLES.SUPER_ADMIN);
 
@@ -71,18 +71,7 @@ export async function requireSuperAdmin(
 export async function requireAuthenticated(
   request: NextRequest
 ): Promise<AuthResult> {
-  const user = await currentUser();
-
-  if (!user) {
-    return {
-      authorized: false,
-      error: {
-        message: "Authentication required",
-        status: 401,
-      },
-    };
-  }
-
+  const user = LOCAL_USER;
   const userRole = getUserRole(user);
 
   return {

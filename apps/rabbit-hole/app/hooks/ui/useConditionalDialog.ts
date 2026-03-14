@@ -4,7 +4,6 @@
  * Wraps dialog hooks with conditional access controls based on
  * authentication, permissions, or any custom logic.
  */
-import { useUser } from "@clerk/nextjs";
 import { useCallback, useState } from "react";
 
 import {
@@ -188,7 +187,7 @@ export function useAuthenticatedDialog<T extends Record<string, unknown>>(
   baseDialogHook: () => T,
   customMessage?: string
 ) {
-  const { isSignedIn } = useUser();
+  const isSignedIn = true;
 
   return useConditionalDialog(baseDialogHook, {
     conditions: [
@@ -210,7 +209,17 @@ export function useRoleBasedDialog<T extends Record<string, unknown>>(
   requiredRole: string,
   customMessage?: string
 ) {
-  const { isSignedIn, user } = useUser();
+  const isSignedIn = true;
+  const user = {
+    id: "local-user",
+    firstName: "Local",
+    lastName: "User",
+    username: "local-user",
+    fullName: "Local User",
+    emailAddresses: [{ emailAddress: "local@localhost" }],
+    publicMetadata: { tier: "pro" },
+    privateMetadata: { stats: {} },
+  };
   const userRole = user?.publicMetadata?.role as string;
 
   return useConditionalDialog(baseDialogHook, {
@@ -234,7 +243,17 @@ export function useRoleRequiredDialog<T extends Record<string, unknown>>(
   requiredRole: UserRole,
   customMessage?: string
 ) {
-  const { isSignedIn, user } = useUser();
+  const isSignedIn = true;
+  const user = {
+    id: "local-user",
+    firstName: "Local",
+    lastName: "User",
+    username: "local-user",
+    fullName: "Local User",
+    emailAddresses: [{ emailAddress: "local@localhost" }],
+    publicMetadata: { tier: "pro" },
+    privateMetadata: { stats: {} },
+  };
   const userRole = user ? getUserRoleClient(user) : undefined;
 
   return useConditionalDialog(baseDialogHook, {

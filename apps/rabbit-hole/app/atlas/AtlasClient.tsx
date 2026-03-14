@@ -9,7 +9,6 @@
 // Force dynamic rendering - uses Clerk and client-only features
 export const dynamic = "force-dynamic";
 
-import { useUser } from "@clerk/nextjs";
 import cytoscape from "cytoscape";
 import cise from "cytoscape-cise";
 import cola from "cytoscape-cola";
@@ -82,7 +81,17 @@ cytoscape.use(cola);
 cytoscape.use(cytoscapePopper(createFloatingUIPopperFactory()));
 
 export default function AtlasClient() {
-  const { isSignedIn, user } = useUser();
+  const isSignedIn = true;
+  const user = {
+    id: "local-user",
+    firstName: "Local",
+    lastName: "User",
+    username: "local-user",
+    fullName: "Local User",
+    emailAddresses: [{ emailAddress: "local@localhost" }],
+    publicMetadata: { tier: "pro" },
+    privateMetadata: { stats: {} },
+  };
   const containerRef = useRef<HTMLDivElement>(null);
   const cyRef = useRef<cytoscape.Core | null>(null);
   const apiService = useRef(new AtlasApiService()).current;

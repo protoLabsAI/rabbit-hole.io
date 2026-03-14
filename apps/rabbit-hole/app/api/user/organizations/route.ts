@@ -4,23 +4,18 @@
  * Returns list of organizations the current user belongs to.
  */
 
-import { auth, clerkClient } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const { userId } = await auth();
+    const { userId } = { userId: "local-user" };
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Get user's organizations from Clerk
-    const client = await clerkClient();
-    const organizationMemberships =
-      await client.users.getOrganizationMembershipList({
-        userId,
-      });
+    const organizationMemberships = { data: [] as any[] };
 
     const organizations = organizationMemberships.data.map((membership) => ({
       id: membership.organization.id,

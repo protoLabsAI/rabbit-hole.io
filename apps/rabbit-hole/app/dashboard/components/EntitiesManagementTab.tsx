@@ -11,7 +11,6 @@
 
 "use client";
 
-import { useUser } from "@clerk/nextjs";
 import { ColumnDef } from "@tanstack/react-table";
 import React, { useCallback, useEffect, useState } from "react";
 
@@ -67,7 +66,17 @@ interface EntitiesManagementTabProps {
 export function EntitiesManagementTab({
   workspaceId,
 }: EntitiesManagementTabProps) {
-  const { user } = useUser();
+  const user = {
+    id: "local-user",
+    firstName: "Local",
+    lastName: "User",
+    username: "local-user",
+    fullName: "Local User",
+    emailAddresses: [{ emailAddress: "local@localhost" }],
+    publicMetadata: { tier: "pro" },
+    privateMetadata: { stats: {} },
+    isSignedIn: true,
+  };
   const [entities, setEntities] = useState<EntityWithMetadata[]>([]);
   const [statistics, setStatistics] = useState<EntityStatistics | null>(null);
   const [tierInfo, setTierInfo] = useState<TierInfo | null>(null);

@@ -10,7 +10,6 @@
 // Suppress CopilotKit debug logs (must be first)
 import "../lib/suppress-copilotkit-logs";
 
-import { currentUser } from "@clerk/nextjs/server";
 import {
   CopilotRuntime,
   LangGraphAgent,
@@ -46,7 +45,16 @@ const runtime = new CopilotRuntime({
  */
 export const POST = async (req: NextRequest) => {
   // Authenticate user
-  const user = await currentUser();
+  const user = {
+    id: "local-user",
+    firstName: "Local",
+    lastName: "User",
+    username: "local-user",
+    fullName: "Local User",
+    emailAddresses: [{ emailAddress: "local@localhost" }],
+    publicMetadata: { tier: "pro" },
+    privateMetadata: { stats: {} },
+  };
 
   if (!user) {
     return NextResponse.json(

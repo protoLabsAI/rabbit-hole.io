@@ -9,7 +9,6 @@
  * - Show upgrade prompts when approaching limits
  */
 
-import { auth, clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import { getUserTier, getTierLimits } from "@proto/auth";
@@ -53,7 +52,10 @@ export async function GET(
   request: NextRequest
 ): Promise<NextResponse<LimitsResponse>> {
   try {
-    const { userId, orgId } = await auth();
+    const { userId, orgId } = {
+      userId: "local-user",
+      orgId: null as string | null,
+    };
 
     if (!userId) {
       return NextResponse.json(
@@ -70,8 +72,11 @@ export async function GET(
       orgId || request.headers.get("x-clerk-org-id") || "public";
 
     // Get user and tier info
-    const client = await clerkClient();
-    const user = await client.users.getUser(userId);
+    const user = {
+      id: userId,
+      publicMetadata: { tier: "pro" },
+      privateMetadata: { stats: {} },
+    };
     const tier = getUserTier(user);
     const limits = getTierLimits(tier);
 

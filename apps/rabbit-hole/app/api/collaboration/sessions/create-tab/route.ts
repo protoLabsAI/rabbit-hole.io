@@ -1,4 +1,3 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import { getUserTier, getTierLimits } from "@proto/auth";
@@ -8,8 +7,20 @@ import { generateSecureId } from "@proto/utils";
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId, orgId } = await auth();
-    const user = await currentUser();
+    const { userId, orgId } = {
+      userId: "local-user",
+      orgId: null as string | null,
+    };
+    const user = {
+      id: "local-user",
+      firstName: "Local",
+      lastName: "User",
+      username: "local-user",
+      fullName: "Local User",
+      emailAddresses: [{ emailAddress: "local@localhost" }],
+      publicMetadata: { tier: "pro" },
+      privateMetadata: { stats: {} },
+    };
 
     if (!userId || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

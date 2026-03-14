@@ -1,6 +1,5 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -73,7 +72,7 @@ export async function mergeResearchToNeo4j(bundle: ResearchBundle): Promise<
 > {
   try {
     // Auth check
-    const { userId } = await auth();
+    const { userId } = { userId: "local-user" };
     if (!userId) {
       return {
         error: "Unauthorized",

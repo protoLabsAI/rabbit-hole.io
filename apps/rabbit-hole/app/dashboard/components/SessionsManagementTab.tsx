@@ -7,7 +7,6 @@
 
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 
 import { Icon } from "@proto/icon-system";
@@ -27,7 +26,7 @@ interface Session {
 }
 
 export function SessionsManagementTab() {
-  const { userId } = useAuth();
+  const userId = "local-user";
   const { toast } = useToast();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);

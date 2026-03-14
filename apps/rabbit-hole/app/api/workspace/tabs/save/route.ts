@@ -1,4 +1,3 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import * as Y from "yjs";
 
@@ -9,8 +8,17 @@ import { getHocuspocusPostgresPool } from "@/lib/hocuspocus-db";
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth();
-    const user = await currentUser();
+    const { userId } = { userId: "local-user" };
+    const user = {
+      id: "local-user",
+      firstName: "Local",
+      lastName: "User",
+      username: "local-user",
+      fullName: "Local User",
+      emailAddresses: [{ emailAddress: "local@localhost" }],
+      publicMetadata: { tier: "pro" },
+      privateMetadata: { stats: {} },
+    };
 
     if (!userId || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -15,6 +15,6 @@ export default defineConfig({
   },
   sourcemap: true,
   clean: true,
-  external: ["react", "react-dom", "@clerk/nextjs"],
+  external: ["react", "react-dom"],
   target: "es2020",
 });

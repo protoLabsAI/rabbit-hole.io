@@ -5,7 +5,6 @@
  * Tier enforcement: Requires Basic+ tier for AI-powered extraction.
  */
 
-import { currentUser } from "@clerk/nextjs/server";
 import mammoth from "mammoth";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -19,7 +18,16 @@ export const maxDuration = 300; // 5 minutes
 
 export async function POST(request: NextRequest) {
   // 1. Authentication check
-  const user = await currentUser();
+  const user = {
+    id: "local-user",
+    firstName: "Local",
+    lastName: "User",
+    username: "local-user",
+    fullName: "Local User",
+    emailAddresses: [{ emailAddress: "local@localhost" }],
+    publicMetadata: { tier: "pro" },
+    privateMetadata: { stats: {} },
+  };
   if (!user) {
     return NextResponse.json(
       {

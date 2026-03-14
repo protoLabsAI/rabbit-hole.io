@@ -7,15 +7,24 @@
  * Requires authentication and Basic tier minimum.
  */
 
-import { useAuth, SignInButton, useUser } from "@clerk/nextjs";
-
 import { getUserTierClient } from "@proto/auth/client";
 
 import { PlaygroundHub } from "./components/playground-hub";
 
 export default function PlaygroundClient() {
-  const { userId } = useAuth();
-  const { user, isLoaded } = useUser();
+  const userId = "local-user";
+  const user = {
+    id: "local-user",
+    firstName: "Local",
+    lastName: "User",
+    username: "local-user",
+    fullName: "Local User",
+    emailAddresses: [{ emailAddress: "local@localhost" }],
+    publicMetadata: { tier: "pro" },
+    privateMetadata: { stats: {} },
+    isSignedIn: true,
+  };
+  const isLoaded = true;
 
   // Wait for user data to load
   if (!isLoaded) {
@@ -39,11 +48,10 @@ export default function PlaygroundClient() {
           <p className="text-muted-foreground mb-4">
             Sign in to access the playground testing environment.
           </p>
-          <SignInButton mode="modal">
-            <button className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 font-medium">
-              Sign In
-            </button>
-          </SignInButton>
+
+          <button className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 font-medium">
+            Sign In
+          </button>
         </div>
       </div>
     );
