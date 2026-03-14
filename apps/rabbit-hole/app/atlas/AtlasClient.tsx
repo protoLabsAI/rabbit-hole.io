@@ -62,6 +62,7 @@ import { ResearchModeImportDialog } from "./components/ResearchModeImportDialog"
 import { TimelineChart } from "./components/TimelineChart";
 import { useAtlasState } from "./hooks/useAtlasState";
 import { useGraphTilesNuqs } from "./hooks/useGraphTilesNuqs";
+import { useGraphUpdates } from "./hooks/useGraphUpdates";
 import { useTimeSliceAggregation } from "./hooks/useTimeSliceAggregation";
 import { AtlasApiService } from "./services/AtlasApiService";
 import {
@@ -454,6 +455,9 @@ export default function AtlasClient() {
       atlasState.finishLoading();
     }
   }, [apiService]);
+
+  // Subscribe to live graph updates via SSE
+  useGraphUpdates(refreshGraphData);
 
   // Handle form submissions
   const handleEntityAdded = useCallback(
