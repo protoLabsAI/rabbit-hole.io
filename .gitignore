@@ -103,4 +103,10 @@ apps/builder/.clerk/.tmp/
 *storybook.log
 storybook-static
 .worktrees/
-.automaker/
+# Automaker — track project config, ignore runtime state
+.automaker/*
+!.automaker/spec.md
+!.automaker/context/
+!.automaker/settings.json
+!.automaker/worktree-init.sh
+!.automaker/categories.json
