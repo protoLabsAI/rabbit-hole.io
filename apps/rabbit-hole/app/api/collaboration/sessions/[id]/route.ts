@@ -15,20 +15,15 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-<<<<<<< HEAD
-    const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
-=======
     const user = {
       id: "local-user",
+      publicMetadata: { tier: "free", role: "admin" },
+      emailAddresses: [{ emailAddress: "local@localhost" }],
       firstName: "Local",
       lastName: "User",
-      username: "local-user",
       fullName: "Local User",
-      emailAddresses: [{ emailAddress: "local@localhost" }],
-      publicMetadata: { tier: "pro" },
-      privateMetadata: { stats: {} },
-    };
->>>>>>> origin/main
+      imageUrl: "",
+    } as any;
     const { id } = await params;
 
     const pool = getGlobalPostgresPool();
@@ -83,20 +78,15 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-<<<<<<< HEAD
-    const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
-=======
     const user = {
       id: "local-user",
+      publicMetadata: { tier: "free", role: "admin" },
+      emailAddresses: [{ emailAddress: "local@localhost" }],
       firstName: "Local",
       lastName: "User",
-      username: "local-user",
       fullName: "Local User",
-      emailAddresses: [{ emailAddress: "local@localhost" }],
-      publicMetadata: { tier: "pro" },
-      privateMetadata: { stats: {} },
-    };
->>>>>>> origin/main
+      imageUrl: "",
+    } as any;
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

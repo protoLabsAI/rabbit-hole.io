@@ -4,7 +4,6 @@
  * Provides server-only role checking and utilities.
  */
 
-<<<<<<< HEAD
 // Inline User type (replaces external auth dependency)
 interface User {
   id: string;
@@ -14,8 +13,6 @@ interface User {
   lastName?: string | null;
 }
 
-=======
->>>>>>> origin/main
 import {
   USER_ROLES,
   ROLE_HIERARCHY,
@@ -29,7 +26,7 @@ import {
  * Extract user role from Clerk user object (server-side)
  * Falls back to default role if none set
  */
-export function getUserRole(user: any | null): UserRole {
+export function getUserRole(user: User | null): UserRole {
   if (!user) return DEFAULT_USER_ROLE;
 
   const roleFromMetadata = user.publicMetadata?.role as string;
@@ -50,7 +47,7 @@ export function getUserRole(user: any | null): UserRole {
  * Legacy admin check for backward compatibility (server-side)
  * Will be removed once all users have roles in metadata
  */
-function checkLegacyAdminUser(user: any): boolean {
+function checkLegacyAdminUser(user: User): boolean {
   const adminEmails = ["josh@rabbit-hole.io", "admin@rabbit-hole.io"];
   const adminUserIds = process.env.ADMIN_USER_IDS?.split(",") || [];
 
@@ -82,21 +79,21 @@ export function hasMinimumRole(
 /**
  * Check if user has admin role (server-side)
  */
-export function isAdmin(user: any | null): boolean {
+export function isAdmin(user: User | null): boolean {
   return getUserRole(user) === USER_ROLES.ADMIN;
 }
 
 /**
  * Check if user has member role or higher (server-side)
  */
-export function isMember(user: any | null): boolean {
+export function isMember(user: User | null): boolean {
   return hasMinimumRole(getUserRole(user), USER_ROLES.MEMBER);
 }
 
 /**
  * Check if user has at least viewer role (server-side)
  */
-export function isViewer(user: any | null): boolean {
+export function isViewer(user: User | null): boolean {
   return hasMinimumRole(getUserRole(user), USER_ROLES.VIEWER);
 }
 
@@ -104,7 +101,7 @@ export function isViewer(user: any | null): boolean {
  * Check if current user can perform action requiring specific role
  */
 export function canPerformAction(
-  currentUser: any | null,
+  currentUser: User | null,
   requiredRole: UserRole
 ): { allowed: boolean; message?: string } {
   if (!currentUser) {
@@ -142,7 +139,7 @@ export function canPerformAction(
  * Prevents unauthorized role escalation
  */
 export function canUpdateRole(
-  currentUser: any | null,
+  currentUser: User | null,
   targetRole: UserRole
 ): { allowed: boolean; message?: string } {
   if (!currentUser) {

@@ -81,22 +81,17 @@ cytoscape.use(cola);
 cytoscape.use(cytoscapePopper(createFloatingUIPopperFactory()));
 
 export default function AtlasPage() {
-<<<<<<< HEAD
-  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
-  const isSignedIn = true;
-=======
-  const isSignedIn = true;
   const user = {
     id: "local-user",
     firstName: "Local",
     lastName: "User",
-    username: "local-user",
     fullName: "Local User",
+    imageUrl: "",
+    publicMetadata: { tier: "free", role: "admin" },
     emailAddresses: [{ emailAddress: "local@localhost" }],
-    publicMetadata: { tier: "pro" },
-    privateMetadata: { stats: {} },
-  };
->>>>>>> origin/main
+    primaryEmailAddress: { emailAddress: "local@localhost" },
+  } as any;
+  const isSignedIn = true;
   const containerRef = useRef<HTMLDivElement>(null);
   const cyRef = useRef<cytoscape.Core | null>(null);
   const apiService = useRef(new AtlasApiService()).current;
@@ -753,8 +748,12 @@ ${
 
         const message =
           relationshipCount > 0
-            ? `Are you sure you want to delete "${nodeData.name}"?\n\nThis will remove the entity and ${relationshipCount} connected relationships from the knowledge graph.`
-            : `Are you sure you want to delete "${nodeData.name}"?\n\nThis entity has no relationships and will be permanently removed.`;
+            ? `Are you sure you want to delete "${nodeData.name}"?
+
+This will remove the entity and ${relationshipCount} connected relationships from the knowledge graph.`
+            : `Are you sure you want to delete "${nodeData.name}"?
+
+This entity has no relationships and will be permanently removed.`;
 
         const confirmed = confirm(message);
         if (!confirmed) return;
@@ -846,7 +845,9 @@ ${
 
       onReverseEdge: async (edgeData) => {
         const confirmed = confirm(
-          `Reverse the direction of this relationship?\n\nThis will swap the source and target of: "${edgeData.label}"`
+          `Reverse the direction of this relationship?
+
+This will swap the source and target of: "${edgeData.label}"`
         );
         if (!confirmed) return;
 
@@ -858,7 +859,9 @@ ${
 
       onDeleteEdge: async (edgeData) => {
         const confirmed = confirm(
-          `Are you sure you want to delete this relationship?\n\n"${edgeData.label}" will be permanently removed from the knowledge graph.`
+          `Are you sure you want to delete this relationship?
+
+"${edgeData.label}" will be permanently removed from the knowledge graph.`
         );
         if (!confirmed) return;
 

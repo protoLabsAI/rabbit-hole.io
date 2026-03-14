@@ -55,11 +55,7 @@ export const POST = withAuthAndLogging("enqueue YouTube batch processing")(
     { userId }: { userId: string }
   ): Promise<NextResponse<BatchProcessResponse>> => {
     try {
-<<<<<<< HEAD
       const orgId = "local-org";
-=======
-      const { orgId } = { orgId: null as string | null };
->>>>>>> origin/main
       const body: BatchProcessRequest = await request.json();
 
       // 1. Validate request
@@ -112,11 +108,7 @@ export const POST = withAuthAndLogging("enqueue YouTube batch processing")(
       }
 
       // 4. Determine quality based on user tier
-<<<<<<< HEAD
       const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
-=======
-      const user = { id: "local-user", firstName: "Local", lastName: "User", username: "local-user", fullName: "Local User", emailAddresses: [{ emailAddress: "local@localhost" }], publicMetadata: { tier: "pro" }, privateMetadata: { stats: {} } };
->>>>>>> origin/main
       const tier = getUserTier(user);
       const quality = tier === "free" ? "720p" : "1080p";
 

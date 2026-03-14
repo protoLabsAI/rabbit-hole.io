@@ -21,11 +21,7 @@ interface ExportFilters {
 
 export async function GET(request: NextRequest) {
   // Check authentication
-<<<<<<< HEAD
   const userId = "local-user";
-=======
-  const { userId } = { userId: "local-user" };
->>>>>>> origin/main
 
   if (!userId) {
     return NextResponse.json(
@@ -508,7 +504,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: `Export validation failed:\n\n${validation.errors}`,
+          error: `Export validation failed:
+
+${validation.errors}`,
         },
         { status: 500 }
       );

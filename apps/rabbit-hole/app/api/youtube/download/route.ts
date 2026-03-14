@@ -55,11 +55,7 @@ export const POST = withAuthAndLogging("download YouTube files")(async (
   { userId }: { userId: string }
 ): Promise<NextResponse> => {
   try {
-<<<<<<< HEAD
     const orgId = "local-org";
-=======
-    const { orgId } = { orgId: null as string | null };
->>>>>>> origin/main
     const body: DownloadRequest = await request.json();
 
     // Validate request - check for presence and non-empty strings

@@ -32,15 +32,8 @@ export async function POST(
   request: NextRequest
 ): Promise<NextResponse<EnqueueJobResponse>> {
   // Check authentication
-<<<<<<< HEAD
   const userId = "local-user";
   const orgId = "local-org";
-=======
-  const { userId, orgId } = {
-    userId: "local-user",
-    orgId: null as string | null,
-  };
->>>>>>> origin/main
   if (!userId) {
     return NextResponse.json(
       {

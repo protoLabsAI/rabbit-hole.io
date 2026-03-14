@@ -19,26 +19,17 @@ import type {
 
 export async function POST(request: NextRequest) {
   try {
-<<<<<<< HEAD
     const userId = "local-user";
-  const orgId = "local-org";
-    const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
-=======
-    const { userId, orgId } = {
-      userId: "local-user",
-      orgId: null as string | null,
-    };
+    const orgId = "local-org";
     const user = {
       id: "local-user",
+      publicMetadata: { tier: "free", role: "admin" },
+      emailAddresses: [{ emailAddress: "local@localhost" }],
       firstName: "Local",
       lastName: "User",
-      username: "local-user",
       fullName: "Local User",
-      emailAddresses: [{ emailAddress: "local@localhost" }],
-      publicMetadata: { tier: "pro" },
-      privateMetadata: { stats: {} },
-    };
->>>>>>> origin/main
+      imageUrl: "",
+    } as any;
 
     if (!userId || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -184,20 +175,15 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-<<<<<<< HEAD
-    const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
-=======
     const user = {
       id: "local-user",
+      publicMetadata: { tier: "free", role: "admin" },
+      emailAddresses: [{ emailAddress: "local@localhost" }],
       firstName: "Local",
       lastName: "User",
-      username: "local-user",
       fullName: "Local User",
-      emailAddresses: [{ emailAddress: "local@localhost" }],
-      publicMetadata: { tier: "pro" },
-      privateMetadata: { stats: {} },
-    };
->>>>>>> origin/main
+      imageUrl: "",
+    } as any;
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

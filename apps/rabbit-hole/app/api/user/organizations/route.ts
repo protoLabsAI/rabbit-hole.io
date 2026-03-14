@@ -8,26 +8,18 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-<<<<<<< HEAD
     const userId = "local-user";
-=======
-    const { userId } = { userId: "local-user" };
->>>>>>> origin/main
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Get user's organizations from Clerk
-<<<<<<< HEAD
     // clerkClient removed - using local user
     const organizationMemberships =
       await client.users.getOrganizationMembershipList({
         userId,
       });
-=======
-    const organizationMemberships = { data: [] as any[] };
->>>>>>> origin/main
 
     const organizations = organizationMemberships.data.map((membership) => ({
       id: membership.organization.id,

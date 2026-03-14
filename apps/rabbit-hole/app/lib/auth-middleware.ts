@@ -3,7 +3,6 @@
  *
  * Shared authentication wrapper for API routes to eliminate duplication.
  * Provides consistent auth checking and error responses.
- * Clerk has been removed — uses local-user context.
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -29,7 +28,6 @@ export function withAuth<T = any>(
 ) {
   return async (request: NextRequest): Promise<NextResponse<T>> => {
     try {
-<<<<<<< HEAD
       // Check authentication
       const userId = "local-user";
 
@@ -42,9 +40,6 @@ export function withAuth<T = any>(
           { status: 401 }
         ) as NextResponse<T>;
       }
-=======
-      const userId = "local-user";
->>>>>>> origin/main
 
       // Log authenticated request if action specified
       if (options.logAction) {

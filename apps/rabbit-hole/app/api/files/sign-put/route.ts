@@ -51,11 +51,7 @@ export const POST = withAuthAndLogging("generate signed upload URL")(async (
 ): Promise<NextResponse<SignPutResponse>> => {
   try {
     // Get orgId from Clerk auth context
-<<<<<<< HEAD
     const orgId = "local-org";
-=======
-    const { orgId } = { orgId: null as string | null };
->>>>>>> origin/main
 
     const config = getObjectStoreConfig();
     const validation = validateConfig(config);
@@ -115,16 +111,8 @@ export const POST = withAuthAndLogging("generate signed upload URL")(async (
     }
 
     // TIER ENFORCEMENT: Check file size and storage limits
-<<<<<<< HEAD
     // clerkClient removed - using local user
     // getUser removed - using local user
-=======
-    const user = {
-      id: userId,
-      publicMetadata: { tier: "pro" },
-      privateMetadata: { stats: {} },
-    };
->>>>>>> origin/main
     const clerkOrgId = orgId || "public";
 
     try {

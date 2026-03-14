@@ -13,11 +13,7 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ jobId: string }> }
 ) {
-<<<<<<< HEAD
   const userId = "local-user";
-=======
-  const { userId } = { userId: "local-user" };
->>>>>>> origin/main
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

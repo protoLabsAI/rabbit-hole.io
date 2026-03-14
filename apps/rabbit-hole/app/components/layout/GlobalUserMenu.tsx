@@ -3,7 +3,6 @@
  *
  * Persistent navigation menu that follows authenticated users across all pages.
  * Provides quick access to navigation, account settings, and workspace features.
- * Clerk has been removed — uses local user context.
  */
 
 "use client";
@@ -12,6 +11,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
+import { getUserTierClient, getTierLimitsClient } from "@proto/auth/client";
+import { TierBadge } from "@proto/auth/ui";
 import { Icon } from "@proto/icon-system";
 import {
   DropdownMenu,
@@ -21,6 +22,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@proto/ui/atoms";
+import { TierGatedMenuItem } from "@proto/ui/organisms";
 
 import { ThemeSelector } from "@/components/ui/ThemeSelector";
 import { useTheme } from "@/context/ThemeProvider";
@@ -30,53 +32,59 @@ export interface GlobalUserMenuProps {
   className?: string;
 }
 
-const LOCAL_USER = {
-  id: "local-user",
-  firstName: "Local",
-  lastName: "User",
-  fullName: "Local User",
-  imageUrl: null as string | null,
-  primaryEmailAddress: { emailAddress: "local@localhost" },
-};
-
 export function GlobalUserMenu({ className = "" }: GlobalUserMenuProps) {
-<<<<<<< HEAD
-  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
-  const signOut = async () => {}; const openUserProfile = () => {};
-=======
->>>>>>> origin/main
+  const user = {
+    id: "local-user",
+    firstName: "Local",
+    lastName: "User",
+    fullName: "Local User",
+    imageUrl: "",
+    publicMetadata: { tier: "free", role: "admin" },
+    emailAddresses: [{ emailAddress: "local@localhost" }],
+    primaryEmailAddress: { emailAddress: "local@localhost" },
+  } as any;
+  const signOut = async () => {};
+  const openUserProfile = () => {};
   const { branding } = useTheme();
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [themePopoverOpen, setThemePopoverOpen] = useState(false);
 
-  const user = LOCAL_USER;
+  const userTier = getUserTierClient(user || null);
+  const tierLimits = getTierLimitsClient(userTier);
+  const canCustomizeThemes = tierLimits.hasCustomThemes;
 
-  // Don't render on auth pages
+  // Don't render if user not loaded or on auth pages
+  if (!user) return null;
   if (pathname?.startsWith("/sign-in") || pathname?.startsWith("/sign-up")) {
     return null;
   }
 
   // Generate initials for avatar fallback
   const getInitials = () => {
+    if (!user) return "?";
     const first = user.firstName?.[0] || "";
     const last = user.lastName?.[0] || "";
-    return (first + last).toUpperCase() || "LU";
+    return (
+      (first + last).toUpperCase() ||
+      user.emailAddresses[0]?.emailAddress[0]?.toUpperCase() ||
+      "?"
+    );
   };
 
   const handleSignOut = async () => {
+    await signOut();
     setMenuOpen(false);
-    // No-op: auth removed
   };
 
   const handleOpenAccountSettings = () => {
+    openUserProfile();
     setMenuOpen(false);
-    // No-op: Clerk profile UI removed
   };
 
   const handleOpenThemeSettings = () => {
     setThemePopoverOpen(true);
-    setMenuOpen(false);
+    setMenuOpen(false); // Close menu when opening theme popover
   };
 
   return (
@@ -103,9 +111,17 @@ export function GlobalUserMenu({ className = "" }: GlobalUserMenuProps) {
             <div className="flex items-center gap-3 py-2">
               {/* Avatar */}
               <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                <span className="text-sm font-semibold text-primary">
-                  {getInitials()}
-                </span>
+                {user.imageUrl ? (
+                  <img
+                    src={user.imageUrl}
+                    alt={user.fullName || "User"}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <span className="text-sm font-semibold text-primary">
+                    {getInitials()}
+                  </span>
+                )}
               </div>
 
               {/* User Info */}
@@ -115,6 +131,9 @@ export function GlobalUserMenu({ className = "" }: GlobalUserMenuProps) {
                 </div>
                 <div className="text-xs text-muted-foreground truncate">
                   {user.primaryEmailAddress?.emailAddress}
+                </div>
+                <div className="mt-1">
+                  <TierBadge />
                 </div>
               </div>
             </div>
@@ -197,10 +216,25 @@ export function GlobalUserMenu({ className = "" }: GlobalUserMenuProps) {
             Account
           </DropdownMenuLabel>
 
-          <DropdownMenuItem onClick={handleOpenThemeSettings}>
-            <Icon name="settings" size={14} className="mr-2" />
-            Theme Settings
-          </DropdownMenuItem>
+          <TierGatedMenuItem
+            icon="settings"
+            label="Theme Settings"
+            hasAccess={canCustomizeThemes}
+            onClick={handleOpenThemeSettings}
+            tierLabel="Basic"
+            featureInfo={{
+              name: "Custom Themes",
+              description:
+                "Personalize your workspace with custom color schemes and themes",
+              benefits: [
+                "20+ pre-built themes",
+                "Custom color palettes",
+                "Dark and light mode support",
+                "Save and export your themes",
+              ],
+              tier: "basic",
+            }}
+          />
 
           <DropdownMenuItem onClick={handleOpenAccountSettings}>
             <Icon name="settings" size={14} className="mr-2" />

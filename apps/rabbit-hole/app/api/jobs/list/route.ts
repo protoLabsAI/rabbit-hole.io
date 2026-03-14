@@ -16,11 +16,7 @@ import { listJobs } from "@proto/sidequest-utils/server";
 export async function GET(request: NextRequest) {
   try {
     // Authenticate user
-<<<<<<< HEAD
     const userId = "local-user";
-=======
-    const { userId } = { userId: "local-user" };
->>>>>>> origin/main
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

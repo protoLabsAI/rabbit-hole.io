@@ -61,11 +61,7 @@ type RequestBody = z.infer<typeof RequestSchema>;
 export async function POST(request: NextRequest) {
   try {
     // Get user authentication
-<<<<<<< HEAD
     const userId = "local-user";
-=======
-    const { userId } = { userId: "local-user" };
->>>>>>> origin/main
 
     // Validate request body with Zod
     const parseResult = RequestSchema.safeParse(await request.json());

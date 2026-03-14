@@ -34,14 +34,8 @@ export async function GET(
   request: NextRequest
 ): Promise<NextResponse<TenantResponse>> {
   try {
-<<<<<<< HEAD
-    const userId = "local-user"; const orgId = "local-org";
-=======
-    const { userId, orgId } = {
-      userId: "local-user",
-      orgId: null as string | null,
-    };
->>>>>>> origin/main
+    const userId = "local-user";
+    const orgId = "local-org";
 
     if (!orgId || !userId) {
       return NextResponse.json(
@@ -104,14 +98,8 @@ export async function POST(
   request: NextRequest
 ): Promise<NextResponse<TenantResponse>> {
   try {
-<<<<<<< HEAD
-    const userId = "local-user"; const orgId = "local-org";
-=======
-    const { userId, orgId } = {
-      userId: "local-user",
-      orgId: null as string | null,
-    };
->>>>>>> origin/main
+    const userId = "local-user";
+    const orgId = "local-org";
 
     if (!orgId || !userId) {
       return NextResponse.json(
@@ -147,14 +135,10 @@ export async function POST(
     }
 
     // Get organization details from Clerk
-<<<<<<< HEAD
     // clerkClient removed - using local user
     const org = await client.organizations.getOrganization({
       organizationId: orgId,
     });
-=======
-    const org = { name: "Local Organization", slug: "local-org" };
->>>>>>> origin/main
 
     // Create tenant
     const tenant = await createTenant({
@@ -201,15 +185,9 @@ export async function PATCH(
   request: NextRequest
 ): Promise<NextResponse<TenantResponse>> {
   try {
-<<<<<<< HEAD
-    const userId = "local-user"; const orgId = "local-org"; const has = () => true;
-=======
-    const { userId, orgId, has } = {
-      userId: "local-user",
-      orgId: null as string | null,
-      has: (_: any) => false,
-    };
->>>>>>> origin/main
+    const userId = "local-user";
+    const orgId = "local-org";
+    const has = () => true;
 
     if (!orgId || !userId) {
       return NextResponse.json(
