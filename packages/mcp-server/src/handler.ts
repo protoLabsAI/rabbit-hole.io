@@ -52,7 +52,8 @@ export async function handleToolCall(
         args.query as string,
         (args.depth as string) ?? "detailed",
         args.entityType as string | undefined,
-        config
+        config,
+        (args.persist as boolean) ?? true
       );
 
     // ─── Media Tools ───────────────────────────────────────────────
@@ -397,7 +398,8 @@ async function researchEntity(
   query: string,
   depth: string,
   entityType: string | undefined,
-  config: HandlerConfig
+  config: HandlerConfig,
+  persist: boolean = true
 ): Promise<unknown> {
   const results: Record<string, unknown> = { query, depth };
   const evidenceNodes: Array<Record<string, unknown>> = [];
@@ -560,9 +562,27 @@ async function researchEntity(
         entityCitations,
       };
 
-      results.validation = validateBundle(
+      const validation = validateBundle(
         results.bundle as Record<string, unknown>
       );
+      results.validation = validation;
+
+      // Step 6: Persist bundle if requested and validation passed
+      if (persist && (validation as Record<string, unknown>).valid === true) {
+        try {
+          const ingestResult = await ingestBundle(
+            results.bundle as Record<string, unknown>
+          );
+          results.persistence = ingestResult;
+        } catch (err) {
+          results.persistence = {
+            error:
+              err instanceof Error
+                ? err.message
+                : "Unknown error during persistence",
+          };
+        }
+      }
     }
   }
 
