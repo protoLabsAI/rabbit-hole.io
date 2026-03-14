@@ -10,7 +10,6 @@
  * - CopilotKit integration (chat panel)
  */
 
-import { useAuth, useUser } from "@clerk/nextjs";
 import { useState, useCallback, useEffect, useMemo } from "react";
 
 import { getUserTierClient, getTierLimitsClient } from "@proto/auth/client";
@@ -30,8 +29,8 @@ import { QueryProvider } from "./providers";
 import "../context-menu/registry/researchMenus.direct";
 
 export default function ResearchClientWorkspace() {
-  const { userId } = useAuth();
-  const { user } = useUser();
+  const userId = "local-user";
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
   const research = useResearchPageState();
   const [mounted, setMounted] = useState(false);
 

@@ -7,7 +7,6 @@
 
 "use client";
 
-import { useUser, useClerk } from "@clerk/nextjs";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -59,8 +58,8 @@ export function WorkspaceHamburgerMenu({
   isOwner,
   className = "",
 }: WorkspaceHamburgerMenuProps) {
-  const { user } = useUser();
-  const { signOut, openUserProfile } = useClerk();
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
+  const signOut = async () => {}; const openUserProfile = () => {};
   const { branding } = useTheme();
   const [showThemeDialog, setShowThemeDialog] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);

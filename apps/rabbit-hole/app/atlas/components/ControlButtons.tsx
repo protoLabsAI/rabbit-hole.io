@@ -8,7 +8,6 @@
  * Requires authentication for Import, Export, and AI Research actions.
  */
 
-import { SignedIn, SignedOut, SignInButton, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
@@ -63,7 +62,7 @@ export function ControlButtons({
   onResetView,
   onFitToScreen,
 }: ControlButtonsProps) {
-  const { user } = useUser();
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
   const router = useRouter();
   const userRole = user ? getUserRoleClient(user) : null;
   const isSuperAdmin = userRole
@@ -75,65 +74,51 @@ export function ControlButtons({
       {/* Super Admin Only: Import & Add Entity */}
       {isSuperAdmin && (
         <ClientOnlyAuthSection>
-          <SignedIn>
-            <div className="flex items-center space-x-2">
-              <Button
-                onClick={onOpenBulkImport}
-                variant="secondary"
-                size="sm"
-                title="Upload JSON bundle with evidence, entities, and relationships"
-              >
-                Import
-              </Button>
+          <div className="flex items-center space-x-2">
+            <Button
+              onClick={onOpenBulkImport}
+              variant="secondary"
+              size="sm"
+              title="Upload JSON bundle with evidence, entities, and relationships"
+            >
+              Import
+            </Button>
 
-              <FileUploadButton variant="outline" size="sm" />
+            <FileUploadButton variant="outline" size="sm" />
 
-              <Button
-                onClick={onOpenAddForm}
-                variant="default"
-                size="sm"
-                title="Add entity to Atlas (Super Admin only)"
-              >
-                Add Entity
-              </Button>
-            </div>
-          </SignedIn>
+            <Button
+              onClick={onOpenAddForm}
+              variant="default"
+              size="sm"
+              title="Add entity to Atlas (Super Admin only)"
+            >
+              Add Entity
+            </Button>
+          </div>
         </ClientOnlyAuthSection>
       )}
 
       {/* All Authenticated Users: Export & Research Link */}
       <ClientOnlyAuthSection>
-        <SignedIn>
-          <div className="flex items-center space-x-2">
-            <Button
-              onClick={onExport}
-              variant="outline"
-              size="sm"
-              title="Download current graph as importable JSON bundle"
-            >
-              Export
-            </Button>
+        <div className="flex items-center space-x-2">
+          <Button
+            onClick={onExport}
+            variant="outline"
+            size="sm"
+            title="Download current graph as importable JSON bundle"
+          >
+            Export
+          </Button>
 
-            <Button
-              onClick={() => router.push("/research")}
-              variant="default"
-              size="sm"
-              title="Create and edit your own personal knowledge graph"
-            >
-              AI Research →
-            </Button>
-          </div>
-        </SignedIn>
-
-        {/* Unauthenticated Users: Show Login button */}
-        <SignedOut>
-          <SignInButton mode="modal">
-            <Button variant="outline" size="sm">
-              <span>🔒</span>
-              <span>Sign In for Research Tools</span>
-            </Button>
-          </SignInButton>
-        </SignedOut>
+          <Button
+            onClick={() => router.push("/research")}
+            variant="default"
+            size="sm"
+            title="Create and edit your own personal knowledge graph"
+          >
+            AI Research →
+          </Button>
+        </div>
       </ClientOnlyAuthSection>
 
       {/* Graph Controls */}

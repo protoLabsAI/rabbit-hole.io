@@ -4,7 +4,6 @@
  * Shows tier, workspace scope, and sync status
  */
 
-import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 
 import { getUserTierClient, getTierLabel } from "@proto/auth/client";
@@ -15,7 +14,7 @@ interface WorkspaceHeaderProps {
 }
 
 export function WorkspaceHeader({ workspaceId }: WorkspaceHeaderProps) {
-  const { user } = useUser();
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
   const tier = getUserTierClient(user || null);
   const tierLabel = getTierLabel(tier);
 

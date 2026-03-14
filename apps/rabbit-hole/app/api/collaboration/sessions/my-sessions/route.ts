@@ -4,14 +4,13 @@
  * Get current user's collaboration sessions with cleanup option
  */
 
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import { getGlobalPostgresPool } from "@proto/database";
 
 export async function GET(request: NextRequest) {
   try {
-    const { userId } = await auth();
+    const userId = "local-user";
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -56,7 +55,7 @@ export async function GET(request: NextRequest) {
 // Cleanup endpoint
 export async function DELETE(request: NextRequest) {
   try {
-    const { userId } = await auth();
+    const userId = "local-user";
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

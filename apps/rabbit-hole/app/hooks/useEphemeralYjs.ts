@@ -6,7 +6,6 @@
  * Guest reconnection requires full resync from Host.
  */
 
-import { useAuth } from "@clerk/nextjs";
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import { useEffect, useState, useCallback } from "react";
 import { IndexeddbPersistence } from "y-indexeddb";
@@ -40,7 +39,7 @@ export function useEphemeralYjs({
   enabled = true,
   fallbackToLocal = true,
 }: UseEphemeralYjsOptions) {
-  const { userId, getToken } = useAuth();
+  const userId = "local-user"; const getToken = async (_opts?: any) => "mock-token";
   const { toast } = useToast();
   const [ydoc] = useState(() => new Y.Doc());
   const [provider, setProvider] = useState<HocuspocusProvider | null>(null);

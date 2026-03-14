@@ -593,9 +593,9 @@ export function useCreateSession() {
 
 ```typescript
 import { createSession } from "@/research/actions/collaboration-sessions";
-import { auth } from "@clerk/nextjs/server";
+// auth import removed (Clerk removed)
 
-jest.mock("@clerk/nextjs/server");
+// jest.mock for Clerk removed
 
 describe("createSession", () => {
   it("returns error if unauthorized", async () => {

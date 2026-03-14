@@ -7,7 +7,6 @@
  * Streams progress events to clients with detailed phase information.
  */
 
-import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextRequest } from "next/server";
 
 import { getUserTier, getTierLimits } from "@proto/auth";
@@ -153,14 +152,14 @@ function deduplicateEntitiesBySimilarity(entities: any[]): any[] {
 }
 
 export async function POST(request: NextRequest) {
-  const { userId } = await auth();
+  const userId = "local-user";
 
   if (!userId) {
     return new Response("Unauthorized", { status: 401 });
   }
 
   // Tier enforcement (must check before starting stream)
-  const user = await currentUser();
+  const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
   if (!user) {
     return new Response("Unauthorized", { status: 401 });
   }

@@ -6,7 +6,6 @@
  * PATCH /api/v1/tenant - Update tenant settings (slug, etc.)
  */
 
-import { auth, clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import {
@@ -35,7 +34,7 @@ export async function GET(
   request: NextRequest
 ): Promise<NextResponse<TenantResponse>> {
   try {
-    const { orgId, userId } = await auth();
+    const userId = "local-user"; const orgId = "local-org";
 
     if (!orgId || !userId) {
       return NextResponse.json(
@@ -98,7 +97,7 @@ export async function POST(
   request: NextRequest
 ): Promise<NextResponse<TenantResponse>> {
   try {
-    const { orgId, userId } = await auth();
+    const userId = "local-user"; const orgId = "local-org";
 
     if (!orgId || !userId) {
       return NextResponse.json(
@@ -134,7 +133,7 @@ export async function POST(
     }
 
     // Get organization details from Clerk
-    const client = await clerkClient();
+    // clerkClient removed - using local user
     const org = await client.organizations.getOrganization({
       organizationId: orgId,
     });
@@ -184,7 +183,7 @@ export async function PATCH(
   request: NextRequest
 ): Promise<NextResponse<TenantResponse>> {
   try {
-    const { orgId, userId, has } = await auth();
+    const userId = "local-user"; const orgId = "local-org"; const has = () => true;
 
     if (!orgId || !userId) {
       return NextResponse.json(

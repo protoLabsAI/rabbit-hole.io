@@ -5,7 +5,6 @@
  * This endpoint runs in the Next.js context and communicates with job processor
  */
 
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import { enqueueTextExtractionJob } from "@proto/sidequest-utils/server";
@@ -33,7 +32,8 @@ export async function POST(
   request: NextRequest
 ): Promise<NextResponse<EnqueueJobResponse>> {
   // Check authentication
-  const { userId, orgId } = await auth();
+  const userId = "local-user";
+  const orgId = "local-org";
   if (!userId) {
     return NextResponse.json(
       {

@@ -5,7 +5,6 @@
  * Supports main tab + collaboration session tabs.
  */
 
-import { useAuth } from "@clerk/nextjs";
 import { useState, useEffect, useCallback, useMemo } from "react";
 
 import { logUserAction } from "@proto/logger";
@@ -88,7 +87,7 @@ export function useWorkspace(
   workspaceId: string,
   options?: UseWorkspaceOptions
 ): UseWorkspaceReturn {
-  const { userId } = useAuth();
+  const userId = "local-user";
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [users, setUsers] = useState<Map<string, UserPresence>>(new Map());
   const [followMode, setFollowMode] = useState<{

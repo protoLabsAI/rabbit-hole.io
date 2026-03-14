@@ -7,7 +7,6 @@
  * Returns immediately with job ID for status tracking.
  */
 
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -27,7 +26,8 @@ const EnqueueYouTubeSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     // Authenticate user
-    const { userId, orgId } = await auth();
+    const userId = "local-user";
+  const orgId = "local-org";
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -7,7 +7,6 @@
  * Seat limits enforced server-side (Free: 1, Pro: 5, Enterprise: 50).
  */
 
-import { useUser } from "@clerk/nextjs";
 import { useMemo } from "react";
 
 import type { CanvasType } from "@proto/workspace";
@@ -54,7 +53,7 @@ export function WorkspacePersistence({
   canvasType = "graph",
   children,
 }: WorkspacePersistenceProps) {
-  const { user } = useUser();
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
   const workspace = useWorkspace(workspaceId, {
     mode: "editing",
     canvasType,

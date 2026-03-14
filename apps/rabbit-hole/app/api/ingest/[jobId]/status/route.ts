@@ -4,7 +4,6 @@
  * Proxy for job-processor's /ingest/:jobId/status endpoint.
  */
 
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 const JOB_PROCESSOR_URL =
@@ -14,7 +13,7 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ jobId: string }> }
 ) {
-  const { userId } = await auth();
+  const userId = "local-user";
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

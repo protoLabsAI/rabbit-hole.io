@@ -11,7 +11,14 @@
  * User workspaces are local-first (Yjs + IndexedDB) and should be validated client-side.
  */
 
-import { type User } from "@clerk/nextjs/server";
+// Inline User type (replaces external auth dependency)
+interface User {
+  id: string;
+  publicMetadata: Record<string, unknown>;
+  emailAddresses: Array<{ emailAddress: string }>;
+  firstName?: string | null;
+  lastName?: string | null;
+}
 
 import { getEntityCount, getRelationshipCount } from "@proto/database";
 

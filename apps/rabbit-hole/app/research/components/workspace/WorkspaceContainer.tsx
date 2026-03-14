@@ -1,6 +1,5 @@
 "use client";
 
-import { useAuth, SignInButton, useUser, useOrganization } from "@clerk/nextjs";
 import React, { useCallback } from "react";
 
 import { getUserTierClient, getTierLimitsClient } from "@proto/auth/client";
@@ -41,8 +40,8 @@ export function WorkspaceContainer({
   canUseAIChat = false,
   pendingImport = null,
 }: WorkspaceContainerProps) {
-  const { userId } = useAuth();
-  const { organization, isLoaded: orgLoaded } = useOrganization();
+  const userId = "local-user";
+  const organization = { id: "local-org", name: "Local Org" } as any;
 
   // Collaboration settings (persisted to localStorage)
   const { showPresence } = useCollaborationSettings();
@@ -57,11 +56,11 @@ export function WorkspaceContainer({
           <p className="text-muted-foreground mb-4">
             Sign in to access your workspace.
           </p>
-          <SignInButton mode="modal">
+          
             <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90">
               Sign In
             </button>
-          </SignInButton>
+          
         </div>
       </div>
     );
@@ -111,8 +110,8 @@ function WorkspaceContent({
   organization,
   pendingImport = null,
 }: WorkspaceContentProps) {
-  const { userId } = useAuth();
-  const { user } = useUser();
+  const userId = "local-user";
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
   const { toast } = useToast();
   const [isViewMode, setIsViewMode] = React.useState(false);
 

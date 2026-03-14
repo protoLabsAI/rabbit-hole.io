@@ -7,7 +7,6 @@
 
 "use client";
 
-import { useUser, useClerk } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -34,8 +33,8 @@ export interface GlobalUserMenuProps {
 }
 
 export function GlobalUserMenu({ className = "" }: GlobalUserMenuProps) {
-  const { user } = useUser();
-  const { signOut, openUserProfile } = useClerk();
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
+  const signOut = async () => {}; const openUserProfile = () => {};
   const { branding } = useTheme();
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);

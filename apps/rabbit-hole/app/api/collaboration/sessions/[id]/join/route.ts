@@ -4,7 +4,6 @@
  * POST /api/collaboration/sessions/[id]/join - Join session
  */
 
-import { currentUser, clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import { getUserTier, getTierLimits } from "@proto/auth";
@@ -21,7 +20,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await currentUser();
+    const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -59,7 +58,7 @@ export async function POST(
     }
 
     // Get owner's tier limits from Clerk
-    const client = await clerkClient();
+    // clerkClient removed - using local user
     const ownerUser = await client.users.getUser(sessionRow.owner_id);
     const ownerTier = getUserTier(ownerUser);
     const limits = getTierLimits(ownerTier);

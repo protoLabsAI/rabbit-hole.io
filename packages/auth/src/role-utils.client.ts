@@ -13,7 +13,7 @@ import {
   isValidUserRole,
 } from "./types";
 
-// Define user type inline to avoid importing from @clerk/nextjs
+// Define user type inline (no external auth dependency)
 interface UserResource {
   id: string;
   emailAddresses: Array<{ emailAddress: string }>;

@@ -6,7 +6,6 @@
 
 "use client";
 
-import { useUser } from "@clerk/nextjs";
 import React, { useState, useRef } from "react";
 
 import { getUserTierClient, getTierLimitsClient } from "@proto/auth/client";
@@ -42,7 +41,7 @@ export function TabBar({
   onTabReorder,
   onNewTab,
 }: TabBarProps) {
-  const { user } = useUser();
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
   const { toast } = useToast();
   const tier = getUserTierClient(user || null);
   const limits = getTierLimitsClient(tier);

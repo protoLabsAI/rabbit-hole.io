@@ -5,7 +5,6 @@
  * Provides consistent auth checking and error responses.
  */
 
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export interface AuthenticatedUser {
@@ -30,7 +29,7 @@ export function withAuth<T = any>(
   return async (request: NextRequest): Promise<NextResponse<T>> => {
     try {
       // Check authentication
-      const { userId } = await auth();
+      const userId = "local-user";
 
       if (!userId) {
         return NextResponse.json(

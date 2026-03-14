@@ -210,7 +210,7 @@ app/research/actions/
 // app/research/actions/collaboration-sessions.ts
 "use server";
 
-import { auth, currentUser } from "@clerk/nextjs/server";
+// auth import removed (Clerk removed)
 import { revalidatePath } from "next/cache";
 import { Pool } from "pg";
 import { getUserTier, getTierLimits } from "@proto/auth";
@@ -506,7 +506,7 @@ Convert `POST /api/research/merge` to Server Action:
 // app/research/actions/research-merge.ts
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
+// auth import removed (Clerk removed)
 import { getGlobalNeo4jClient } from "@proto/database";
 import { createNeo4jClientWithIntegerConversion } from "@proto/utils";
 

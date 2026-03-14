@@ -7,13 +7,12 @@
 
 "use client";
 
-import { useOrganizationList, useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 
 import { getUserTierClient } from "@proto/auth/client";
 
 export function OrganizationRequired() {
-  const { user } = useUser();
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
   const tier = getUserTierClient(user || null);
   const needsOrg = tier === "team" || tier === "enterprise";
 
@@ -22,11 +21,7 @@ export function OrganizationRequired() {
     return null;
   }
 
-  const orgList = useOrganizationList({
-    userMemberships: {
-      infinite: true,
-    },
-  });
+  const orgList = { userMemberships: { data: [], count: 0, isLoading: false }, setActive: async (_: any) => {} } as any;
   const [attempting, setAttempting] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

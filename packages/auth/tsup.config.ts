@@ -18,7 +18,6 @@ export default defineConfig({
   sourcemap: true,
   minify: false,
   external: [
-    "@clerk/nextjs",
     "next",
     "react",
     "react-dom",

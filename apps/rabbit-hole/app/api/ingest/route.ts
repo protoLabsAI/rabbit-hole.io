@@ -5,7 +5,6 @@
  * Accepts multipart form data (file + metadata) or JSON (URL source).
  */
 
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import { generateSecureId } from "@proto/utils";
@@ -14,7 +13,7 @@ const JOB_PROCESSOR_URL =
   process.env.JOB_PROCESSOR_URL || "http://localhost:8680";
 
 export async function POST(req: NextRequest) {
-  const { userId } = await auth();
+  const userId = "local-user";
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

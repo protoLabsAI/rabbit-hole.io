@@ -7,7 +7,6 @@
 
 "use client";
 
-import { SignedIn, SignedOut, useUser } from "@clerk/nextjs";
 import { useSearchParams } from "next/navigation";
 import React, { useState, useEffect, useMemo } from "react";
 
@@ -28,7 +27,7 @@ import {
 import { dashboardPanelConfig } from "./registry/dashboard-panels";
 
 export default function DashboardClient() {
-  const { user } = useUser();
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -84,8 +83,7 @@ export default function DashboardClient() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SignedIn>
-        <PanelHub
+      <PanelHub
           config={dashboardPanelConfig}
           defaultPanelId={defaultPanelId}
           title={isAdmin ? "System Management" : "Workspace Dashboard"}
@@ -104,25 +102,6 @@ export default function DashboardClient() {
             Icon,
           }}
         />
-      </SignedIn>
-
-      <SignedOut>
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="rounded-lg border border-border bg-card p-8 text-center max-w-md">
-            <div className="mb-4 flex justify-center">
-              <Icon name="lock" size={64} className="text-muted-foreground" />
-            </div>
-            <h2 className="text-xl font-semibold text-card-foreground mb-4">
-              Authentication Required
-            </h2>
-            <p className="text-muted-foreground mb-6">
-              The development dashboard requires authentication to access system
-              management tools.
-            </p>
-            <Button>Sign In to Access Dashboard</Button>
-          </div>
-        </div>
-      </SignedOut>
     </div>
   );
 }

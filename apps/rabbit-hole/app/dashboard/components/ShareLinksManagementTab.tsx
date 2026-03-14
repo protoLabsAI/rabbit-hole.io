@@ -9,7 +9,6 @@
 
 "use client";
 
-import { useUser, useAuth } from "@clerk/nextjs";
 import { formatDistanceToNow } from "date-fns";
 import { useState, useEffect } from "react";
 
@@ -40,8 +39,8 @@ interface ShareToken {
 }
 
 export function ShareLinksManagementTab() {
-  const { user } = useUser();
-  const { getToken } = useAuth();
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
+  const getToken = async (_opts?: any) => "mock-token";
   const { toast } = useToast();
   const [shareTokens, setShareTokens] = useState<ShareToken[]>([]);
   const [loading, setLoading] = useState(true);

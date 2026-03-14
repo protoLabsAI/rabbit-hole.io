@@ -4,7 +4,14 @@
  * Provides server-only tier checking and limit utilities.
  */
 
-import { type User } from "@clerk/nextjs/server";
+// Inline User type (replaces external auth dependency)
+interface User {
+  id: string;
+  publicMetadata: Record<string, unknown>;
+  emailAddresses: Array<{ emailAddress: string }>;
+  firstName?: string | null;
+  lastName?: string | null;
+}
 
 import { TIER_LIMITS, type UserTierLimits, isUnlimited } from "./tier-limits";
 import { USER_TIERS, type UserTier, isValidUserTier } from "./types";

@@ -1,6 +1,5 @@
 "use client";
 
-import { useAuth, useOrganization, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -19,9 +18,9 @@ interface ViewSessionClientProps {
 export default function ViewSessionClient({
   sessionId,
 }: ViewSessionClientProps) {
-  const { userId } = useAuth();
-  const { user } = useUser();
-  const { organization } = useOrganization();
+  const userId = "local-user";
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
+  const organization = { id: "local-org", name: "Local Org" } as any;
   const router = useRouter();
   const { toast } = useToast();
   const [role, setRole] = useState<"guest" | "viewer">("guest");

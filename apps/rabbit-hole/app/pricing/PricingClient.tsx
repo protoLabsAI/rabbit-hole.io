@@ -1,12 +1,11 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
 import { useEffect } from "react";
 
 import { logPageView, logUserAction } from "@proto/logger";
 
 export function PricingPageLogger() {
-  const { user } = useUser();
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
 
   useEffect(() => {
     const sessionId =
@@ -40,7 +39,7 @@ export function PlanAction({
   action,
   children,
 }: PlanActionProps) {
-  const { user } = useUser();
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
 
   const handleClick = () => {
     const sessionId =

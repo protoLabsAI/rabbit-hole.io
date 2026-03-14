@@ -13,11 +13,7 @@ import {
   deleteCollaborationSession,
 } from "../collaboration-sessions";
 
-// Mock dependencies
-vi.mock("@clerk/nextjs/server", () => ({
-  auth: vi.fn(),
-  currentUser: vi.fn(),
-}));
+// Clerk mock removed - auth is now hardcoded to local-user
 
 vi.mock("@proto/auth", () => ({
   getUserTier: vi.fn(),
@@ -55,7 +51,7 @@ describe("createCollaborationSession", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    mockAuth = await import("@clerk/nextjs/server");
+    mockAuth = {} as any; // Clerk removed
     mockAuthFns = await import("@proto/auth");
     const pg = await import("pg");
     Pool = pg.Pool;
@@ -196,7 +192,7 @@ describe("endCollaborationSession", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    mockAuth = await import("@clerk/nextjs/server");
+    mockAuth = {} as any; // Clerk removed
     const pg = await import("pg");
     Pool = pg.Pool;
   });
@@ -282,7 +278,7 @@ describe("deleteCollaborationSession", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    mockAuth = await import("@clerk/nextjs/server");
+    mockAuth = {} as any; // Clerk removed
     const pg = await import("pg");
     Pool = pg.Pool;
   });
@@ -345,7 +341,7 @@ describe("initializeSessionData", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    mockAuth = await import("@clerk/nextjs/server");
+    mockAuth = {} as any; // Clerk removed
     const pg = await import("pg");
     Pool = pg.Pool;
   });

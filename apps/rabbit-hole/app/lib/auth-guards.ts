@@ -4,7 +4,6 @@
  * Reusable auth checks for different access levels
  */
 
-import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import {
@@ -30,7 +29,7 @@ export interface AuthResult {
 export async function requireSuperAdmin(
   request: NextRequest
 ): Promise<AuthResult> {
-  const user = await currentUser();
+  const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
 
   if (!user) {
     return {
@@ -71,7 +70,7 @@ export async function requireSuperAdmin(
 export async function requireAuthenticated(
   request: NextRequest
 ): Promise<AuthResult> {
-  const user = await currentUser();
+  const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
 
   if (!user) {
     return {

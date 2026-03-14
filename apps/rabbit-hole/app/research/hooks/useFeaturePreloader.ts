@@ -5,7 +5,6 @@
  * Uses requestIdleCallback for non-blocking loads.
  */
 
-import { useUser } from "@clerk/nextjs";
 import { useEffect } from "react";
 
 import { getUserTierClient, getTierLimitsClient } from "@proto/auth/client";
@@ -30,7 +29,7 @@ const PRELOAD_CONFIG: PreloadConfig[] = [
 ];
 
 export function useFeaturePreloader() {
-  const { user } = useUser();
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
   const userTier = getUserTierClient(user || null);
   const tierLimits = getTierLimitsClient(userTier);
 

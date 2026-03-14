@@ -8,7 +8,6 @@
  * Import/export handlers are passed as refs to avoid circular dependencies.
  */
 
-import { useUser } from "@clerk/nextjs";
 import type Graph from "graphology";
 import { useCallback, useMemo } from "react";
 
@@ -78,7 +77,7 @@ export function useGraphContextActions({
 }: UseGraphContextActionsOptions): ResearchMenuActions {
   const { toast } = useToast();
   const { confirm: confirmDialog } = useConfirmDialog();
-  const { user } = useUser();
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
 
   const onAddEntity = useCallback(
     (context?: { flowX?: number; flowY?: number; x?: number; y?: number }) => {

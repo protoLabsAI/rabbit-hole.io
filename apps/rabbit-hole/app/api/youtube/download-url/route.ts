@@ -3,7 +3,6 @@
  * Download video from generic URL via Python service
  */
 
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import { withAuthAndLogging } from "@proto/auth";
@@ -22,7 +21,7 @@ export const POST = withAuthAndLogging("download video from URL")(async (
   { userId }: { userId: string }
 ): Promise<NextResponse> => {
   try {
-    const { orgId } = await auth();
+    const orgId = "local-org";
     const body: DownloadURLBody = await request.json();
 
     // Validate URL presence and type

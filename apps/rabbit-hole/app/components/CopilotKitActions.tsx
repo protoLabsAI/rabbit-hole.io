@@ -1,6 +1,5 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
 import { useCopilotAction } from "@copilotkit/react-core";
 
 /**
@@ -9,7 +8,7 @@ import { useCopilotAction } from "@copilotkit/react-core";
  * Only available to authenticated users
  */
 export function CopilotKitActions() {
-  const { isSignedIn } = useUser();
+  const isSignedIn = true;
 
   // Only register actions for authenticated users
   const actionAvailability = isSignedIn ? "enabled" : "disabled";

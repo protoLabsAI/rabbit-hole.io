@@ -5,7 +5,6 @@
  * Perfect for sharing investigations, backups, and cross-instance transfers.
  */
 
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import { getGlobalNeo4jClient } from "@proto/database";
@@ -22,7 +21,7 @@ interface ExportFilters {
 
 export async function GET(request: NextRequest) {
   // Check authentication
-  const { userId } = await auth();
+  const userId = "local-user";
 
   if (!userId) {
     return NextResponse.json(

@@ -20,13 +20,7 @@ global.fetch = vi.fn(() =>
   })
 ) as any;
 
-// Mock Clerk
-vi.mock("@clerk/nextjs", () => ({
-  useAuth: () => ({
-    userId: "test-user-123",
-    getToken: async () => "mock-token",
-  }),
-}));
+// Clerk mock removed - useAuth replaced with local-user stub
 
 // Mock toast
 vi.mock("@/components/hooks/use-toast", () => ({

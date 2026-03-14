@@ -1,4 +1,3 @@
-import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -26,7 +25,7 @@ const DiscoverRequestSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  const user = await currentUser();
+  const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
 
   if (!user) {
     return NextResponse.json(

@@ -7,7 +7,6 @@
 
 import { randomUUID } from "crypto";
 
-import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import { getUserTier, getTierLimits } from "@proto/auth";
@@ -20,8 +19,9 @@ import type {
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId, orgId } = await auth();
-    const user = await currentUser();
+    const userId = "local-user";
+  const orgId = "local-org";
+    const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
 
     if (!userId || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -167,7 +167,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await currentUser();
+    const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

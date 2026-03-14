@@ -1,6 +1,5 @@
 "use client";
 
-import { SignedIn, SignedOut, SignInButton, useUser } from "@clerk/nextjs";
 import { useRouter, usePathname } from "next/navigation";
 import React from "react";
 
@@ -30,7 +29,8 @@ import { contextMenuRegistry } from "../registry";
 export function ContextMenuRenderer() {
   const contextMenuHook = useContextMenu();
   const { contextMenu, closeContextMenu } = contextMenuHook;
-  const { isSignedIn, user } = useUser();
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
+  const isSignedIn = true;
   const router = useRouter();
   const pathname = usePathname();
   const { toast } = useToast();
@@ -211,12 +211,12 @@ export function ContextMenuRenderer() {
         </span>
       </DropdownMenuItem>
       <DropdownMenuItem onClick={closeContextMenu}>
-        <SignInButton mode="modal">
+        
           <span className="flex items-center space-x-2 text-primary cursor-pointer">
             <span>🔐</span>
             <span>Sign In</span>
           </span>
-        </SignInButton>
+        
       </DropdownMenuItem>
     </>
   );
@@ -242,22 +242,7 @@ export function ContextMenuRenderer() {
           className="!bg-card/95 backdrop-blur-lg min-w-48"
           onCloseAutoFocus={(e) => e.preventDefault()}
         >
-          <SignedIn>{renderConfig(menuConfig)}</SignedIn>
-          <SignedOut>
-            {renderConfig(
-              menuConfig.filter(
-                (item) => !("requiresAuth" in item && item.requiresAuth)
-              )
-            )}
-            {menuConfig.some(
-              (item) => "requiresAuth" in item && item.requiresAuth
-            ) && (
-              <>
-                <DropdownMenuSeparator />
-                {renderAuthPrompt()}
-              </>
-            )}
-          </SignedOut>
+          {renderConfig(menuConfig)}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

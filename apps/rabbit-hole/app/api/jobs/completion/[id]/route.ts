@@ -7,7 +7,6 @@
  * cleaned up by Sidequest. Eliminates 404 errors on completed jobs.
  */
 
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import { getJobCompletion } from "@proto/sidequest-utils/server";
@@ -17,7 +16,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = await auth();
+    const userId = "local-user";
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

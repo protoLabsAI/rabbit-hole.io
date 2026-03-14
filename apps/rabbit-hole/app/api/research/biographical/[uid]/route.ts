@@ -5,7 +5,6 @@
  * following the "Transparency Over Perfection" philosophy
  */
 
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import { getGlobalNeo4jClient } from "@proto/database";
@@ -59,7 +58,7 @@ export async function GET(
   { params }: { params: { uid: string } }
 ) {
   // Check authentication
-  const { userId } = await auth();
+  const userId = "local-user";
 
   if (!userId) {
     return NextResponse.json(

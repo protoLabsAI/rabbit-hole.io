@@ -6,12 +6,10 @@
 
 "use client";
 
-import { useUser } from "@clerk/nextjs";
-
 import { getUserTierClient, getTierLabel, getTierColor } from "../client";
 
 export function TierBadge() {
-  const { user } = useUser();
+  const user = { id: "local-user", firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], primaryEmailAddress: { emailAddress: "local@localhost" } } as any;
 
   if (!user) return null;
 

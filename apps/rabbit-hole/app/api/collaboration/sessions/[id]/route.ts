@@ -5,7 +5,6 @@
  * DELETE /api/collaboration/sessions/[id] - End session
  */
 
-import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import { getGlobalPostgresPool } from "@proto/database";
@@ -16,7 +15,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await currentUser();
+    const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
     const { id } = await params;
 
     const pool = getGlobalPostgresPool();
@@ -71,7 +70,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await currentUser();
+    const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

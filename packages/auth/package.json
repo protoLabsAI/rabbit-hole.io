@@ -30,7 +30,6 @@
     "test:coverage": "vitest --coverage"
   },
   "dependencies": {
-    "@clerk/nextjs": "^6.5.0",
     "@proto/database": "workspace:*",
     "@proto/icon-system": "workspace:*",
     "next": "^15.1.0"

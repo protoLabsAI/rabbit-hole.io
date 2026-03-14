@@ -1,6 +1,5 @@
 "use server";
 
-import { auth, currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -80,8 +79,9 @@ export async function createCollaborationSession(
     } = parsed.data;
 
     // Auth check
-    const { userId, orgId } = await auth();
-    const user = await currentUser();
+    const userId = "local-user";
+  const orgId = "local-org";
+    const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
 
     if (!userId || !user) {
       return {
@@ -256,8 +256,9 @@ export async function createTabSession(
     } = parsed.data;
 
     // Auth check
-    const { userId, orgId } = await auth();
-    const user = await currentUser();
+    const userId = "local-user";
+  const orgId = "local-org";
+    const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
 
     if (!userId || !user) {
       return {
@@ -432,7 +433,7 @@ export async function initializeSessionData(
       canvasType = "graph",
     } = parsed.data;
 
-    const { userId } = await auth();
+    const userId = "local-user";
     if (!userId) {
       return {
         error: "Unauthorized",
@@ -530,7 +531,7 @@ export async function endCollaborationSession(
 
     const { sessionId } = parsed.data;
 
-    const { userId } = await auth();
+    const userId = "local-user";
     if (!userId) {
       return {
         error: "Unauthorized",
@@ -622,7 +623,7 @@ export async function deleteCollaborationSession(
 
     const { sessionId } = parsed.data;
 
-    const { userId } = await auth();
+    const userId = "local-user";
     if (!userId) {
       return {
         error: "Unauthorized",

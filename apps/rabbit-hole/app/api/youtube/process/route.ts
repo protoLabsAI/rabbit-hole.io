@@ -3,7 +3,6 @@
  * Re-enabled with direct Python service integration
  */
 
-import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import { withAuthAndLogging } from "@proto/auth";
@@ -23,8 +22,8 @@ export const POST = withAuthAndLogging("process YouTube video")(async (
   { userId }: { userId: string }
 ): Promise<NextResponse> => {
   try {
-    const { orgId } = await auth();
-    const user = await currentUser();
+    const orgId = "local-org";
+    const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
     const body: ProcessYouTubeRequest = await request.json();
 
     // Validate request
@@ -129,7 +128,6 @@ export async function GET(): Promise<NextResponse> {
 }
 
 /* DISABLED CODE - PRESERVED FOR RE-ENABLING
-import { auth, currentUser } from "@clerk/nextjs/server";
 import { withAuthAndLogging } from "@proto/api-utils";
 import { getUserTier } from "@proto/auth";
 import { enqueueYouTubeProcessing } from "../../../../services/job-processor/jobs";
@@ -152,7 +150,7 @@ export const POST = withAuthAndLogging("enqueue YouTube processing")(async (
   { userId }: { userId: string }
 ): Promise<NextResponse<ProcessYouTubeResponse>> => {
   try {
-    const { orgId } = await auth();
+    const orgId = "local-org";
     const body: ProcessYouTubeRequest = await request.json();
 
     // 1. Validate request
@@ -191,7 +189,7 @@ export const POST = withAuthAndLogging("enqueue YouTube processing")(async (
     }
 
     // 3. Determine quality based on user tier
-    const user = await currentUser();
+    const user = { id: "local-user", publicMetadata: { tier: "free", role: "admin" }, emailAddresses: [{ emailAddress: "local@localhost" }], firstName: "Local", lastName: "User", fullName: "Local User", imageUrl: "" } as any;
     const tier = getUserTier(user);
     const quality = tier === "free" ? "720p" : "1080p";
 
