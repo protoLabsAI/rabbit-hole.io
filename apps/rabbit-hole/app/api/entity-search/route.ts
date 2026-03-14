@@ -153,7 +153,7 @@ const handleEntitySearch = async (
     const result = await client.executeRead(searchCypher, {
       searchQuery: searchQuery.trim(),
       limit: validLimit,
-      orgId: tenant?.clerkOrgId, // Optional - undefined means no filtering
+      orgId: tenant?.clerkOrgId || "public",
     });
 
     const entities = result.records.map(
