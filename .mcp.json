@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "rabbit-hole": {
+      "command": "bash",
+      "args": [
+        "-c",
+        "set -a; [ -f .env.research ] && . .env.research; set +a; exec node packages/mcp-server/dist/index.js"
+      ],
+      "env": {
+        "JOB_PROCESSOR_URL": "http://localhost:8680"
+      }
+    }
+  }
+}
