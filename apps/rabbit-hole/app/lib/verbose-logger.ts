@@ -1,67 +1,48 @@
 /**
  * Verbose Logger
  *
- * Provides controlled logging that respects user preferences.
- * Only outputs when verboseLogging is enabled in collaboration settings.
+ * Controlled logging utility. Verbose output enabled via
+ * localStorage flag "verboseLogging".
  */
-
-import { useCollaborationSettings } from "@/hooks/useCollaborationSettings";
 
 class VerboseLogger {
   private isEnabled(): boolean {
     if (typeof window === "undefined") return false;
-    const settings = useCollaborationSettings.getState();
-    return settings.verboseLogging;
+    try {
+      return localStorage.getItem("verboseLogging") === "true";
+    } catch {
+      return false;
+    }
   }
 
   log(message: string, data?: any) {
     if (this.isEnabled()) {
-      if (data !== undefined) {
-        console.log(message, data);
-      } else {
-        console.log(message);
-      }
+      data !== undefined ? console.log(message, data) : console.log(message);
     }
   }
 
   info(message: string, data?: any) {
     if (this.isEnabled()) {
-      if (data !== undefined) {
-        console.info(message, data);
-      } else {
-        console.info(message);
-      }
+      data !== undefined ? console.info(message, data) : console.info(message);
     }
   }
 
   warn(message: string, data?: any) {
-    // Warnings always show
-    if (data !== undefined) {
-      console.warn(message, data);
-    } else {
-      console.warn(message);
-    }
+    data !== undefined ? console.warn(message, data) : console.warn(message);
   }
 
   error(message: string, data?: any) {
-    // Errors always show
-    if (data !== undefined) {
-      console.error(message, data);
-    } else {
-      console.error(message);
-    }
+    data !== undefined
+      ? console.error(message, data)
+      : console.error(message);
   }
 
   group(label: string) {
-    if (this.isEnabled()) {
-      console.group(label);
-    }
+    if (this.isEnabled()) console.group(label);
   }
 
   groupEnd() {
-    if (this.isEnabled()) {
-      console.groupEnd();
-    }
+    if (this.isEnabled()) console.groupEnd();
   }
 }
 
