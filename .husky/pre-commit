@@ -12,6 +12,16 @@ if [ -z "$STAGED_FILES" ]; then
   exit 0
 fi
 
+# Block commits with unresolved merge conflict markers
+CONFLICT_FILES=$(git diff --cached --name-only -z | xargs -0 grep -l "<<<<<<< " 2>/dev/null || true)
+if [ -n "$CONFLICT_FILES" ]; then
+  echo "CONFLICT MARKERS DETECTED in staged files:"
+  echo "$CONFLICT_FILES"
+  echo ""
+  echo "Resolve all merge conflicts before committing."
+  exit 1
+fi
+
 # Run lint-staged and re-stage changes
 pnpm lint-staged
 
