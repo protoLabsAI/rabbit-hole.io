@@ -45,8 +45,15 @@ export function SearchBar({
         body: JSON.stringify({ searchQuery: searchQuery.trim(), limit: 8 }),
       });
       const data = await response.json();
-      if (data.success && data.results) {
-        setResults(data.results);
+      if (data.success && data.data?.results) {
+        setResults(
+          data.data.results.map((r: any) => ({
+            uid: r.entity.uid,
+            name: r.entity.name,
+            type: r.entity.type,
+            matchReason: r.matchReasons?.[0],
+          }))
+        );
         setIsOpen(true);
         setSelectedIndex(-1);
       } else {
