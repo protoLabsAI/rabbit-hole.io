@@ -598,15 +598,41 @@ async function researchEntity(
 async function ingestBundle(bundle: Record<string, unknown>): Promise<unknown> {
   const rabbitHoleUrl = process.env.RABBIT_HOLE_URL || "http://localhost:3000";
 
+  // Strip entityCitations/relationshipCitations if they contain plain string
+  // arrays (evidence UIDs) instead of SourceGrounding objects — the API schema
+  // expects { claimText, sourceUrl, excerpt, confidence } objects.
+  const sanitized = { ...bundle };
+  for (const key of ["entityCitations", "relationshipCitations"] as const) {
+    const citations = sanitized[key];
+    if (citations && typeof citations === "object") {
+      const values = Object.values(citations as Record<string, unknown>);
+      const firstArr = values.find((v) => Array.isArray(v)) as
+        | unknown[]
+        | undefined;
+      if (firstArr && firstArr.length > 0 && typeof firstArr[0] === "string") {
+        // Plain UID arrays — not SourceGrounding objects; remove to avoid 400
+        delete sanitized[key];
+      }
+    }
+  }
+
   const res = await fetch(`${rabbitHoleUrl}/api/ingest-bundle`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(bundle),
+    body: JSON.stringify(sanitized),
   });
 
   if (!res.ok) {
+    // Read the response body for detailed validation errors
+    let detail = "";
+    try {
+      const body = (await res.json()) as Record<string, unknown>;
+      detail = (body.error as string) || JSON.stringify(body);
+    } catch {
+      detail = res.statusText;
+    }
     return {
-      error: `Ingest bundle API error: ${res.status} ${res.statusText}`,
+      error: `Ingest bundle API error: ${res.status} — ${detail}`,
     };
   }
 
