@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Search, X, Loader2 } from "lucide-react";
+
+import { Icon } from "@proto/icon-system";
 import { Badge } from "@proto/ui/atoms";
 
 interface SearchResult {
@@ -16,7 +17,10 @@ interface SearchBarProps {
   onResearchRequest: (query: string) => void;
 }
 
-export function SearchBar({ onEntitySelect, onResearchRequest }: SearchBarProps) {
+export function SearchBar({
+  onEntitySelect,
+  onResearchRequest,
+}: SearchBarProps) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -139,7 +143,10 @@ export function SearchBar({ onEntitySelect, onResearchRequest }: SearchBarProps)
     >
       <div className="bg-card/95 backdrop-blur-md rounded-xl shadow-lg border border-border">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Icon
+            name="Search"
+            className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
+          />
           <input
             ref={inputRef}
             type="text"
@@ -153,13 +160,16 @@ export function SearchBar({ onEntitySelect, onResearchRequest }: SearchBarProps)
             className="w-full bg-transparent border-0 focus:outline-none focus:ring-0 text-sm pl-10 pr-10 py-3 text-foreground placeholder:text-muted-foreground"
           />
           {isLoading ? (
-            <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground animate-spin" />
+            <Icon
+              name="Loader2"
+              className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground animate-spin"
+            />
           ) : query ? (
             <button
               onClick={handleClear}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
             >
-              <X className="h-4 w-4" />
+              <Icon name="X" className="h-4 w-4" />
             </button>
           ) : null}
         </div>
@@ -200,9 +210,7 @@ export function SearchBar({ onEntitySelect, onResearchRequest }: SearchBarProps)
             </div>
           ) : !isLoading && query.trim() ? (
             <div className="px-4 py-6 text-center">
-              <p className="text-sm text-muted-foreground">
-                No results found
-              </p>
+              <p className="text-sm text-muted-foreground">No results found</p>
               <p className="text-xs text-muted-foreground mt-1">
                 Press Enter to research &ldquo;{query.trim()}&rdquo;
               </p>
