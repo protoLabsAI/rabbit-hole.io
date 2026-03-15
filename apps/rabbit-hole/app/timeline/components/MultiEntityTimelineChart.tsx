@@ -3,7 +3,7 @@
  *
  * Core visualization component for comparing timelines across multiple entities.
  * Supports different view modes: comparison, merged, and side-by-side.
- * Extends EventTimelineChart for multi-entity display.
+ * Supports multi-entity display with multiple view modes.
  */
 
 "use client";
@@ -21,8 +21,6 @@ import {
 } from "@proto/ui/atoms";
 import { getEntityColors } from "@proto/utils";
 import { getEntityImage } from "@proto/utils/atlas";
-
-import { EventTimelineChart } from "@/components/share/EventTimelineChart";
 
 import type { MultiEntityTimelineData } from "../hooks/useMultiEntityTimeline";
 import type { TimelineFilters } from "../hooks/useTimelinePageState";
@@ -141,16 +139,12 @@ const ComparisonTimelineView = memo(function ComparisonTimelineView({
       {/* Legend */}
       <ComparisonLegend entities={entities} entityColors={entityColors} />
 
-      {/* Unified Timeline */}
-      <EventTimelineChart
-        events={allEvents}
-        height={height}
-        timeWindow={timeWindow}
-        onEventClick={(event) =>
-          onEventClick?.(event, (event as any).entityUid)
-        }
-        className="multi-entity-timeline"
-      />
+      {/* TODO: EventTimelineChart was removed - replace with new timeline visualization */}
+      <div className="multi-entity-timeline" style={{ height }}>
+        <div className="p-4 text-center text-gray-500 text-sm">
+          {allEvents.length} events in comparison view
+        </div>
+      </div>
 
       {/* Summary Statistics */}
       <ComparisonStatistics entities={entities} />
@@ -204,14 +198,12 @@ const SideBySideTimelineView = memo(function SideBySideTimelineView({
           </CardHeader>
           <CardContent>
             {entity.timeline.length > 0 ? (
-              <EventTimelineChart
-                events={entity.timeline}
-                height={entityHeight}
-                timeWindow={timeWindow}
-                onEventClick={(event) =>
-                  onEventClick?.(event, entity.entityUid)
-                }
-              />
+              /* TODO: EventTimelineChart was removed - replace with new timeline visualization */
+              <div style={{ height: entityHeight }}>
+                <div className="p-4 text-center text-gray-500 text-sm">
+                  {entity.timeline.length} events
+                </div>
+              </div>
             ) : (
               <div className="p-4 text-center text-gray-500">
                 <Icon name="clock" size={24} className="mx-auto mb-2" />
@@ -448,15 +440,12 @@ const MergedTimelineView = memo(function MergedTimelineView({
         <Badge variant="outline">{mergedEvents.length} total events</Badge>
       </div>
 
-      <EventTimelineChart
-        events={mergedEvents}
-        height={height}
-        timeWindow={timeWindow}
-        onEventClick={(event) =>
-          onEventClick?.(event, (event as any).entityUid)
-        }
-        className="merged-timeline"
-      />
+      {/* TODO: EventTimelineChart was removed - replace with new timeline visualization */}
+      <div className="merged-timeline" style={{ height }}>
+        <div className="p-4 text-center text-gray-500 text-sm">
+          {mergedEvents.length} events in merged view
+        </div>
+      </div>
     </div>
   );
 });

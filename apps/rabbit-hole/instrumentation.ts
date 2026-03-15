@@ -18,7 +18,7 @@ export async function register() {
       // Initialize custom domains from auto-discovery system (RAB-15/16)
       // Must run before application starts handling requests
       // Synchronous registration with pre-compiled TypeScript configs
-      initializeDomains();
+      await initializeDomains();
     } catch (error) {
       // Swallow errors to allow server startup even if domain init fails
       // During build: generated files may not exist yet (prebuild runs scanner)

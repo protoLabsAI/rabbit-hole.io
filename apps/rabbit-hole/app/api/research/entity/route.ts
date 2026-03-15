@@ -50,12 +50,12 @@ export async function POST(request: NextRequest) {
 
   // Get organization ID and user for tier enforcement
   const clerkOrgId = orgId || request.headers.get("x-clerk-org-id") || "public";
-  // clerkClient removed - using local user
-  // getUser removed - using local user
+  // Stub user object for tier enforcement (Clerk removed)
+  const stubUser = { id: userId, publicMetadata: {}, emailAddresses: [] };
 
   // ENFORCE ENTITY LIMIT BEFORE RESEARCH
   try {
-    await enforceEntityLimit(user, clerkOrgId);
+    await enforceEntityLimit(stubUser, clerkOrgId);
   } catch (error) {
     if (error instanceof TierLimitError) {
       return NextResponse.json(
@@ -251,7 +251,7 @@ export async function POST(request: NextRequest) {
 
     // CHECK IF RESULTS WOULD EXCEED LIMIT
     const currentCount = await getEntityCount(clerkOrgId);
-    const tier = getUserTier(user);
+    const tier = getUserTier(stubUser);
     const limits = getTierLimits(tier);
     const totalNewEntities = workflowResult.entities.length;
 

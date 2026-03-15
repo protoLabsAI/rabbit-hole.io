@@ -33,7 +33,6 @@ import type {
   CanvasType,
 } from "../../types/workspace";
 
-import { TabCollaborationMenu } from "./TabCollaborationMenu";
 import { ToolbarSettings } from "./toolbar/ToolbarSettings";
 import { UndoRedoButtons } from "./toolbar/UndoRedoButtons";
 
@@ -177,17 +176,15 @@ export function HorizontalToolbar({
               disabledClassName="p-2 rounded-md transition-colors text-muted-foreground/40"
             >
               <div className="relative">
-                <TabCollaborationMenu
-                  tabId={tabId}
-                  tabName={tabName || "Canvas"}
-                  workspaceId={workspaceId}
-                  workspaceReady={workspaceReady}
-                  activeSessionId={activeSessionId || null}
-                  canvasData={canvasData}
-                  canvasType={canvasType}
-                  onSessionCreated={onSessionCreated}
-                  onEndSession={onSessionEnded}
-                />
+                {/* TODO: TabCollaborationMenu was removed */}
+                <button
+                  type="button"
+                  className="p-2 rounded-md transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"
+                  title="Collaboration (coming soon)"
+                  disabled
+                >
+                  <Icon name="globe" size={16} />
+                </button>
               </div>
             </PaidFeaturePopover>
           </>

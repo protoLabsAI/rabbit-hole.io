@@ -14,7 +14,6 @@ import {
   withAuthAndLogging,
   checkAdminRole,
   type AuthenticatedUser,
-  getUserTier,
   getTierLimits,
 } from "@proto/auth";
 import { getGlobalNeo4jClient, getEntityCount } from "@proto/database";
@@ -248,16 +247,14 @@ export const GET = withAuthAndLogging("list entities for management")(async (
           throw new Error("User not found");
         }
 
-        // clerkClient removed - using local user
-        // getUser removed - using local user
-        const tier = getUserTier(clerkUser);
+        // Use AuthenticatedUser tier directly (Clerk removed)
+        const tier = user.tier;
         const limits = getTierLimits(tier);
 
-        // Get org ID from Clerk organization memberships
-        const organizationMemberships =
-          await client.users.getOrganizationMembershipList({ userId });
-        const orgId = organizationMemberships.data[0]?.organization?.id;
-        const currentCount = orgId ? await getEntityCount(orgId) : 0;
+        // Use workspaceId as org scope for entity counting
+        const currentCount = workspaceId
+          ? await getEntityCount(workspaceId)
+          : 0;
 
         tierInfo = {
           currentCount,

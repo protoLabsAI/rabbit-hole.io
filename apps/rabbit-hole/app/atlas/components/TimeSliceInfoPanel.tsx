@@ -20,8 +20,6 @@ import {
   globalTimeSliceCache,
 } from "@proto/utils/atlas";
 
-import { EventGanttChart } from "@/components/share/EventGanttChart";
-
 import { EntityCard, EntityCardEmptyState } from "./EntityCard";
 import { TimelineChart } from "./TimelineChart";
 
@@ -612,17 +610,12 @@ export function TimeSliceInfoPanel({
                   <span className="text-gray-600">Loading timeline...</span>
                 </div>
               ) : expandedTimelineEvents.length > 0 ? (
-                <EventGanttChart
-                  events={expandedTimelineEvents}
-                  height={500}
-                  className="w-full"
-                  readOnly={false}
-                  groupBy="category"
-                  range="monthly"
-                  onEventClick={(event) => {
-                    console.log("Event clicked:", event);
-                  }}
-                />
+                <div className="p-4">
+                  {/* TODO: EventGanttChart was removed - replace with new timeline visualization */}
+                  <div className="text-sm text-gray-600">
+                    {expandedTimelineEvents.length} timeline events loaded
+                  </div>
+                </div>
               ) : (
                 <div className="text-center py-8 text-gray-500">
                   <div className="text-4xl mb-2">📅</div>
