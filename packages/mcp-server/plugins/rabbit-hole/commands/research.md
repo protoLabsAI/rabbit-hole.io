@@ -9,7 +9,10 @@ allowed-tools:
   - mcp__rabbit-hole__tavily_search
   - mcp__rabbit-hole__extract_entities
   - mcp__rabbit-hole__validate_bundle
+  - mcp__rabbit-hole__ingest_bundle
   - mcp__rabbit-hole__research_entity
+  - mcp__rabbit-hole__ingest_url
+  - Agent
   - Read
   - Write
   - Bash
@@ -17,28 +20,54 @@ allowed-tools:
 
 # Research Command
 
-You are a research assistant. The user wants to research a topic and build structured knowledge.
+You are a research assistant. The user wants to research a topic and build structured knowledge in the graph.
 
-## Flow
+## Assess Complexity First
 
-1. **If the user provided a specific topic**, use `research_entity` for a complete pipeline run
-2. **If the topic is broad**, break it down:
-   - Use `wikipedia_search` for foundational context
-   - Use `web_search` or `tavily_search` for additional sources
-   - Use `extract_entities` on the gathered text to get structured data
-   - Use `validate_bundle` to check the extraction quality
+Before starting, determine if this is a **simple** or **complex** research task:
 
-## Output
+**Simple** (use inline `research_entity`):
+- A single well-known entity (person, company, technology)
+- A specific fact-finding query
+- Something Wikipedia + a few web searches can cover
 
-After research completes, present:
-- A summary of what was found
-- Key entities discovered (name, type, key properties)
-- Relationships between entities
-- The raw bundle JSON (save to a file if large)
+**Complex** (spawn the `deep-research` agent):
+- A book, ecosystem, or industry with many interconnected entities
+- A topic requiring 4+ research dimensions
+- When the user explicitly asks for "deep" or "comprehensive" research
+- When the topic has many sub-entities (e.g., "the Apollo program" → astronauts, missions, technology, organizations)
+
+## Simple Flow (inline)
+
+1. Use `research_entity` for a complete pipeline run
+2. If results are thin, supplement:
+   - Use `tavily_search` for recent/specific content
+   - Use `extract_entities` on the additional text
+   - Use `ingest_bundle` to persist supplementary entities
+3. Present results: entities found, relationships, key facts
+
+## Complex Flow (delegate to agent)
+
+Spawn the deep-research agent:
+```
+Use the Agent tool with subagent_type="rabbit-hole:deep-research"
+```
+
+Pass the full topic and any user context (depth preference, focus areas, etc.) in the prompt.
+
+The agent will:
+1. Write a research brief with defined dimensions
+2. Search each dimension with structured reflection
+3. Extract and cross-reference entities
+4. Validate and ingest the bundle
+5. Return a summary
+
+Present the agent's summary to the user.
 
 ## Tips
 
 - Start with Wikipedia for well-known topics
 - Use Tavily for recent events or niche topics
 - For people, search their name + role for best results
-- Always validate the bundle before presenting results
+- Always validate bundles before ingesting
+- If `research_entity` returns poor results (wrong Wikipedia article, etc.), fall back to manual search + extract
