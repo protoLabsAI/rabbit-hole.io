@@ -11,53 +11,100 @@ import { ResearchProgress } from "./components/search/ResearchProgress";
 import { SearchInput } from "./components/search/SearchInput";
 import { SourceCards } from "./components/search/SourceCards";
 import { useTheme } from "./context/ThemeProvider";
-import { useSearch } from "./hooks/useSearch";
+import { useSearch, type SearchMessage } from "./hooks/useSearch";
+
+// ─── Single Message Block ────────────────────────────────────────────
+
+function MessageBlock({
+  message,
+  onFollowUp,
+  isLatest,
+}: {
+  message: SearchMessage;
+  onFollowUp: (q: string) => void;
+  isLatest: boolean;
+}) {
+  return (
+    <div className="space-y-5 pb-6 border-b border-border/50 last:border-0">
+      {/* Query */}
+      <h2 className="text-xl font-semibold text-foreground">{message.query}</h2>
+
+      {/* Graph results */}
+      <GraphResults entities={message.graphEntities} />
+
+      {/* Research progress */}
+      <ResearchProgress steps={message.researchSteps} phase={message.phase} />
+
+      {/* Sources */}
+      <SourceCards sources={message.sources} />
+
+      {/* Answer */}
+      <AnswerBlock answer={message.answer} phase={message.phase} />
+
+      {/* Follow-up suggestions — only show on latest message */}
+      {isLatest && message.phase === "done" && (
+        <FollowUpSuggestions
+          suggestions={message.suggestions}
+          onSelect={onFollowUp}
+        />
+      )}
+
+      {/* Error */}
+      {message.error && (
+        <div className="rounded-xl border border-destructive/50 bg-destructive/5 p-4">
+          <div className="flex items-center gap-2">
+            <Icon name="AlertCircle" className="h-4 w-4 text-destructive" />
+            <p className="text-sm text-destructive">{message.error}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Loading state */}
+      {message.phase === "searching_graph" && (
+        <div className="flex items-center gap-3 text-sm text-muted-foreground py-4">
+          <Icon name="Loader2" className="h-5 w-5 animate-spin text-primary" />
+          <span>Searching the knowledge graph...</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Main Page ───────────────────────────────────────────────────────
 
 export default function SearchPage() {
   const { branding } = useTheme();
-  const {
-    phase,
-    query,
-    graphEntities,
-    sources,
-    researchSteps,
-    answer,
-    suggestions,
-    error,
-    search,
-    reset,
-  } = useSearch();
+  const { messages, activeMessage, isIdle, search, reset } = useSearch();
 
-  const resultsRef = useRef<HTMLDivElement>(null);
-
-  const isIdle = phase === "idle";
+  const bottomRef = useRef<HTMLDivElement>(null);
 
   const handleSearch = useCallback(
     (q: string) => {
       search(q);
-      // Scroll to top on new search
-      window.scrollTo({ top: 0, behavior: "smooth" });
     },
     [search]
   );
 
-  // Auto-scroll as answer streams
+  // Auto-scroll to bottom when new content appears
   useEffect(() => {
-    if (phase === "answering" && resultsRef.current) {
-      resultsRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
+    if (
+      activeMessage?.phase === "answering" ||
+      activeMessage?.phase === "done"
+    ) {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
     }
-  }, [answer, phase]);
+  }, [activeMessage?.answer, activeMessage?.phase]);
+
+  // ─── Empty State ─────────────────────────────────────────────────
 
   if (isIdle) {
     return (
       <div className="relative min-h-screen bg-gradient-to-b from-background via-background to-muted/10 overflow-hidden">
-        {/* Background */}
         <div className="absolute inset-0 bg-grid-pattern opacity-[0.03]" />
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl" />
 
         <div className="relative flex flex-col items-center justify-center min-h-screen px-4">
           <div className="flex flex-col items-center gap-8 w-full max-w-3xl">
-            {/* Logo & Title */}
             <div className="flex flex-col items-center gap-3">
               <span className="text-5xl sm:text-6xl">
                 {branding?.logo || "🕳️"}
@@ -70,10 +117,8 @@ export default function SearchPage() {
               </p>
             </div>
 
-            {/* Search Input */}
             <SearchInput onSearch={handleSearch} size="large" autoFocus />
 
-            {/* Quick suggestions */}
             <div className="flex flex-wrap justify-center gap-2 mt-2">
               {["DORA metrics", "Accelerate book", "DevOps practices"].map(
                 (suggestion) => (
@@ -93,74 +138,54 @@ export default function SearchPage() {
     );
   }
 
-  // ─── Results View ──────────────────────────────────────────────────
+  // ─── Conversation Thread ─────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Top bar */}
       <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center gap-4">
           <button
             onClick={reset}
-            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors flex-shrink-0"
           >
             <span className="text-xl">{branding?.logo || "🕳️"}</span>
             <span className="font-medium hidden sm:inline">
               {branding?.name || "Rabbit Hole"}
             </span>
           </button>
-          <div className="flex-1">
-            <SearchInput onSearch={handleSearch} initialQuery={query} />
-          </div>
+          {messages.length > 1 && (
+            <span className="text-[11px] text-muted-foreground bg-muted/50 px-2 py-0.5 rounded-full">
+              {messages.length} messages
+            </span>
+          )}
         </div>
       </header>
 
-      {/* Results */}
-      <main className="max-w-3xl mx-auto px-4 py-6" ref={resultsRef}>
-        <div className="space-y-6">
-          {/* Query */}
-          <h2 className="text-2xl font-semibold text-foreground">{query}</h2>
-
-          {/* Graph results */}
-          <GraphResults entities={graphEntities} />
-
-          {/* Research progress */}
-          <ResearchProgress steps={researchSteps} phase={phase} />
-
-          {/* Sources */}
-          <SourceCards sources={sources} />
-
-          {/* Answer */}
-          <AnswerBlock answer={answer} phase={phase} />
-
-          {/* Follow-up suggestions */}
-          <FollowUpSuggestions
-            suggestions={suggestions}
-            onSelect={handleSearch}
-          />
-
-          {/* Error */}
-          {error && (
-            <div className="rounded-xl border border-destructive/50 bg-destructive/5 p-4">
-              <div className="flex items-center gap-2">
-                <Icon name="AlertCircle" className="h-4 w-4 text-destructive" />
-                <p className="text-sm text-destructive">{error}</p>
-              </div>
-            </div>
-          )}
-
-          {/* Loading state */}
-          {phase === "searching_graph" && (
-            <div className="flex items-center gap-3 text-sm text-muted-foreground py-8">
-              <Icon
-                name="Loader2"
-                className="h-5 w-5 animate-spin text-primary"
-              />
-              <span>Searching the knowledge graph...</span>
-            </div>
-          )}
+      {/* Messages */}
+      <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-6">
+        <div className="space-y-8">
+          {messages.map((msg, i) => (
+            <MessageBlock
+              key={msg.id}
+              message={msg}
+              onFollowUp={handleSearch}
+              isLatest={i === messages.length - 1}
+            />
+          ))}
         </div>
+        <div ref={bottomRef} />
       </main>
+
+      {/* Bottom input bar — always visible when in conversation */}
+      <footer className="sticky bottom-0 z-40 bg-background/80 backdrop-blur-md border-t border-border">
+        <div className="max-w-3xl mx-auto px-4 py-3">
+          <SearchInput
+            onSearch={handleSearch}
+            autoFocus={activeMessage?.phase === "done"}
+          />
+        </div>
+      </footer>
     </div>
   );
 }
