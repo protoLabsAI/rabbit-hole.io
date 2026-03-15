@@ -263,6 +263,7 @@ interface ChatMessageProps {
   isLast: boolean;
   onIngest?: (text: string) => void;
   onFollowUp?: (query: string) => void;
+  onRegenerate?: () => void;
 }
 
 export function ChatMessage({
@@ -271,9 +272,11 @@ export function ChatMessage({
   isLast,
   onIngest,
   onFollowUp,
+  onRegenerate,
 }: ChatMessageProps) {
   const [ingesting, setIngesting] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [feedback, setFeedback] = useState<"up" | "down" | null>(null);
 
   const handleIngest = useCallback(async () => {
     if (!onIngest) return;
@@ -299,15 +302,18 @@ export function ChatMessage({
     setTimeout(() => setCopied(false), 2000);
   }, [message]);
 
-  // User message
+  // User message — stands out with left accent bar
   if (message.role === "user") {
     const text = (message.parts ?? [])
       .filter((p): p is { type: "text"; text: string } => p.type === "text")
       .map((p) => p.text)
       .join("");
     return (
-      <div className="pb-2">
-        <h2 className="text-xl font-semibold text-foreground">{text}</h2>
+      <div className="flex items-start gap-3 pt-4 first:pt-0">
+        <div className="w-0.5 self-stretch rounded-full bg-primary/40 flex-shrink-0" />
+        <h2 className="text-lg font-semibold text-foreground leading-snug py-1">
+          {text}
+        </h2>
       </div>
     );
   }
@@ -329,7 +335,7 @@ export function ChatMessage({
   const isComplete = !isStreaming || !isLast;
 
   return (
-    <div className="space-y-3 pb-6 border-b border-border/30 last:border-0">
+    <div className="space-y-3 pb-2">
       {/* Tool calls — compact cards */}
       {allTools.length > 0 && (
         <div className="space-y-1">
@@ -360,23 +366,69 @@ export function ChatMessage({
 
       {/* Actions */}
       {isComplete && textContent && (
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5 pt-1">
+          {/* Copy */}
           <button
             onClick={handleCopy}
-            className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-muted/50"
+            className="p-1.5 text-muted-foreground/60 hover:text-foreground transition-colors rounded-md hover:bg-muted/50"
+            title="Copy"
           >
-            <Icon name={copied ? "Check" : "Copy"} className="h-3 w-3" />
-            {copied ? "Copied" : "Copy"}
+            <Icon
+              name={copied ? "Check" : "Copy"}
+              className={`h-3.5 w-3.5 ${copied ? "text-green-500" : ""}`}
+            />
           </button>
+
+          {/* Regenerate */}
+          {onRegenerate && isLast && (
+            <button
+              onClick={onRegenerate}
+              className="p-1.5 text-muted-foreground/60 hover:text-foreground transition-colors rounded-md hover:bg-muted/50"
+              title="Regenerate"
+            >
+              <Icon name="RotateCcw" className="h-3.5 w-3.5" />
+            </button>
+          )}
+
+          {/* Thumbs up */}
+          <button
+            onClick={() => setFeedback(feedback === "up" ? null : "up")}
+            className={`p-1.5 transition-colors rounded-md hover:bg-muted/50 ${
+              feedback === "up"
+                ? "text-green-500"
+                : "text-muted-foreground/60 hover:text-foreground"
+            }`}
+            title="Good response"
+          >
+            <Icon name="ThumbsUp" className="h-3.5 w-3.5" />
+          </button>
+
+          {/* Thumbs down */}
+          <button
+            onClick={() => setFeedback(feedback === "down" ? null : "down")}
+            className={`p-1.5 transition-colors rounded-md hover:bg-muted/50 ${
+              feedback === "down"
+                ? "text-red-500"
+                : "text-muted-foreground/60 hover:text-foreground"
+            }`}
+            title="Poor response"
+          >
+            <Icon name="ThumbsDown" className="h-3.5 w-3.5" />
+          </button>
+
+          {/* Divider */}
+          <div className="w-px h-4 bg-border/40 mx-1" />
+
+          {/* Add to Knowledge Graph */}
           {onIngest && (
             <button
               onClick={handleIngest}
               disabled={ingesting}
-              className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-muted/50 disabled:opacity-50"
+              className="flex items-center gap-1 text-[11px] text-muted-foreground/60 hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-muted/50 disabled:opacity-50"
             >
               <Icon
                 name={ingesting ? "Loader2" : "DatabaseZap"}
-                className={`h-3 w-3 ${ingesting ? "animate-spin" : ""}`}
+                className={`h-3.5 w-3.5 ${ingesting ? "animate-spin" : ""}`}
               />
               {ingesting ? "Adding..." : "Add to Knowledge Graph"}
             </button>
