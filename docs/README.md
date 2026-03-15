@@ -2,18 +2,24 @@
 
 Technical documentation for the Rabbit Hole knowledge graph platform.
 
-## Architecture
+## Product Vision
 
-System design, data flow, and scaling decisions.
+Three products shipping in phases:
+
+1. **Search Engine** (NOW) — Perplexity-style AI search at `/`. Self-growing knowledge graph. Every search enriches Neo4j.
+2. **3D Atlas** (NEXT) — Replace Cytoscape with modern 3D visualization for millions of nodes. Consumes the graph Search builds.
+3. **Research App** (FUTURE) — Downloadable Tauri/Electron app. Self-hostable local search engine with full research workspace.
+
+**Current priority: Search → KG pipeline.** Make the search experience world-class.
+
+## Architecture
 
 | Document | Description |
 |----------|-------------|
-| [Search System](architecture/search.md) | Full-text search, indexing strategy, scaling roadmap |
+| [Search System](architecture/search.md) | AI search pipeline, self-growing graph, sessions, scaling roadmap |
 | [Database & Schema](architecture/database.md) | Neo4j schema, entity model, migration system |
 
 ## API Reference
-
-HTTP endpoints and MCP tool interfaces.
 
 | Document | Description |
 |----------|-------------|
@@ -21,8 +27,6 @@ HTTP endpoints and MCP tool interfaces.
 | [MCP Tools](api/mcp-tools.md) | All MCP server tools for research, search, and ingestion |
 
 ## Operations
-
-Running, maintaining, and scaling the platform.
 
 | Document | Description |
 |----------|-------------|
