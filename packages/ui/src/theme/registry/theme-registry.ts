@@ -1,60 +1,37 @@
 /**
  * Theme Registry
  *
- * Central registry of all available themes for the whitelabel system
+ * Single theme: prod-environment (reading-optimized).
+ * This is the only theme. It serves as both "default" and "prod-environment".
  */
 
 import { z } from "zod";
 
-import { defaultTheme } from "../config";
 import type { ThemeConfig } from "../config";
 
-import { corporateBlueTheme } from "./examples/corporate-blue.theme";
-import { curiousMindsTheme } from "./examples/curious-minds.theme";
-import { devEnvironmentTheme } from "./examples/dev-environment.theme";
-import { natureGreenTheme } from "./examples/nature-green.theme";
-import { notoTheme } from "./examples/noto.theme";
 import { prodEnvironmentTheme } from "./examples/prod-environment.theme";
-import { svgvalTheme } from "./examples/svgval.theme";
 
-// Registry of all available themes
+// Registry — prod-environment is the only theme, aliased as default
 export const availableThemes = {
-  default: defaultTheme,
-  "corporate-blue": corporateBlueTheme,
-  "curious-minds": curiousMindsTheme,
-  "nature-green": natureGreenTheme,
-  "dev-environment": devEnvironmentTheme,
+  default: prodEnvironmentTheme,
   "prod-environment": prodEnvironmentTheme,
-  noto: notoTheme,
-  svgval: svgvalTheme,
 } as const;
 
 // Type for theme names
 export type AvailableThemeName = keyof typeof availableThemes;
 
 // Zod schema for theme name validation
-export const themeNameSchema = z.enum([
-  "default",
-  "corporate-blue",
-  "curious-minds",
-  "nature-green",
-  "dev-environment",
-  "prod-environment",
-  "noto",
-  "svgval",
-]);
+export const themeNameSchema = z.enum(["default", "prod-environment"]);
 
 // Validated theme name getter with fallback
 export function getValidatedThemeName(
   value: string | undefined,
-  fallback: AvailableThemeName = "dev-environment"
+  fallback: AvailableThemeName = "default"
 ): AvailableThemeName {
   const result = themeNameSchema.safeParse(value);
 
   if (!result.success) {
-    console.warn(
-      `⚠️ Invalid theme name: "${value}". Using fallback: "${fallback}"`
-    );
+    // Any unknown theme falls back to default (prod-environment)
     return fallback;
   }
 
