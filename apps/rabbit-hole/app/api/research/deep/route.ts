@@ -85,8 +85,6 @@ async function runResearch(researchId: string, query: string) {
           .describe("One paragraph overview of the research topic"),
         dimensions: z
           .array(z.string())
-          .min(3)
-          .max(6)
           .describe("3-6 specific research dimensions to investigate"),
       }),
       prompt: `You are planning a deep research investigation on: "${query}"

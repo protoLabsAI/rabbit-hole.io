@@ -35,17 +35,45 @@ The agent decides tool order and iteration. `stopWhen: stepCountIs(5)`.
 
 **Graph ingestion is user-triggered** — not automatic. Users click "Add to Knowledge Graph" on a message, which calls `POST /api/chat/ingest` to extract entities and ingest via `/api/ingest-bundle`.
 
+**Shared search utilities**: `app/lib/search.ts` is the single source of truth for `searchGraph`, `searchWeb`, `searchWikipedia`, `buildLuceneQuery`, and `withRetry`. Both `/api/chat` and `/api/research/deep` import from here.
+
 **Key files:**
 - `app/page.tsx` — Search engine UI (useChat + ChatMessage)
+- `app/lib/search.ts` — Shared search utilities (graph, web, wiki, retry)
 - `app/api/chat/route.ts` — Agentic search endpoint (streamText + tools)
 - `app/api/chat/ingest/route.ts` — Manual entity extraction + ingest
 - `app/api/entity-search/route.ts` — Neo4j full-text entity lookup
 - `app/hooks/useChatSearch.ts` — useChat wrapper
 - `app/hooks/useSearchSessions.ts` — Session persistence (localStorage)
 - `app/components/search/ChatMessage.tsx` — UIMessage parts renderer
+- `app/components/search/ChatMarkdown.tsx` — Markdown renderer with inline citation support
 - `app/components/search/SearchInput.tsx` — Input with file attach
 - `app/components/search/SearchSidebar.tsx` — Session history + nav
 - `packages/llm-providers/src/server/ai-sdk.ts` — AI SDK provider adapter
+
+## Deep Research Architecture
+
+**Agentic pipeline**: SCOPE → PLAN REVIEW → RESEARCH (per dimension) → EVALUATE (gap analysis) → [loop?] → SYNTHESIS (streamed)
+
+- `POST /api/research/deep` — Start a research job, returns `researchId`
+- `GET /api/research/deep/:id` — SSE stream of research events
+- `DELETE /api/research/deep/:id` — Cancel a running job
+- `GET /api/research/deep/:id/status` — Polling fallback
+
+**Pipeline details:**
+- **Scope**: `generateObject` with structured zod schema produces 3-6 dimensions
+- **Research loop**: For each dimension: graph + web + wiki search with retry, then compress findings with `generateObject` extracting `summary` + `keyFinding`
+- **Evaluate**: LLM checks coverage gaps. If gaps found and iterations < 3, new dimensions are researched
+- **Synthesis**: `streamText` produces the final report with inline citations `[1]`, `[2]` referencing numbered sources
+- **State**: In-memory store on `globalThis.__researchStore` (survives Turbopack module isolation)
+
+**UI**: Three-panel layout — activity feed (left) | report with ToC (center) | source cards (right, toggleable)
+
+**Key files:**
+- `app/api/research/deep/route.ts` — Pipeline + POST handler
+- `app/api/research/deep/research-store.ts` — In-memory state store
+- `app/api/research/deep/[id]/route.ts` — SSE stream + DELETE cancel
+- `app/components/search/DeepResearchPanel.tsx` — Full-screen research UI
 
 ## Product Vision
 

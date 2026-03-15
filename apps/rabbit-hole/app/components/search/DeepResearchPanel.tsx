@@ -99,7 +99,7 @@ function ActivityEntry({ event }: { event: ResearchEvent }) {
     case "research.finding":
       icon = "Lightbulb";
       label = event.data?.text || "Key finding";
-      color = "text-amber-500";
+      color = "text-blue-500";
       isFinding = true;
       break;
     case "research.evaluation":
@@ -107,7 +107,7 @@ function ActivityEntry({ event }: { event: ResearchEvent }) {
       label = event.data?.complete
         ? "Coverage sufficient"
         : `${event.data?.gaps?.length} gaps found — researching deeper`;
-      color = event.data?.complete ? "text-green-500" : "text-amber-500";
+      color = event.data?.complete ? "text-green-500" : "text-blue-500";
       break;
     case "scope.completed":
       icon = "ListChecks";
@@ -154,7 +154,7 @@ function ActivityEntry({ event }: { event: ResearchEvent }) {
     <div
       className={`flex items-start gap-2 py-1.5 rounded px-2 -mx-2 ${
         isFinding
-          ? "bg-amber-500/5 border border-amber-500/10 my-1"
+          ? "bg-blue-500/5 border border-blue-500/10 my-1"
           : "cursor-pointer hover:bg-muted/30"
       }`}
       onClick={() => detail && !isFinding && setExpanded(!expanded)}
@@ -685,10 +685,10 @@ export function DeepResearchPanel({
 
           {/* Key Findings summary */}
           {findings.length > 0 && (
-            <div className="px-3 py-2 border-b border-amber-500/10 bg-amber-500/5">
+            <div className="px-3 py-2 border-b border-blue-500/10 bg-blue-500/5">
               <div className="flex items-center gap-1.5 mb-1.5">
-                <Icon name="Lightbulb" className="h-3 w-3 text-amber-500" />
-                <span className="text-[10px] font-medium text-amber-600 dark:text-amber-400">
+                <Icon name="Lightbulb" className="h-3 w-3 text-blue-500" />
+                <span className="text-[10px] font-medium text-blue-600 dark:text-blue-400">
                   Key Findings ({findings.length})
                 </span>
               </div>
