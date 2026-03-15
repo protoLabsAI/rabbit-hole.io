@@ -5,7 +5,6 @@
  * - searchGraph: Neo4j full-text search
  * - searchWeb: Tavily advanced search
  * - searchWikipedia: Wikipedia article fetch
- * - ingestEntities: Extract + ingest entities into the knowledge graph
  *
  * The LLM decides which tools to call and in what order.
  * Results stream as UIMessage parts (text, tool calls, data).
@@ -15,195 +14,14 @@ import {
   streamText,
   tool,
   convertToModelMessages,
-  generateText,
   stepCountIs,
   type UIMessage,
 } from "ai";
 import { z } from "zod";
 
-import { getGlobalNeo4jClient } from "@proto/database";
 import { getAIModel } from "@proto/llm-providers/server";
-import { createNeo4jClientWithIntegerConversion } from "@proto/utils";
 
-// ─── Tool Implementations ───────────────────────────────────────────
-
-function buildLuceneQuery(rawQuery: string): string {
-  const escaped = rawQuery
-    .trim()
-    .replace(/([+\-&|!(){}\[\]^"~*?:\\/])/g, "\\$1");
-  if (!escaped) return escaped;
-  const parts = escaped.split(/\s+/);
-  parts[parts.length - 1] = parts[parts.length - 1] + "*";
-  return parts.join(" ");
-}
-
-async function doSearchGraph(query: string) {
-  const baseClient = getGlobalNeo4jClient();
-  const client = createNeo4jClientWithIntegerConversion(baseClient);
-  const ftQuery = buildLuceneQuery(query);
-
-  const result = await client.executeRead(
-    `
-    CALL db.index.fulltext.queryNodes('idx_entity_name_fulltext', $ftQuery)
-    YIELD node AS e, score
-    WHERE e.uid IS NOT NULL AND e.name IS NOT NULL
-    WITH e, score
-    OPTIONAL MATCH (e)-[r]-(connected)
-    WHERE connected.name IS NOT NULL
-    WITH e, score,
-         count(r) as relCount,
-         collect(DISTINCT {
-           name: connected.name,
-           type: labels(connected)[0],
-           relationship: type(r)
-         })[0..5] as connections
-    RETURN
-      e.uid as uid, e.name as name, labels(e)[0] as type,
-      COALESCE(e.tags, []) as tags, COALESCE(e.aliases, []) as aliases,
-      score, relCount, connections
-    ORDER BY score DESC, e.name ASC
-    LIMIT 10
-    `,
-    { ftQuery, limit: 10 }
-  );
-
-  return result.records.map((r: any) => ({
-    uid: r.get("uid"),
-    name: r.get("name"),
-    type: r.get("type"),
-    tags: r.get("tags"),
-    aliases: r.get("aliases"),
-    score: r.get("score"),
-    relationshipCount: r.get("relCount"),
-    connectedEntities: r.get("connections"),
-  }));
-}
-
-async function doSearchWeb(query: string) {
-  const apiKey = process.env.TAVILY_API_KEY;
-  if (!apiKey) return { results: [], note: "TAVILY_API_KEY not set" };
-
-  const res = await fetch("https://api.tavily.com/search", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      api_key: apiKey,
-      query,
-      max_results: 6,
-      search_depth: "advanced",
-      include_answer: false,
-    }),
-  });
-  if (!res.ok) return { results: [], note: `Tavily error: ${res.status}` };
-
-  const data = (await res.json()) as {
-    results?: Array<{
-      title: string;
-      url: string;
-      content: string;
-      score: number;
-    }>;
-  };
-
-  return {
-    results:
-      data.results?.map((r) => ({
-        title: r.title,
-        url: r.url,
-        snippet: r.content?.slice(0, 400),
-        score: r.score,
-      })) ?? [],
-  };
-}
-
-async function doSearchWikipedia(query: string) {
-  const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&format=json&utf8=1&srlimit=2`;
-  const searchRes = await fetch(searchUrl);
-  const searchData = (await searchRes.json()) as {
-    query?: { search?: Array<{ title: string }> };
-  };
-
-  const results = searchData?.query?.search;
-  if (!results?.length) return { title: null, text: "", url: null };
-
-  const title = results[0].title;
-  const contentUrl = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(title)}&prop=extracts&explaintext=1&format=json&utf8=1`;
-  const contentRes = await fetch(contentUrl);
-  const contentData = (await contentRes.json()) as {
-    query?: { pages?: Record<string, { extract?: string }> };
-  };
-
-  const page = Object.values(contentData?.query?.pages ?? {})[0];
-  const text = page?.extract ?? "";
-
-  return {
-    title,
-    text: text.slice(0, 4000),
-    url: `https://en.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, "_"))}`,
-  };
-}
-
-async function doIngestEntities(query: string, context: string) {
-  const rabbitHoleUrl = process.env.RABBIT_HOLE_URL || "http://localhost:3000";
-
-  // Use fast model for extraction
-  const model = getAIModel("fast");
-  const result = await generateText({
-    model,
-    prompt: `Extract entities and relationships from this text about "${query}".
-
-Return ONLY valid JSON:
-{
-  "entities": [{"uid": "{type}:{snake_name}", "name": "...", "type": "Person|Organization|Technology|Concept|Event|Publication", "properties": {}, "tags": [], "aliases": []}],
-  "relationships": [{"uid": "rel:{src}_{type}_{tgt}", "type": "RELATED_TO|AUTHORED|FOUNDED|WORKS_AT|PART_OF", "source": "entity_uid", "target": "entity_uid", "properties": {}}]
-}
-
-Text:\n${context.slice(0, 6000)}`,
-  });
-
-  const raw = result.text ?? "";
-  let parsed: any;
-  try {
-    let jsonStr = raw.trim();
-    const fence = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/);
-    if (fence) jsonStr = fence[1].trim();
-    parsed = JSON.parse(jsonStr);
-  } catch {
-    return { success: false, error: "Failed to parse extraction result" };
-  }
-
-  if (!parsed?.entities?.length) {
-    return { success: false, error: "No entities extracted" };
-  }
-
-  const bundle = {
-    entities: parsed.entities,
-    relationships: parsed.relationships ?? [],
-    evidence: [
-      {
-        uid: `evidence:search_${Date.now()}`,
-        kind: "research",
-        title: `Search: ${query}`,
-        publisher: "Rabbit Hole Search",
-        date: new Date().toISOString().slice(0, 10),
-        reliability: 0.6,
-      },
-    ],
-  };
-
-  // Fire-and-forget ingest
-  fetch(`${rabbitHoleUrl}/api/ingest-bundle`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(bundle),
-  }).catch(() => {});
-
-  return {
-    success: true,
-    entitiesIngested: parsed.entities.length,
-    relationshipsIngested: (parsed.relationships ?? []).length,
-  };
-}
+import { searchGraph, searchWeb, searchWikipedia } from "../../lib/search";
 
 // ─── Tool Definitions ───────────────────────────────────────────────
 
@@ -214,7 +32,7 @@ const searchTools = {
     inputSchema: z.object({
       query: z.string().describe("Search query for the knowledge graph"),
     }),
-    execute: async (input: { query: string }) => doSearchGraph(input.query),
+    execute: async (input: { query: string }) => searchGraph(input.query),
   }),
 
   searchWeb: tool({
@@ -223,7 +41,13 @@ const searchTools = {
     inputSchema: z.object({
       query: z.string().describe("Web search query"),
     }),
-    execute: async (input: { query: string }) => doSearchWeb(input.query),
+    execute: async (input: { query: string }) => {
+      const results = await searchWeb(input.query);
+      if (results.length === 0 && !process.env.TAVILY_API_KEY) {
+        return { results: [], note: "TAVILY_API_KEY not set" };
+      }
+      return { results };
+    },
   }),
 
   searchWikipedia: tool({
@@ -232,7 +56,15 @@ const searchTools = {
     inputSchema: z.object({
       query: z.string().describe("Wikipedia search query"),
     }),
-    execute: async (input: { query: string }) => doSearchWikipedia(input.query),
+    execute: async (input: { query: string }) => {
+      const result = await searchWikipedia(input.query);
+      if (!result) return { title: null, text: "", url: null };
+      return {
+        title: result.title,
+        text: result.text,
+        url: result.url,
+      };
+    },
   }),
 };
 
