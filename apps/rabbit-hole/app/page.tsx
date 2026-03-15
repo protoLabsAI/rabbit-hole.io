@@ -140,9 +140,9 @@ export default function SearchPage() {
 
   if (isIdle) {
     return (
-      <div className="relative min-h-screen bg-gradient-to-b from-background via-background to-muted/10 overflow-hidden">
+      <div className="relative h-screen bg-gradient-to-b from-background via-background to-muted/10 overflow-hidden flex flex-col">
         <div className="absolute inset-0 bg-grid-pattern opacity-[0.03]" />
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl" />
 
         {/* Sidebar toggle */}
         {sessionMgr.sessions.length > 0 && (
@@ -164,7 +164,8 @@ export default function SearchPage() {
           onToggle={() => setSidebarOpen(!sidebarOpen)}
         />
 
-        <div className="relative flex flex-col items-center justify-center min-h-screen px-4 -mt-16">
+        <div className="flex-1" />
+        <div className="relative flex flex-col items-center px-4 pb-[38vh]">
           <div className="flex flex-col items-center gap-8 w-full max-w-3xl">
             <div className="flex flex-col items-center gap-3">
               <span className="text-5xl sm:text-6xl">
