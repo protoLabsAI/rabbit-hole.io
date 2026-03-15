@@ -583,22 +583,12 @@ export async function POST(request: NextRequest) {
             })),
           ];
           sseEvent("sources", allSources, controller);
-
-          // ─── Phase 3b: Auto-ingest research into graph ──────────
-          // Fire-and-forget — don't block the answer stream
-          extractAndIngest(query, wikiText, webSources, controller).catch(
-            () => {}
-          );
         }
 
         // ─── Phase 3c: Process Attached Files ─────────────────────
         let fileText = "";
         if (files?.length) {
           fileText = await processFiles(files, controller);
-          // Auto-ingest entities from uploaded files
-          if (fileText) {
-            extractAndIngest(query, fileText, [], controller).catch(() => {});
-          }
         }
 
         // ─── Phase 4: Stream AI Answer ───────────────────────────
