@@ -1,15 +1,24 @@
 "use client";
 
 /**
- * ChatMarkdown — Streaming-safe markdown renderer.
+ * ChatMarkdown — Streaming-safe markdown renderer with inline citations.
  * Ported from @protolabsai/ui/ai ChatMessageMarkdown.
  */
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 import { CodeBlock } from "./CodeBlock";
+
+// ── Types ────────────────────────────────────────────────────────────
+
+interface Source {
+  title: string;
+  url: string;
+  type?: string;
+  snippet?: string;
+}
 
 // ── Prose classes — exact match with ava ─────────────────────────────
 
@@ -53,36 +62,121 @@ function extractText(node: React.ReactNode): string {
   return "";
 }
 
+/** Convert [1], [2] etc. to markdown links for citation rendering */
+function preprocessCitations(text: string): string {
+  // Match [N] not followed by ( (which would be a markdown link)
+  return text.replace(/\[(\d{1,3})\](?!\()/g, "[$1](#cite-$1)");
+}
+
+// ── Citation Badge ───────────────────────────────────────────────────
+
+function CitationBadge({ index, source }: { index: number; source?: Source }) {
+  const [showTooltip, setShowTooltip] = useState(false);
+  const domain = source?.url
+    ? (() => {
+        try {
+          return new URL(source.url).hostname.replace("www.", "");
+        } catch {
+          return "";
+        }
+      })()
+    : "";
+
+  return (
+    <span className="relative inline-block align-baseline">
+      <button
+        onMouseEnter={() => setShowTooltip(true)}
+        onMouseLeave={() => setShowTooltip(false)}
+        onClick={(e) => {
+          e.preventDefault();
+          if (source?.url && !source.url.startsWith("#")) {
+            window.open(source.url, "_blank");
+          }
+        }}
+        className="inline-flex items-center justify-center min-w-[1.1rem] h-[1.1rem] px-0.5 text-[9px] font-semibold bg-primary/10 text-primary rounded-full align-super cursor-pointer hover:bg-primary/20 transition-colors"
+      >
+        {index}
+      </button>
+      {showTooltip && source && (
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-card border border-border rounded-lg shadow-lg text-xs z-50 pointer-events-none">
+          <div className="flex items-center gap-2 mb-1">
+            {domain && !source.url.startsWith("#") && (
+              <img
+                src={`https://www.google.com/s2/favicons?domain=${domain}&sz=16`}
+                className="w-4 h-4 flex-shrink-0"
+                alt=""
+              />
+            )}
+            <span className="font-medium truncate text-foreground">
+              {source.title}
+            </span>
+          </div>
+          {domain && (
+            <span className="text-[10px] text-muted-foreground">{domain}</span>
+          )}
+          {source.snippet && (
+            <p className="mt-1.5 text-muted-foreground line-clamp-3 leading-relaxed">
+              {source.snippet.slice(0, 150)}
+              {(source.snippet.length ?? 0) > 150 ? "..." : ""}
+            </p>
+          )}
+        </div>
+      )}
+    </span>
+  );
+}
+
 // ── Component ────────────────────────────────────────────────────────
 
 interface ChatMarkdownProps {
   content: string;
   isStreaming?: boolean;
   className?: string;
+  sources?: Source[];
 }
 
 export function ChatMarkdown({
   content,
   isStreaming,
   className,
+  sources,
 }: ChatMarkdownProps) {
   // Stable plugins — prevent re-mount during streaming
   const remarkPlugins = useMemo(() => [remarkGfm], []);
+
+  // Pre-process citations if sources are provided
+  const processedContent = useMemo(
+    () => (sources?.length ? preprocessCitations(content) : content),
+    [content, sources?.length]
+  );
 
   return (
     <div className={`${PROSE_CLASSES} ${className ?? ""}`}>
       <ReactMarkdown
         remarkPlugins={remarkPlugins}
         components={{
-          // Links
-          a: ({ ...props }) => (
-            <a
-              {...props}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary underline underline-offset-2 hover:text-primary/80"
-            />
-          ),
+          // Links + Citation badges
+          a: ({ href, children, ...props }) => {
+            // Citation link — render as badge
+            if (href?.startsWith("#cite-")) {
+              const index = parseInt(href.replace("#cite-", ""), 10);
+              const source = sources?.[index - 1];
+              return <CitationBadge index={index} source={source} />;
+            }
+
+            // Regular link
+            return (
+              <a
+                {...props}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary underline underline-offset-2 hover:text-primary/80"
+              >
+                {children}
+              </a>
+            );
+          },
 
           // Code blocks — intercept <pre> for CodeBlock
           pre: ({ children }) => {
@@ -163,7 +257,7 @@ export function ChatMarkdown({
           ),
         }}
       >
-        {content}
+        {processedContent}
       </ReactMarkdown>
     </div>
   );

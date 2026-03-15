@@ -1,29 +1,36 @@
 /**
- * Deep Research API — Start a long-running research job
+ * Deep Research API — Agentic research pipeline
  *
  * POST /api/research/deep
  * Body: { query: string }
  * Returns: { researchId: string }
  *
- * The research runs in the background. Stream progress via:
- * GET /api/research/deep/:id (SSE)
- * GET /api/research/deep/:id/status (polling)
+ * Pipeline: SCOPE → RESEARCH (per dimension) → EVALUATE → [loop?] → SYNTHESIS (streamed)
+ * Stream progress via GET /api/research/deep/:id (SSE)
  */
 
-import { generateText } from "ai";
+import { generateObject, streamText } from "ai";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
-import { getGlobalNeo4jClient } from "@proto/database";
 import { getAIModel } from "@proto/llm-providers/server";
 import { safeValidate } from "@proto/types";
-import { createNeo4jClientWithIntegerConversion } from "@proto/utils";
+
+import {
+  searchGraph,
+  searchWeb,
+  searchWikipedia,
+  withRetry,
+  type WebSearchResult,
+  type WikiSearchResult,
+} from "../../../lib/search";
 
 import {
   createResearch,
   getResearch,
   addEvent,
   updateResearch,
+  isAborted,
   type ResearchSource,
 } from "./research-store";
 
@@ -31,235 +38,382 @@ const RequestSchema = z.object({
   query: z.string().min(2).max(500),
 });
 
-// ─── Tool Implementations (shared with /api/chat) ───────────────────
+// ─── Abort Guard ──────────────────────────────────────────────────────
 
-function buildLuceneQuery(rawQuery: string): string {
-  const escaped = rawQuery
-    .trim()
-    .replace(/([+\-&|!(){}\[\]^"~*?:\\/])/g, "\\$1");
-  if (!escaped) return escaped;
-  const parts = escaped.split(/\s+/);
-  parts[parts.length - 1] = parts[parts.length - 1] + "*";
-  return parts.join(" ");
+function checkAbort(researchId: string) {
+  if (isAborted(researchId)) {
+    throw new Error("CANCELLED");
+  }
 }
 
-async function searchGraph(query: string) {
-  const baseClient = getGlobalNeo4jClient();
-  const client = createNeo4jClientWithIntegerConversion(baseClient);
-  const ftQuery = buildLuceneQuery(query);
-  const result = await client.executeRead(
-    `
-    CALL db.index.fulltext.queryNodes('idx_entity_name_fulltext', $ftQuery)
-    YIELD node AS e, score
-    WHERE e.uid IS NOT NULL AND e.name IS NOT NULL
-    RETURN e.uid as uid, e.name as name, labels(e)[0] as type, score
-    ORDER BY score DESC LIMIT 15
-    `,
-    { ftQuery, limit: 15 }
-  );
-  return result.records.map((r: any) => ({
-    uid: r.get("uid"),
-    name: r.get("name"),
-    type: r.get("type"),
-    score: r.get("score"),
-  }));
-}
-
-async function searchWeb(query: string): Promise<ResearchSource[]> {
-  const apiKey = process.env.TAVILY_API_KEY;
-  if (!apiKey) return [];
-  const res = await fetch("https://api.tavily.com/search", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      api_key: apiKey,
-      query,
-      max_results: 5,
-      search_depth: "advanced",
-      include_answer: false,
-    }),
-  });
-  if (!res.ok) return [];
-  const data = (await res.json()) as {
-    results?: Array<{ title: string; url: string; content: string }>;
-  };
-  return (
-    data.results?.map((r) => ({
-      title: r.title,
-      url: r.url,
-      type: "web" as const,
-      snippet: r.content?.slice(0, 500),
-    })) ?? []
-  );
-}
-
-async function searchWikipedia(
-  query: string
-): Promise<{ text: string; source: ResearchSource | null }> {
-  const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&format=json&utf8=1&srlimit=1`;
-  const searchRes = await fetch(searchUrl);
-  const searchData = (await searchRes.json()) as {
-    query?: { search?: Array<{ title: string }> };
-  };
-  const results = searchData?.query?.search;
-  if (!results?.length) return { text: "", source: null };
-
-  const title = results[0].title;
-  const contentUrl = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(title)}&prop=extracts&explaintext=1&format=json&utf8=1`;
-  const contentRes = await fetch(contentUrl);
-  const contentData = (await contentRes.json()) as {
-    query?: { pages?: Record<string, { extract?: string }> };
-  };
-  const page = Object.values(contentData?.query?.pages ?? {})[0];
-  const text = page?.extract ?? "";
-  const url = `https://en.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, "_"))}`;
-
-  return {
-    text: text.slice(0, 5000),
-    source: { title, url, type: "wikipedia", snippet: text.slice(0, 300) },
-  };
-}
-
-// ─── Research Pipeline ──────────────────────────────────────────────
+// ─── Research Pipeline ───────────────────────────────────────────────
 
 async function runResearch(researchId: string, query: string) {
   const emit = (type: string, data: unknown) =>
     addEvent(researchId, type, data);
 
+  const allSources: ResearchSource[] = [];
+  const allNotes: string[] = [];
+  const allFindings: string[] = [];
+  let totalSearches = 0;
+
+  const trackSearch = () => {
+    totalSearches++;
+    updateResearch(researchId, { searchCount: totalSearches });
+    emit("counters.update", {
+      searches: totalSearches,
+      sources: allSources.length,
+    });
+  };
+
   try {
-    // ── Phase 1: SCOPE ──────────────────────────────────────────
+    // ── Phase 1: SCOPE — Structured output ───────────────────────
     emit("phase.started", { phase: "scope", label: "Planning research" });
     updateResearch(researchId, {
       phase: "scope",
       phaseDetail: "Writing research brief...",
     });
 
+    checkAbort(researchId);
+
     const scopeModel = getAIModel("fast");
-    const scopeResult = await generateText({
+    const scopeResult = await generateObject({
       model: scopeModel,
+      schema: z.object({
+        brief: z
+          .string()
+          .describe("One paragraph overview of the research topic"),
+        dimensions: z
+          .array(z.string())
+          .min(3)
+          .max(6)
+          .describe("3-6 specific research dimensions to investigate"),
+      }),
       prompt: `You are planning a deep research investigation on: "${query}"
 
-Write a research brief with 3-5 research dimensions to investigate.
-Return as JSON: { "dimensions": ["dimension 1", "dimension 2", ...], "brief": "one paragraph overview" }`,
+Write a research brief and identify 3-6 specific research dimensions to investigate.
+Each dimension should be a focused sub-topic that, combined, gives comprehensive coverage.`,
     });
 
-    let dimensions: string[] = [];
-    let brief = "";
-    try {
-      const parsed = JSON.parse(
-        scopeResult.text.replace(/```json?\n?/g, "").replace(/```/g, "")
-      );
-      dimensions = parsed.dimensions ?? [];
-      brief = parsed.brief ?? "";
-    } catch {
-      dimensions = [query];
-      brief = `Research on ${query}`;
-    }
+    const { dimensions, brief } = scopeResult.object;
 
+    updateResearch(researchId, { dimensions, brief });
     emit("scope.completed", { dimensions, brief });
     emit("phase.completed", { phase: "scope" });
 
-    // ── Phase 2: RESEARCH LOOP ──────────────────────────────────
-    emit("phase.started", { phase: "research", label: "Researching" });
+    // ── Phase 2: PLAN REVIEW — Show plan, continue automatically ─
+    emit("phase.started", {
+      phase: "plan-review",
+      label: "Reviewing research plan",
+    });
     updateResearch(researchId, {
-      phase: "research",
-      phaseDetail: "Searching and analyzing...",
+      phase: "plan-review",
+      phaseDetail: `${dimensions.length} dimensions planned`,
     });
+    // Brief pause to let the UI show the plan
+    await new Promise((r) => setTimeout(r, 1500));
+    emit("phase.completed", { phase: "plan-review" });
 
-    const allSources: ResearchSource[] = [];
-    const allNotes: string[] = [];
+    // ── Phase 3: RESEARCH LOOP (with agentic iteration) ──────────
+    let iteration = 0;
+    let dimensionsToResearch = [...dimensions];
 
-    // Check existing knowledge first
-    emit("search.started", { query, source: "graph" });
-    const graphResults = await searchGraph(query);
-    emit("search.completed", {
-      query,
-      source: "graph",
-      resultCount: graphResults.length,
-    });
-    if (graphResults.length > 0) {
-      allNotes.push(
-        `Knowledge graph entities: ${graphResults.map((e) => `${e.name} (${e.type})`).join(", ")}`
-      );
-      for (const e of graphResults) {
-        allSources.push({
-          title: e.name,
-          url: `#entity:${e.uid}`,
-          type: "graph",
-        });
-      }
-    }
+    while (iteration < 3 && dimensionsToResearch.length > 0) {
+      iteration++;
+      updateResearch(researchId, { supervisorIteration: iteration });
 
-    // Research each dimension
-    for (let i = 0; i < Math.min(dimensions.length, 5); i++) {
-      const dimension = dimensions[i];
+      emit("phase.started", {
+        phase: "research",
+        label:
+          iteration === 1 ? "Researching" : `Research iteration ${iteration}`,
+      });
       updateResearch(researchId, {
-        supervisorIteration: i + 1,
-        phaseDetail: `Researching: ${dimension}`,
+        phase: "research",
+        phaseDetail: `Iteration ${iteration}: ${dimensionsToResearch.length} dimensions`,
       });
 
-      emit("research.dimension", {
-        index: i,
-        total: dimensions.length,
-        dimension,
-      });
+      // Search knowledge graph first (only on first iteration)
+      if (iteration === 1) {
+        checkAbort(researchId);
+        emit("search.started", { query, source: "graph" });
+        try {
+          const graphResults = await withRetry(() => searchGraph(query, 15));
+          trackSearch();
+          emit("search.completed", {
+            query,
+            source: "graph",
+            resultCount: graphResults.length,
+          });
+          if (graphResults.length > 0) {
+            const graphNote = `Knowledge graph entities: ${graphResults.map((e) => `${e.name} (${e.type})`).join(", ")}`;
+            allNotes.push(graphNote);
+            for (const e of graphResults) {
+              allSources.push({
+                title: e.name,
+                url: `#entity:${e.uid}`,
+                type: "graph",
+              });
+            }
+            // Surface as a finding
+            const finding = `Found ${graphResults.length} existing entities in the knowledge graph`;
+            allFindings.push(finding);
+            updateResearch(researchId, { findings: allFindings });
+            emit("research.finding", { text: finding });
+          }
+        } catch {
+          emit("search.completed", {
+            query,
+            source: "graph",
+            resultCount: 0,
+          });
+        }
+      }
 
-      // Web search
-      emit("search.started", { query: dimension, source: "web" });
-      const webResults = await searchWeb(dimension);
-      emit("search.completed", {
-        query: dimension,
-        source: "web",
-        resultCount: webResults.length,
-      });
-      allSources.push(...webResults);
+      // Research each dimension
+      for (let i = 0; i < Math.min(dimensionsToResearch.length, 6); i++) {
+        const dimension = dimensionsToResearch[i];
+        checkAbort(researchId);
 
-      // Wikipedia
-      emit("search.started", { query: dimension, source: "wikipedia" });
-      const wiki = await searchWikipedia(dimension);
-      emit("search.completed", {
-        query: dimension,
-        source: "wikipedia",
-        resultCount: wiki.source ? 1 : 0,
-      });
-      if (wiki.source) allSources.push(wiki.source);
-
-      // Compress this dimension's findings
-      const corpus = [
-        wiki.text,
-        ...webResults.map((r) => `${r.title}: ${r.snippet ?? ""}`),
-      ]
-        .filter(Boolean)
-        .join("\n\n");
-
-      if (corpus) {
-        emit("research.compressing", { dimension });
-        const compressModel = getAIModel("fast");
-        const compressed = await generateText({
-          model: compressModel,
-          prompt: `Summarize the key findings about "${dimension}" from the following research. Be concise but include all important facts, names, dates, and relationships.\n\n${corpus.slice(0, 8000)}`,
+        updateResearch(researchId, {
+          phaseDetail: `Researching: ${dimension}`,
         });
-        allNotes.push(`## ${dimension}\n\n${compressed.text}`);
-        emit("research.compressed", {
+
+        emit("research.dimension", {
+          index: i,
+          total: dimensionsToResearch.length,
           dimension,
-          noteLength: compressed.text.length,
+          iteration,
+        });
+
+        // Web search with retry
+        emit("search.started", { query: dimension, source: "web" });
+        let webResults: WebSearchResult[] = [];
+        try {
+          webResults = await withRetry(() => searchWeb(dimension, 5));
+        } catch {
+          /* continue without web results */
+        }
+        trackSearch();
+        emit("search.completed", {
+          query: dimension,
+          source: "web",
+          resultCount: webResults.length,
+        });
+
+        for (const r of webResults) {
+          allSources.push({
+            title: r.title,
+            url: r.url,
+            type: "web",
+            snippet: r.snippet,
+          });
+        }
+
+        // Wikipedia with retry
+        checkAbort(researchId);
+        emit("search.started", { query: dimension, source: "wikipedia" });
+        let wiki: WikiSearchResult | null = null;
+        try {
+          wiki = await withRetry(() => searchWikipedia(dimension));
+        } catch {
+          /* continue without wiki */
+        }
+        trackSearch();
+        emit("search.completed", {
+          query: dimension,
+          source: "wikipedia",
+          resultCount: wiki ? 1 : 0,
+        });
+        if (wiki) {
+          allSources.push({
+            title: wiki.title,
+            url: wiki.url,
+            type: "wikipedia",
+            snippet: wiki.snippet,
+          });
+        }
+
+        // Graph search per dimension (beyond first iteration)
+        if (iteration > 1) {
+          checkAbort(researchId);
+          emit("search.started", { query: dimension, source: "graph" });
+          try {
+            const dimGraphResults = await withRetry(() =>
+              searchGraph(dimension, 5)
+            );
+            trackSearch();
+            emit("search.completed", {
+              query: dimension,
+              source: "graph",
+              resultCount: dimGraphResults.length,
+            });
+            if (dimGraphResults.length > 0) {
+              for (const e of dimGraphResults) {
+                if (!allSources.find((s) => s.url === `#entity:${e.uid}`)) {
+                  allSources.push({
+                    title: e.name,
+                    url: `#entity:${e.uid}`,
+                    type: "graph",
+                  });
+                }
+              }
+            }
+          } catch {
+            /* continue */
+          }
+        }
+
+        // Compress dimension findings
+        const corpus = [
+          wiki?.text ?? "",
+          ...webResults.map((r) => `${r.title}: ${r.snippet ?? ""}`),
+        ]
+          .filter(Boolean)
+          .join("\n\n");
+
+        if (corpus) {
+          checkAbort(researchId);
+          emit("research.compressing", { dimension });
+          try {
+            const compressModel = getAIModel("fast");
+            const compressed = await generateObject({
+              model: compressModel,
+              schema: z.object({
+                summary: z.string().describe("Concise summary of key findings"),
+                keyFinding: z
+                  .string()
+                  .describe("Single most important finding in one sentence"),
+              }),
+              prompt: `Summarize the key findings about "${dimension}" from the following research.
+Be concise but include all important facts, names, dates, and relationships.
+Also provide the single most important finding in one sentence.
+
+${corpus.slice(0, 8000)}`,
+            });
+
+            allNotes.push(`## ${dimension}\n\n${compressed.object.summary}`);
+
+            // Surface key finding
+            allFindings.push(compressed.object.keyFinding);
+            updateResearch(researchId, { findings: allFindings });
+            emit("research.finding", { text: compressed.object.keyFinding });
+
+            emit("research.compressed", {
+              dimension,
+              noteLength: compressed.object.summary.length,
+            });
+          } catch {
+            // Fallback: store raw corpus excerpt
+            allNotes.push(`## ${dimension}\n\n${corpus.slice(0, 2000)}`);
+          }
+        }
+
+        updateResearch(researchId, {
+          notes: allNotes,
+          sources: allSources,
         });
       }
 
-      updateResearch(researchId, { notes: allNotes, sources: allSources });
+      emit("phase.completed", { phase: "research" });
+
+      // ── EVALUATE — Should we research more? ────────────────────
+      checkAbort(researchId);
+
+      if (iteration < 3) {
+        emit("phase.started", {
+          phase: "evaluating",
+          label: "Evaluating coverage",
+        });
+        updateResearch(researchId, {
+          phase: "evaluating",
+          phaseDetail: "Checking for gaps...",
+        });
+
+        try {
+          const evalModel = getAIModel("fast");
+          const evalResult = await generateObject({
+            model: evalModel,
+            schema: z.object({
+              complete: z
+                .boolean()
+                .describe(
+                  "Whether the research is comprehensive enough for a quality report"
+                ),
+              gaps: z
+                .array(z.string())
+                .describe(
+                  "Specific topics or angles not yet covered, empty if complete"
+                ),
+            }),
+            prompt: `You are evaluating research coverage on: "${query}"
+
+Research brief: ${brief}
+
+Planned dimensions: ${dimensions.join(", ")}
+
+Research notes so far:
+${allNotes.map((n) => n.slice(0, 500)).join("\n---\n")}
+
+Sources found: ${allSources.length}
+
+Is this research comprehensive enough for a quality, well-cited report?
+If not, identify 1-3 specific gaps that should be investigated.
+Be conservative — only flag genuine gaps, not minor tangents.`,
+          });
+
+          emit("phase.completed", { phase: "evaluating" });
+
+          if (
+            evalResult.object.complete ||
+            evalResult.object.gaps.length === 0
+          ) {
+            emit("research.evaluation", {
+              complete: true,
+              iteration,
+            });
+            break; // Move to synthesis
+          }
+
+          // More research needed
+          dimensionsToResearch = evalResult.object.gaps.slice(0, 3);
+          emit("research.evaluation", {
+            complete: false,
+            gaps: dimensionsToResearch,
+            iteration,
+          });
+
+          const finding = `Identified ${dimensionsToResearch.length} gap(s) — researching deeper`;
+          allFindings.push(finding);
+          updateResearch(researchId, { findings: allFindings });
+          emit("research.finding", { text: finding });
+        } catch {
+          // If evaluation fails, just proceed to synthesis
+          emit("phase.completed", { phase: "evaluating" });
+          break;
+        }
+      }
     }
 
-    emit("phase.completed", { phase: "research" });
+    // ── Phase 4: SYNTHESIS — Streamed with inline citations ──────
+    checkAbort(researchId);
 
-    // ── Phase 3: SYNTHESIS ──────────────────────────────────────
     emit("phase.started", { phase: "synthesis", label: "Writing report" });
     updateResearch(researchId, {
       phase: "synthesis",
-      phaseDetail: "Generating final report...",
+      phaseDetail: "Generating report...",
     });
 
+    // Build numbered source list for citations
+    const uniqueSources = deduplicateSources(allSources);
+    const sourceList = uniqueSources
+      .map(
+        (s, i) =>
+          `[${i + 1}] ${s.title} (${s.type}) — ${s.url}${s.snippet ? `\n    "${s.snippet.slice(0, 200)}"` : ""}`
+      )
+      .join("\n");
+
     const reportModel = getAIModel("smart");
-    const reportResult = await generateText({
+    const reportStream = streamText({
       model: reportModel,
       prompt: `You are writing a comprehensive research report on: "${query}"
 
@@ -268,40 +422,70 @@ Research brief: ${brief}
 Accumulated research notes:
 ${allNotes.join("\n\n---\n\n")}
 
-Sources found: ${allSources.length}
+## Available Sources
+${sourceList}
 
-Write a well-structured, comprehensive research report with:
-1. Executive summary
-2. Key findings organized by theme
-3. Detailed analysis
-4. Connections and relationships between entities
-5. Conclusions and implications
+## Instructions
+Write a well-structured, comprehensive research report with these sections:
+1. **Executive Summary** — 2-3 paragraph overview
+2. **Key Findings** — organized by theme with specific facts
+3. **Detailed Analysis** — deep dive into the most important aspects
+4. **Connections & Relationships** — how entities and concepts relate
+5. **Conclusions** — implications and significance
 
-Use markdown formatting. Cite sources where relevant.
-End with 3-5 related search queries for further exploration.`,
+## Citation Rules
+- Use inline citations like [1], [2], etc. referring to the numbered sources above
+- Cite specific claims — don't just cite generally
+- Every major fact should have at least one citation
+- Use multiple citations where evidence converges: [1][3]
+
+## Format
+- Use markdown with clear ## headings
+- Be thorough but readable (aim for 1500-3000 words)
+- End with 3-5 "Related Topics" as short search phrases (not questions)`,
     });
 
-    const finalReport = reportResult.text;
+    // Stream report chunks as events
+    let fullReport = "";
+    const reportChunks: string[] = [];
 
-    emit("report.completed", { length: finalReport.length });
+    for await (const chunk of reportStream.textStream) {
+      checkAbort(researchId);
+      fullReport += chunk;
+      reportChunks.push(chunk);
+      updateResearch(researchId, { reportChunks });
+      emit("report.chunk", { text: chunk });
+    }
+
+    emit("report.completed", { length: fullReport.length });
     emit("phase.completed", { phase: "synthesis" });
 
-    // ── Complete ────────────────────────────────────────────────
+    // ── Complete ──────────────────────────────────────────────────
     updateResearch(researchId, {
       status: "completed",
       phase: "complete",
       phaseDetail: "Research complete",
-      finalReport,
+      finalReport: fullReport,
+      sources: uniqueSources,
       completedAt: Date.now(),
     });
 
     emit("research.completed", {
-      reportLength: finalReport.length,
-      sourcesCount: allSources.length,
+      reportLength: fullReport.length,
+      sourcesCount: uniqueSources.length,
       notesCount: allNotes.length,
+      findingsCount: allFindings.length,
+      iterations: iteration,
       duration: Date.now() - (getResearchStartTime(researchId) ?? Date.now()),
     });
   } catch (error) {
+    if (
+      error instanceof Error &&
+      (error.message === "CANCELLED" || isAborted(researchId))
+    ) {
+      // Already handled by cancelResearch()
+      return;
+    }
     const msg = error instanceof Error ? error.message : "Research failed";
     updateResearch(researchId, {
       status: "failed",
@@ -315,6 +499,16 @@ End with 3-5 related search queries for further exploration.`,
 function getResearchStartTime(id: string): number | null {
   const state = getResearch(id);
   return state?.startedAt ?? null;
+}
+
+function deduplicateSources(sources: ResearchSource[]): ResearchSource[] {
+  const seen = new Set<string>();
+  return sources.filter((s) => {
+    const key = s.url;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 // ─── Route Handler ──────────────────────────────────────────────────

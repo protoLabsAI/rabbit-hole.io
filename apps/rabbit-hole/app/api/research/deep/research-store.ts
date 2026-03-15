@@ -20,19 +20,30 @@ export interface ResearchEvent {
 export interface ResearchState {
   id: string;
   query: string;
-  status: "running" | "completed" | "failed";
-  phase: "scope" | "research" | "synthesis" | "complete";
+  status: "running" | "completed" | "failed" | "cancelled";
+  phase:
+    | "scope"
+    | "plan-review"
+    | "research"
+    | "evaluating"
+    | "synthesis"
+    | "complete";
   phaseDetail: string;
   supervisorIteration: number;
   maxIterations: number;
   notes: string[];
   sources: ResearchSource[];
-  reportSections: string[];
+  findings: string[];
+  dimensions: string[];
+  brief: string;
+  searchCount: number;
+  reportChunks: string[];
   finalReport: string;
   error: string | null;
   events: ResearchEvent[];
   startedAt: number;
   completedAt: number | null;
+  abortController: AbortController | null;
 }
 
 // Use globalThis to survive Turbopack module isolation
@@ -53,15 +64,20 @@ export function createResearch(id: string, query: string): ResearchState {
     phase: "scope",
     phaseDetail: "Planning research dimensions...",
     supervisorIteration: 0,
-    maxIterations: 6,
+    maxIterations: 3,
     notes: [],
     sources: [],
-    reportSections: [],
+    findings: [],
+    dimensions: [],
+    brief: "",
+    searchCount: 0,
+    reportChunks: [],
     finalReport: "",
     error: null,
     events: [],
     startedAt: Date.now(),
     completedAt: null,
+    abortController: new AbortController(),
   };
   store.set(id, state);
   return state;
@@ -90,11 +106,27 @@ export function addEvent(
 
 export function updateResearch(
   id: string,
-  update: Partial<ResearchState>
+  update: Partial<Omit<ResearchState, "abortController">>
 ): void {
   const state = store.get(id);
   if (!state) return;
   Object.assign(state, update);
+}
+
+export function cancelResearch(id: string): boolean {
+  const state = store.get(id);
+  if (!state || state.status !== "running") return false;
+  state.abortController?.abort();
+  state.status = "cancelled";
+  state.phaseDetail = "Cancelled by user";
+  state.completedAt = Date.now();
+  addEvent(id, "research.cancelled", { phase: state.phase });
+  return true;
+}
+
+export function isAborted(id: string): boolean {
+  const state = store.get(id);
+  return state?.abortController?.signal.aborted ?? false;
 }
 
 // Cleanup old research after 2 hours

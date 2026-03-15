@@ -1,14 +1,15 @@
 /**
- * Deep Research SSE Stream
+ * Deep Research SSE Stream + Cancel
  *
- * GET /api/research/deep/:id
- * Streams research progress as Server-Sent Events.
+ * GET  /api/research/deep/:id — Stream research progress as SSE
+ * DELETE /api/research/deep/:id — Cancel a running research job
+ *
  * Heartbeat every 15s. Supports reconnection via Last-Event-ID.
  */
 
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-import { getResearch } from "../research-store";
+import { getResearch, cancelResearch } from "../research-store";
 
 export async function GET(
   request: NextRequest,
@@ -51,11 +52,24 @@ export async function GET(
         sentIndex = i + 1;
       }
 
-      // If already complete, send final state and close
-      if (state.status === "completed" || state.status === "failed") {
+      // If already complete/failed/cancelled, send final state and close
+      if (state.status !== "running") {
         controller.enqueue(
           encoder.encode(
-            `data: ${JSON.stringify({ type: "state", data: { status: state.status, phase: state.phase, finalReport: state.finalReport, sources: state.sources, error: state.error } })}\n\n`
+            `data: ${JSON.stringify({
+              type: "state",
+              data: {
+                status: state.status,
+                phase: state.phase,
+                finalReport: state.finalReport,
+                sources: state.sources,
+                findings: state.findings,
+                dimensions: state.dimensions,
+                brief: state.brief,
+                searchCount: state.searchCount,
+                error: state.error,
+              },
+            })}\n\n`
           )
         );
         controller.close();
@@ -64,7 +78,7 @@ export async function GET(
 
       // Poll for new events + heartbeat
       const HEARTBEAT_MS = 15000;
-      const POLL_MS = 500;
+      const POLL_MS = 300;
       const MAX_DURATION_MS = 25 * 60 * 1000; // 25 min max
       const startTime = Date.now();
       let lastHeartbeat = Date.now();
@@ -98,11 +112,24 @@ export async function GET(
             sentIndex++;
           }
 
-          // Check completion
-          if (current.status === "completed" || current.status === "failed") {
+          // Check completion (including cancelled)
+          if (current.status !== "running") {
             controller.enqueue(
               encoder.encode(
-                `data: ${JSON.stringify({ type: "state", data: { status: current.status, phase: current.phase, finalReport: current.finalReport, sources: current.sources, error: current.error } })}\n\n`
+                `data: ${JSON.stringify({
+                  type: "state",
+                  data: {
+                    status: current.status,
+                    phase: current.phase,
+                    finalReport: current.finalReport,
+                    sources: current.sources,
+                    findings: current.findings,
+                    dimensions: current.dimensions,
+                    brief: current.brief,
+                    searchCount: current.searchCount,
+                    error: current.error,
+                  },
+                })}\n\n`
               )
             );
             controller.close();
@@ -137,4 +164,31 @@ export async function GET(
       Connection: "keep-alive",
     },
   });
+}
+
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+  const cancelled = cancelResearch(id);
+
+  if (!cancelled) {
+    const state = getResearch(id);
+    if (!state) {
+      return NextResponse.json(
+        { success: false, error: "Research not found" },
+        { status: 404 }
+      );
+    }
+    return NextResponse.json(
+      {
+        success: false,
+        error: `Cannot cancel — status is ${state.status}`,
+      },
+      { status: 400 }
+    );
+  }
+
+  return NextResponse.json({ success: true });
 }
