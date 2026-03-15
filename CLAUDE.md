@@ -25,3 +25,15 @@
 - `services/` — Backend services (job-processor)
 - `agent/` — LangGraph agent server
 - `custom-domains/` — Entity type definitions
+- `packages/mcp-server/plugins/rabbit-hole/` — Claude Code plugin (commands: `/research`, `/ingest`, `/graph`; agents: `deep-research`, `entity-extractor`)
+
+## Rabbit Hole Plugin
+
+The rabbit-hole Claude Code plugin is installed as a user-level marketplace in `~/.claude/settings.json`. It provides:
+
+- `/research <topic>` — Research an entity/topic and extract structured knowledge
+- `/ingest <url or file>` — Ingest URLs, PDFs, audio, video, or documents
+- `/graph <topic>` — Build and validate knowledge graph bundles
+- MCP tools: `mcp__rabbit-hole__*` (web_search, tavily_search, wikipedia_search, extract_entities, research_entity, etc.)
+
+Required env vars: `RABBIT_HOLE_ROOT`, `ANTHROPIC_API_KEY`, `TAVILY_API_KEY`, `GROQ_API_KEY`
