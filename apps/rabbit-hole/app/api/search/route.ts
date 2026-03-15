@@ -20,12 +20,22 @@ import { createNeo4jClientWithIntegerConversion } from "@proto/utils";
 const RABBIT_HOLE_URL = process.env.RABBIT_HOLE_URL || "http://localhost:3000";
 
 const SearchRequestSchema = z.object({
-  query: z.string().min(2).max(200),
+  query: z.string().min(1).max(500),
   history: z
     .array(
       z.object({
         role: z.enum(["user", "assistant"]),
         content: z.string(),
+      })
+    )
+    .optional(),
+  files: z
+    .array(
+      z.object({
+        name: z.string(),
+        size: z.number(),
+        mediaType: z.string(),
+        base64: z.string(),
       })
     )
     .optional(),
@@ -208,6 +218,118 @@ async function searchWikipedia(query: string) {
   };
 }
 
+// ─── File Processing via Job Processor ──────────────────────────────
+
+const JOB_PROCESSOR_URL =
+  process.env.JOB_PROCESSOR_URL || "http://localhost:8680";
+
+async function processFiles(
+  files: Array<{
+    name: string;
+    size: number;
+    mediaType: string;
+    base64: string;
+  }>,
+  controller: ReadableStreamDefaultController
+): Promise<string> {
+  if (files.length === 0) return "";
+
+  sseEvent(
+    "research_step",
+    {
+      step: "processing_files",
+      message: `Processing ${files.length} file(s)...`,
+    },
+    controller
+  );
+
+  let extractedText = "";
+
+  for (const file of files) {
+    const jobId = `search-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+
+    try {
+      // Submit to job processor
+      const submitRes = await fetch(`${JOB_PROCESSOR_URL}/ingest`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          jobId,
+          request: {
+            source: {
+              type: "file",
+              bufferBase64: file.base64,
+              mediaType: file.mediaType,
+              fileName: file.name,
+            },
+          },
+        }),
+      });
+
+      if (!submitRes.ok) {
+        sseEvent(
+          "research_step",
+          { step: "file_error", message: `Failed to process ${file.name}` },
+          controller
+        );
+        continue;
+      }
+
+      // Poll for completion (max 30s)
+      const maxWait = 30000;
+      const pollInterval = 1000;
+      const start = Date.now();
+
+      while (Date.now() - start < maxWait) {
+        await new Promise((r) => setTimeout(r, pollInterval));
+        const statusRes = await fetch(
+          `${JOB_PROCESSOR_URL}/ingest/${jobId}/status`
+        );
+        if (!statusRes.ok) continue;
+
+        const status = (await statusRes.json()) as {
+          status: string;
+          result?: { text: string };
+          error?: string;
+        };
+
+        if (status.status === "completed" && status.result?.text) {
+          extractedText += `\n\n## File: ${file.name}\n\n${status.result.text.slice(0, 8000)}`;
+          sseEvent(
+            "research_step",
+            {
+              step: "file_processed",
+              message: `Extracted text from ${file.name}`,
+            },
+            controller
+          );
+          break;
+        }
+
+        if (status.status === "failed") {
+          sseEvent(
+            "research_step",
+            {
+              step: "file_error",
+              message: `Failed: ${file.name} — ${status.error || "unknown error"}`,
+            },
+            controller
+          );
+          break;
+        }
+      }
+    } catch {
+      sseEvent(
+        "research_step",
+        { step: "file_error", message: `Error processing ${file.name}` },
+        controller
+      );
+    }
+  }
+
+  return extractedText;
+}
+
 // ─── Auto-Ingest Research into Graph ────────────────────────────────
 
 async function extractAndIngest(
@@ -381,7 +503,7 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const { query, history } = validation.data;
+  const { query, history, files } = validation.data;
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -479,15 +601,28 @@ export async function POST(request: NextRequest) {
           );
         }
 
+        // ─── Phase 3c: Process Attached Files ─────────────────────
+        let fileText = "";
+        if (files?.length) {
+          fileText = await processFiles(files, controller);
+          // Auto-ingest entities from uploaded files
+          if (fileText) {
+            extractAndIngest(query, fileText, [], controller).catch(() => {});
+          }
+        }
+
         // ─── Phase 4: Stream AI Answer ───────────────────────────
         sseEvent("answer_start", null, controller);
 
-        const context = buildAnswerPrompt(
+        let context = buildAnswerPrompt(
           query,
           graphEntities,
           webSources,
           wikiText
         );
+        if (fileText) {
+          context += "\n## Attached Files\n" + fileText + "\n";
+        }
 
         const userMessage = context
           ? `Question: ${query}\n\n---\n\nContext:\n${context}`

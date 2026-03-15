@@ -100,7 +100,15 @@ export function useSearch() {
   );
 
   const search = useCallback(
-    async (query: string) => {
+    async (
+      query: string,
+      files?: Array<{
+        name: string;
+        size: number;
+        mediaType: string;
+        base64: string;
+      }>
+    ) => {
       abortRef.current?.abort();
       const abort = new AbortController();
       abortRef.current = abort;
@@ -123,7 +131,7 @@ export function useSearch() {
         const res = await fetch("/api/search", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ query, history }),
+          body: JSON.stringify({ query, history, files }),
           signal: abort.signal,
         });
 
