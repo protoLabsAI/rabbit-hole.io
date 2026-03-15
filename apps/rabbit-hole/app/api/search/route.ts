@@ -332,14 +332,27 @@ async function processFiles(
 
 // ─── Auto-Ingest Research into Graph ────────────────────────────────
 
+const EXTRACTION_PROMPT = `Extract entities and relationships from this text.
+
+Return ONLY valid JSON:
+{
+  "entities": [{"uid": "{type}:{snake_name}", "name": "...", "type": "Person|Organization|Technology|Concept|Event|Publication", "properties": {}, "tags": [], "aliases": []}],
+  "relationships": [{"uid": "rel:{src}_{type}_{tgt}", "type": "RELATED_TO|AUTHORED|FOUNDED|WORKS_AT|PART_OF", "source": "entity_uid", "target": "entity_uid", "properties": {}}]
+}
+
+Rules:
+- Entity UIDs: {type_prefix}:{snake_case_name} (e.g. person:elon_musk, org:spacex)
+- Relationship UIDs: rel:{source}_{type}_{target}
+- Extract 5-15 entities and their relationships
+- Only include entities clearly mentioned in the text`;
+
 async function extractAndIngest(
   query: string,
   wikiText: string,
   webSources: any[],
   controller: ReadableStreamDefaultController
 ) {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey || (!wikiText && webSources.length === 0)) return;
+  if (!wikiText && webSources.length === 0) return;
 
   sseEvent(
     "research_step",
@@ -350,7 +363,6 @@ async function extractAndIngest(
     controller
   );
 
-  // Build text corpus from research
   let corpus = "";
   if (wikiText) corpus += wikiText + "\n\n";
   for (const s of webSources.slice(0, 3)) {
@@ -359,42 +371,22 @@ async function extractAndIngest(
   if (!corpus.trim()) return;
 
   try {
-    // Extract entities via Claude
-    const extractRes = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: "claude-haiku-4-5-20251001",
-        max_tokens: 2048,
-        messages: [
-          {
-            role: "user",
-            content: `Extract entities and relationships from this text about "${query}".
+    const model = getModel("fast");
+    const result = await model.invoke([
+      ["system", EXTRACTION_PROMPT],
+      ["human", `Topic: "${query}"\n\nText:\n${corpus.slice(0, 6000)}`],
+    ]);
 
-Return ONLY valid JSON:
-{
-  "entities": [{"uid": "{type}:{snake_name}", "name": "...", "type": "Person|Organization|Technology|Concept|Event|Publication", "properties": {}, "tags": [], "aliases": []}],
-  "relationships": [{"uid": "rel:{src}_{type}_{tgt}", "type": "RELATED_TO|AUTHORED|FOUNDED|WORKS_AT|PART_OF", "source": "entity_uid", "target": "entity_uid", "properties": {}}]
-}
+    const raw =
+      typeof result.content === "string"
+        ? result.content
+        : Array.isArray(result.content)
+          ? result.content
+              .filter((c: any) => c.type === "text")
+              .map((c: any) => c.text)
+              .join("")
+          : "";
 
-Text:\n${corpus.slice(0, 6000)}`,
-          },
-        ],
-      }),
-    });
-
-    if (!extractRes.ok) return;
-
-    const extractData = (await extractRes.json()) as {
-      content?: Array<{ text?: string }>;
-    };
-    const raw = extractData.content?.[0]?.text ?? "";
-
-    // Parse JSON
     let parsed: any;
     try {
       let jsonStr = raw.trim();
@@ -407,7 +399,6 @@ Text:\n${corpus.slice(0, 6000)}`,
 
     if (!parsed?.entities?.length || !Array.isArray(parsed.entities)) return;
 
-    // Build evidence node for provenance
     const evidenceUid = `evidence:search_${Date.now()}`;
     const bundle = {
       entities: parsed.entities,
@@ -425,7 +416,6 @@ Text:\n${corpus.slice(0, 6000)}`,
       ],
     };
 
-    // Fire-and-forget ingest
     fetch(`${RABBIT_HOLE_URL}/api/ingest-bundle`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -441,7 +431,7 @@ Text:\n${corpus.slice(0, 6000)}`,
       controller
     );
   } catch {
-    // Extraction failed — non-critical, continue
+    // Extraction failed — non-critical
   }
 }
 

@@ -241,13 +241,37 @@ export default function SearchPage() {
                 {messages.length} messages
               </span>
             )}
-            <button
-              onClick={handleNewSession}
-              className="ml-auto p-1.5 text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-muted/50"
-              title="New search"
-            >
-              <Icon name="PenSquare" className="h-4 w-4" />
-            </button>
+            <div className="ml-auto flex items-center gap-1">
+              <button
+                onClick={() => {
+                  const url = window.location.href;
+                  if (navigator.clipboard?.writeText) {
+                    navigator.clipboard.writeText(url);
+                  } else {
+                    // Fallback for non-HTTPS contexts
+                    const ta = document.createElement("textarea");
+                    ta.value = url;
+                    ta.style.position = "fixed";
+                    ta.style.opacity = "0";
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(ta);
+                  }
+                }}
+                className="p-1.5 text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-muted/50"
+                title="Copy link"
+              >
+                <Icon name="Link" className="h-4 w-4" />
+              </button>
+              <button
+                onClick={handleNewSession}
+                className="p-1.5 text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-muted/50"
+                title="New search"
+              >
+                <Icon name="PenSquare" className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         </header>
 
