@@ -93,11 +93,11 @@ export default function SearchPage() {
   }, [sessionMgr.loaded, sessionMgr.activeSession?.id]);
 
   const handleSearch = useCallback(
-    (q: string) => {
+    (q: string, files?: any[]) => {
       if (!sessionMgr.activeSessionId) {
         sessionMgr.createSession(q);
       }
-      search(q);
+      search(q, files);
     },
     [search, sessionMgr]
   );
