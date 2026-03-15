@@ -34,6 +34,16 @@
 - `docs/` — Technical documentation (architecture, API, operations)
 - `custom-domains/` — Entity type definitions
 
+## Product Vision
+
+Three products, shipping in order. **Current focus: Search → KG pipeline.**
+
+1. **Search Engine** (`/`) — Active. Perplexity-style AI search. Self-growing knowledge graph.
+2. **3D Atlas** — Planned. Replace Cytoscape with modern 3D viz for millions of nodes. Don't invest in current Atlas.
+3. **Research App** — Planned. Extract research workspace into downloadable Tauri/Electron app. Self-hostable.
+
+The search agent is defined in the search page first, then will be reused in Atlas and Research later.
+
 ## Search Engine
 
 The landing page (`/`) is a Perplexity-style AI search engine:
