@@ -164,7 +164,7 @@ export default function SearchPage() {
           onToggle={() => setSidebarOpen(!sidebarOpen)}
         />
 
-        <div className="relative flex flex-col items-center justify-center min-h-screen px-4">
+        <div className="relative flex flex-col items-center px-4 pt-[30vh]">
           <div className="flex flex-col items-center gap-8 w-full max-w-3xl">
             <div className="flex flex-col items-center gap-3">
               <span className="text-5xl sm:text-6xl">
