@@ -75,15 +75,6 @@ contextMenuRegistry.register({
             helpers.closeMenu();
           },
         },
-        {
-          id: "evidence-pack",
-          label: "Evidence Pack",
-          icon: "📦",
-          action: (ctx, helpers) => {
-            helpers.actions?.onViewEvidencePack?.(ctx);
-            helpers.closeMenu();
-          },
-        },
         { type: "divider", id: "research-div" },
         {
           id: "add-relationship",
