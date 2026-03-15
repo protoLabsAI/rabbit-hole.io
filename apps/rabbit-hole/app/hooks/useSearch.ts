@@ -9,6 +9,12 @@ export interface GraphEntity {
   tags: string[];
   aliases: string[];
   score: number;
+  relationshipCount?: number;
+  connectedEntities?: Array<{
+    name: string;
+    type: string;
+    relationship: string;
+  }>;
 }
 
 export interface Source {
@@ -30,160 +36,175 @@ export type SearchPhase =
   | "done"
   | "error";
 
-export interface SearchState {
-  phase: SearchPhase;
+export interface SearchMessage {
+  id: string;
   query: string;
+  phase: SearchPhase;
   graphEntities: GraphEntity[];
   sources: Source[];
   researchSteps: ResearchStep[];
   answer: string;
   suggestions: string[];
   error: string | null;
+  timestamp: number;
 }
 
-const initialState: SearchState = {
-  phase: "idle",
-  query: "",
-  graphEntities: [],
-  sources: [],
-  researchSteps: [],
-  answer: "",
-  suggestions: [],
-  error: null,
-};
+function createMessageId(): string {
+  return `msg_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+}
+
+function emptyMessage(query: string): SearchMessage {
+  return {
+    id: createMessageId(),
+    query,
+    phase: "searching_graph",
+    graphEntities: [],
+    sources: [],
+    researchSteps: [],
+    answer: "",
+    suggestions: [],
+    error: null,
+    timestamp: Date.now(),
+  };
+}
 
 export function useSearch() {
-  const [state, setState] = useState<SearchState>(initialState);
+  const [messages, setMessages] = useState<SearchMessage[]>([]);
+  const [activeId, setActiveId] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
-  const search = useCallback(async (query: string) => {
-    // Abort any in-flight search
-    abortRef.current?.abort();
-    const abort = new AbortController();
-    abortRef.current = abort;
+  // Build conversation history for the API
+  const buildHistory = useCallback(
+    (excludeId?: string) =>
+      messages
+        .filter((m) => m.phase === "done" && m.id !== excludeId)
+        .map((m) => [
+          { role: "user" as const, content: m.query },
+          { role: "assistant" as const, content: m.answer },
+        ])
+        .flat(),
+    [messages]
+  );
 
-    setState({
-      ...initialState,
-      phase: "searching_graph",
-      query,
-    });
+  const search = useCallback(
+    async (query: string) => {
+      abortRef.current?.abort();
+      const abort = new AbortController();
+      abortRef.current = abort;
 
-    try {
-      const res = await fetch("/api/search", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query }),
-        signal: abort.signal,
-      });
+      const msg = emptyMessage(query);
+      setActiveId(msg.id);
+      setMessages((prev) => [...prev, msg]);
 
-      if (!res.ok) {
-        throw new Error(`Search failed: ${res.status}`);
-      }
+      const history = buildHistory();
 
-      const reader = res.body?.getReader();
-      if (!reader) throw new Error("No response stream");
+      const updateActive = (
+        updater: (m: SearchMessage) => Partial<SearchMessage>
+      ) => {
+        setMessages((prev) =>
+          prev.map((m) => (m.id === msg.id ? { ...m, ...updater(m) } : m))
+        );
+      };
 
-      const decoder = new TextDecoder();
-      let buffer = "";
+      try {
+        const res = await fetch("/api/search", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query, history }),
+          signal: abort.signal,
+        });
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+        if (!res.ok) throw new Error(`Search failed: ${res.status}`);
+        const reader = res.body?.getReader();
+        if (!reader) throw new Error("No response stream");
 
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split("\n");
-        buffer = lines.pop() ?? "";
+        const decoder = new TextDecoder();
+        let buffer = "";
 
-        for (const line of lines) {
-          if (!line.startsWith("data: ")) continue;
-          const json = line.slice(6);
-          if (!json) continue;
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
 
-          try {
-            const event = JSON.parse(json) as {
-              type: string;
-              data: any;
-            };
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop() ?? "";
 
-            switch (event.type) {
-              case "graph_results":
-                setState((s) => ({
-                  ...s,
-                  graphEntities: event.data.entities ?? [],
-                  phase:
-                    (event.data.entities?.length ?? 0) >= 3
-                      ? "answering"
-                      : "researching",
-                }));
-                break;
+          for (const line of lines) {
+            if (!line.startsWith("data: ")) continue;
+            try {
+              const event = JSON.parse(line.slice(6)) as {
+                type: string;
+                data: any;
+              };
 
-              case "research_start":
-                setState((s) => ({ ...s, phase: "researching" }));
-                break;
-
-              case "research_step":
-                setState((s) => ({
-                  ...s,
-                  researchSteps: [...s.researchSteps, event.data],
-                }));
-                break;
-
-              case "sources":
-                setState((s) => ({ ...s, sources: event.data }));
-                break;
-
-              case "answer_start":
-                setState((s) => ({ ...s, phase: "answering" }));
-                break;
-
-              case "answer_delta":
-                setState((s) => ({
-                  ...s,
-                  answer: s.answer + (event.data.text ?? ""),
-                }));
-                break;
-
-              case "answer_done":
-                break;
-
-              case "suggestions":
-                setState((s) => ({
-                  ...s,
-                  suggestions: event.data ?? [],
-                }));
-                break;
-
-              case "done":
-                setState((s) => ({ ...s, phase: "done" }));
-                break;
-
-              case "error":
-                setState((s) => ({
-                  ...s,
-                  phase: "error",
-                  error: event.data.message,
-                }));
-                break;
+              switch (event.type) {
+                case "graph_results":
+                  updateActive(() => ({
+                    graphEntities: event.data.entities ?? [],
+                    phase:
+                      (event.data.entities?.length ?? 0) >= 3
+                        ? "answering"
+                        : "researching",
+                  }));
+                  break;
+                case "research_start":
+                  updateActive(() => ({ phase: "researching" }));
+                  break;
+                case "research_step":
+                  updateActive((m) => ({
+                    researchSteps: [...m.researchSteps, event.data],
+                  }));
+                  break;
+                case "sources":
+                  updateActive(() => ({ sources: event.data }));
+                  break;
+                case "answer_start":
+                  updateActive(() => ({ phase: "answering" }));
+                  break;
+                case "answer_delta":
+                  updateActive((m) => ({
+                    answer: m.answer + (event.data.text ?? ""),
+                  }));
+                  break;
+                case "suggestions":
+                  updateActive(() => ({
+                    suggestions: event.data ?? [],
+                  }));
+                  break;
+                case "done":
+                  updateActive(() => ({ phase: "done" }));
+                  break;
+                case "error":
+                  updateActive(() => ({
+                    phase: "error",
+                    error: event.data.message,
+                  }));
+                  break;
+              }
+            } catch {
+              /* skip */
             }
-          } catch {
-            // Skip unparseable lines
           }
         }
+      } catch (err) {
+        if ((err as Error).name === "AbortError") return;
+        updateActive(() => ({
+          phase: "error",
+          error: err instanceof Error ? err.message : "Search failed",
+        }));
       }
-    } catch (err) {
-      if ((err as Error).name === "AbortError") return;
-      setState((s) => ({
-        ...s,
-        phase: "error",
-        error: err instanceof Error ? err.message : "Search failed",
-      }));
-    }
-  }, []);
+    },
+    [buildHistory]
+  );
 
   const reset = useCallback(() => {
     abortRef.current?.abort();
-    setState(initialState);
+    setMessages([]);
+    setActiveId(null);
   }, []);
 
-  return { ...state, search, reset };
+  const activeMessage = messages.find((m) => m.id === activeId) ?? null;
+  const isIdle = messages.length === 0;
+
+  return { messages, activeMessage, isIdle, search, reset };
 }
