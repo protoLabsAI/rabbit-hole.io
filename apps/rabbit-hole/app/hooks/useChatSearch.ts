@@ -9,9 +9,15 @@ const transport = new DefaultChatTransport({
 });
 
 export function useChatSearch() {
-  const { messages, sendMessage, status, stop, setMessages, error } = useChat({
-    transport,
-  });
+  const {
+    messages,
+    sendMessage,
+    status,
+    stop,
+    setMessages,
+    error,
+    regenerate,
+  } = useChat({ transport });
 
   const isStreaming = status === "streaming" || status === "submitted";
   const isIdle = messages.length === 0 && status === "ready";
@@ -47,5 +53,6 @@ export function useChatSearch() {
     stop,
     setMessages,
     lastAssistantMessage,
+    regenerate,
   };
 }

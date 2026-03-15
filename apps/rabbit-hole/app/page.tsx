@@ -23,6 +23,7 @@ export default function SearchPage() {
     reset,
     setMessages,
     lastAssistantMessage,
+    regenerate,
   } = useChatSearch();
 
   const sessionMgr = useSearchSessions();
@@ -221,7 +222,7 @@ export default function SearchPage() {
 
         {/* Messages */}
         <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-6">
-          <div className="space-y-6">
+          <div className="space-y-2">
             {messages.map((msg, i) => (
               <ChatMessage
                 key={msg.id}
@@ -230,6 +231,11 @@ export default function SearchPage() {
                 isLast={i === messages.length - 1}
                 onIngest={msg.role === "assistant" ? handleIngest : undefined}
                 onFollowUp={handleSearch}
+                onRegenerate={
+                  msg.role === "assistant" && i === messages.length - 1
+                    ? regenerate
+                    : undefined
+                }
               />
             ))}
           </div>
