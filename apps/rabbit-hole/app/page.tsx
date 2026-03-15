@@ -229,6 +229,7 @@ export default function SearchPage() {
                 isStreaming={isStreaming}
                 isLast={i === messages.length - 1}
                 onIngest={msg.role === "assistant" ? handleIngest : undefined}
+                onFollowUp={handleSearch}
               />
             ))}
           </div>

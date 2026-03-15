@@ -2,10 +2,11 @@
 
 import type { UIMessage } from "ai";
 import { useState, useCallback } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 import { Icon } from "@proto/icon-system";
 import { Badge } from "@proto/ui/atoms";
-import { MarkdownContent } from "@proto/ui/organisms";
 
 // ─── Tool Card Config ───────────────────────────────────────────────
 
@@ -198,18 +199,74 @@ function ToolCallCard({
 
 // ─── Chat Message ───────────────────────────────────────────────────
 
+// ─── Extract follow-up suggestions from answer text ─────────────────
+
+function extractSuggestions(text: string): string[] {
+  if (!text) return [];
+  // Look for lines that are questions (end with ?)
+  // Typically at the end of the answer after "Follow-up" or similar
+  const lines = text.split("\n").filter((l) => l.trim());
+  const suggestions: string[] = [];
+
+  // Scan from the end for question-like lines
+  for (let i = lines.length - 1; i >= Math.max(0, lines.length - 8); i--) {
+    const line = lines[i]
+      .replace(/^[-*•\d.)\s]+/, "") // strip list markers
+      .replace(/\*\*/g, "") // strip bold
+      .trim();
+    if (line.endsWith("?") && line.length > 10 && line.length < 120) {
+      suggestions.unshift(line);
+    }
+  }
+
+  return suggestions.slice(0, 3);
+}
+
+// ─── Suggestion Pills ───────────────────────────────────────────────
+
+function SuggestionPills({
+  suggestions,
+  onSelect,
+}: {
+  suggestions: string[];
+  onSelect: (q: string) => void;
+}) {
+  if (suggestions.length === 0) return null;
+  return (
+    <div className="flex flex-wrap gap-2 pt-2">
+      {suggestions.map((s, i) => (
+        <button
+          key={i}
+          onClick={() => onSelect(s)}
+          className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-primary/5 transition-colors"
+        >
+          <Icon name="ArrowRight" className="h-3 w-3" />
+          {s}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// ─── Chat Message ───────────────────────────────────────────────────
+
 interface ChatMessageProps {
   message: UIMessage;
   isStreaming: boolean;
   isLast: boolean;
   onIngest?: (text: string) => void;
+  onFollowUp?: (query: string) => void;
 }
+
+// Stabilize plugins to prevent re-mount during streaming
+const remarkPlugins = [remarkGfm] as any;
 
 export function ChatMessage({
   message,
   isStreaming,
   isLast,
   onIngest,
+  onFollowUp,
 }: ChatMessageProps) {
   const [ingesting, setIngesting] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -286,8 +343,40 @@ export function ChatMessage({
 
       {/* Answer */}
       {textContent && (
-        <div className="rounded-xl border border-border/50 bg-card/30 p-4 sm:p-5">
-          <MarkdownContent content={textContent} />
+        <div className="text-sm leading-relaxed text-foreground">
+          <div
+            className={[
+              "prose prose-sm dark:prose-invert max-w-none",
+              "prose-p:mt-0 prose-p:mb-4 prose-p:leading-relaxed",
+              "prose-h1:text-base prose-h1:font-semibold prose-h1:mt-6 prose-h1:mb-3",
+              "prose-h2:text-sm prose-h2:font-semibold prose-h2:mt-5 prose-h2:mb-2",
+              "prose-h3:text-sm prose-h3:font-medium prose-h3:mt-5 prose-h3:mb-2",
+              "prose-h4:text-xs prose-h4:font-medium prose-h4:uppercase prose-h4:tracking-wide prose-h4:text-muted-foreground prose-h4:mt-4 prose-h4:mb-2",
+              "prose-ul:my-3 prose-ol:my-3 prose-ul:pl-5 prose-ol:pl-5",
+              "prose-li:my-1.5 prose-li:leading-relaxed",
+              "[&_li_ul]:my-0.5 [&_li_ol]:my-0.5 [&_li_li]:my-0.5",
+              "prose-blockquote:border-l-2 prose-blockquote:border-primary/30 prose-blockquote:pl-3 prose-blockquote:py-0.5 prose-blockquote:my-2 prose-blockquote:not-italic prose-blockquote:text-muted-foreground",
+              "prose-hr:my-4 prose-hr:border-border/40",
+              "prose-a:text-primary prose-a:underline prose-a:underline-offset-2 hover:prose-a:text-primary/80",
+              "prose-code:rounded prose-code:bg-muted/60 prose-code:px-1 prose-code:py-0.5 prose-code:font-mono prose-code:text-xs prose-code:before:content-none prose-code:after:content-none",
+              "prose-pre:my-2 prose-pre:overflow-x-auto prose-pre:rounded-md prose-pre:bg-muted/40 prose-pre:p-3 prose-pre:text-xs",
+              "prose-table:my-2 prose-table:w-full prose-table:border-collapse prose-table:text-xs",
+              "prose-th:px-2 prose-th:py-1.5 prose-th:text-left prose-th:text-xs prose-th:font-medium prose-th:text-muted-foreground prose-th:border-b prose-th:border-border/60",
+              "prose-td:border-t prose-td:border-border/30 prose-td:px-2 prose-td:py-1 prose-td:text-xs",
+              "prose-strong:font-semibold prose-strong:text-foreground",
+            ].join(" ")}
+          >
+            <ReactMarkdown
+              remarkPlugins={remarkPlugins}
+              components={{
+                a: (props) => (
+                  <a {...props} target="_blank" rel="noopener noreferrer" />
+                ),
+              }}
+            >
+              {textContent}
+            </ReactMarkdown>
+          </div>
           {isStreaming && isLast && (
             <span className="inline-block w-1.5 h-4 bg-primary/70 animate-pulse ml-0.5 align-text-bottom rounded-sm" />
           )}
@@ -318,6 +407,14 @@ export function ChatMessage({
             </button>
           )}
         </div>
+      )}
+
+      {/* Follow-up suggestions */}
+      {isComplete && isLast && onFollowUp && (
+        <SuggestionPills
+          suggestions={extractSuggestions(textContent)}
+          onSelect={onFollowUp}
+        />
       )}
 
       {/* Loading state — waiting for first content */}
