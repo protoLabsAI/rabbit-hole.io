@@ -19,6 +19,14 @@ import { createNeo4jClientWithIntegerConversion } from "@proto/utils";
 
 const SearchRequestSchema = z.object({
   query: z.string().min(2).max(200),
+  history: z
+    .array(
+      z.object({
+        role: z.enum(["user", "assistant"]),
+        content: z.string(),
+      })
+    )
+    .optional(),
 });
 
 // ─── SSE Helpers ────────────────────────────────────────────────────
@@ -58,10 +66,20 @@ async function searchGraph(query: string) {
     CALL db.index.fulltext.queryNodes('idx_entity_name_fulltext', $ftQuery)
     YIELD node AS e, score
     WHERE e.uid IS NOT NULL AND e.name IS NOT NULL
+    WITH e, score
+    OPTIONAL MATCH (e)-[r]-(connected)
+    WHERE connected.name IS NOT NULL
+    WITH e, score,
+         count(r) as relCount,
+         collect(DISTINCT {
+           name: connected.name,
+           type: labels(connected)[0],
+           relationship: type(r)
+         })[0..5] as connections
     RETURN
       e.uid as uid, e.name as name, labels(e)[0] as type,
       COALESCE(e.tags, []) as tags, COALESCE(e.aliases, []) as aliases,
-      score
+      score, relCount, connections
     ORDER BY score DESC, e.name ASC
     LIMIT $limit
     `,
@@ -75,6 +93,8 @@ async function searchGraph(query: string) {
     tags: r.get("tags"),
     aliases: r.get("aliases"),
     score: r.get("score"),
+    relationshipCount: r.get("relCount"),
+    connectedEntities: r.get("connections"),
   }));
 }
 
@@ -205,7 +225,7 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const { query } = validation.data;
+  const { query, history } = validation.data;
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -302,10 +322,19 @@ export async function POST(request: NextRequest) {
 
         try {
           const model = getModel("smart");
-          const answerStream = await model.stream([
+
+          // Build message array with conversation history
+          const llmMessages: Array<[string, string]> = [
             ["system", SYSTEM_PROMPT],
-            ["human", userMessage],
-          ]);
+          ];
+          if (history?.length) {
+            for (const h of history.slice(-6)) {
+              llmMessages.push([h.role === "user" ? "human" : "ai", h.content]);
+            }
+          }
+          llmMessages.push(["human", userMessage]);
+
+          const answerStream = await model.stream(llmMessages);
 
           for await (const chunk of answerStream) {
             const text =
