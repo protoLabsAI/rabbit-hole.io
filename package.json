@@ -156,6 +156,8 @@
     "vitest": "^1.6.1"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.58",
+    "@ai-sdk/react": "^3.0.118",
     "@aws-sdk/client-s3": "^3.901.0",
     "@aws-sdk/s3-request-presigner": "^3.901.0",
     "@copilotkit/react-core": "^1.10.4",
@@ -212,6 +214,7 @@
     "@types/ws": "^8.18.1",
     "@uidotdev/usehooks": "^2.4.1",
     "@xyflow/react": "^12.8.6",
+    "ai": "^6.0.116",
     "archiver": "^7.0.1",
     "canvas": "3.2.0",
     "class-variance-authority": "^0.7.1",

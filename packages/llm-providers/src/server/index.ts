@@ -5,7 +5,7 @@
  * Uses Node.js APIs - DO NOT import in client components
  */
 
-// Factory and convenience functions
+// Factory and convenience functions (LangChain)
 export { LLMProviderFactory } from "./factory/provider-factory";
 export {
   getProvider,
@@ -13,6 +13,9 @@ export {
   getModelByName,
   listProviders,
 } from "./factory/convenience";
+
+// AI SDK adapter (Vercel AI SDK v6)
+export { getAIModel, getAIModelByName, resetAIProvider } from "./ai-sdk";
 
 // Configuration (uses fs)
 export { loadConfig, getConfig } from "./config";
