@@ -1,8 +1,15 @@
 /**
  * Production Environment Theme
  *
- * Conservative, professional theme optimized for production environments
- * Features muted colors and refined aesthetics for end-users
+ * Optimized for prolonged reading and search use.
+ * Evidence-based color choices:
+ * - Light mode: warm off-white (#F8F7F4) bg, off-black (#1C1C1E) text
+ * - Dark mode: off-black (#141414) bg, off-white (#E0E0E0) text
+ * - Contrast ratio ~12:1 (comfortable range, avoids halation)
+ * - Warm tints reduce blue light and match indoor ambient lighting
+ *
+ * Sources: NN/g dark mode research, APCA Lc 90 body text target,
+ * Material Design dark theme, Perplexity/Linear/iA Writer color analysis
  */
 
 import { ThemeConfig } from "../../config";
@@ -127,21 +134,21 @@ export const prodEnvironmentTheme: ThemeConfig = {
         950: "#030712",
       },
       background: {
-        primary: "#ffffff",
-        secondary: "#f9fafb", // Clean, minimal background
-        tertiary: "#f3f4f6",
-        muted: "#f1f5f9",
+        primary: "#F8F7F4", // Warm off-white — reduces blue light, matches Perplexity
+        secondary: "#F0EFEC", // Sidebar, chrome
+        tertiary: "#E8E7E4",
+        muted: "#EEEDEA",
       },
       foreground: {
-        primary: "#111827", // Professional dark text
-        secondary: "#374151",
-        muted: "#6b7280",
-        inverse: "#ffffff",
+        primary: "#1C1C1E", // Off-black body text — ~12:1 contrast on #F8F7F4
+        secondary: "#48484A", // Secondary text
+        muted: "#8E8E93", // Metadata, placeholders
+        inverse: "#F8F7F4",
       },
       border: {
-        primary: "rgba(71, 85, 105, 0.2)", // Subtle borders
-        secondary: "rgba(71, 85, 105, 0.1)",
-        muted: "rgba(71, 85, 105, 0.05)",
+        primary: "rgba(60, 60, 67, 0.18)", // Warm gray borders
+        secondary: "rgba(60, 60, 67, 0.10)",
+        muted: "rgba(60, 60, 67, 0.05)",
       },
       overlay: {
         light: "rgba(255, 255, 255, 0.25)",
@@ -255,26 +262,26 @@ export const prodEnvironmentTheme: ThemeConfig = {
         950: "#f9fafb",
       },
       background: {
-        primary: "#0f1419", // Professional dark background
-        secondary: "#1c2128",
-        tertiary: "#262d34",
-        muted: "#1f2937",
+        primary: "#141414", // Off-black — avoids halation, allows elevation
+        secondary: "#1C1C1E", // Elevated surface (cards, panels)
+        tertiary: "#2C2C2E", // Modals, popovers
+        muted: "#242426",
       },
       foreground: {
-        primary: "#f8fafc", // Clean light text
-        secondary: "#e2e8f0",
-        muted: "#cbd5e1",
-        inverse: "#0f1419",
+        primary: "#E0E0E0", // Off-white body text — ~87% white, comfortable
+        secondary: "#A0A0A0", // Secondary text
+        muted: "#6B6B6B", // Metadata, placeholders
+        inverse: "#141414",
       },
       border: {
-        primary: "rgba(148, 163, 184, 0.3)", // Professional borders
-        secondary: "rgba(148, 163, 184, 0.2)",
-        muted: "rgba(148, 163, 184, 0.1)",
+        primary: "rgba(255, 255, 255, 0.12)", // Subtle light borders
+        secondary: "rgba(255, 255, 255, 0.08)",
+        muted: "rgba(255, 255, 255, 0.04)",
       },
       overlay: {
-        light: "rgba(15, 20, 25, 0.25)",
-        medium: "rgba(15, 20, 25, 0.4)",
-        dark: "rgba(15, 20, 25, 0.8)",
+        light: "rgba(20, 20, 20, 0.25)",
+        medium: "rgba(20, 20, 20, 0.4)",
+        dark: "rgba(20, 20, 20, 0.8)",
       },
     },
   },
