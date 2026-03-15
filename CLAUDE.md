@@ -1,69 +1,60 @@
 # CLAUDE.md
 
+## Focus
+
+The active surface is the **Search Engine** at `/`. Everything else (Atlas, Research, Evidence) exists but is not the priority. Don't modify Atlas Cytoscape code (it's being replaced with 3D). Don't restructure Research (it's being extracted into a standalone app). Focus all work on the search → knowledge graph pipeline.
+
 ## Git Workflow
 
-- **Ship to main**: Feature branches are created from `main` and PR back to `main`
-- PRs are squash-merged with auto-merge when CI passes
+- **Ship to main**: Feature branches from `main`, squash-merge PRs
 - **Never commit unresolved merge conflicts** — pre-commit hook blocks `<<<<<<` markers
-- When merging branches, always verify zero conflict markers before committing
 
 ## Code Conventions
 
 - **Monorepo**: pnpm workspace + Turborepo
-- **Testing**: Vitest, TDD approach
+- **Testing**: Vitest
 - **Linting**: ESLint flat config with strict import ordering
-- Use `getModel()` from `@proto/llm-providers/server` — never import LangChain models directly
-- Use `getGlobalNeo4jClient()` from `@proto/database` — never create Neo4j driver directly
-- Use `getGlobalPostgresPool()` from `@proto/database` — never create `Pool` directly
-- Use `generateSecureId()` from `@proto/utils` — takes no arguments, never use `crypto.randomUUID`
-- Use `Icon` from `@proto/icon-system` — never import `lucide-react` directly
-- Default theme: `prod-environment` (🐰 rabbit-hole.io branding)
+- **AI SDK**: Use `getAIModel()` from `@proto/llm-providers/server` for AI SDK models (streamText, generateText)
+- **LangChain**: Use `getModel()` from `@proto/llm-providers/server` for LangChain models (legacy paths)
+- Use `getGlobalNeo4jClient()` from `@proto/database`
+- Use `getGlobalPostgresPool()` from `@proto/database`
+- Use `generateSecureId()` from `@proto/utils`
+- Use `Icon` from `@proto/icon-system`
+- Default theme: `prod-environment` (🐰 rabbit-hole.io)
 
-## Project Structure
+## Search Engine Architecture
 
-- `apps/rabbit-hole/` — Next.js application (search engine, atlas, research, evidence)
-- `apps/rabbit-hole/app/page.tsx` — AI search engine landing page
-- `apps/rabbit-hole/app/api/search/` — Streaming search API (SSE)
-- `apps/rabbit-hole/app/api/entity-search/` — Full-text entity lookup (Neo4j Lucene)
-- `apps/rabbit-hole/app/api/ingest-bundle/` — Bundle ingestion into Neo4j
-- `packages/` — Shared libraries (@proto/types, @proto/database, @proto/ui, @proto/utils, etc.)
-- `packages/mcp-server/` — MCP server with research tools and Claude Code plugin
-- `services/job-processor/` — Media ingestion pipeline (PDF, audio, video, text)
-- `agent/` — LangGraph agent server
-- `migrations/` — Neo4j schema migrations (run with cypher-shell or Node.js)
-- `docs/` — Technical documentation (architecture, API, operations)
-- `custom-domains/` — Entity type definitions
+**Frontend**: `useChat` from `@ai-sdk/react` + `DefaultChatTransport` → `POST /api/chat`
+
+**Backend**: AI SDK v6 `streamText` with 3 tools:
+- `searchGraph` — Neo4j full-text search via Lucene index
+- `searchWeb` — Tavily advanced search
+- `searchWikipedia` — Wikipedia article fetch
+
+The agent decides tool order and iteration. `stopWhen: stepCountIs(5)`.
+
+**Graph ingestion is user-triggered** — not automatic. Users click "Add to Knowledge Graph" on a message, which calls `POST /api/chat/ingest` to extract entities and ingest via `/api/ingest-bundle`.
+
+**Key files:**
+- `app/page.tsx` — Search engine UI (useChat + ChatMessage)
+- `app/api/chat/route.ts` — Agentic search endpoint (streamText + tools)
+- `app/api/chat/ingest/route.ts` — Manual entity extraction + ingest
+- `app/api/entity-search/route.ts` — Neo4j full-text entity lookup
+- `app/hooks/useChatSearch.ts` — useChat wrapper
+- `app/hooks/useSearchSessions.ts` — Session persistence (localStorage)
+- `app/components/search/ChatMessage.tsx` — UIMessage parts renderer
+- `app/components/search/SearchInput.tsx` — Input with file attach
+- `app/components/search/SearchSidebar.tsx` — Session history + nav
+- `packages/llm-providers/src/server/ai-sdk.ts` — AI SDK provider adapter
 
 ## Product Vision
 
-Three products, shipping in order. **Current focus: Search → KG pipeline.**
+1. **Search Engine** (NOW) — Perplexity-style AI search. User-controlled graph growth.
+2. **3D Atlas** (NEXT) — Replace Cytoscape with modern 3D for millions of nodes.
+3. **Research App** (FUTURE) — Downloadable Tauri/Electron self-hostable app.
 
-1. **Search Engine** (`/`) — Active. Perplexity-style AI search. Self-growing knowledge graph.
-2. **3D Atlas** — Planned. Replace Cytoscape with modern 3D viz for millions of nodes. Don't invest in current Atlas.
-3. **Research App** — Planned. Extract research workspace into downloadable Tauri/Electron app. Self-hostable.
+## MCP Plugin
 
-The search agent is defined in the search page first, then will be reused in Atlas and Research later.
-
-## Search Engine
-
-The landing page (`/`) is a Perplexity-style AI search engine:
-
-1. Graph search via Neo4j full-text index (sub-5ms)
-2. Web research via Tavily + Wikipedia when graph is thin
-3. Auto-extract entities and ingest back (self-growing graph)
-4. Process file attachments via job-processor media pipeline
-5. Stream AI answer with citations via `getModel("smart")`
-6. Follow-up suggestions via `getModel("fast")`
-
-Sessions stored in localStorage, synced to URL via `?s=<id>`.
-
-## Rabbit Hole Plugin
-
-The rabbit-hole Claude Code plugin provides:
-
-- `/research <topic>` — Research an entity/topic and extract structured knowledge
-- `/ingest <url or file>` — Ingest URLs, PDFs, audio, video, or documents
-- `/graph <topic>` — Build and validate knowledge graph bundles
-- MCP tools: `graph_search`, `research_entity`, `extract_entities`, `validate_bundle`, `ingest_bundle`, `wikipedia_search`, `tavily_search`, `web_search`
-
-Required env vars: `RABBIT_HOLE_ROOT`, `ANTHROPIC_API_KEY`, `TAVILY_API_KEY`, `GROQ_API_KEY`
+- `/research`, `/ingest`, `/graph` commands
+- Tools: `graph_search`, `research_entity`, `extract_entities`, `validate_bundle`, `ingest_bundle`, `wikipedia_search`, `tavily_search`, `web_search`
+- Env: `RABBIT_HOLE_ROOT`, `ANTHROPIC_API_KEY`, `TAVILY_API_KEY`, `GROQ_API_KEY`
