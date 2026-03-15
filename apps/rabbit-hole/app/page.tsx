@@ -5,6 +5,7 @@ import { useCallback, useRef, useEffect, useState } from "react";
 import { Icon } from "@proto/icon-system";
 
 import { AnswerBlock } from "./components/search/AnswerBlock";
+import { EvidenceGrid } from "./components/search/EvidenceGrid";
 import { FollowUpSuggestions } from "./components/search/FollowUpSuggestions";
 import { GraphResults } from "./components/search/GraphResults";
 import { ResearchProgress } from "./components/search/ResearchProgress";
@@ -33,14 +34,11 @@ function MessageBlock({
     <div className="space-y-5 pb-6 border-b border-border/50 last:border-0">
       <h2 className="text-xl font-semibold text-foreground">{message.query}</h2>
       <GraphResults entities={message.graphEntities} />
+      <EvidenceGrid evidence={message.evidence} />
       <ResearchProgress steps={message.researchSteps} phase={message.phase} />
       <SourceCards
         sources={message.sources}
-        onViewAll={
-          message.sources.length > 3
-            ? () => onViewSources(message.sources)
-            : undefined
-        }
+        onViewAll={() => onViewSources(message.sources)}
       />
       <AnswerBlock answer={message.answer} phase={message.phase} />
       {isLatest && message.phase === "done" && (

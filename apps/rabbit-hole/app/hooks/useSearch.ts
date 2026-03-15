@@ -23,6 +23,17 @@ export interface Source {
   type: "wikipedia" | "web";
 }
 
+export interface EvidenceNode {
+  uid: string;
+  title: string;
+  kind: string;
+  publisher: string | null;
+  url: string | null;
+  date: string | null;
+  reliability: number;
+  relatedEntities: string[];
+}
+
 export interface ResearchStep {
   step: string;
   message: string;
@@ -41,6 +52,7 @@ export interface SearchMessage {
   query: string;
   phase: SearchPhase;
   graphEntities: GraphEntity[];
+  evidence: EvidenceNode[];
   sources: Source[];
   researchSteps: ResearchStep[];
   answer: string;
@@ -59,6 +71,7 @@ function emptyMessage(query: string): SearchMessage {
     query,
     phase: "searching_graph",
     graphEntities: [],
+    evidence: [],
     sources: [],
     researchSteps: [],
     answer: "",
@@ -146,6 +159,9 @@ export function useSearch() {
                         ? "answering"
                         : "researching",
                   }));
+                  break;
+                case "evidence":
+                  updateActive(() => ({ evidence: event.data ?? [] }));
                   break;
                 case "research_start":
                   updateActive(() => ({ phase: "researching" }));
