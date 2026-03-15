@@ -4,100 +4,45 @@ import { useCallback, useRef, useEffect, useState } from "react";
 
 import { Icon } from "@proto/icon-system";
 
-import { AnswerBlock } from "./components/search/AnswerBlock";
-import { EvidenceGrid } from "./components/search/EvidenceGrid";
-import { FollowUpSuggestions } from "./components/search/FollowUpSuggestions";
-import { GraphResults } from "./components/search/GraphResults";
-import { ResearchProgress } from "./components/search/ResearchProgress";
+import { ChatMessage } from "./components/search/ChatMessage";
 import { SearchInput } from "./components/search/SearchInput";
 import { SearchSidebar } from "./components/search/SearchSidebar";
-import { SourceCards } from "./components/search/SourceCards";
-import { SourcePanel } from "./components/search/SourcePanel";
 import { useTheme } from "./context/ThemeProvider";
-import { useSearch, type SearchMessage, type Source } from "./hooks/useSearch";
+import { useChatSearch } from "./hooks/useChatSearch";
 import { useSearchSessions } from "./hooks/useSearchSessions";
-
-// ─── Single Message Block ────────────────────────────────────────────
-
-function MessageBlock({
-  message,
-  onFollowUp,
-  onViewSources,
-  isLatest,
-}: {
-  message: SearchMessage;
-  onFollowUp: (q: string) => void;
-  onViewSources: (sources: Source[]) => void;
-  isLatest: boolean;
-}) {
-  return (
-    <div className="space-y-5 pb-6 border-b border-border/50 last:border-0">
-      <h2 className="text-xl font-semibold text-foreground">{message.query}</h2>
-      <GraphResults entities={message.graphEntities} />
-      <EvidenceGrid evidence={message.evidence} />
-      <ResearchProgress steps={message.researchSteps} phase={message.phase} />
-      <SourceCards
-        sources={message.sources}
-        onViewAll={() => onViewSources(message.sources)}
-      />
-      <AnswerBlock answer={message.answer} phase={message.phase} />
-      {isLatest && message.phase === "done" && (
-        <FollowUpSuggestions
-          suggestions={message.suggestions}
-          onSelect={onFollowUp}
-        />
-      )}
-      {message.error && (
-        <div className="rounded-xl border border-destructive/50 bg-destructive/5 p-4">
-          <div className="flex items-center gap-2">
-            <Icon name="AlertCircle" className="h-4 w-4 text-destructive" />
-            <p className="text-sm text-destructive">{message.error}</p>
-          </div>
-        </div>
-      )}
-      {message.phase === "searching_graph" && (
-        <div className="flex items-center gap-3 text-sm text-muted-foreground py-4">
-          <Icon name="Loader2" className="h-5 w-5 animate-spin text-primary" />
-          <span>Searching the knowledge graph...</span>
-        </div>
-      )}
-    </div>
-  );
-}
 
 // ─── Main Page ───────────────────────────────────────────────────────
 
 export default function SearchPage() {
   const { branding } = useTheme();
-  const { messages, activeMessage, isIdle, search, reset, loadMessages } =
-    useSearch();
-  const sessionMgr = useSearchSessions();
+  const {
+    messages,
+    isStreaming,
+    isIdle,
+    search,
+    reset,
+    setMessages,
+    lastAssistantMessage,
+  } = useChatSearch();
 
+  const sessionMgr = useSearchSessions();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sourcePanelSources, setSourcePanelSources] = useState<Source[]>([]);
-  const [sourcePanelOpen, setSourcePanelOpen] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  // Sync search messages to active session
+  // Sync messages to active session
   useEffect(() => {
     if (sessionMgr.activeSessionId && messages.length > 0) {
-      sessionMgr.updateSession(sessionMgr.activeSessionId, messages);
+      // Store serializable snapshot
+      sessionMgr.updateSession(sessionMgr.activeSessionId, messages as any);
     }
   }, [messages]);
 
-  // Restore session from URL on mount
-  useEffect(() => {
-    if (sessionMgr.loaded && sessionMgr.activeSession && isIdle) {
-      loadMessages(sessionMgr.activeSession.messages);
-    }
-  }, [sessionMgr.loaded, sessionMgr.activeSession?.id]);
-
   const handleSearch = useCallback(
-    (q: string, files?: any[]) => {
+    (q: string) => {
       if (!sessionMgr.activeSessionId) {
         sessionMgr.createSession(q);
       }
-      search(q, files);
+      search(q);
     },
     [search, sessionMgr]
   );
@@ -110,29 +55,46 @@ export default function SearchPage() {
   const handleSelectSession = useCallback(
     (id: string) => {
       const session = sessionMgr.sessions.find((s) => s.id === id);
-      if (session) {
+      if (session?.messages) {
         sessionMgr.selectSession(id);
-        loadMessages(session.messages);
+        setMessages(session.messages as any);
       }
       setSidebarOpen(false);
     },
-    [sessionMgr, loadMessages]
+    [sessionMgr, setMessages]
   );
 
-  const handleViewSources = useCallback((sources: Source[]) => {
-    setSourcePanelSources(sources);
-    setSourcePanelOpen(true);
-  }, []);
+  const handleIngest = useCallback(
+    async (text: string) => {
+      // Get the query from the last user message
+      const lastUser = [...messages].reverse().find((m) => m.role === "user");
+      const query =
+        lastUser?.parts
+          ?.filter(
+            (p): p is { type: "text"; text: string } => p.type === "text"
+          )
+          .map((p) => p.text)
+          .join("") || "search result";
+
+      try {
+        await fetch("/api/chat/ingest", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query, text }),
+        });
+      } catch {
+        // Best effort
+      }
+    },
+    [messages]
+  );
 
   // Auto-scroll
   useEffect(() => {
-    if (
-      activeMessage?.phase === "answering" ||
-      activeMessage?.phase === "done"
-    ) {
+    if (isStreaming) {
       bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
     }
-  }, [activeMessage?.answer, activeMessage?.phase]);
+  }, [lastAssistantMessage?.parts, isStreaming]);
 
   // ─── Empty State ─────────────────────────────────────────────────
 
@@ -142,7 +104,6 @@ export default function SearchPage() {
         <div className="absolute inset-0 bg-grid-pattern opacity-[0.03]" />
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl" />
 
-        {/* Sidebar toggle */}
         {sessionMgr.sessions.length > 0 && (
           <button
             onClick={() => setSidebarOpen(true)}
@@ -199,7 +160,6 @@ export default function SearchPage() {
 
   return (
     <div className="min-h-screen bg-background flex">
-      {/* Sidebar */}
       <SearchSidebar
         sessions={sessionMgr.sessions}
         activeSessionId={sessionMgr.activeSessionId}
@@ -208,13 +168,6 @@ export default function SearchPage() {
         onDeleteSession={sessionMgr.deleteSession}
         isOpen={sidebarOpen}
         onToggle={() => setSidebarOpen(!sidebarOpen)}
-      />
-
-      {/* Source panel (right side) */}
-      <SourcePanel
-        sources={sourcePanelSources}
-        isOpen={sourcePanelOpen}
-        onClose={() => setSourcePanelOpen(false)}
       />
 
       <div className="flex-1 flex flex-col min-w-0">
@@ -236,9 +189,10 @@ export default function SearchPage() {
                 {branding?.name || "Rabbit Hole"}
               </span>
             </button>
-            {messages.length > 1 && (
-              <span className="text-[11px] text-muted-foreground bg-muted/50 px-2 py-0.5 rounded-full">
-                {messages.length} messages
+            {isStreaming && (
+              <span className="text-[11px] text-primary bg-primary/10 px-2 py-0.5 rounded-full flex items-center gap-1">
+                <Icon name="Loader2" className="h-3 w-3 animate-spin" />
+                Researching
               </span>
             )}
             <div className="ml-auto flex items-center gap-1">
@@ -247,16 +201,6 @@ export default function SearchPage() {
                   const url = window.location.href;
                   if (navigator.clipboard?.writeText) {
                     navigator.clipboard.writeText(url);
-                  } else {
-                    // Fallback for non-HTTPS contexts
-                    const ta = document.createElement("textarea");
-                    ta.value = url;
-                    ta.style.position = "fixed";
-                    ta.style.opacity = "0";
-                    document.body.appendChild(ta);
-                    ta.select();
-                    document.execCommand("copy");
-                    document.body.removeChild(ta);
                   }
                 }}
                 className="p-1.5 text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-muted/50"
@@ -277,14 +221,14 @@ export default function SearchPage() {
 
         {/* Messages */}
         <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-6">
-          <div className="space-y-8">
+          <div className="space-y-6">
             {messages.map((msg, i) => (
-              <MessageBlock
+              <ChatMessage
                 key={msg.id}
                 message={msg}
-                onFollowUp={handleSearch}
-                onViewSources={handleViewSources}
-                isLatest={i === messages.length - 1}
+                isStreaming={isStreaming}
+                isLast={i === messages.length - 1}
+                onIngest={msg.role === "assistant" ? handleIngest : undefined}
               />
             ))}
           </div>
@@ -294,10 +238,7 @@ export default function SearchPage() {
         {/* Bottom input bar */}
         <footer className="sticky bottom-0 z-30 bg-background/80 backdrop-blur-md border-t border-border">
           <div className="max-w-3xl mx-auto px-4 py-3">
-            <SearchInput
-              onSearch={handleSearch}
-              autoFocus={activeMessage?.phase === "done"}
-            />
+            <SearchInput onSearch={handleSearch} autoFocus={!isStreaming} />
           </div>
         </footer>
       </div>
