@@ -1,8 +1,18 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
 import { Icon } from "@proto/icon-system";
 
 import type { SearchSession } from "../../hooks/useSearchSessions";
+
+const NAV_LINKS = [
+  { href: "/", icon: "Search", label: "Search" },
+  { href: "/atlas", icon: "Network", label: "Atlas" },
+  { href: "/research", icon: "FlaskConical", label: "Research" },
+  { href: "/evidence", icon: "FileStack", label: "Evidence" },
+] as const;
 
 interface SearchSidebarProps {
   sessions: SearchSession[];
@@ -44,6 +54,31 @@ function groupSessionsByDate(sessions: SearchSession[]) {
   }
 
   return { today, yesterday, thisWeek, older };
+}
+
+function NavLinks() {
+  const pathname = usePathname();
+  return (
+    <>
+      {NAV_LINKS.map((link) => {
+        const isActive = pathname === link.href;
+        return (
+          <Link
+            key={link.href}
+            href={link.href}
+            className={`flex items-center gap-2.5 px-3 py-2 text-sm rounded-lg transition-colors ${
+              isActive
+                ? "bg-muted text-foreground font-medium"
+                : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+            }`}
+          >
+            <Icon name={link.icon as any} className="h-4 w-4" />
+            {link.label}
+          </Link>
+        );
+      })}
+    </>
+  );
 }
 
 export function SearchSidebar({
@@ -142,9 +177,9 @@ export function SearchSidebar({
           )}
         </div>
 
-        {/* Footer */}
-        <div className="px-3 py-2 border-t border-border text-[10px] text-muted-foreground/50">
-          {sessions.length} sessions
+        {/* Navigation */}
+        <div className="border-t border-border px-2 py-2 space-y-0.5">
+          <NavLinks />
         </div>
       </aside>
     </>
