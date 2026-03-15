@@ -1,16 +1,15 @@
-/**
- * Global User Menu Wrapper
- *
- * Client component wrapper for the global user menu.
- * Positioned to match research workspace TabBar placement (top-right of tab bar area).
- * Visible on all pages. Clerk has been removed.
- */
-
 "use client";
+
+import { usePathname } from "next/navigation";
 
 import { GlobalUserMenu } from "./GlobalUserMenu";
 
 export function GlobalUserMenuWrapper() {
+  const pathname = usePathname();
+
+  // Hidden on search page — nav is in the sidebar
+  if (pathname === "/") return null;
+
   return (
     <div className="fixed top-2 right-4 z-50">
       <GlobalUserMenu />
