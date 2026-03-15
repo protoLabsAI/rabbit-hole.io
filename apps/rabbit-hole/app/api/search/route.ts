@@ -17,6 +17,8 @@ import { getModel } from "@proto/llm-providers/server";
 import { safeValidate } from "@proto/types";
 import { createNeo4jClientWithIntegerConversion } from "@proto/utils";
 
+const RABBIT_HOLE_URL = process.env.RABBIT_HOLE_URL || "http://localhost:3000";
+
 const SearchRequestSchema = z.object({
   query: z.string().min(2).max(200),
   history: z
@@ -206,6 +208,121 @@ async function searchWikipedia(query: string) {
   };
 }
 
+// ─── Auto-Ingest Research into Graph ────────────────────────────────
+
+async function extractAndIngest(
+  query: string,
+  wikiText: string,
+  webSources: any[],
+  controller: ReadableStreamDefaultController
+) {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey || (!wikiText && webSources.length === 0)) return;
+
+  sseEvent(
+    "research_step",
+    {
+      step: "ingesting",
+      message: "Extracting entities to enrich the knowledge graph...",
+    },
+    controller
+  );
+
+  // Build text corpus from research
+  let corpus = "";
+  if (wikiText) corpus += wikiText + "\n\n";
+  for (const s of webSources.slice(0, 3)) {
+    if (s.snippet) corpus += `${s.title}: ${s.snippet}\n\n`;
+  }
+  if (!corpus.trim()) return;
+
+  try {
+    // Extract entities via Claude
+    const extractRes = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: "claude-haiku-4-5-20251001",
+        max_tokens: 2048,
+        messages: [
+          {
+            role: "user",
+            content: `Extract entities and relationships from this text about "${query}".
+
+Return ONLY valid JSON:
+{
+  "entities": [{"uid": "{type}:{snake_name}", "name": "...", "type": "Person|Organization|Technology|Concept|Event|Publication", "properties": {}, "tags": [], "aliases": []}],
+  "relationships": [{"uid": "rel:{src}_{type}_{tgt}", "type": "RELATED_TO|AUTHORED|FOUNDED|WORKS_AT|PART_OF", "source": "entity_uid", "target": "entity_uid", "properties": {}}]
+}
+
+Text:\n${corpus.slice(0, 6000)}`,
+          },
+        ],
+      }),
+    });
+
+    if (!extractRes.ok) return;
+
+    const extractData = (await extractRes.json()) as {
+      content?: Array<{ text?: string }>;
+    };
+    const raw = extractData.content?.[0]?.text ?? "";
+
+    // Parse JSON
+    let parsed: any;
+    try {
+      let jsonStr = raw.trim();
+      const fence = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/);
+      if (fence) jsonStr = fence[1].trim();
+      parsed = JSON.parse(jsonStr);
+    } catch {
+      return;
+    }
+
+    if (!parsed?.entities?.length || !Array.isArray(parsed.entities)) return;
+
+    // Build evidence node for provenance
+    const evidenceUid = `evidence:search_${Date.now()}`;
+    const bundle = {
+      entities: parsed.entities,
+      relationships: parsed.relationships ?? [],
+      evidence: [
+        {
+          uid: evidenceUid,
+          kind: "research",
+          title: `Search: ${query}`,
+          publisher: "Rabbit Hole Search",
+          date: new Date().toISOString().slice(0, 10),
+          reliability: 0.6,
+          notes: `Auto-extracted from search for "${query}"`,
+        },
+      ],
+    };
+
+    // Fire-and-forget ingest
+    fetch(`${RABBIT_HOLE_URL}/api/ingest-bundle`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(bundle),
+    }).catch(() => {});
+
+    sseEvent(
+      "research_step",
+      {
+        step: "ingested",
+        message: `Added ${parsed.entities.length} entities to the knowledge graph`,
+      },
+      controller
+    );
+  } catch {
+    // Extraction failed — non-critical, continue
+  }
+}
+
 // ─── Answer Generation ──────────────────────────────────────────────
 
 function buildAnswerPrompt(
@@ -354,6 +471,12 @@ export async function POST(request: NextRequest) {
             })),
           ];
           sseEvent("sources", allSources, controller);
+
+          // ─── Phase 3b: Auto-ingest research into graph ──────────
+          // Fire-and-forget — don't block the answer stream
+          extractAndIngest(query, wikiText, webSources, controller).catch(
+            () => {}
+          );
         }
 
         // ─── Phase 4: Stream AI Answer ───────────────────────────
