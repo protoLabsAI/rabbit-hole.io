@@ -61,8 +61,12 @@ export default function SearchPage() {
   const handleSelectSession = useCallback(
     (id: string) => {
       const session = sessionMgr.sessions.find((s) => s.id === id);
-      if (session?.messages) {
-        sessionMgr.selectSession(id);
+      if (!session) return;
+      sessionMgr.selectSession(id);
+
+      if (session.type === "deep-research" && session.researchId) {
+        setDeepResearch({ id: session.researchId, query: session.title });
+      } else if (session.messages) {
         setMessages(session.messages as any);
       }
       setSidebarOpen(false);
@@ -70,21 +74,28 @@ export default function SearchPage() {
     [sessionMgr, setMessages]
   );
 
-  const handleDeepResearch = useCallback(async (query: string) => {
-    try {
-      const res = await fetch("/api/research/deep", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query }),
-      });
-      const data = await res.json();
-      if (data.success && data.researchId) {
-        setDeepResearch({ id: data.researchId, query });
+  const handleDeepResearch = useCallback(
+    async (query: string) => {
+      try {
+        const res = await fetch("/api/research/deep", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query }),
+        });
+        const data = await res.json();
+        if (data.success && data.researchId) {
+          sessionMgr.createSession(query, {
+            type: "deep-research",
+            researchId: data.researchId,
+          });
+          setDeepResearch({ id: data.researchId, query });
+        }
+      } catch {
+        // Best effort
       }
-    } catch {
-      // Best effort
-    }
-  }, []);
+    },
+    [sessionMgr]
+  );
 
   const handleIngest = useCallback(
     async (text: string) => {

@@ -5,7 +5,10 @@ import { useState, useCallback, useEffect } from "react";
 export interface SearchSession {
   id: string;
   title: string;
-  messages: any[]; // UIMessage[] serialized
+  type: "chat" | "deep-research";
+  messages: any[]; // UIMessage[] serialized for chat sessions
+  researchId?: string; // For deep research sessions
+  researchReport?: string;
   createdAt: number;
   updatedAt: number;
 }
@@ -90,19 +93,27 @@ export function useSearchSessions() {
 
   const activeSession = sessions.find((s) => s.id === activeSessionId) ?? null;
 
-  const createSession = useCallback((firstQuery: string): string => {
-    const id = generateSessionId();
-    const session: SearchSession = {
-      id,
-      title: firstQuery,
-      messages: [],
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    };
-    setSessions((prev) => [session, ...prev]);
-    setActiveSessionId(id);
-    return id;
-  }, []);
+  const createSession = useCallback(
+    (
+      firstQuery: string,
+      opts?: { type?: "chat" | "deep-research"; researchId?: string }
+    ): string => {
+      const id = generateSessionId();
+      const session: SearchSession = {
+        id,
+        title: firstQuery,
+        type: opts?.type || "chat",
+        messages: [],
+        researchId: opts?.researchId,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      };
+      setSessions((prev) => [session, ...prev]);
+      setActiveSessionId(id);
+      return id;
+    },
+    []
+  );
 
   const updateSession = useCallback((sessionId: string, messages: any[]) => {
     setSessions((prev) =>
@@ -119,6 +130,19 @@ export function useSearchSessions() {
       )
     );
   }, []);
+
+  const updateResearchReport = useCallback(
+    (sessionId: string, report: string) => {
+      setSessions((prev) =>
+        prev.map((s) =>
+          s.id === sessionId
+            ? { ...s, researchReport: report, updatedAt: Date.now() }
+            : s
+        )
+      );
+    },
+    []
+  );
 
   const selectSession = useCallback((sessionId: string) => {
     setActiveSessionId(sessionId);
@@ -146,6 +170,7 @@ export function useSearchSessions() {
     activeSessionId,
     createSession,
     updateSession,
+    updateResearchReport,
     selectSession,
     newSession,
     deleteSession,

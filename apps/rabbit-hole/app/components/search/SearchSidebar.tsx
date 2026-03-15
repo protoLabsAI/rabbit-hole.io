@@ -114,7 +114,14 @@ export function SearchSidebar({
                 : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
             }`}
           >
-            <Icon name="MessageSquare" className="h-3.5 w-3.5 flex-shrink-0" />
+            <Icon
+              name={
+                session.type === "deep-research"
+                  ? "FlaskConical"
+                  : "MessageSquare"
+              }
+              className="h-3.5 w-3.5 flex-shrink-0"
+            />
             <span className="truncate flex-1">{session.title}</span>
             <button
               onClick={(e) => {
