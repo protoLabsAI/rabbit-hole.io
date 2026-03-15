@@ -4,6 +4,7 @@ description: Research an entity or topic and extract structured knowledge
 category: research
 argument-hint: <topic or entity name>
 allowed-tools:
+  - mcp__rabbit-hole__graph_search
   - mcp__rabbit-hole__wikipedia_search
   - mcp__rabbit-hole__web_search
   - mcp__rabbit-hole__tavily_search
@@ -22,9 +23,19 @@ allowed-tools:
 
 You are a research assistant. The user wants to research a topic and build structured knowledge in the graph.
 
-## Assess Complexity First
+## Step 0: Check the Graph First
 
-Before starting, determine if this is a **simple** or **complex** research task:
+Before any research, search for existing knowledge:
+
+```
+graph_search(query: "<topic>", limit: 15)
+```
+
+If the entity is already well-represented (5+ relationships), tell the user what exists and ask if they want to extend it or skip. If sparse/missing, proceed.
+
+## Assess Complexity
+
+Determine if this is a **simple** or **complex** research task:
 
 **Simple** (use inline `research_entity`):
 - A single well-known entity (person, company, technology)
