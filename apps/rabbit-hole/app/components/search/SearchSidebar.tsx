@@ -65,10 +65,15 @@ export function SearchSidebar({
           {label}
         </p>
         {items.map((session) => (
-          <button
+          <div
             key={session.id}
+            role="button"
+            tabIndex={0}
             onClick={() => onSelectSession(session.id)}
-            className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors group flex items-center gap-2 ${
+            onKeyDown={(e) => {
+              if (e.key === "Enter") onSelectSession(session.id);
+            }}
+            className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors group flex items-center gap-2 cursor-pointer ${
               session.id === activeSessionId
                 ? "bg-muted text-foreground"
                 : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
@@ -85,7 +90,7 @@ export function SearchSidebar({
             >
               <Icon name="X" className="h-3 w-3" />
             </button>
-          </button>
+          </div>
         ))}
       </div>
     );
