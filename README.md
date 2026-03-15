@@ -6,14 +6,21 @@ A self-growing knowledge graph search engine. Every search makes the graph smart
 
 Rabbit Hole is an AI search engine backed by a living knowledge graph. When you search, the graph expands — new entities, relationships, and evidence are discovered and ingested in real-time. Upload documents and they become part of the knowledge base. Every piece of knowledge is traceable to its source.
 
-### Surfaces
+### Product Roadmap
+
+| Phase | Product | Status |
+|-------|---------|--------|
+| **1** | **Search Engine** (`/`) — Perplexity-style AI search. Self-growing knowledge graph. | Active |
+| **2** | **3D Atlas** — Modern 3D graph visualization for millions of nodes and communities. | Planned |
+| **3** | **Research App** — Downloadable self-hostable search engine (Tauri/Electron) with full research workspace. | Planned |
+
+### Current Surfaces
 
 | Surface | Description |
 |---------|-------------|
-| **Search** (`/`) | Perplexity-style AI search engine. Graph search + web research + streaming answers. |
-| **Atlas** (`/atlas`) | Interactive knowledge graph visualization (Cytoscape.js) |
-| **Research** (`/research`) | AI-assisted research workspace (React Flow + CopilotKit) |
-| **Evidence** (`/evidence`) | Evidence timeline and provenance viewer |
+| **Search** (`/`) | AI search engine. Graph search + web research + streaming answers + auto-ingest. |
+| **Atlas** (`/atlas`) | Knowledge graph visualization (Cytoscape.js — will be replaced with 3D) |
+| **Research** (`/research`) | Research workspace (React Flow canvas, entity cards, enrichment wizards, media upload) |
 
 ## Quick Start
 
