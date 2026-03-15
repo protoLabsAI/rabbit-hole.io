@@ -40,6 +40,7 @@
     "validate-models": "tsx scripts/validate-models.ts"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.58",
     "@langchain/anthropic": "^1.0.0",
     "@langchain/community": "^1.0.0",
     "@langchain/core": "^1.0.1",
@@ -47,6 +48,7 @@
     "@langchain/groq": "^1.0.0",
     "@langchain/ollama": "^0.1.0",
     "@langchain/openai": "^1.0.0",
+    "ai": "^6.0.116",
     "zod": "^4.1.12"
   },
   "devDependencies": {
