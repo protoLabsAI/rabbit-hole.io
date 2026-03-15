@@ -20,7 +20,7 @@ const inter = Inter({ subsets: ["latin"] });
 export function generateMetadata(): Metadata {
   const themeName = getValidatedThemeName(
     process.env.NEXT_PUBLIC_DEFAULT_THEME,
-    "prod-environment"
+    "default"
   );
   const theme = getTheme(themeName);
 
@@ -61,7 +61,7 @@ export default function RootLayout({
   // Validate theme name from env var with Zod schema
   const defaultTheme = getValidatedThemeName(
     process.env.NEXT_PUBLIC_DEFAULT_THEME,
-    "prod-environment"
+    "default"
   );
 
   return (
