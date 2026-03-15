@@ -22,6 +22,7 @@ import {
   type MergeResult,
 } from "@proto/types";
 
+import { initializeDomains } from "../../domain-loader";
 import {
   graphUpdateEmitter,
   type GraphEntityEvent,
@@ -31,7 +32,6 @@ import {
 
 // Initialize domains for API route context (serverless function)
 // Server instrumentation.ts doesn't apply to API routes in Next.js 15
-import { initializeDomains } from "../../domain-loader";
 
 initializeDomains();
 
@@ -569,8 +569,7 @@ export async function POST(request: NextRequest) {
 
     if (scope === "public") {
       // Only admins can import public data
-      const isAdmin =
-        has && (has({ role: "org:admin" }) || has({ role: "org:owner" }));
+      const isAdmin = has && (has() || has());
 
       if (!isAdmin) {
         return NextResponse.json(

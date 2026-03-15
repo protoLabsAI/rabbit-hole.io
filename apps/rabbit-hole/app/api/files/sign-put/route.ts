@@ -111,16 +111,16 @@ export const POST = withAuthAndLogging("generate signed upload URL")(async (
     }
 
     // TIER ENFORCEMENT: Check file size and storage limits
-    // clerkClient removed - using local user
-    // getUser removed - using local user
+    // Stub user object for tier enforcement (Clerk removed)
+    const stubUser = { id: userId, publicMetadata: {}, emailAddresses: [] };
     const clerkOrgId = orgId || "public";
 
     try {
       // Check single file size limit
-      await enforceFileSizeLimit(user, body.fileSize);
+      await enforceFileSizeLimit(stubUser, body.fileSize);
 
       // Check total storage limit
-      await enforceStorageLimit(user, clerkOrgId, body.fileSize);
+      await enforceStorageLimit(stubUser, clerkOrgId, body.fileSize);
     } catch (err) {
       if (err instanceof TierLimitError) {
         return NextResponse.json(

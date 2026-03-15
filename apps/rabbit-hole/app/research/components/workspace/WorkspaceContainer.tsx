@@ -7,12 +7,9 @@ import { useToast } from "@proto/ui/hooks";
 import type { CanvasType } from "@proto/workspace";
 
 import { DialogRegistry } from "@/components/ui/DialogRegistry";
-import { useCollaborationSettings } from "@/hooks/useCollaborationSettings";
 
-import { useActiveSessions } from "../../hooks/queries/useCollaborationSessions";
 import { useEntityImportFromUrl } from "../../hooks/useEntityImportFromUrl";
 import { useWorkspaceKeyboardShortcuts } from "../../hooks/useWorkspaceKeyboardShortcuts";
-import { useCollaborationStore } from "../../store/useCollaborationStore";
 
 import { AgentBundleBridge } from "./AgentBundleBridge";
 import { getCanvasRenderer } from "./canvas/CanvasRegistry";
@@ -43,8 +40,8 @@ export function WorkspaceContainer({
   const userId = "local-user";
   const organization = { id: "local-org", name: "Local Org" } as any;
 
-  // Collaboration settings (persisted to localStorage)
-  const { showPresence } = useCollaborationSettings();
+  // Collaboration settings stub (hooks removed)
+  const showPresence = false;
 
   // Auth guard
   if (!userId) {
@@ -151,16 +148,15 @@ function WorkspaceContent({
     localStorage.setItem("workspace-single-tab-mode", String(singleTabMode));
   }, [singleTabMode]);
 
-  // Use Zustand for collaboration state (prevents re-render loops)
-  const {
-    activeSessionsByTab,
-    loaded: sessionsLoaded,
-    addSession,
-    removeSession,
-    loadSessions,
-    getSessionForTab,
-    getActiveCount,
-  } = useCollaborationStore();
+  // Collaboration store stubs (modules removed)
+  const removeSession = (_tabId: string) => {};
+  const getSessionForTab = (_tabId: string): string | null => null;
+  const getActiveCount = () => 0;
+  const addSession = (
+    _tabId: string,
+    _sessionId: string,
+    _shareLink: string
+  ) => {};
 
   // Tier checking for collaboration
   const userTier = getUserTierClient(user || null);
@@ -176,32 +172,6 @@ function WorkspaceContent({
       workspaceReady: context.ready,
       pendingImport,
     });
-
-  // Use React Query to poll active sessions (auto-polls every 10s)
-  const { data: sessionsData } = useActiveSessions();
-
-  // Sync React Query data to Zustand store
-  React.useEffect(() => {
-    if (!sessionsData?.sessions) return;
-
-    const activeSessions = sessionsData.sessions
-      .filter(
-        (session: any) => session.status === "active" && !session.isExpired
-      )
-      .map((session: any) => ({
-        sessionId: session.id,
-        tabId: session.tabId,
-        createdAt: session.createdAt,
-      }));
-
-    loadSessions(activeSessions);
-
-    if (!sessionsLoaded && activeSessions.length > 0) {
-      console.log(
-        `🔄 Restored ${activeSessions.length} active sessions from database`
-      );
-    }
-  }, [sessionsData, sessionsLoaded, loadSessions]);
 
   const {
     workspace,
@@ -335,29 +305,7 @@ function WorkspaceContent({
     addTab("graph");
   }, [ready, workspace?.tabs?.length, addTab]);
 
-  // Cleanup all active sessions on unmount (browser close, navigation away)
-  // EXCEPT when navigating to session host/guest pages
-  React.useEffect(() => {
-    return () => {
-      // Don't cleanup if navigating to a session page
-      const currentPath = window.location.pathname;
-      if (currentPath.startsWith("/session/")) {
-        console.log("Skipping session cleanup - navigating to session page");
-        return;
-      }
-
-      // Get sessions at unmount time
-      const sessions = useCollaborationStore.getState().activeSessionsByTab;
-      Object.entries(sessions).forEach(([tabId, sessionId]) => {
-        fetch(`/api/collaboration/sessions/${sessionId}/end`, {
-          method: "POST",
-          keepalive: true,
-        }).catch((err) => {
-          console.error("Failed to end session on unmount:", err);
-        });
-      });
-    };
-  }, []); // Empty deps - gets fresh state at unmount
+  // Collaboration session cleanup removed (store removed)
 
   // Get active session ID for current tab
   const currentSessionId = getSessionForTab(activeTab?.id);

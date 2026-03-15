@@ -8,6 +8,12 @@
  */
 
 import {
+  CopilotKit,
+  useCopilotChatHeadless_c,
+  useCoAgent,
+  useCopilotAction,
+} from "@copilotkit/react-core";
+import {
   ReactFlow,
   Background,
   Controls,
@@ -18,13 +24,6 @@ import {
   type Edge,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-
-import { CopilotKit } from "@copilotkit/react-core";
-import {
-  useCopilotChatHeadless_c,
-  useCoAgent,
-  useCopilotAction,
-} from "@copilotkit/react-core";
 import { useState, useCallback } from "react";
 
 // ─── Canvas Component ───────────────────────────────────────────────────────
@@ -74,23 +73,37 @@ function ResearchChat({
     name: "push_entities_to_canvas",
     description: "Push research entities to the canvas for visualization",
     parameters: [
-      { name: "entities", type: "object[]", description: "Entity objects", required: true },
-      { name: "relationships", type: "object[]", description: "Relationship objects", required: false },
+      {
+        name: "entities",
+        type: "object[]",
+        description: "Entity objects",
+        required: true,
+      },
+      {
+        name: "relationships",
+        type: "object[]",
+        description: "Relationship objects",
+        required: false,
+      },
     ],
     handler: async ({ entities, relationships }) => {
-      const newNodes: Node[] = (entities ?? []).map((entity: any, i: number) => ({
-        id: entity.uid || `entity-${i}`,
-        type: "default",
-        position: { x: 200 * (i % 5), y: 200 * Math.floor(i / 5) },
-        data: { label: entity.name || entity.uid || `Entity ${i}` },
-      }));
+      const newNodes: Node[] = (entities ?? []).map(
+        (entity: any, i: number) => ({
+          id: entity.uid || `entity-${i}`,
+          type: "default",
+          position: { x: 200 * (i % 5), y: 200 * Math.floor(i / 5) },
+          data: { label: entity.name || entity.uid || `Entity ${i}` },
+        })
+      );
 
-      const newEdges: Edge[] = (relationships ?? []).map((rel: any, i: number) => ({
-        id: rel.uid || `rel-${i}`,
-        source: rel.source,
-        target: rel.target,
-        label: rel.type,
-      }));
+      const newEdges: Edge[] = (relationships ?? []).map(
+        (rel: any, i: number) => ({
+          id: rel.uid || `rel-${i}`,
+          source: rel.source,
+          target: rel.target,
+          label: rel.type,
+        })
+      );
 
       onEntitiesReceived(newNodes, newEdges);
       return `Added ${newNodes.length} entities and ${newEdges.length} relationships to canvas.`;
@@ -119,7 +132,9 @@ function ResearchChat({
         {messages.length === 0 && (
           <div className="text-center text-muted-foreground text-sm py-8">
             <p className="mb-2">Ask something like:</p>
-            <p className="italic">&ldquo;Research the key figures in the Apollo space program&rdquo;</p>
+            <p className="italic">
+              &ldquo;Research the key figures in the Apollo space program&rdquo;
+            </p>
           </div>
         )}
         {messages.map((msg: any) => (
@@ -131,7 +146,8 @@ function ResearchChat({
                 : "bg-muted mr-8"
             }`}
           >
-            {msg.content || (isLoading && msg.role === "assistant" ? "Thinking..." : "")}
+            {msg.content ||
+              (isLoading && msg.role === "assistant" ? "Thinking..." : "")}
           </div>
         ))}
         {isLoading && messages[messages.length - 1]?.role !== "assistant" && (
@@ -177,8 +193,8 @@ function ResearchChat({
 // ─── Main POC Component ─────────────────────────────────────────────────────
 
 function ResearchWorkspace() {
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
   const handleEntitiesReceived = useCallback(
     (newNodes: Node[], newEdges: Edge[]) => {
