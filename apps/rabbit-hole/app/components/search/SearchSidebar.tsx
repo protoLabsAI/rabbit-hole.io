@@ -100,17 +100,14 @@ export function SearchSidebar({
     <>
       {/* Mobile overlay */}
       {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/20 z-40 sm:hidden"
-          onClick={onToggle}
-        />
+        <div className="fixed inset-0 bg-black/20 z-40" onClick={onToggle} />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-50 h-full bg-card border-r border-border flex flex-col transition-transform duration-200 w-64 ${
+        className={`fixed top-0 left-0 z-50 h-full bg-card border-r border-border flex flex-col transition-transform duration-200 w-64 shadow-xl ${
           isOpen ? "translate-x-0" : "-translate-x-full"
-        } sm:translate-x-0 sm:static sm:z-auto ${isOpen ? "" : "sm:-translate-x-full sm:w-0 sm:border-0 sm:overflow-hidden"}`}
+        }`}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-3 py-3 border-b border-border">
