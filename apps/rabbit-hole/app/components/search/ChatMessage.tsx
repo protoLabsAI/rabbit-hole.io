@@ -203,18 +203,25 @@ function ToolCallCard({
 
 function extractSuggestions(text: string): string[] {
   if (!text) return [];
-  // Look for lines that are questions (end with ?)
-  // Typically at the end of the answer after "Follow-up" or similar
   const lines = text.split("\n").filter((l) => l.trim());
   const suggestions: string[] = [];
 
-  // Scan from the end for question-like lines
+  // Scan the last ~8 lines for search-query-style items
+  // These are short phrases in list items at the end of the answer
   for (let i = lines.length - 1; i >= Math.max(0, lines.length - 8); i--) {
     const line = lines[i]
       .replace(/^[-*•\d.)\s]+/, "") // strip list markers
       .replace(/\*\*/g, "") // strip bold
+      .replace(/^[""]|[""]$/g, "") // strip quotes
       .trim();
-    if (line.endsWith("?") && line.length > 10 && line.length < 120) {
+    // Match search queries: short phrases (not full sentences with periods mid-text)
+    if (
+      line.length > 5 &&
+      line.length < 100 &&
+      !line.startsWith("#") &&
+      !line.startsWith("http") &&
+      !line.includes(". ") // not a full sentence
+    ) {
       suggestions.unshift(line);
     }
   }
