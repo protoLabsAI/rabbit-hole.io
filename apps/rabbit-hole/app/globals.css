@@ -12,6 +12,12 @@
    BASE STYLES (non-theme related)
    ============================================================================ */
 
+/* Font smoothing for cleaner text on modern displays */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 /* Ensure smooth transitions for theme changes */
 *,
 *::before,

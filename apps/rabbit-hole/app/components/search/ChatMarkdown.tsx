@@ -13,20 +13,29 @@ import { CodeBlock } from "./CodeBlock";
 
 // ── Prose classes — exact match with ava ─────────────────────────────
 
+// Optimized for prolonged reading (Kindle/Medium/Apple Books research):
+// - prose base (16px) not prose-sm (14px) — every reading app uses 16-20px
+// - line-height 1.5-1.6 via leading-relaxed
+// - -0.003em letter-spacing (Medium's value)
+// - 1.5em paragraph spacing
+// - antialiased font smoothing
 const PROSE_CLASSES = [
-  "prose prose-sm dark:prose-invert max-w-none",
-  "prose-p:mt-0 prose-p:mb-4 prose-p:leading-relaxed",
-  "prose-h1:text-base prose-h1:font-semibold prose-h1:mt-6 prose-h1:mb-3",
-  "prose-h2:text-sm prose-h2:font-semibold prose-h2:mt-5 prose-h2:mb-2",
-  "prose-h3:text-sm prose-h3:font-medium prose-h3:mt-5 prose-h3:mb-2",
-  "prose-h4:text-xs prose-h4:font-medium prose-h4:uppercase prose-h4:tracking-wide prose-h4:text-muted-foreground prose-h4:mt-4 prose-h4:mb-2",
-  "prose-ul:my-3 prose-ol:my-3 prose-ul:pl-5 prose-ol:pl-5",
-  "prose-li:my-1.5 prose-li:leading-relaxed",
-  "[&_li_ul]:my-0.5 [&_li_ol]:my-0.5 [&_li_li]:my-0.5",
+  "prose dark:prose-invert max-w-none",
+  "antialiased",
+  "tracking-[-0.003em]",
+  "prose-p:mt-0 prose-p:mb-[1.5em] prose-p:leading-[1.6]",
+  "prose-h1:text-xl prose-h1:font-semibold prose-h1:mt-8 prose-h1:mb-4 prose-h1:tracking-[-0.015em]",
+  "prose-h2:text-lg prose-h2:font-semibold prose-h2:mt-6 prose-h2:mb-3 prose-h2:tracking-[-0.01em]",
+  "prose-h3:text-base prose-h3:font-medium prose-h3:mt-5 prose-h3:mb-2",
+  "prose-h4:text-sm prose-h4:font-medium prose-h4:uppercase prose-h4:tracking-wide prose-h4:text-muted-foreground prose-h4:mt-4 prose-h4:mb-2",
+  "prose-ul:my-4 prose-ol:my-4 prose-ul:pl-6 prose-ol:pl-6",
+  "prose-li:my-2 prose-li:leading-[1.6]",
+  "[&_li_ul]:my-1 [&_li_ol]:my-1 [&_li_li]:my-1",
   "prose-blockquote:border-l-2 prose-blockquote:border-primary/30",
-  "prose-blockquote:pl-3 prose-blockquote:py-0.5 prose-blockquote:my-2",
+  "prose-blockquote:pl-4 prose-blockquote:py-1 prose-blockquote:my-4",
   "prose-blockquote:not-italic prose-blockquote:text-muted-foreground",
-  "prose-hr:my-4 prose-hr:border-border/40",
+  "prose-hr:my-6 prose-hr:border-border/40",
+  "prose-strong:font-semibold",
   "[&_li:has(>input[type=checkbox])]:list-none [&_li:has(>input[type=checkbox])]:pl-0",
   "[&_input[type=checkbox]]:mr-1.5 [&_input[type=checkbox]]:accent-primary",
 ].join(" ");
