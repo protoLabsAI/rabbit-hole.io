@@ -234,17 +234,6 @@ const searchTools = {
     }),
     execute: async (input: { query: string }) => doSearchWikipedia(input.query),
   }),
-
-  ingestEntities: tool({
-    description:
-      "Extract entities and relationships from research text and add them to the knowledge graph. Call this after gathering information to grow the graph.",
-    inputSchema: z.object({
-      query: z.string().describe("The topic being researched"),
-      context: z.string().describe("The text to extract entities from"),
-    }),
-    execute: async (input: { query: string; context: string }) =>
-      doIngestEntities(input.query, input.context),
-  }),
 };
 
 // ─── System Prompt ──────────────────────────────────────────────────
@@ -255,8 +244,7 @@ const SYSTEM_PROMPT = `You are Rabbit Hole, an AI search engine powered by a liv
 1. ALWAYS call searchGraph first to check existing knowledge
 2. If the graph has good results (3+ entities), use them to answer
 3. If the graph is thin, call searchWeb and/or searchWikipedia for more context
-4. After gathering web research, call ingestEntities to grow the knowledge graph — pass it the topic and a concatenation of the text you found
-5. Synthesize all findings into a clear, well-cited answer
+4. Synthesize all findings into a clear, well-cited answer
 
 ## Answer Format
 - Answer directly and concisely
