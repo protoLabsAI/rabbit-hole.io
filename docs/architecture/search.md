@@ -2,71 +2,64 @@
 
 How entity search works, why it's built this way, and where it's going.
 
-## Current Architecture (v4 — AI Search Engine)
+## Current Architecture (v5 — AI SDK Agent)
 
-The landing page (`/`) is a Perplexity-style AI search engine. The full pipeline:
+The landing page (`/`) is a Perplexity-style AI search engine. The backend is an AI SDK v6 `streamText` agent that decides which tools to call and in what order:
 
 ```
-User query (+ optional file attachments)
+User query
       │
-      ├─ Phase 1: Neo4j graph search (instant, sub-5ms)
-      │     └─ Full-text index on Entity.name, aliases, tags
-      │     └─ Returns entities with relationship counts + connections
-      │
-      ├─ Phase 1b: Evidence fetch
-      │     └─ Traverses EVIDENCES/CITES/REFERENCES from found entities
-      │
-      ├─ Phase 2: Classify — need web research?
-      │     └─ If <3 graph entities → trigger web research
-      │
-      ├─ Phase 3: Web research (parallel)
-      │     ├─ Tavily (advanced search, 6 results)
-      │     └─ Wikipedia (full article text)
-      │
-      ├─ Phase 3b: Auto-ingest (fire-and-forget)
-      │     └─ Extract entities via getModel("fast")
-      │     └─ Ingest bundle to Neo4j → graph grows
-      │
-      ├─ Phase 3c: Process file attachments
-      │     └─ Send to job-processor for text extraction
-      │     └─ Extract entities from file content → ingest
-      │
-      ├─ Phase 4: Stream AI answer
-      │     └─ getModel("smart") with conversation history
-      │     └─ Context: graph entities + web sources + file text
-      │
-      └─ Phase 5: Follow-up suggestions
-            └─ getModel("fast") generates 3 follow-up queries
+      └─ POST /api/chat
+            │
+            └─ streamText agent (stopWhen: stepCountIs(5))
+                  │
+                  ├─ searchGraph — Neo4j full-text search via Lucene index
+                  │     └─ Returns entities with relationship counts + connections
+                  │
+                  ├─ searchWeb — Tavily advanced search (6 results)
+                  │     └─ Used when graph is thin
+                  │
+                  └─ searchWikipedia — Wikipedia article fetch
+                        └─ Used for foundational context on well-known topics
 ```
+
+The agent's default workflow (from the system prompt):
+1. Always call `searchGraph` first to check existing knowledge
+2. If graph has good results (3+ entities), use them to answer
+3. If graph is thin, call `searchWeb` and/or `searchWikipedia`
+4. Synthesize all findings into a well-cited answer
 
 ### Self-Growing Knowledge Graph
 
-Every search enriches the graph:
-1. Web research results are auto-extracted for entities and ingested
-2. Uploaded files are processed and their entities ingested
-3. Evidence provenance tracks where each entity came from
-4. Subsequent searches for the same topic find the new entities
+Graph growth is **user-triggered**, not automatic. After receiving an answer, users click "Add to Knowledge Graph" on a message. This calls `POST /api/chat/ingest`, which:
+1. Extracts entities from the message content via `getAIModel("fast")`
+2. Posts the bundle to `/api/ingest-bundle` → persists to Neo4j
 
 ### Sessions
 
 - Sessions stored in localStorage with URL sync (`?s=<id>`)
 - Sidebar shows grouped history (Today / Yesterday / This week / Older)
-- Conversation history (last 6 turns) sent to LLM for context
+- Conversation history sent to LLM for context on follow-up queries
 - Sessions are revisitable via URL
 
-### UI Components
+### Key Files
 
-| Component | Purpose |
-|-----------|---------|
-| `SearchInput` | Textarea with file attach (paperclip) and submit |
-| `GraphResults` | Entity cards with type icons, connections, expandable details |
-| `EvidenceGrid` | Evidence nodes with reliability scores and provenance |
-| `SourceCards` | Web source cards with favicons, clickable to open panel |
-| `SourcePanel` | Slide-in right panel with full source details |
-| `ResearchProgress` | Animated research step indicators |
-| `AnswerBlock` | Streaming markdown answer with copy button |
-| `FollowUpSuggestions` | Clickable follow-up query buttons |
-| `SearchSidebar` | Session history + navigation (Atlas, Research, Evidence) |
+| File | Purpose |
+|------|---------|
+| `app/page.tsx` | Search engine UI (`useChat` + `ChatMessage`) |
+| `app/api/chat/route.ts` | Agentic search endpoint (`streamText` + tools) |
+| `app/api/chat/ingest/route.ts` | Manual entity extraction + ingest |
+| `app/api/entity-search/route.ts` | Neo4j full-text entity lookup |
+| `app/hooks/useChatSearch.ts` | `useChat` wrapper |
+| `app/hooks/useSearchSessions.ts` | Session persistence (localStorage) |
+| `app/components/search/ChatMessage.tsx` | UIMessage parts renderer |
+| `app/components/search/SearchInput.tsx` | Input with file attach |
+| `app/components/search/SearchSidebar.tsx` | Session history + nav |
+| `packages/llm-providers/src/server/ai-sdk.ts` | AI SDK provider adapter |
+
+### Frontend
+
+Uses `useChat` from `@ai-sdk/react` with `DefaultChatTransport` posting to `POST /api/chat`. Messages are rendered as UIMessage parts (text, tool calls, tool results).
 
 ## Full-Text Index
 

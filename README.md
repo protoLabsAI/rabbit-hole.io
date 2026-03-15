@@ -48,23 +48,24 @@ open http://localhost:3000
 | Neo4j Bolt | 7687 | Graph database protocol |
 | MinIO Console | 9001 | Object storage UI |
 | Job Processor | 8680 | Media processing + job queue |
-| LangGraph Agent | 8123 | AI research agent |
 
 ## How Search Works
 
 ```
-User query (+ optional file attachments)
+User query
     │
-    ├─ Neo4j graph search (instant, sub-5ms via Lucene full-text index)
-    ├─ Evidence node fetch (provenance for found entities)
-    ├─ Web research if graph is thin (Tavily + Wikipedia, parallel)
-    ├─ Auto-extract entities → ingest back to graph (self-growing)
-    ├─ Process uploaded files via job-processor pipeline
-    ├─ Stream AI answer with citations (getModel("smart"))
-    └─ Generate follow-up suggestions (getModel("fast"))
+    └─ POST /api/chat
+          │
+          └─ AI SDK v6 streamText agent (stopWhen: stepCountIs(5))
+                │
+                ├─ searchGraph — Neo4j full-text search (instant, sub-5ms)
+                ├─ searchWeb — Tavily advanced search (when graph is thin)
+                └─ searchWikipedia — Wikipedia (foundational context)
 ```
 
-Sessions are stored locally and accessible via URL (`?s=<id>`). Conversation history provides context for follow-up questions.
+The agent decides which tools to call and in what order. Sessions are stored locally and accessible via URL (`?s=<id>`). Conversation history provides context for follow-up questions.
+
+**Graph growth is user-triggered**: click "Add to Knowledge Graph" on any answer → entities are extracted and ingested into Neo4j.
 
 ## Architecture
 
@@ -75,7 +76,7 @@ rabbit-hole.io/
 │   ├── app/atlas/             # Knowledge graph visualization
 │   ├── app/research/          # Research workspace
 │   ├── app/evidence/          # Evidence management
-│   ├── app/api/search/        # Streaming search API (SSE)
+│   ├── app/api/chat/          # Agentic search API (AI SDK streamText)
 │   ├── app/api/entity-search/ # Full-text entity lookup
 │   └── app/api/ingest-bundle/ # Bundle ingestion
 ├── packages/
@@ -111,7 +112,7 @@ The `@proto/mcp-server` provides tools for Claude Code and other MCP clients:
 
 - **Search**: Neo4j full-text (Lucene), Tavily, Wikipedia, DuckDuckGo
 - **Graph database**: Neo4j 5 with APOC
-- **AI**: Claude via `@proto/llm-providers`, LangGraph agents
+- **AI**: Claude via `@proto/llm-providers` (`getAIModel()`), AI SDK v6 agents
 - **Framework**: Next.js 15, React 19, TypeScript
 - **UI**: Tailwind CSS, @proto/ui component library, Lucide icons
 - **Media**: Job processor with adapters for PDF, audio, video, text, HTML
