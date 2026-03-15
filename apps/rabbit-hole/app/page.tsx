@@ -5,6 +5,7 @@ import { useCallback, useRef, useEffect, useState } from "react";
 import { Icon } from "@proto/icon-system";
 
 import { ChatMessage } from "./components/search/ChatMessage";
+import { DeepResearchPanel } from "./components/search/DeepResearchPanel";
 import { SearchInput } from "./components/search/SearchInput";
 import { SearchSidebar } from "./components/search/SearchSidebar";
 import { useTheme } from "./context/ThemeProvider";
@@ -28,6 +29,10 @@ export default function SearchPage() {
 
   const sessionMgr = useSearchSessions();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [deepResearch, setDeepResearch] = useState<{
+    id: string;
+    query: string;
+  } | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // Sync messages to active session
@@ -65,6 +70,22 @@ export default function SearchPage() {
     [sessionMgr, setMessages]
   );
 
+  const handleDeepResearch = useCallback(async (query: string) => {
+    try {
+      const res = await fetch("/api/research/deep", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query }),
+      });
+      const data = await res.json();
+      if (data.success && data.researchId) {
+        setDeepResearch({ id: data.researchId, query });
+      }
+    } catch {
+      // Best effort
+    }
+  }, []);
+
   const handleIngest = useCallback(
     async (text: string) => {
       // Get the query from the last user message
@@ -90,12 +111,39 @@ export default function SearchPage() {
     [messages]
   );
 
+  const handleDeepResearchIngest = useCallback(
+    async (text: string, query: string) => {
+      try {
+        await fetch("/api/chat/ingest", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query, text }),
+        });
+      } catch {
+        /* best effort */
+      }
+    },
+    []
+  );
+
   // Auto-scroll
   useEffect(() => {
     if (isStreaming) {
       bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
     }
   }, [lastAssistantMessage?.parts, isStreaming]);
+
+  // Deep research panel — renders as full-page overlay
+  if (deepResearch) {
+    return (
+      <DeepResearchPanel
+        researchId={deepResearch.id}
+        query={deepResearch.query}
+        onClose={() => setDeepResearch(null)}
+        onIngest={handleDeepResearchIngest}
+      />
+    );
+  }
 
   // ─── Empty State ─────────────────────────────────────────────────
 
@@ -136,7 +184,12 @@ export default function SearchPage() {
               </h1>
             </div>
 
-            <SearchInput onSearch={handleSearch} size="large" autoFocus />
+            <SearchInput
+              onSearch={handleSearch}
+              onDeepResearch={handleDeepResearch}
+              size="large"
+              autoFocus
+            />
 
             <div className="flex flex-wrap justify-center gap-2 mt-2">
               {["DORA metrics", "Accelerate book", "DevOps practices"].map(
@@ -245,7 +298,11 @@ export default function SearchPage() {
         {/* Bottom input bar */}
         <footer className="sticky bottom-0 z-30 bg-background/80 backdrop-blur-md border-t border-border">
           <div className="max-w-3xl mx-auto px-4 py-3">
-            <SearchInput onSearch={handleSearch} autoFocus={!isStreaming} />
+            <SearchInput
+              onSearch={handleSearch}
+              onDeepResearch={handleDeepResearch}
+              autoFocus={!isStreaming}
+            />
           </div>
         </footer>
       </div>

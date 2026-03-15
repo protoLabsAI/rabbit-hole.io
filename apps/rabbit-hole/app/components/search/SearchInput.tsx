@@ -13,6 +13,7 @@ export interface AttachedFile {
 
 interface SearchInputProps {
   onSearch: (query: string, files?: AttachedFile[]) => void;
+  onDeepResearch?: (query: string) => void;
   initialQuery?: string;
   size?: "large" | "normal";
   autoFocus?: boolean;
@@ -43,6 +44,7 @@ function formatFileSize(bytes: number): string {
 
 export function SearchInput({
   onSearch,
+  onDeepResearch,
   initialQuery = "",
   size = "normal",
   autoFocus = false,
@@ -165,6 +167,22 @@ export function SearchInput({
           <div
             className={`absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5`}
           >
+            {/* Deep Research */}
+            {onDeepResearch && query.trim() && (
+              <button
+                onClick={() => onDeepResearch(query.trim())}
+                className={`text-muted-foreground hover:text-primary transition-colors rounded-lg ${
+                  isLarge ? "p-2" : "p-1.5"
+                }`}
+                title="Deep Research (comprehensive report)"
+              >
+                <Icon
+                  name="FlaskConical"
+                  className={isLarge ? "h-5 w-5" : "h-4 w-4"}
+                />
+              </button>
+            )}
+
             {/* File attach */}
             <button
               onClick={() => fileInputRef.current?.click()}
