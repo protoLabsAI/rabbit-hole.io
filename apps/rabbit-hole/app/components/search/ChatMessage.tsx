@@ -4,21 +4,118 @@ import type { UIMessage } from "ai";
 import { useState, useCallback } from "react";
 
 import { Icon } from "@proto/icon-system";
+import { Badge } from "@proto/ui/atoms";
 import { MarkdownContent } from "@proto/ui/organisms";
 
-const TOOL_ICONS: Record<string, string> = {
-  searchGraph: "Database",
-  searchWeb: "Globe",
-  searchWikipedia: "BookOpen",
-  ingestEntities: "Plus",
+// ─── Tool Card Config ───────────────────────────────────────────────
+
+const TOOL_CONFIG: Record<
+  string,
+  { icon: string; label: string; activeLabel: string }
+> = {
+  searchGraph: {
+    icon: "Database",
+    label: "Knowledge Graph",
+    activeLabel: "Searching knowledge graph...",
+  },
+  searchWeb: {
+    icon: "Globe",
+    label: "Web Search",
+    activeLabel: "Searching the web...",
+  },
+  searchWikipedia: {
+    icon: "BookOpen",
+    label: "Wikipedia",
+    activeLabel: "Reading Wikipedia...",
+  },
 };
 
-const TOOL_LABELS: Record<string, string> = {
-  searchGraph: "Searching knowledge graph",
-  searchWeb: "Searching the web",
-  searchWikipedia: "Reading Wikipedia",
-  ingestEntities: "Adding to knowledge graph",
-};
+// ─── Rich Tool Output Renderers ─────────────────────────────────────
+
+function GraphResults({ output }: { output: any[] }) {
+  if (!Array.isArray(output) || output.length === 0) return null;
+  return (
+    <div className="flex flex-wrap gap-1.5 pt-1.5">
+      {output.slice(0, 8).map((e: any, i: number) => (
+        <div
+          key={e.uid || i}
+          className="flex items-center gap-1.5 bg-background/80 border border-border/50 rounded-md px-2 py-1"
+        >
+          <span className="text-[11px] font-medium text-foreground">
+            {e.name}
+          </span>
+          <Badge variant="secondary" className="text-[9px] font-normal">
+            {e.type}
+          </Badge>
+          {e.relationshipCount > 0 && (
+            <span className="text-[9px] text-muted-foreground">
+              {e.relationshipCount} links
+            </span>
+          )}
+        </div>
+      ))}
+      {output.length > 8 && (
+        <span className="text-[10px] text-muted-foreground self-center">
+          +{output.length - 8} more
+        </span>
+      )}
+    </div>
+  );
+}
+
+function WebResults({ output }: { output: any }) {
+  const results = output?.results;
+  if (!Array.isArray(results) || results.length === 0) return null;
+  return (
+    <div className="space-y-1 pt-1.5">
+      {results.slice(0, 4).map((r: any, i: number) => (
+        <a
+          key={r.url || i}
+          href={r.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 text-[11px] hover:text-primary transition-colors"
+        >
+          <img
+            src={`https://www.google.com/s2/favicons?domain=${new URL(r.url).hostname}&sz=16`}
+            alt=""
+            className="w-3 h-3 flex-shrink-0"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = "none";
+            }}
+          />
+          <span className="text-foreground/80 truncate">{r.title}</span>
+          <Icon
+            name="ExternalLink"
+            className="h-2.5 w-2.5 text-muted-foreground/50 flex-shrink-0"
+          />
+        </a>
+      ))}
+    </div>
+  );
+}
+
+function WikiResult({ output }: { output: any }) {
+  if (!output?.title) return null;
+  return (
+    <div className="pt-1.5">
+      <a
+        href={output.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-2 text-[11px] hover:text-primary transition-colors"
+      >
+        <Icon name="BookOpen" className="h-3 w-3 text-muted-foreground" />
+        <span className="text-foreground/80">{output.title}</span>
+        <span className="text-muted-foreground/50">
+          ({(output.text?.length || 0).toLocaleString()} chars)
+        </span>
+      </a>
+    </div>
+  );
+}
+
+// ─── Tool Call Card ─────────────────────────────────────────────────
 
 function ToolCallCard({
   toolName,
@@ -31,9 +128,12 @@ function ToolCallCard({
   output?: any;
   state: string;
 }) {
-  const [expanded, setExpanded] = useState(false);
-  const icon = TOOL_ICONS[toolName] || "Wrench";
-  const label = TOOL_LABELS[toolName] || toolName;
+  const [expanded, setExpanded] = useState(true);
+  const config = TOOL_CONFIG[toolName] || {
+    icon: "Wrench",
+    label: toolName,
+    activeLabel: `Running ${toolName}...`,
+  };
   const isRunning =
     state === "partial-call" ||
     state === "call" ||
@@ -41,53 +141,62 @@ function ToolCallCard({
     state === "input-available";
   const isDone = state === "result" || state === "output-available";
 
-  // Summarize output
   let summary = "";
   if (isDone && output) {
     if (toolName === "searchGraph" && Array.isArray(output)) {
-      summary = `Found ${output.length} entities`;
+      summary = `${output.length} entities`;
     } else if (toolName === "searchWeb" && output?.results) {
-      summary = `Found ${output.results.length} sources`;
+      summary = `${output.results.length} sources`;
     } else if (toolName === "searchWikipedia" && output?.title) {
-      summary = `Read: ${output.title}`;
-    } else if (toolName === "ingestEntities" && output?.entitiesIngested) {
-      summary = `Added ${output.entitiesIngested} entities`;
+      summary = output.title;
     }
   }
 
+  // Rich output renderer
+  const renderOutput = () => {
+    if (!isDone || !output) return null;
+    if (toolName === "searchGraph") return <GraphResults output={output} />;
+    if (toolName === "searchWeb") return <WebResults output={output} />;
+    if (toolName === "searchWikipedia") return <WikiResult output={output} />;
+    return null;
+  };
+
   return (
-    <div className="rounded-lg border border-border bg-muted/30 overflow-hidden">
+    <div className="rounded-lg border border-border/60 bg-muted/20 overflow-hidden">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+        className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
       >
         {isRunning ? (
-          <Icon
-            name="Loader2"
-            className="h-3.5 w-3.5 animate-spin text-primary"
-          />
+          <Icon name="Loader2" className="h-3 w-3 animate-spin text-primary" />
         ) : (
-          <Icon name={icon as any} className="h-3.5 w-3.5" />
+          <Icon
+            name={config.icon as any}
+            className="h-3 w-3 text-muted-foreground/70"
+          />
         )}
-        <span className="font-medium">{label}</span>
-        {summary && (
-          <span className="text-muted-foreground/60 ml-1">— {summary}</span>
+        <span className="font-medium">
+          {isRunning ? config.activeLabel : config.label}
+        </span>
+        {summary && !isRunning && (
+          <span className="text-muted-foreground/50">— {summary}</span>
+        )}
+        {input?.query && isRunning && (
+          <span className="text-primary/60 italic truncate max-w-[200px]">
+            &quot;{input.query}&quot;
+          </span>
         )}
         <Icon
           name={expanded ? "ChevronUp" : "ChevronDown"}
-          className="h-3 w-3 ml-auto"
+          className="h-3 w-3 ml-auto opacity-40"
         />
       </button>
-      {expanded && output && (
-        <div className="px-3 pb-2 border-t border-border/50">
-          <pre className="text-[10px] text-muted-foreground overflow-auto max-h-40 mt-1.5">
-            {JSON.stringify(output, null, 2).slice(0, 2000)}
-          </pre>
-        </div>
-      )}
+      {expanded && renderOutput()}
     </div>
   );
 }
+
+// ─── Chat Message ───────────────────────────────────────────────────
 
 interface ChatMessageProps {
   message: UIMessage;
@@ -103,10 +212,10 @@ export function ChatMessage({
   onIngest,
 }: ChatMessageProps) {
   const [ingesting, setIngesting] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const handleIngest = useCallback(async () => {
     if (!onIngest) return;
-    // Collect all text parts
     const text = (message.parts ?? [])
       .filter((p): p is { type: "text"; text: string } => p.type === "text")
       .map((p) => p.text)
@@ -117,45 +226,52 @@ export function ChatMessage({
     setTimeout(() => setIngesting(false), 3000);
   }, [message, onIngest]);
 
+  const handleCopy = useCallback(() => {
+    const text = (message.parts ?? [])
+      .filter((p): p is { type: "text"; text: string } => p.type === "text")
+      .map((p) => p.text)
+      .join("\n");
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(text);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [message]);
+
+  // User message
   if (message.role === "user") {
     const text = (message.parts ?? [])
       .filter((p): p is { type: "text"; text: string } => p.type === "text")
       .map((p) => p.text)
       .join("");
     return (
-      <div className="pb-4">
+      <div className="pb-2">
         <h2 className="text-xl font-semibold text-foreground">{text}</h2>
       </div>
     );
   }
 
-  // Assistant message — render parts
+  // Assistant message
   const parts = message.parts ?? [];
   const textContent = parts
     .filter((p): p is { type: "text"; text: string } => p.type === "text")
     .map((p) => p.text)
     .join("");
 
-  const toolParts = parts.filter(
-    (p) =>
-      p.type.startsWith("tool-") &&
-      p.type !== "tool-invocation" &&
-      "toolName" in p
+  // Collect all tool-related parts
+  const allTools = parts.filter(
+    (p): p is any =>
+      p.type === "tool-invocation" ||
+      (p.type.startsWith("tool-") && "toolName" in p)
   );
 
-  // Also check for generic tool-invocation type
-  const toolInvocations = parts.filter(
-    (p): p is any => p.type === "tool-invocation"
-  );
-
-  const allTools = [...toolParts, ...toolInvocations] as any[];
   const isComplete = !isStreaming || !isLast;
 
   return (
-    <div className="space-y-3 pb-6 border-b border-border/50 last:border-0">
-      {/* Tool calls */}
+    <div className="space-y-3 pb-6 border-b border-border/30 last:border-0">
+      {/* Tool calls — compact cards */}
       {allTools.length > 0 && (
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           {allTools.map((t: any, i: number) => (
             <ToolCallCard
               key={t.toolCallId || i}
@@ -168,9 +284,9 @@ export function ChatMessage({
         </div>
       )}
 
-      {/* Answer text */}
+      {/* Answer */}
       {textContent && (
-        <div className="rounded-xl border border-border bg-card/50 p-4 sm:p-6">
+        <div className="rounded-xl border border-border/50 bg-card/30 p-4 sm:p-5">
           <MarkdownContent content={textContent} />
           {isStreaming && isLast && (
             <span className="inline-block w-1.5 h-4 bg-primary/70 animate-pulse ml-0.5 align-text-bottom rounded-sm" />
@@ -178,20 +294,15 @@ export function ChatMessage({
         </div>
       )}
 
-      {/* Actions — only show when message is complete */}
+      {/* Actions */}
       {isComplete && textContent && (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <button
-            onClick={() => {
-              const url = window.location.href;
-              if (navigator.clipboard?.writeText) {
-                navigator.clipboard.writeText(textContent);
-              }
-            }}
+            onClick={handleCopy}
             className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-muted/50"
           >
-            <Icon name="Copy" className="h-3 w-3" />
-            Copy
+            <Icon name={copied ? "Check" : "Copy"} className="h-3 w-3" />
+            {copied ? "Copied" : "Copy"}
           </button>
           {onIngest && (
             <button
@@ -206,6 +317,14 @@ export function ChatMessage({
               {ingesting ? "Adding..." : "Add to Knowledge Graph"}
             </button>
           )}
+        </div>
+      )}
+
+      {/* Loading state — waiting for first content */}
+      {isStreaming && isLast && !textContent && allTools.length === 0 && (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground py-4">
+          <Icon name="Loader2" className="h-4 w-4 animate-spin text-primary" />
+          <span>Thinking...</span>
         </div>
       )}
     </div>
