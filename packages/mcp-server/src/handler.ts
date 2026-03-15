@@ -595,23 +595,36 @@ async function researchEntity(
 
 // ─── Bundle Ingest ──────────────────────────────────────────────────
 
-async function ingestBundle(bundle: Record<string, unknown>): Promise<unknown> {
+async function ingestBundle(
+  bundle: Record<string, unknown> | string
+): Promise<unknown> {
   const rabbitHoleUrl = process.env.RABBIT_HOLE_URL || "http://localhost:3000";
+
+  // The MCP SDK may pass the bundle as a pre-serialized JSON string.
+  // Parse it back to an object so we can sanitize and re-serialize cleanly.
+  let parsed: Record<string, unknown>;
+  if (typeof bundle === "string") {
+    try {
+      parsed = JSON.parse(bundle) as Record<string, unknown>;
+    } catch {
+      return { error: "Invalid bundle: failed to parse JSON string" };
+    }
+  } else {
+    parsed = { ...bundle };
+  }
 
   // Strip entityCitations/relationshipCitations if they contain plain string
   // arrays (evidence UIDs) instead of SourceGrounding objects — the API schema
   // expects { claimText, sourceUrl, excerpt, confidence } objects.
-  const sanitized = { ...bundle };
   for (const key of ["entityCitations", "relationshipCitations"] as const) {
-    const citations = sanitized[key];
+    const citations = parsed[key];
     if (citations && typeof citations === "object") {
       const values = Object.values(citations as Record<string, unknown>);
       const firstArr = values.find((v) => Array.isArray(v)) as
         | unknown[]
         | undefined;
       if (firstArr && firstArr.length > 0 && typeof firstArr[0] === "string") {
-        // Plain UID arrays — not SourceGrounding objects; remove to avoid 400
-        delete sanitized[key];
+        delete parsed[key];
       }
     }
   }
@@ -619,7 +632,7 @@ async function ingestBundle(bundle: Record<string, unknown>): Promise<unknown> {
   const res = await fetch(`${rabbitHoleUrl}/api/ingest-bundle`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(sanitized),
+    body: JSON.stringify(parsed),
   });
 
   if (!res.ok) {
