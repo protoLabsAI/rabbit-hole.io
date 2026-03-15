@@ -47,6 +47,13 @@ export async function handleToolCall(
     case "ingest_bundle":
       return await ingestBundle(args.bundle as Record<string, unknown>);
 
+    case "graph_search":
+      return await graphSearch(
+        args.query as string,
+        args.entityTypes as string[] | undefined,
+        (args.limit as number) ?? 10
+      );
+
     case "research_entity":
       return await researchEntity(
         args.query as string,
@@ -591,6 +598,61 @@ async function researchEntity(
   results.entityCitations = entityCitations;
 
   return results;
+}
+
+// ─── Graph Search ───────────────────────────────────────────────────
+
+async function graphSearch(
+  query: string,
+  entityTypes?: string[],
+  limit: number = 10
+): Promise<unknown> {
+  const rabbitHoleUrl = process.env.RABBIT_HOLE_URL || "http://localhost:3000";
+
+  const body: Record<string, unknown> = { searchQuery: query, limit };
+  if (entityTypes?.length) body.entityTypes = entityTypes;
+
+  const res = await fetch(`${rabbitHoleUrl}/api/entity-search`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    return { error: `Search API error: ${res.status} ${res.statusText}` };
+  }
+
+  const data = (await res.json()) as {
+    success: boolean;
+    data?: {
+      results?: Array<{
+        entity: { uid: string; name: string; type: string };
+        similarity: number;
+        matchReasons: string[];
+      }>;
+      totalResults?: number;
+      searchTime?: number;
+    };
+    error?: string;
+  };
+
+  if (!data.success) {
+    return { error: data.error ?? "Search failed" };
+  }
+
+  return {
+    query,
+    totalResults: data.data?.totalResults ?? 0,
+    searchTime: data.data?.searchTime,
+    results:
+      data.data?.results?.map((r) => ({
+        uid: r.entity.uid,
+        name: r.entity.name,
+        type: r.entity.type,
+        score: r.similarity,
+        matchReasons: r.matchReasons,
+      })) ?? [],
+  };
 }
 
 // ─── Bundle Ingest ──────────────────────────────────────────────────

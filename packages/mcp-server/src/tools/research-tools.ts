@@ -116,6 +116,33 @@ export const researchTools: Tool[] = [
     },
   },
   {
+    name: "graph_search",
+    description:
+      "Search the Rabbit Hole knowledge graph for existing entities by name, alias, or tag. Returns matching entities with UIDs, types, and relevance scores. Use before research_entity to check if an entity already exists in the graph.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        query: {
+          type: "string",
+          description:
+            "Entity name or search terms (e.g., 'Donald Trump', 'OpenAI', 'climate change')",
+        },
+        entityTypes: {
+          type: "array",
+          items: { type: "string" },
+          description:
+            "Optional: filter by entity type (e.g., ['Person', 'Organization'])",
+        },
+        limit: {
+          type: "number",
+          description: "Maximum results to return (default: 10, max: 50)",
+          default: 10,
+        },
+      },
+      required: ["query"],
+    },
+  },
+  {
     name: "research_entity",
     description:
       "Run the full research pipeline for an entity. Searches multiple sources, extracts entities and relationships, and assembles a complete knowledge graph bundle. This is the high-level orchestration tool — use individual tools for more control.",
