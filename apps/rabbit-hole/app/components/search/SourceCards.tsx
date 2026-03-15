@@ -1,5 +1,7 @@
 "use client";
 
+import { Icon } from "@proto/icon-system";
+
 import type { Source } from "../../hooks/useSearch";
 
 interface SourceCardsProps {
@@ -15,9 +17,14 @@ export function SourceCards({ sources, onViewAll }: SourceCardsProps) {
 
   return (
     <div className="space-y-2">
-      <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-        Sources
-      </h3>
+      <button
+        onClick={onViewAll}
+        className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground uppercase tracking-wider hover:text-foreground transition-colors"
+      >
+        <Icon name="FileStack" className="h-3.5 w-3.5" />
+        {sources.length} Sources
+        <Icon name="ChevronRight" className="h-3 w-3" />
+      </button>
       <div className="flex gap-2 overflow-x-auto">
         {visible.map((source, i) => (
           <a
@@ -54,7 +61,7 @@ export function SourceCards({ sources, onViewAll }: SourceCardsProps) {
             </div>
           </a>
         ))}
-        {remaining > 0 && onViewAll && (
+        {remaining > 0 && (
           <button
             onClick={onViewAll}
             className="flex items-center justify-center rounded-lg border border-border bg-card/50 px-4 hover:bg-muted/50 transition-colors min-w-[100px] flex-shrink-0"

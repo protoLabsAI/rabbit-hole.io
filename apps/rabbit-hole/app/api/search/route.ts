@@ -98,6 +98,45 @@ async function searchGraph(query: string) {
   }));
 }
 
+// ─── Evidence Fetch ─────────────────────────────────────────────────
+
+async function fetchEvidence(entityUids: string[]) {
+  if (entityUids.length === 0) return [];
+  const baseClient = getGlobalNeo4jClient();
+  const client = createNeo4jClientWithIntegerConversion(baseClient);
+
+  const result = await client.executeRead(
+    `
+    UNWIND $uids AS entityUid
+    MATCH (e {uid: entityUid})-[:EVIDENCES|CITES|REFERENCES*1..2]-(ev:Evidence)
+    WHERE ev.uid IS NOT NULL
+    RETURN DISTINCT
+      ev.uid as uid,
+      ev.title as title,
+      COALESCE(ev.kind, 'unknown') as kind,
+      ev.publisher as publisher,
+      ev.url as url,
+      ev.date as date,
+      COALESCE(ev.reliability, 0.5) as reliability,
+      collect(DISTINCT e.name)[0..3] as relatedEntities
+    ORDER BY ev.reliability DESC
+    LIMIT 10
+    `,
+    { uids: entityUids }
+  );
+
+  return result.records.map((r: any) => ({
+    uid: r.get("uid"),
+    title: r.get("title"),
+    kind: r.get("kind"),
+    publisher: r.get("publisher"),
+    url: r.get("url"),
+    date: r.get("date"),
+    reliability: r.get("reliability"),
+    relatedEntities: r.get("relatedEntities"),
+  }));
+}
+
 // ─── Web Search (Tavily) ───────────────────────────────────────────
 
 async function searchTavily(query: string) {
@@ -249,6 +288,17 @@ export async function POST(request: NextRequest) {
             { entities: [], searchTime: 0 },
             controller
           );
+        }
+
+        // ─── Phase 1b: Fetch Evidence ──────────────────────────
+        try {
+          const entityUids = graphEntities.map((e: any) => e.uid);
+          const evidence = await fetchEvidence(entityUids);
+          if (evidence.length > 0) {
+            sseEvent("evidence", evidence, controller);
+          }
+        } catch {
+          // Evidence fetch is optional
         }
 
         // ─── Phase 2: Classify — need web research? ─────────────
