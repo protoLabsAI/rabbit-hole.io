@@ -18,7 +18,7 @@ Rabbit Hole is an AI search engine backed by a living knowledge graph. When you 
 
 | Surface | Description |
 |---------|-------------|
-| **Search** (`/`) | AI search engine. Graph search + web research + streaming answers + auto-ingest. |
+| **Search** (`/`) | AI search engine. Graph search + web research + streaming answers + user-triggered KG ingest + deep research mode. |
 | **Atlas** (`/atlas`) | Knowledge graph visualization (Cytoscape.js — will be replaced with 3D) |
 | **Research** (`/research`) | Research workspace (React Flow canvas, entity cards, enrichment wizards, media upload) |
 
@@ -52,17 +52,36 @@ open http://localhost:3000
 
 ## How Search Works
 
+### Quick Search (`POST /api/chat`)
+
 ```
 User query (+ optional file attachments)
     │
-    ├─ Neo4j graph search (instant, sub-5ms via Lucene full-text index)
-    ├─ Evidence node fetch (provenance for found entities)
-    ├─ Web research if graph is thin (Tavily + Wikipedia, parallel)
-    ├─ Auto-extract entities → ingest back to graph (self-growing)
-    ├─ Process uploaded files via job-processor pipeline
-    ├─ Stream AI answer with citations (getModel("smart"))
-    └─ Generate follow-up suggestions (getModel("fast"))
+    ├─ searchGraph: Neo4j full-text search (sub-5ms via Lucene index)
+    ├─ searchWeb: Tavily advanced search (if graph is thin)
+    ├─ searchWikipedia: Wikipedia article fetch (for foundational context)
+    ├─ AI SDK v6 streamText with tool loop (up to 5 steps)
+    └─ Stream answer with inline citations
 ```
+
+Users can click **"Add to Knowledge Graph"** on any answer to extract entities and ingest them — graph growth is user-controlled, not automatic.
+
+### Deep Research (`POST /api/research/deep`)
+
+```
+User query
+    │
+    ├─ SCOPE: generateObject → 3-6 research dimensions (structured output)
+    ├─ PLAN REVIEW: Show dimensions to user (auto-continues)
+    ├─ RESEARCH LOOP (per dimension, up to 3 iterations):
+    │   ├─ searchGraph + searchWeb + searchWikipedia (with retry)
+    │   ├─ Compress findings → extract key finding
+    │   └─ EVALUATE: LLM checks for coverage gaps → loop if gaps found
+    ├─ SYNTHESIS: streamText → report with inline citations [1][2]
+    └─ Stream report chunks to UI as they're generated
+```
+
+Three-panel UI: Activity feed (left) | Report with ToC + citations (center) | Source cards panel (right). Cancel button preserves partial reports.
 
 Sessions are stored locally and accessible via URL (`?s=<id>`). Conversation history provides context for follow-up questions.
 
@@ -75,7 +94,9 @@ rabbit-hole.io/
 │   ├── app/atlas/             # Knowledge graph visualization
 │   ├── app/research/          # Research workspace
 │   ├── app/evidence/          # Evidence management
-│   ├── app/api/search/        # Streaming search API (SSE)
+│   ├── app/lib/search.ts      # Shared search utilities (graph, web, wiki)
+│   ├── app/api/chat/          # AI SDK v6 agentic search + ingest
+│   ├── app/api/research/deep/ # Deep research pipeline (SSE + cancel)
 │   ├── app/api/entity-search/ # Full-text entity lookup
 │   └── app/api/ingest-bundle/ # Bundle ingestion
 ├── packages/
@@ -111,7 +132,7 @@ The `@proto/mcp-server` provides tools for Claude Code and other MCP clients:
 
 - **Search**: Neo4j full-text (Lucene), Tavily, Wikipedia, DuckDuckGo
 - **Graph database**: Neo4j 5 with APOC
-- **AI**: Claude via `@proto/llm-providers`, LangGraph agents
+- **AI**: AI SDK v6 (`streamText`, `generateObject`), Claude via `@proto/llm-providers`, LangGraph agents
 - **Framework**: Next.js 15, React 19, TypeScript
 - **UI**: Tailwind CSS, @proto/ui component library, Lucide icons
 - **Media**: Job processor with adapters for PDF, audio, video, text, HTML
