@@ -203,8 +203,14 @@ export function useSearch() {
     setActiveId(null);
   }, []);
 
+  const loadMessages = useCallback((msgs: SearchMessage[]) => {
+    abortRef.current?.abort();
+    setMessages(msgs);
+    setActiveId(msgs.length > 0 ? msgs[msgs.length - 1].id : null);
+  }, []);
+
   const activeMessage = messages.find((m) => m.id === activeId) ?? null;
   const isIdle = messages.length === 0;
 
-  return { messages, activeMessage, isIdle, search, reset };
+  return { messages, activeMessage, isIdle, search, reset, loadMessages };
 }
