@@ -35,7 +35,15 @@ export interface ResearchState {
   completedAt: number | null;
 }
 
-const store = new Map<string, ResearchState>();
+// Use globalThis to survive Turbopack module isolation
+// (POST route and GET route may load this module as separate instances)
+const globalStore = globalThis as unknown as {
+  __researchStore?: Map<string, ResearchState>;
+};
+if (!globalStore.__researchStore) {
+  globalStore.__researchStore = new Map();
+}
+const store = globalStore.__researchStore;
 
 export function createResearch(id: string, query: string): ResearchState {
   const state: ResearchState = {
