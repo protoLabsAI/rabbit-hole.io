@@ -67,22 +67,31 @@ Build, validate, or extend knowledge graph bundles.
 ## Agents
 
 ### deep-research
-Comprehensive multi-source research agent. Use via the Task tool:
+Comprehensive multi-source research agent with a structured 7-phase pipeline:
+1. Scope & research brief
+2. Evidence gathering with reflection
+3. Entity extraction
+4. Cross-reference & gap filling
+5. Bundle assembly & validation
+6. Ingestion to Neo4j
+7. Summary report
+
+Uses a supervisor-researcher pattern inspired by LangChain's open_deep_research.
 
 ```
-Task(subagent_type: "rabbit-hole:deep-research",
-     prompt: "Research the history of artificial intelligence")
+Agent(subagent_type: "rabbit-hole:deep-research",
+      prompt: "Research the Apollo space program ecosystem")
 ```
 
 ### entity-extractor
 Focused entity extraction from text. Fast, uses Haiku:
 
 ```
-Task(subagent_type: "rabbit-hole:entity-extractor",
-     prompt: "Extract entities from ./document.txt")
+Agent(subagent_type: "rabbit-hole:entity-extractor",
+      prompt: "Extract entities from ./document.txt")
 ```
 
-## Available MCP Tools (10)
+## Available MCP Tools (11)
 
 | Tool | Description | Requires |
 |------|-------------|----------|
@@ -91,6 +100,7 @@ Task(subagent_type: "rabbit-hole:entity-extractor",
 | `tavily_search` | Premium web search | TAVILY_API_KEY |
 | `extract_entities` | LLM entity extraction from text | ANTHROPIC_API_KEY |
 | `validate_bundle` | Bundle integrity validation | Nothing |
+| `ingest_bundle` | Ingest bundle into Neo4j graph | App running |
 | `research_entity` | Full research pipeline | ANTHROPIC_API_KEY |
 | `ingest_url` | Ingest content from URL | Docker services |
 | `ingest_file` | Ingest local file | Docker services |
