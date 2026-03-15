@@ -2,12 +2,10 @@
 
 import { useState, useCallback, useEffect } from "react";
 
-import type { SearchMessage } from "./useSearch";
-
 export interface SearchSession {
   id: string;
   title: string;
-  messages: SearchMessage[];
+  messages: any[]; // UIMessage[] serialized
   createdAt: number;
   updatedAt: number;
 }
@@ -106,24 +104,21 @@ export function useSearchSessions() {
     return id;
   }, []);
 
-  const updateSession = useCallback(
-    (sessionId: string, messages: SearchMessage[]) => {
-      setSessions((prev) =>
-        prev.map((s) =>
-          s.id === sessionId
-            ? {
-                ...s,
-                messages,
-                updatedAt: Date.now(),
-                // Update title from first query if it changed
-                title: messages[0]?.query || s.title,
-              }
-            : s
-        )
-      );
-    },
-    []
-  );
+  const updateSession = useCallback((sessionId: string, messages: any[]) => {
+    setSessions((prev) =>
+      prev.map((s) =>
+        s.id === sessionId
+          ? {
+              ...s,
+              messages,
+              updatedAt: Date.now(),
+              // Update title from first query if it changed
+              title: messages[0]?.query || s.title,
+            }
+          : s
+      )
+    );
+  }, []);
 
   const selectSession = useCallback((sessionId: string) => {
     setActiveSessionId(sessionId);
