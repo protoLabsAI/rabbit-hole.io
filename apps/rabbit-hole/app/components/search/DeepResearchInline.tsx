@@ -212,7 +212,8 @@ export function DeepResearchInline({
       {/* Header */}
       <div className="px-4 py-3 flex items-center gap-3 border-b border-border/50">
         <div
-          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium ${modeBg} ${modeColor}`}
+          className={`flex items-center justify-center w-7 h-7 rounded-lg ${modeBg} ${modeColor}`}
+          title={modeLabel}
         >
           <Icon
             name={
@@ -220,9 +221,8 @@ export function DeepResearchInline({
                 ? ("Scale" as any)
                 : ("Microscope" as any)
             }
-            className="h-3.5 w-3.5"
+            className="h-4 w-4"
           />
-          {modeLabel}
         </div>
 
         {/* Phase pills */}

@@ -394,8 +394,10 @@ function ResearchPlanCard({
 interface DeepResearchPanelProps {
   researchId: string;
   query: string;
-  onClose: () => void;
+  onClose?: () => void;
   onIngest?: (text: string, query: string) => void;
+  /** Render embedded in page layout instead of fixed overlay */
+  embedded?: boolean;
 }
 
 export function DeepResearchPanel({
@@ -403,6 +405,7 @@ export function DeepResearchPanel({
   query,
   onClose,
   onIngest,
+  embedded = false,
 }: DeepResearchPanelProps) {
   const [events, setEvents] = useState<ResearchEvent[]>([]);
   const [phase, setPhase] = useState("scope");
@@ -592,15 +595,23 @@ export function DeepResearchPanel({
   const graphSourceCount = sources.filter((s) => s.type === "graph").length;
 
   return (
-    <div className="fixed inset-0 z-50 bg-background flex flex-col">
+    <div
+      className={
+        embedded
+          ? "flex flex-col flex-1 min-h-0"
+          : "fixed inset-0 z-50 bg-background flex flex-col"
+      }
+    >
       {/* Header */}
       <header className="border-b border-border px-4 py-3 flex items-center gap-3">
-        <button
-          onClick={onClose}
-          className="p-1.5 text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-muted/50"
-        >
-          <Icon name="ArrowLeft" className="h-4 w-4" />
-        </button>
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="p-1.5 text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-muted/50"
+          >
+            <Icon name="ArrowLeft" className="h-4 w-4" />
+          </button>
+        )}
         <div className="flex-1 min-w-0">
           <h1 className="text-sm font-semibold text-foreground truncate">
             Deep Research: {query}
@@ -671,9 +682,9 @@ export function DeepResearchPanel({
       </header>
 
       {/* Content */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden min-h-0">
         {/* Activity Feed (left) */}
-        <div className="w-60 border-r border-border flex flex-col">
+        <div className="w-60 border-r border-border flex flex-col min-h-0">
           <div className="px-3 py-2 border-b border-border/50 flex items-center justify-between">
             <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
               Activity
@@ -870,7 +881,7 @@ export function DeepResearchPanel({
 
         {/* Sources Panel (right) */}
         {sourcePanelOpen && sources.length > 0 && (
-          <div className="w-72 border-l border-border flex flex-col">
+          <div className="w-72 border-l border-border flex flex-col min-h-0">
             <div className="px-3 py-2 border-b border-border/50 flex items-center justify-between">
               <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
                 Sources ({sources.length})
