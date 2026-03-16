@@ -1,25 +1,31 @@
 {
-  "name": "Rabbit Hole Research Platform",
+  "name": "rabbit-hole.io",
   "short_name": "Rabbit Hole",
-  "description": "Deep research platform with knowledge graph visualization",
-  "start_url": "/research",
+  "description": "AI search engine powered by a self-growing knowledge graph",
+  "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f0f0f",
-  "theme_color": "#6d28d9",
+  "background_color": "#F8F7F4",
+  "theme_color": "#F8F7F4",
   "orientation": "any",
-  "categories": ["productivity", "education"],
+  "categories": ["productivity", "education", "research"],
   "icons": [
     {
-      "src": "/icon-192.svg",
+      "src": "/icons/icon-192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "/icon-512.svg",
+      "src": "/icons/icon-512.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
