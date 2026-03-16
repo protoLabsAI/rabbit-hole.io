@@ -5,7 +5,7 @@ import { useCallback, useRef, useEffect, useState } from "react";
 import { Icon } from "@proto/icon-system";
 
 import { ChatMessage } from "./components/search/ChatMessage";
-import { DeepResearchInline } from "./components/search/DeepResearchInline";
+import { DeepResearchPanel } from "./components/search/DeepResearchPanel";
 import { SearchInput, type SearchMode } from "./components/search/SearchInput";
 import { SearchSidebar } from "./components/search/SearchSidebar";
 import { useTheme } from "./context/ThemeProvider";
@@ -225,8 +225,8 @@ export default function SearchPage() {
         <div className="flex-1" />
         <div className="relative flex flex-col items-center px-4 pb-[38vh]">
           <div className="flex flex-col items-center gap-8 w-full max-w-3xl">
-            <div className="flex flex-col items-center gap-3">
-              <BrandLogo logo={branding?.logo} size={64} />
+            <div className="flex items-center gap-2">
+              <BrandLogo logo={branding?.logo} size={48} />
               <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-foreground">
                 {branding?.name || "Rabbit Hole"}
               </h1>
@@ -256,7 +256,9 @@ export default function SearchPage() {
   // ─── Conversation Thread ─────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div
+      className={`bg-background flex ${activeResearch ? "h-screen overflow-hidden" : "min-h-screen"}`}
+    >
       <SearchSidebar
         sessions={sessionMgr.sessions}
         activeSessionId={sessionMgr.activeSessionId}
@@ -267,7 +269,7 @@ export default function SearchPage() {
         onToggle={() => setSidebarOpen(!sidebarOpen)}
       />
 
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 min-h-0">
         {/* Top bar */}
         <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border">
           <div className="max-w-3xl mx-auto px-4 py-3 flex items-center gap-3">
@@ -316,55 +318,48 @@ export default function SearchPage() {
           </div>
         </header>
 
-        {/* Messages + Research */}
-        <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-6">
-          <div className="space-y-2">
-            {messages.map((msg, i) => (
-              <ChatMessage
-                key={msg.id}
-                message={msg}
-                isStreaming={isStreaming}
-                isLast={i === messages.length - 1 && !activeResearch}
-                onIngest={msg.role === "assistant" ? handleIngest : undefined}
-                onFollowUp={handleSearch}
-                onRegenerate={
-                  msg.role === "assistant" &&
-                  i === messages.length - 1 &&
-                  !activeResearch
-                    ? regenerate
-                    : undefined
-                }
-              />
-            ))}
-
-            {/* Inline Deep Research */}
-            {activeResearch && (
-              <div className="py-2">
-                {/* User query badge */}
-                <div className="flex items-start gap-3 mb-3">
-                  <div className="w-0.5 self-stretch bg-primary/40 rounded-full flex-shrink-0" />
-                  <p className="text-sm text-foreground py-1">
-                    {activeResearch.query}
-                  </p>
-                </div>
-                <DeepResearchInline
-                  researchId={activeResearch.id}
-                  query={activeResearch.query}
-                  mode={activeResearch.mode}
-                  onIngest={handleResearchIngest}
-                />
+        {/* Deep Research — panel layout */}
+        {activeResearch ? (
+          <DeepResearchPanel
+            researchId={activeResearch.id}
+            query={activeResearch.query}
+            onIngest={handleResearchIngest}
+            embedded
+          />
+        ) : (
+          <>
+            {/* Messages */}
+            <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-6">
+              <div className="space-y-2">
+                {messages.map((msg, i) => (
+                  <ChatMessage
+                    key={msg.id}
+                    message={msg}
+                    isStreaming={isStreaming}
+                    isLast={i === messages.length - 1}
+                    onIngest={
+                      msg.role === "assistant" ? handleIngest : undefined
+                    }
+                    onFollowUp={handleSearch}
+                    onRegenerate={
+                      msg.role === "assistant" && i === messages.length - 1
+                        ? regenerate
+                        : undefined
+                    }
+                  />
+                ))}
               </div>
-            )}
-          </div>
-          <div ref={bottomRef} />
-        </main>
+              <div ref={bottomRef} />
+            </main>
 
-        {/* Bottom input bar */}
-        <footer className="sticky bottom-0 z-30 bg-background/80 backdrop-blur-md border-t border-border">
-          <div className="max-w-3xl mx-auto px-4 py-3">
-            <SearchInput onSearch={handleSearch} autoFocus={!isStreaming} />
-          </div>
-        </footer>
+            {/* Bottom input bar */}
+            <footer className="sticky bottom-0 z-30 bg-background/80 backdrop-blur-md border-t border-border">
+              <div className="max-w-3xl mx-auto px-4 py-3">
+                <SearchInput onSearch={handleSearch} autoFocus={!isStreaming} />
+              </div>
+            </footer>
+          </>
+        )}
       </div>
     </div>
   );
