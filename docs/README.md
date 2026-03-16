@@ -28,8 +28,9 @@ Technical documentation for the Rabbit Hole knowledge graph platform.
 |----------|--------|---------|
 | `/api/chat` | POST | Agentic search — AI SDK streamText with tools |
 | `/api/chat/ingest` | POST | Manual entity extraction + KG ingestion |
-| `/api/research/deep` | POST | Start deep research job |
+| `/api/research/deep` | POST | Start deep research job (mode: deep-research or due-diligence) |
 | `/api/research/deep/:id` | GET | SSE stream for research progress |
+| `/api/research/deep/:id` | DELETE | Cancel a running research job |
 | `/api/research/deep/:id/status` | GET | Polling fallback for research status |
 
 ## Operations
