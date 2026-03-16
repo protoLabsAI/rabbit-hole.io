@@ -12,6 +12,23 @@ import { useTheme } from "./context/ThemeProvider";
 import { useChatSearch } from "./hooks/useChatSearch";
 import { useSearchSessions } from "./hooks/useSearchSessions";
 
+// ─── Brand Logo ─────────────────────────────────────────────────────
+
+function BrandLogo({ logo, size = 24 }: { logo?: string; size?: number }) {
+  if (logo?.startsWith("/")) {
+    return (
+      <img
+        src={logo}
+        alt="Logo"
+        width={size}
+        height={size}
+        className="dark:invert"
+      />
+    );
+  }
+  return <span style={{ fontSize: size * 0.8 }}>{logo || "🐰"}</span>;
+}
+
 // ─── Types ──────────────────────────────────────────────────────────
 
 interface ActiveResearch {
@@ -199,9 +216,7 @@ export default function SearchPage() {
         <div className="relative flex flex-col items-center px-4 pb-[38vh]">
           <div className="flex flex-col items-center gap-8 w-full max-w-3xl">
             <div className="flex flex-col items-center gap-3">
-              <span className="text-5xl sm:text-6xl">
-                {branding?.logo || "🐰"}
-              </span>
+              <BrandLogo logo={branding?.logo} size={64} />
               <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-foreground">
                 {branding?.name || "Rabbit Hole"}
               </h1>
@@ -256,7 +271,7 @@ export default function SearchPage() {
               onClick={handleNewSession}
               className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors flex-shrink-0"
             >
-              <span className="text-lg">{branding?.logo || "🐰"}</span>
+              <BrandLogo logo={branding?.logo} size={20} />
               <span className="font-medium hidden sm:inline">
                 {branding?.name || "Rabbit Hole"}
               </span>

@@ -33,8 +33,14 @@ export function generateMetadata(): Metadata {
     title: theme.branding.name,
     description: theme.branding.tagline || "Knowledge graph platform",
     icons: {
-      icon: theme.branding.favicon,
-      apple: "/icon-192.svg",
+      icon: [
+        { url: "/favicon.svg", type: "image/svg+xml" },
+        { url: "/favicon.ico", sizes: "32x32" },
+      ],
+      apple: "/apple-touch-icon.png",
+    },
+    openGraph: {
+      images: [{ url: "/og-image.png", width: 1200, height: 630 }],
     },
     manifest: "/manifest.json",
     appleWebApp: {
@@ -47,8 +53,8 @@ export function generateMetadata(): Metadata {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0f0f0f" },
+    { media: "(prefers-color-scheme: light)", color: "#F8F7F4" },
+    { media: "(prefers-color-scheme: dark)", color: "#141414" },
   ],
   colorScheme: "light dark",
 };
