@@ -16,13 +16,23 @@ import { useSearchSessions } from "./hooks/useSearchSessions";
 
 function BrandLogo({ logo, size = 24 }: { logo?: string; size?: number }) {
   if (logo?.startsWith("/")) {
+    // CSS mask renders the SVG shape in currentColor (adapts to light/dark)
     return (
-      <img
-        src={logo}
-        alt="Logo"
-        width={size}
-        height={size}
-        className="dark:invert"
+      <span
+        className="inline-block text-foreground"
+        style={{
+          width: size,
+          height: size,
+          backgroundColor: "currentColor",
+          maskImage: `url(${logo})`,
+          WebkitMaskImage: `url(${logo})`,
+          maskSize: "contain",
+          WebkitMaskSize: "contain",
+          maskRepeat: "no-repeat",
+          WebkitMaskRepeat: "no-repeat",
+          maskPosition: "center",
+          WebkitMaskPosition: "center",
+        }}
       />
     );
   }

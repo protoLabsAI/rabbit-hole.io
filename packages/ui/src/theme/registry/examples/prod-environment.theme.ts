@@ -22,7 +22,7 @@ export const prodEnvironmentTheme: ThemeConfig = {
   branding: {
     name: "rabbit-hole.io",
     tagline: "Alice was on to something",
-    logo: "/rabbit-hole.svg",
+    logo: "/rabbit-hole-icon.svg",
     favicon: "/favicon.svg",
     homeUrl: "/",
   },
