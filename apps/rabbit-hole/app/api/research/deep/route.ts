@@ -36,6 +36,7 @@ import {
 
 const RequestSchema = z.object({
   query: z.string().min(2).max(500),
+  mode: z.enum(["deep-research", "due-diligence"]).default("deep-research"),
 });
 
 // ─── Abort Guard ──────────────────────────────────────────────────────
@@ -48,7 +49,11 @@ function checkAbort(researchId: string) {
 
 // ─── Research Pipeline ───────────────────────────────────────────────
 
-async function runResearch(researchId: string, query: string) {
+async function runResearch(
+  researchId: string,
+  query: string,
+  mode: "deep-research" | "due-diligence" = "deep-research"
+) {
   const emit = (type: string, data: unknown) =>
     addEvent(researchId, type, data);
 
@@ -87,7 +92,17 @@ async function runResearch(researchId: string, query: string) {
           .array(z.string())
           .describe("3-6 specific research dimensions to investigate"),
       }),
-      prompt: `You are planning a deep research investigation on: "${query}"
+      prompt:
+        mode === "due-diligence"
+          ? `You are planning a due diligence investigation on: "${query}"
+
+Write a brief and identify 3-6 evaluation dimensions. Focus on:
+- Performance and scalability evidence
+- Compatibility and integration risks
+- Community support and maintenance trajectory
+- Alternatives and trade-offs
+- Real-world case studies and production usage`
+          : `You are planning a deep research investigation on: "${query}"
 
 Write a research brief and identify 3-6 specific research dimensions to investigate.
 Each dimension should be a focused sub-topic that, combined, gives comprehensive coverage.`,
@@ -411,9 +426,40 @@ Be conservative — only flag genuine gaps, not minor tangents.`,
       .join("\n");
 
     const reportModel = getAIModel("smart");
+
+    const synthesisInstructions =
+      mode === "due-diligence"
+        ? `## Instructions
+Write a structured due diligence report with these sections:
+1. **Executive Summary** — What was evaluated and the top-level recommendation
+2. **Analysis** — Evidence-based evaluation of each dimension
+3. **Strengths** — What works well, with specific evidence
+4. **Risks & Concerns** — What could go wrong, with specific evidence
+5. **Alternatives Considered** — Other approaches and why they were ranked lower
+6. **Recommendation** — Clear recommendation with confidence level and caveats
+
+## Format
+- Use markdown with clear ## headings
+- Be evidence-driven — every claim needs a citation
+- Include specific metrics, benchmarks, or case studies where available
+- Be honest about uncertainty
+- End with 3-5 "Related Topics" as short search phrases`
+        : `## Instructions
+Write a well-structured, comprehensive research report with these sections:
+1. **Executive Summary** — 2-3 paragraph overview
+2. **Key Findings** — organized by theme with specific facts
+3. **Detailed Analysis** — deep dive into the most important aspects
+4. **Connections & Relationships** — how entities and concepts relate
+5. **Conclusions** — implications and significance
+
+## Format
+- Use markdown with clear ## headings
+- Be thorough but readable (aim for 1500-3000 words)
+- End with 3-5 "Related Topics" as short search phrases (not questions)`;
+
     const reportStream = streamText({
       model: reportModel,
-      prompt: `You are writing a comprehensive research report on: "${query}"
+      prompt: `You are writing a ${mode === "due-diligence" ? "due diligence report" : "comprehensive research report"} on: "${query}"
 
 Research brief: ${brief}
 
@@ -423,24 +469,13 @@ ${allNotes.join("\n\n---\n\n")}
 ## Available Sources
 ${sourceList}
 
-## Instructions
-Write a well-structured, comprehensive research report with these sections:
-1. **Executive Summary** — 2-3 paragraph overview
-2. **Key Findings** — organized by theme with specific facts
-3. **Detailed Analysis** — deep dive into the most important aspects
-4. **Connections & Relationships** — how entities and concepts relate
-5. **Conclusions** — implications and significance
+${synthesisInstructions}
 
 ## Citation Rules
 - Use inline citations like [1], [2], etc. referring to the numbered sources above
 - Cite specific claims — don't just cite generally
 - Every major fact should have at least one citation
-- Use multiple citations where evidence converges: [1][3]
-
-## Format
-- Use markdown with clear ## headings
-- Be thorough but readable (aim for 1500-3000 words)
-- End with 3-5 "Related Topics" as short search phrases (not questions)`,
+- Use multiple citations where evidence converges: [1][3]`,
     });
 
     // Stream report chunks as events
@@ -521,13 +556,13 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { query } = validation.data;
+  const { query, mode } = validation.data;
   const researchId = `research_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
 
   createResearch(researchId, query);
 
   // Run research in background (don't await)
-  runResearch(researchId, query).catch((err) => {
+  runResearch(researchId, query, mode).catch((err) => {
     console.error(`[deep-research] Fatal error for ${researchId}:`, err);
     updateResearch(researchId, {
       status: "failed",

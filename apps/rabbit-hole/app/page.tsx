@@ -5,12 +5,20 @@ import { useCallback, useRef, useEffect, useState } from "react";
 import { Icon } from "@proto/icon-system";
 
 import { ChatMessage } from "./components/search/ChatMessage";
-import { DeepResearchPanel } from "./components/search/DeepResearchPanel";
-import { SearchInput } from "./components/search/SearchInput";
+import { DeepResearchInline } from "./components/search/DeepResearchInline";
+import { SearchInput, type SearchMode } from "./components/search/SearchInput";
 import { SearchSidebar } from "./components/search/SearchSidebar";
 import { useTheme } from "./context/ThemeProvider";
 import { useChatSearch } from "./hooks/useChatSearch";
 import { useSearchSessions } from "./hooks/useSearchSessions";
+
+// ─── Types ──────────────────────────────────────────────────────────
+
+interface ActiveResearch {
+  id: string;
+  query: string;
+  mode: "deep-research" | "due-diligence";
+}
 
 // ─── Main Page ───────────────────────────────────────────────────────
 
@@ -29,25 +37,31 @@ export default function SearchPage() {
 
   const sessionMgr = useSearchSessions();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [deepResearch, setDeepResearch] = useState<{
-    id: string;
-    query: string;
-  } | null>(null);
+  const [activeResearch, setActiveResearch] = useState<ActiveResearch | null>(
+    null
+  );
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // Sync messages to active session
   useEffect(() => {
     if (sessionMgr.activeSessionId && messages.length > 0) {
-      // Store serializable snapshot
       sessionMgr.updateSession(sessionMgr.activeSessionId, messages as any);
     }
   }, [messages]);
 
   const handleSearch = useCallback(
-    (q: string) => {
+    (q: string, _files?: any[], mode?: SearchMode) => {
+      // Slash command modes → deep research
+      if (mode === "deep-research" || mode === "due-diligence") {
+        handleDeepResearch(q, mode);
+        return;
+      }
+
+      // Normal search
       if (!sessionMgr.activeSessionId) {
         sessionMgr.createSession(q);
       }
+      setActiveResearch(null);
       search(q);
     },
     [search, sessionMgr]
@@ -55,6 +69,7 @@ export default function SearchPage() {
 
   const handleNewSession = useCallback(() => {
     reset();
+    setActiveResearch(null);
     sessionMgr.newSession();
   }, [reset, sessionMgr]);
 
@@ -65,22 +80,28 @@ export default function SearchPage() {
       sessionMgr.selectSession(id);
 
       if (session.type === "deep-research" && session.researchId) {
-        setDeepResearch({ id: session.researchId, query: session.title });
+        setActiveResearch({
+          id: session.researchId,
+          query: session.title,
+          mode: "deep-research",
+        });
+        reset();
       } else if (session.messages) {
+        setActiveResearch(null);
         setMessages(session.messages as any);
       }
       setSidebarOpen(false);
     },
-    [sessionMgr, setMessages]
+    [sessionMgr, setMessages, reset]
   );
 
   const handleDeepResearch = useCallback(
-    async (query: string) => {
+    async (query: string, mode: "deep-research" | "due-diligence") => {
       try {
         const res = await fetch("/api/research/deep", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ query }),
+          body: JSON.stringify({ query, mode }),
         });
         const data = await res.json();
         if (data.success && data.researchId) {
@@ -88,18 +109,18 @@ export default function SearchPage() {
             type: "deep-research",
             researchId: data.researchId,
           });
-          setDeepResearch({ id: data.researchId, query });
+          setActiveResearch({ id: data.researchId, query, mode });
+          reset(); // Clear chat messages so research is the focus
         }
       } catch {
         // Best effort
       }
     },
-    [sessionMgr]
+    [sessionMgr, reset]
   );
 
   const handleIngest = useCallback(
     async (text: string) => {
-      // Get the query from the last user message
       const lastUser = [...messages].reverse().find((m) => m.role === "user");
       const query =
         lastUser?.parts
@@ -122,7 +143,7 @@ export default function SearchPage() {
     [messages]
   );
 
-  const handleDeepResearchIngest = useCallback(
+  const handleResearchIngest = useCallback(
     async (text: string, query: string) => {
       try {
         await fetch("/api/chat/ingest", {
@@ -139,26 +160,17 @@ export default function SearchPage() {
 
   // Auto-scroll
   useEffect(() => {
-    if (isStreaming) {
+    if (isStreaming || activeResearch) {
       bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
     }
-  }, [lastAssistantMessage?.parts, isStreaming]);
+  }, [lastAssistantMessage?.parts, isStreaming, activeResearch]);
 
-  // Deep research panel — renders as full-page overlay
-  if (deepResearch) {
-    return (
-      <DeepResearchPanel
-        researchId={deepResearch.id}
-        query={deepResearch.query}
-        onClose={() => setDeepResearch(null)}
-        onIngest={handleDeepResearchIngest}
-      />
-    );
-  }
+  // Determine if we're in "idle" state (no messages AND no active research)
+  const showEmptyState = isIdle && !activeResearch;
 
   // ─── Empty State ─────────────────────────────────────────────────
 
-  if (isIdle) {
+  if (showEmptyState) {
     return (
       <div className="relative h-screen bg-gradient-to-b from-background via-background to-muted/10 overflow-hidden flex flex-col">
         <div className="absolute inset-0 bg-grid-pattern opacity-[0.03]" />
@@ -195,12 +207,7 @@ export default function SearchPage() {
               </h1>
             </div>
 
-            <SearchInput
-              onSearch={handleSearch}
-              onDeepResearch={handleDeepResearch}
-              size="large"
-              autoFocus
-            />
+            <SearchInput onSearch={handleSearch} size="large" autoFocus />
 
             <div className="flex flex-wrap justify-center gap-2 mt-2">
               {["DORA metrics", "Accelerate book", "DevOps practices"].map(
@@ -257,7 +264,7 @@ export default function SearchPage() {
             {isStreaming && (
               <span className="text-[11px] text-primary bg-primary/10 px-2 py-0.5 rounded-full flex items-center gap-1">
                 <Icon name="Loader2" className="h-3 w-3 animate-spin" />
-                Researching
+                Searching
               </span>
             )}
             <div className="ml-auto flex items-center gap-1">
@@ -284,7 +291,7 @@ export default function SearchPage() {
           </div>
         </header>
 
-        {/* Messages */}
+        {/* Messages + Research */}
         <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-6">
           <div className="space-y-2">
             {messages.map((msg, i) => (
@@ -292,16 +299,37 @@ export default function SearchPage() {
                 key={msg.id}
                 message={msg}
                 isStreaming={isStreaming}
-                isLast={i === messages.length - 1}
+                isLast={i === messages.length - 1 && !activeResearch}
                 onIngest={msg.role === "assistant" ? handleIngest : undefined}
                 onFollowUp={handleSearch}
                 onRegenerate={
-                  msg.role === "assistant" && i === messages.length - 1
+                  msg.role === "assistant" &&
+                  i === messages.length - 1 &&
+                  !activeResearch
                     ? regenerate
                     : undefined
                 }
               />
             ))}
+
+            {/* Inline Deep Research */}
+            {activeResearch && (
+              <div className="py-2">
+                {/* User query badge */}
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-0.5 self-stretch bg-primary/40 rounded-full flex-shrink-0" />
+                  <p className="text-sm text-foreground py-1">
+                    {activeResearch.query}
+                  </p>
+                </div>
+                <DeepResearchInline
+                  researchId={activeResearch.id}
+                  query={activeResearch.query}
+                  mode={activeResearch.mode}
+                  onIngest={handleResearchIngest}
+                />
+              </div>
+            )}
           </div>
           <div ref={bottomRef} />
         </main>
@@ -309,11 +337,7 @@ export default function SearchPage() {
         {/* Bottom input bar */}
         <footer className="sticky bottom-0 z-30 bg-background/80 backdrop-blur-md border-t border-border">
           <div className="max-w-3xl mx-auto px-4 py-3">
-            <SearchInput
-              onSearch={handleSearch}
-              onDeepResearch={handleDeepResearch}
-              autoFocus={!isStreaming}
-            />
+            <SearchInput onSearch={handleSearch} autoFocus={!isStreaming} />
           </div>
         </footer>
       </div>
