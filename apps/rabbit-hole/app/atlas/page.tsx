@@ -6,12 +6,12 @@
 
 import { Suspense } from "react";
 
-import AtlasClient from "./AtlasClient";
+import Atlas3DClient from "./Atlas3DClient";
 
 export default function AtlasPage() {
   return (
     <Suspense fallback={<AtlasLoading />}>
-      <AtlasClient />
+      <Atlas3DClient />
     </Suspense>
   );
 }
