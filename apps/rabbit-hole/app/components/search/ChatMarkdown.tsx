@@ -2,12 +2,13 @@
 
 /**
  * ChatMarkdown — Streaming-safe markdown renderer with inline citations.
+ * Uses streamdown for streaming-optimized rendering with word-by-word animation.
  * Ported from @protolabsai/ui/ai ChatMessageMarkdown.
  */
 
 import { useMemo, useState } from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import { Streamdown } from "streamdown";
+import "streamdown/styles.css";
 
 import { CodeBlock } from "./CodeBlock";
 
@@ -141,124 +142,189 @@ export function ChatMarkdown({
   className,
   sources,
 }: ChatMarkdownProps) {
-  // Stable plugins — prevent re-mount during streaming
-  const remarkPlugins = useMemo(() => [remarkGfm], []);
-
   // Pre-process citations if sources are provided
   const processedContent = useMemo(
     () => (sources?.length ? preprocessCitations(content) : content),
     [content, sources?.length]
   );
 
+  // Stable components object — prevent re-creation during streaming
+  const components = useMemo(
+    () => ({
+      // Links + Citation badges
+      a: ({
+        href,
+        children,
+        node: _node,
+        ...props
+      }: React.AnchorHTMLAttributes<HTMLAnchorElement> & {
+        node?: unknown;
+      }) => {
+        // Citation link — render as badge
+        if (href?.startsWith("#cite-")) {
+          const index = parseInt(href.replace("#cite-", ""), 10);
+          const source = sources?.[index - 1];
+          return <CitationBadge index={index} source={source} />;
+        }
+
+        // Regular link
+        return (
+          <a
+            {...props}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary underline underline-offset-2 hover:text-primary/80"
+          >
+            {children}
+          </a>
+        );
+      },
+
+      // Code blocks — intercept <pre> for CodeBlock
+      pre: ({
+        children,
+        node: _node,
+        ...rest
+      }: React.HTMLAttributes<HTMLPreElement> & { node?: unknown }) => {
+        const codeEl = children as React.ReactElement<{
+          className?: string;
+          children?: React.ReactNode;
+        }> | null;
+
+        if (codeEl && typeof codeEl === "object" && "props" in codeEl) {
+          const codeProps = codeEl.props;
+          const langMatch = codeProps.className?.match(/language-(\w+)/);
+          const language = langMatch?.[1];
+          const code = extractText(codeProps.children);
+          return (
+            <CodeBlock
+              code={code}
+              language={language}
+              isStreaming={isStreaming}
+            />
+          );
+        }
+        return (
+          <pre
+            {...rest}
+            className="my-2 overflow-x-auto rounded-md bg-background/50 p-3 text-xs"
+          >
+            {children}
+          </pre>
+        );
+      },
+
+      // Inline code
+      code: ({
+        className: codeClassName,
+        children: codeChildren,
+        node: _node,
+        ...props
+      }: React.HTMLAttributes<HTMLElement> & { node?: unknown }) => {
+        if (codeClassName?.startsWith("language-")) {
+          return (
+            <code {...props} className={codeClassName}>
+              {codeChildren}
+            </code>
+          );
+        }
+        return (
+          <code
+            {...props}
+            className="rounded bg-background/50 px-1 py-0.5 font-mono text-xs"
+          >
+            {codeChildren}
+          </code>
+        );
+      },
+
+      // Tables
+      table: ({
+        children,
+        node: _node,
+        ...rest
+      }: React.HTMLAttributes<HTMLTableElement> & { node?: unknown }) => (
+        <table
+          {...rest}
+          className="my-2 w-full border-collapse text-xs"
+        >
+          {children}
+        </table>
+      ),
+      thead: ({
+        children,
+        node: _node,
+        ...rest
+      }: React.HTMLAttributes<HTMLTableSectionElement> & {
+        node?: unknown;
+      }) => (
+        <thead {...rest} className="border-b border-border/60">
+          {children}
+        </thead>
+      ),
+      th: ({
+        children,
+        node: _node,
+        ...rest
+      }: React.HTMLAttributes<HTMLTableCellElement> & { node?: unknown }) => (
+        <th
+          {...rest}
+          className="px-2 py-1.5 text-left text-xs font-medium text-muted-foreground"
+        >
+          {children}
+        </th>
+      ),
+      td: ({
+        children,
+        node: _node,
+        ...rest
+      }: React.HTMLAttributes<HTMLTableCellElement> & { node?: unknown }) => (
+        <td
+          {...rest}
+          className="border-t border-border/30 px-2 py-1 text-xs"
+        >
+          {children}
+        </td>
+      ),
+
+      // HR
+      hr: ({ node: _node, ...rest }: { node?: unknown } & React.HTMLAttributes<HTMLHRElement>) => (
+        <hr {...rest} className="my-4 border-border/40" />
+      ),
+
+      // Strikethrough
+      del: ({
+        children,
+        node: _node,
+        ...rest
+      }: React.HTMLAttributes<HTMLModElement> & { node?: unknown }) => (
+        <del {...rest} className="opacity-60 line-through">
+          {children}
+        </del>
+      ),
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [sources, isStreaming]
+  );
+
   return (
     <div className={`${PROSE_CLASSES} ${className ?? ""}`}>
-      <ReactMarkdown
-        remarkPlugins={remarkPlugins}
-        components={{
-          // Links + Citation badges
-          a: ({ href, children, ...props }) => {
-            // Citation link — render as badge
-            if (href?.startsWith("#cite-")) {
-              const index = parseInt(href.replace("#cite-", ""), 10);
-              const source = sources?.[index - 1];
-              return <CitationBadge index={index} source={source} />;
-            }
-
-            // Regular link
-            return (
-              <a
-                {...props}
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary underline underline-offset-2 hover:text-primary/80"
-              >
-                {children}
-              </a>
-            );
-          },
-
-          // Code blocks — intercept <pre> for CodeBlock
-          pre: ({ children }) => {
-            const codeEl = children as React.ReactElement<{
-              className?: string;
-              children?: React.ReactNode;
-            }> | null;
-
-            if (codeEl && typeof codeEl === "object" && "props" in codeEl) {
-              const codeProps = codeEl.props;
-              const langMatch = codeProps.className?.match(/language-(\w+)/);
-              const language = langMatch?.[1];
-              const code = extractText(codeProps.children);
-              return (
-                <CodeBlock
-                  code={code}
-                  language={language}
-                  isStreaming={isStreaming}
-                />
-              );
-            }
-            return (
-              <pre className="my-2 overflow-x-auto rounded-md bg-background/50 p-3 text-xs">
-                {children}
-              </pre>
-            );
-          },
-
-          // Inline code
-          code: ({
-            className: codeClassName,
-            children: codeChildren,
-            ...props
-          }) => {
-            if (codeClassName?.startsWith("language-")) {
-              return (
-                <code {...props} className={codeClassName}>
-                  {codeChildren}
-                </code>
-              );
-            }
-            return (
-              <code
-                {...props}
-                className="rounded bg-background/50 px-1 py-0.5 font-mono text-xs"
-              >
-                {codeChildren}
-              </code>
-            );
-          },
-
-          // Tables
-          table: ({ children }) => (
-            <table className="my-2 w-full border-collapse text-xs">
-              {children}
-            </table>
-          ),
-          thead: ({ children }) => (
-            <thead className="border-b border-border/60">{children}</thead>
-          ),
-          th: ({ children }) => (
-            <th className="px-2 py-1.5 text-left text-xs font-medium text-muted-foreground">
-              {children}
-            </th>
-          ),
-          td: ({ children }) => (
-            <td className="border-t border-border/30 px-2 py-1 text-xs">
-              {children}
-            </td>
-          ),
-
-          // HR
-          hr: () => <hr className="my-4 border-border/40" />,
-
-          // Strikethrough
-          del: ({ children }) => (
-            <del className="opacity-60 line-through">{children}</del>
-          ),
-        }}
+      <Streamdown
+        components={components}
+        mode={isStreaming ? "streaming" : "static"}
+        isAnimating={isStreaming}
+        animated={
+          isStreaming
+            ? { animation: "fadeIn", sep: "word", duration: 80, stagger: 20 }
+            : false
+        }
+        caret={isStreaming ? "block" : undefined}
+        controls={false}
+        lineNumbers={false}
       >
         {processedContent}
-      </ReactMarkdown>
+      </Streamdown>
     </div>
   );
 }
