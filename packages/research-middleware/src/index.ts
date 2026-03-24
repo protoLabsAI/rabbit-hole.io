@@ -86,3 +86,13 @@ export {
   type ToolLoadedResult,
   type ToolNotFoundResult,
 } from "./middleware/deferred-tools.js";
+export {
+  StructuredExtractionMiddleware,
+  buildExtractionContext,
+  buildExtractionPrompt,
+  parseExtractionResult,
+  type ExtractionPreview,
+  type ExtractedEntity,
+  type ExtractedRelationship,
+  type ToolCallRecord,
+} from "./middleware/structured-extraction.js";

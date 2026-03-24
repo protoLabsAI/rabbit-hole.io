@@ -8,6 +8,109 @@ import { Badge } from "@proto/ui/atoms";
 
 import { ChatMarkdown } from "./ChatMarkdown";
 
+// ─── Extraction Preview Types ────────────────────────────────────────
+
+/** Matches ExtractionPreview from @proto/research-middleware */
+interface ExtractionPreview {
+  entities: Array<{ uid: string; type: string; name: string }>;
+  relationships: Array<{ uid: string; type: string; source: string; target: string }>;
+  evidence: string[];
+  citations: string[];
+  confidence: number;
+}
+
+// ─── Add to Graph Card ───────────────────────────────────────────────
+
+/**
+ * Renders a pre-computed extraction preview as an "Add to Graph" card.
+ * The extraction was produced by the middleware using the full research context.
+ * User must explicitly confirm to ingest — extraction is never auto-ingested.
+ */
+function ExtractionPreviewCard({
+  preview,
+  onConfirm,
+}: {
+  preview: ExtractionPreview;
+  onConfirm: () => void;
+}) {
+  const [confirmed, setConfirmed] = useState(false);
+  const [ingesting, setIngesting] = useState(false);
+
+  const handleConfirm = () => {
+    if (confirmed || ingesting) return;
+    setIngesting(true);
+    onConfirm();
+    setTimeout(() => {
+      setIngesting(false);
+      setConfirmed(true);
+    }, 1500);
+  };
+
+  const topEntities = preview.entities.slice(0, 5);
+
+  return (
+    <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 px-4 py-3 space-y-3">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+          <Icon name="DatabaseZap" className="h-3.5 w-3.5 flex-shrink-0" />
+          <span>Knowledge Graph Extraction Ready</span>
+        </div>
+        <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+          <span>{preview.entities.length} entities</span>
+          <span className="text-border">·</span>
+          <span>{preview.relationships.length} relationships</span>
+          <span className="text-border">·</span>
+          <span>{Math.round(preview.confidence * 100)}% confidence</span>
+        </div>
+      </div>
+
+      {topEntities.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {topEntities.map((entity) => (
+            <div
+              key={entity.uid}
+              className="flex items-center gap-1 bg-background/80 border border-border/50 rounded-md px-2 py-0.5"
+            >
+              <span className="text-[11px] font-medium text-foreground">
+                {entity.name}
+              </span>
+              <Badge variant="secondary" className="text-[9px] font-normal">
+                {entity.type}
+              </Badge>
+            </div>
+          ))}
+          {preview.entities.length > 5 && (
+            <span className="text-[10px] text-muted-foreground self-center">
+              +{preview.entities.length - 5} more
+            </span>
+          )}
+        </div>
+      )}
+
+      <div className="flex items-center gap-2">
+        <button
+          onClick={handleConfirm}
+          disabled={confirmed || ingesting}
+          className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md transition-colors ${
+            confirmed
+              ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 cursor-default"
+              : "bg-emerald-500 text-white hover:bg-emerald-600 disabled:opacity-50"
+          }`}
+        >
+          <Icon
+            name={confirmed ? "Check" : ingesting ? "Loader2" : "DatabaseZap"}
+            className={`h-3.5 w-3.5 ${ingesting ? "animate-spin" : ""}`}
+          />
+          {confirmed ? "Added to Graph" : ingesting ? "Adding..." : "Add to Knowledge Graph"}
+        </button>
+        <p className="text-[10px] text-muted-foreground">
+          Extracted from full research context — higher quality than manual ingest
+        </p>
+      </div>
+    </div>
+  );
+}
+
 // ─── Sub-Query Plan Card ─────────────────────────────────────────────
 
 /**
@@ -357,6 +460,8 @@ interface ChatMessageProps {
   isStreaming: boolean;
   isLast: boolean;
   onIngest?: (text: string) => void;
+  /** Called when the user confirms ingestion of the pre-computed extraction preview. */
+  onIngestBundle?: (preview: ExtractionPreview) => void;
   onFollowUp?: (query: string) => void;
   onRegenerate?: () => void;
 }
@@ -366,6 +471,7 @@ export function ChatMessage({
   isStreaming,
   isLast,
   onIngest,
+  onIngestBundle,
   onFollowUp,
   onRegenerate,
 }: ChatMessageProps) {
@@ -419,6 +525,17 @@ export function ChatMessage({
     .filter((p): p is { type: "text"; text: string } => p.type === "text")
     .map((p) => p.text)
     .join("");
+
+  // Extraction preview: read from message annotations (populated by the server
+  // after afterAgent completes). The server writes this as a data annotation via
+  // the middleware pipeline; the user must explicitly confirm to ingest.
+  const extractionPreview = (message.annotations ?? []).find(
+    (a): a is ExtractionPreview & { type: string } =>
+      typeof a === "object" &&
+      a !== null &&
+      !Array.isArray(a) &&
+      (a as Record<string, unknown>)["type"] === "extraction_preview"
+  ) as ExtractionPreview | undefined;
 
   // Collect all tool-related parts
   const allTools = parts.filter(
@@ -529,6 +646,14 @@ export function ChatMessage({
             </button>
           )}
         </div>
+      )}
+
+      {/* Extraction Preview — "Add to Graph" card (pre-computed from full research context) */}
+      {isComplete && extractionPreview && onIngestBundle && (
+        <ExtractionPreviewCard
+          preview={extractionPreview}
+          onConfirm={() => onIngestBundle(extractionPreview)}
+        />
       )}
 
       {/* Follow-up suggestions */}
