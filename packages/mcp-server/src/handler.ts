@@ -5,6 +5,13 @@
  * Tools call external services (job-processor, search APIs) directly.
  */
 
+import {
+  evaluateQuality,
+  BudgetTracker,
+  DEFAULT_BUDGET,
+} from "./lib/research-quality.js";
+import type { ResearchBudget } from "./lib/research-quality.js";
+
 // ─── Langfuse (optional tracing) ────────────────────────────────────
 // Imported lazily so the server starts fine without LANGFUSE_* env vars.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -178,7 +185,8 @@ export async function handleToolCall(
         (args.depth as string) ?? "detailed",
         args.entityType as string | undefined,
         config,
-        (args.persist as boolean) ?? true
+        (args.persist as boolean) ?? true,
+        args.budget as ResearchBudget | undefined
       );
 
     // ─── Media Tools ───────────────────────────────────────────────
@@ -524,12 +532,14 @@ async function researchEntity(
   depth: string,
   entityType: string | undefined,
   config: HandlerConfig,
-  persist: boolean = true
+  persist: boolean = true,
+  budgetConfig?: ResearchBudget
 ): Promise<unknown> {
   const pipelineStart = Date.now();
   const results: Record<string, unknown> = { query, depth };
   const evidenceNodes: Array<Record<string, unknown>> = [];
   const entityCitations: Record<string, Array<Record<string, unknown>>> = {};
+  const budget = new BudgetTracker(budgetConfig ?? DEFAULT_BUDGET);
 
   // ── Langfuse trace ──────────────────────────────────────────────────
   const langfuse = getLangfuse();
@@ -779,6 +789,184 @@ async function researchEntity(
     results.entityCitations = entityCitations;
     trace?.update({ output: results });
     return results;
+  }
+
+  // ── Adaptive Depth: Quality evaluation and targeted follow-up rounds ─
+  // After the initial parallel search, evaluate quality against the requested
+  // depth threshold. If insufficient and budget allows, run targeted follow-up
+  // searches using gap-analysis queries to improve evidence quality.
+
+  const initialQuality = evaluateQuality(results, depth);
+  results._qualityAfterRound0 = {
+    metrics: initialQuality.metrics,
+    sufficient: initialQuality.sufficient,
+    gapDescriptions: initialQuality.gaps.descriptions,
+  };
+
+  // Track initial sources in budget (wikipedia, duckduckgo, tavily = up to 3)
+  const initialSourcesUsed =
+    (wikiSettled.status === "fulfilled" ? 1 : 0) +
+    (webSettled.status === "fulfilled" ? 1 : 0) +
+    (tavilySettled.status === "fulfilled" ? 1 : 0);
+  budget.recordSources(initialSourcesUsed);
+
+  // Langfuse span: quality evaluation round 0
+  trace?.span({
+    name: "quality_eval_round_0",
+    startTime: new Date(),
+    endTime: new Date(),
+    metadata: {
+      depth,
+      round: 0,
+      metrics: initialQuality.metrics,
+      sufficient: initialQuality.sufficient,
+      gapDescriptions: initialQuality.gaps.descriptions,
+      sourcesUsed: initialSourcesUsed,
+      budgetExhausted: budget.isExhausted(),
+    },
+  });
+
+  if (!initialQuality.sufficient && !budget.isExhausted()) {
+    const additionalRoundResults: Array<Record<string, unknown>> = [];
+
+    for (const followUpQuery of initialQuality.gaps.suggestedQueries) {
+      if (budget.isExhausted()) break;
+
+      const roundStart = Date.now();
+      budget.recordRound();
+      budget.recordSources(1);
+
+      // Prefer Tavily for follow-up rounds (highest signal), fall back to DDG
+      let followUpResult: Record<string, unknown> = {};
+      let followUpSource = "duckduckgo";
+
+      if (isSourceEnabled("tavily") && config.tavilyApiKey) {
+        followUpSource = "tavily";
+        const tavilyFollowUp = await withTimeout(
+          tavilySearch(`${query} ${followUpQuery}`, 3, config.tavilyApiKey),
+          SOURCE_TIMEOUT_MS,
+          "tavily"
+        ).catch((err: unknown) => {
+          recordSourceFailure("tavily");
+          return { error: err instanceof Error ? err.message : "Tavily follow-up failed" };
+        });
+        followUpResult = tavilyFollowUp as Record<string, unknown>;
+        if (!followUpResult.error) recordSourceSuccess("tavily");
+      } else if (isSourceEnabled("duckduckgo")) {
+        const ddgFollowUp = await withTimeout(
+          duckduckgoSearch(`${query} ${followUpQuery}`),
+          SOURCE_TIMEOUT_MS,
+          "duckduckgo"
+        ).catch((err: unknown) => {
+          recordSourceFailure("duckduckgo");
+          return { error: err instanceof Error ? err.message : "DuckDuckGo follow-up failed" };
+        });
+        followUpResult = ddgFollowUp as Record<string, unknown>;
+        if (!followUpResult.error) recordSourceSuccess("duckduckgo");
+      } else {
+        // No sources available for follow-up — stop early
+        break;
+      }
+
+      const roundLatencyMs = Date.now() - roundStart;
+      const roundNum = budget.getRoundsUsed();
+
+      // Merge follow-up Tavily results into the existing tavily result set
+      // so entity extraction will incorporate the additional data
+      if (followUpSource === "tavily" && !followUpResult.error) {
+        const existing = (results.tavilySearch as Record<string, unknown>) ?? {};
+        const existingItems = (existing.results as Array<Record<string, unknown>>) ?? [];
+        const newItems = (followUpResult.results as Array<Record<string, unknown>>) ?? [];
+        // Append new items to existing tavily results (de-dup by URL)
+        const existingUrls = new Set(existingItems.map((r) => r.url as string));
+        const uniqueNew = newItems.filter((r) => !existingUrls.has(r.url as string));
+        results.tavilySearch = { ...existing, results: [...existingItems, ...uniqueNew] };
+
+        // Build evidence nodes for new Tavily items
+        for (let i = 0; i < uniqueNew.length; i++) {
+          const item = uniqueNew[i];
+          if (item?.url && typeof item.url === "string" && item.url.startsWith("http")) {
+            const slug = toSlug((item.title as string) ?? `tavily_followup_${roundNum}_${i}`);
+            evidenceNodes.push({
+              uid: `evidence:tavily_followup_${slug}_r${roundNum}_${i}`,
+              kind: "major_media",
+              title: (item.title as string) ?? `Tavily follow-up ${i + 1}`,
+              publisher: new URL(item.url).hostname.replace(/^www\./, ""),
+              date: todayDate(),
+              url: item.url,
+              retrieved_at: nowIso(),
+              reliability: typeof item.score === "number" ? Math.min(item.score, 1) : 0.6,
+            });
+          }
+        }
+      } else if (followUpSource === "duckduckgo" && !followUpResult.error) {
+        // Append DDG follow-up results to webSearch
+        const existing = (results.webSearch as Record<string, unknown>) ?? {};
+        const existingItems = (existing.results as Array<Record<string, unknown>>) ?? [];
+        const newItems = (followUpResult.results as Array<Record<string, unknown>>) ?? [];
+        const existingUrls = new Set(existingItems.map((r) => r.url as string));
+        const uniqueNew = newItems.filter((r) => !existingUrls.has(r.url as string));
+        results.webSearch = { ...existing, results: [...existingItems, ...uniqueNew] };
+
+        // Build evidence nodes for new DDG items
+        for (let i = 0; i < Math.min(uniqueNew.length, 2); i++) {
+          const item = uniqueNew[i];
+          if (item?.url && typeof item.url === "string" && item.url.startsWith("http")) {
+            const slug = toSlug((item.title as string) ?? `web_followup_${roundNum}_${i}`);
+            evidenceNodes.push({
+              uid: `evidence:web_followup_${slug}_r${roundNum}_${i}`,
+              kind: "major_media",
+              title: (item.title as string) ?? `Web follow-up ${i + 1}`,
+              publisher: new URL(item.url).hostname.replace(/^www\./, ""),
+              date: todayDate(),
+              url: item.url,
+              retrieved_at: nowIso(),
+              reliability: 0.5,
+            });
+          }
+        }
+      }
+
+      additionalRoundResults.push({
+        round: roundNum,
+        query: `${query} ${followUpQuery}`,
+        source: followUpSource,
+        latencyMs: roundLatencyMs,
+        error: followUpResult.error ?? null,
+      });
+
+      // Langfuse span: follow-up round
+      trace?.span({
+        name: `adaptive_round_${roundNum}`,
+        startTime: new Date(roundStart),
+        endTime: new Date(roundStart + roundLatencyMs),
+        metadata: {
+          depth,
+          round: roundNum,
+          followUpQuery: `${query} ${followUpQuery}`,
+          source: followUpSource,
+          latencyMs: roundLatencyMs,
+          success: !followUpResult.error,
+          roundsUsed: budget.getRoundsUsed(),
+          sourcesQueried: budget.getSourcesQueried(),
+          budgetExhausted: budget.isExhausted(),
+        },
+      });
+    }
+
+    results._adaptiveRounds = additionalRoundResults;
+    results._budgetUsed = {
+      roundsUsed: budget.getRoundsUsed(),
+      sourcesQueried: budget.getSourcesQueried(),
+      exhausted: budget.isExhausted(),
+    };
+  } else {
+    results._adaptiveRounds = [];
+    results._budgetUsed = {
+      roundsUsed: budget.getRoundsUsed(),
+      sourcesQueried: budget.getSourcesQueried(),
+      exhausted: budget.isExhausted(),
+    };
   }
 
   // ── Step 4: Extract entities from Wikipedia text ────────────────────
