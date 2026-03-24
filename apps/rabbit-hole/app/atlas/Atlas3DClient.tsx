@@ -139,15 +139,18 @@ export default function Atlas3DClient() {
 
   if (loading) {
     return (
-      <div className="w-full h-full bg-[#000011] flex items-center justify-center">
-        <div className="text-center">
-          <Icon
-            name="Loader2"
-            className="h-8 w-8 animate-spin text-primary mx-auto mb-3"
-          />
-          <p className="text-sm text-muted-foreground">
-            Loading knowledge graph...
-          </p>
+      <div className="w-full h-full bg-background flex flex-col">
+        <AtlasHeader />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <Icon
+              name="Loader2"
+              className="h-8 w-8 animate-spin text-primary mx-auto mb-3"
+            />
+            <p className="text-sm text-muted-foreground">
+              Loading knowledge graph...
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -155,26 +158,34 @@ export default function Atlas3DClient() {
 
   if (error) {
     return (
-      <div className="w-full h-full bg-[#000011] flex items-center justify-center">
-        <div className="text-center">
-          <Icon
-            name="AlertCircle"
-            className="h-8 w-8 text-destructive mx-auto mb-3"
-          />
-          <p className="text-sm text-destructive">{error}</p>
+      <div className="w-full h-full bg-background flex flex-col">
+        <AtlasHeader />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <Icon
+              name="AlertCircle"
+              className="h-8 w-8 text-destructive mx-auto mb-3"
+            />
+            <p className="text-sm text-destructive">{error}</p>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full h-full bg-[#000011] relative">
+    <div className="w-full h-full bg-background flex flex-col">
+      <AtlasHeader
+        nodeCount={graphData?.nodes.length}
+        linkCount={graphData?.links.length}
+      />
+      <div className="flex-1 relative">
       {graphData && (
         <CosmosGraph
           ref={graphRef}
           nodes={graphData.nodes}
           links={graphData.links}
-          backgroundColor="#000011"
+          backgroundColor="#0a0a12"
           pointSize={4}
           linkWidth={0.3}
           simulationGravity={0.15}
@@ -224,12 +235,49 @@ export default function Atlas3DClient() {
         </div>
       )}
 
-      {/* Stats overlay */}
-      <div className="absolute bottom-3 left-3 text-[10px] text-muted-foreground/40 tabular-nums">
-        {graphData
-          ? `${graphData.nodes.length.toLocaleString()} nodes · ${graphData.links.length.toLocaleString()} edges`
-          : ""}
       </div>
     </div>
+  );
+}
+
+// ─── Header (matches search engine + research page style) ───────────
+
+function AtlasHeader({
+  nodeCount,
+  linkCount,
+}: {
+  nodeCount?: number;
+  linkCount?: number;
+}) {
+  return (
+    <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border">
+      <div className="px-4 py-2 flex items-center gap-3">
+        <a
+          href="/"
+          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors flex-shrink-0"
+        >
+          <Icon name="ArrowLeft" className="h-4 w-4" />
+        </a>
+        <div className="flex items-center gap-2">
+          <Icon name="Globe" className="h-4 w-4 text-primary" />
+          <span className="text-xs font-medium text-foreground">Atlas</span>
+        </div>
+        {nodeCount !== undefined && (
+          <span className="text-[10px] text-muted-foreground/50 tabular-nums">
+            {nodeCount.toLocaleString()} nodes &middot;{" "}
+            {(linkCount ?? 0).toLocaleString()} edges
+          </span>
+        )}
+        <div className="ml-auto flex items-center gap-1">
+          <a
+            href="/"
+            className="flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-muted/50"
+          >
+            <Icon name="Search" className="h-3.5 w-3.5" />
+            Search
+          </a>
+        </div>
+      </div>
+    </header>
   );
 }
