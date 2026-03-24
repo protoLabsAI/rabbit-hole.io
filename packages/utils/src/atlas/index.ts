@@ -6,7 +6,6 @@
  */
 
 export * from "./entity-styling";
-export * from "./layout-configs";
 export * from "./data-transformers";
 export * from "./ego-network-queries";
 export * from "./temporal-helpers";
@@ -18,4 +17,3 @@ export * from "./compact-timeline-utils";
 export * from "./timeline-error-handler";
 export * from "./timeline-cache";
 export * from "./time-slice-cache";
-export * from "./cytoscape-performance";
