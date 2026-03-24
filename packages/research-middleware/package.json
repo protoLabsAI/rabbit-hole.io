@@ -20,6 +20,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@proto/database": "workspace:*",
     "@proto/llm-providers": "workspace:*",
     "@proto/utils": "workspace:*",
     "ai": "^6.0.116",
