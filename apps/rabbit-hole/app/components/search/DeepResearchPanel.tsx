@@ -421,6 +421,7 @@ export function DeepResearchPanel({
   const [error, setError] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState(0);
   const [sourcePanelOpen, setSourcePanelOpen] = useState(true);
+  const [drawerTab, setDrawerTab] = useState<"activity" | "sources">("activity");
   const [cancelling, setCancelling] = useState(false);
   const feedRef = useRef<HTMLDivElement>(null);
   const reportRef = useRef<HTMLDivElement>(null);
@@ -683,88 +684,7 @@ export function DeepResearchPanel({
 
       {/* Content */}
       <div className="flex-1 flex overflow-hidden min-h-0">
-        {/* Activity Feed (left) */}
-        <div className="w-60 border-r border-border flex flex-col min-h-0">
-          <div className="px-3 py-2 border-b border-border/50 flex items-center justify-between">
-            <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
-              Activity
-            </span>
-            <span className="text-[10px] text-muted-foreground/50">
-              {visibleEvents.length}
-            </span>
-          </div>
-
-          {/* Key Findings summary */}
-          {findings.length > 0 && (
-            <div className="px-3 py-2 border-b border-blue-500/10 bg-blue-500/5">
-              <div className="flex items-center gap-1.5 mb-1.5">
-                <Icon name="Lightbulb" className="h-3 w-3 text-blue-500" />
-                <span className="text-[10px] font-medium text-blue-600 dark:text-blue-400">
-                  Key Findings ({findings.length})
-                </span>
-              </div>
-              <div className="space-y-1">
-                {findings.slice(-3).map((f, i) => (
-                  <p
-                    key={i}
-                    className="text-[10px] text-muted-foreground leading-relaxed"
-                  >
-                    {f}
-                  </p>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div
-            ref={feedRef}
-            className="flex-1 overflow-y-auto px-3 py-2"
-            onScroll={(e) => {
-              const el = e.currentTarget;
-              autoScrollRef.current =
-                el.scrollHeight - el.scrollTop - el.clientHeight < 50;
-            }}
-          >
-            {visibleEvents.map((event, i) => (
-              <ActivityEntry key={i} event={event} />
-            ))}
-            {status === "running" && visibleEvents.length === 0 && (
-              <div className="flex items-center gap-2 text-xs text-muted-foreground py-4">
-                <Icon
-                  name="Loader2"
-                  className="h-4 w-4 animate-spin text-primary"
-                />
-                Starting research...
-              </div>
-            )}
-          </div>
-
-          {/* Source type summary */}
-          {sources.length > 0 && (
-            <div className="px-3 py-2 border-t border-border/50 flex items-center gap-3 text-[10px] text-muted-foreground">
-              {webSourceCount > 0 && (
-                <span className="flex items-center gap-1">
-                  <Icon name="Globe" className="h-3 w-3 text-green-500" />
-                  {webSourceCount}
-                </span>
-              )}
-              {wikiSourceCount > 0 && (
-                <span className="flex items-center gap-1">
-                  <Icon name="BookOpen" className="h-3 w-3 text-blue-500" />
-                  {wikiSourceCount}
-                </span>
-              )}
-              {graphSourceCount > 0 && (
-                <span className="flex items-center gap-1">
-                  <Icon name="Database" className="h-3 w-3 text-purple-500" />
-                  {graphSourceCount}
-                </span>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Report (center) */}
+        {/* Report (main) */}
         <div ref={reportRef} className="flex-1 overflow-y-auto px-8 py-6">
           <div className="max-w-3xl mx-auto">
             {/* Research Plan Card */}
@@ -879,25 +799,141 @@ export function DeepResearchPanel({
           </div>
         </div>
 
-        {/* Sources Panel (right) */}
-        {sourcePanelOpen && sources.length > 0 && (
-          <div className="w-72 border-l border-border flex flex-col min-h-0">
-            <div className="px-3 py-2 border-b border-border/50 flex items-center justify-between">
-              <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
-                Sources ({sources.length})
-              </span>
+        {/* Right Drawer — Activity + Sources tabs */}
+        {sourcePanelOpen && (
+          <div className="w-80 border-l border-border flex flex-col min-h-0">
+            {/* Tabs */}
+            <div className="px-1 pt-1.5 pb-0 border-b border-border/50 flex items-center gap-0">
+              <button
+                onClick={() => setDrawerTab("activity")}
+                className={`px-3 py-1.5 text-[11px] font-medium rounded-t-md transition-colors ${
+                  drawerTab === "activity"
+                    ? "text-foreground bg-muted/50 border border-border/50 border-b-transparent -mb-px"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Activity
+                {visibleEvents.length > 0 && (
+                  <span className="ml-1.5 text-[10px] text-muted-foreground/60">
+                    {visibleEvents.length}
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => setDrawerTab("sources")}
+                className={`px-3 py-1.5 text-[11px] font-medium rounded-t-md transition-colors ${
+                  drawerTab === "sources"
+                    ? "text-foreground bg-muted/50 border border-border/50 border-b-transparent -mb-px"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Sources
+                {sources.length > 0 && (
+                  <span className="ml-1.5 text-[10px] text-muted-foreground/60">
+                    {sources.length}
+                  </span>
+                )}
+              </button>
+              <div className="flex-1" />
               <button
                 onClick={() => setSourcePanelOpen(false)}
-                className="p-1 text-muted-foreground hover:text-foreground transition-colors rounded"
+                className="p-1 mr-1 text-muted-foreground hover:text-foreground transition-colors rounded"
               >
                 <Icon name="X" className="h-3 w-3" />
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto p-3 space-y-2">
-              {sources.map((source, i) => (
-                <SourceCard key={i} source={source} index={i} />
-              ))}
-            </div>
+
+            {/* Activity Tab */}
+            {drawerTab === "activity" && (
+              <div className="flex-1 flex flex-col min-h-0">
+                {/* Key Findings summary */}
+                {findings.length > 0 && (
+                  <div className="px-3 py-2 border-b border-blue-500/10 bg-blue-500/5">
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <Icon name="Lightbulb" className="h-3 w-3 text-blue-500" />
+                      <span className="text-[10px] font-medium text-blue-600 dark:text-blue-400">
+                        Key Findings ({findings.length})
+                      </span>
+                    </div>
+                    <div className="space-y-1">
+                      {findings.slice(-3).map((f, i) => (
+                        <p
+                          key={i}
+                          className="text-[10px] text-muted-foreground leading-relaxed"
+                        >
+                          {f}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div
+                  ref={feedRef}
+                  className="flex-1 overflow-y-auto px-3 py-2"
+                  onScroll={(e) => {
+                    const el = e.currentTarget;
+                    autoScrollRef.current =
+                      el.scrollHeight - el.scrollTop - el.clientHeight < 50;
+                  }}
+                >
+                  {visibleEvents.map((event, i) => (
+                    <ActivityEntry key={i} event={event} />
+                  ))}
+                  {status === "running" && visibleEvents.length === 0 && (
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground py-4">
+                      <Icon
+                        name="Loader2"
+                        className="h-4 w-4 animate-spin text-primary"
+                      />
+                      Starting research...
+                    </div>
+                  )}
+                </div>
+
+                {/* Source type summary footer */}
+                {sources.length > 0 && (
+                  <div className="px-3 py-2 border-t border-border/50 flex items-center gap-3 text-[10px] text-muted-foreground">
+                    {webSourceCount > 0 && (
+                      <span className="flex items-center gap-1">
+                        <Icon name="Globe" className="h-3 w-3 text-green-500" />
+                        {webSourceCount}
+                      </span>
+                    )}
+                    {wikiSourceCount > 0 && (
+                      <span className="flex items-center gap-1">
+                        <Icon name="BookOpen" className="h-3 w-3 text-blue-500" />
+                        {wikiSourceCount}
+                      </span>
+                    )}
+                    {graphSourceCount > 0 && (
+                      <span className="flex items-center gap-1">
+                        <Icon name="Database" className="h-3 w-3 text-purple-500" />
+                        {graphSourceCount}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Sources Tab */}
+            {drawerTab === "sources" && (
+              <div className="flex-1 overflow-y-auto p-3 space-y-2">
+                {sources.length > 0 ? (
+                  sources.map((source, i) => (
+                    <SourceCard key={i} source={source} index={i} />
+                  ))
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-8 text-center">
+                    <Icon name="FileSearch" className="h-6 w-6 text-muted-foreground/30 mb-2" />
+                    <p className="text-xs text-muted-foreground/50">
+                      Sources will appear as research progresses
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
