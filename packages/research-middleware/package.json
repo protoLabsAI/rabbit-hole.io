@@ -1,0 +1,43 @@
+{
+  "name": "@proto/research-middleware",
+  "version": "0.1.0",
+  "description": "DeerFlow-inspired middleware pipeline for AI SDK streamText tool calls",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@proto/utils": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.3",
+    "tsup": "^8.0.1",
+    "typescript": "^5.5.4",
+    "vitest": "^1.6.1"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "middleware",
+    "ai-sdk",
+    "research",
+    "proto"
+  ],
+  "license": "MIT",
+  "type": "module"
+}
