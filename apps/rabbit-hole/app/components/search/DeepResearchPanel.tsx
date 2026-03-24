@@ -226,13 +226,13 @@ function PhaseProgress({ currentPhase }: { currentPhase: string }) {
             >
               <Icon
                 name={
-                  (isDone
+                  (isDone || (isActive && phase.key === "complete")
                     ? "CheckCircle2"
                     : isActive
                       ? "Loader2"
                       : PHASE_LABELS[phase.key]?.icon || "Circle") as any
                 }
-                className={`h-3 w-3 ${isActive ? "animate-spin" : ""}`}
+                className={`h-3 w-3 ${isActive && phase.key !== "complete" ? "animate-spin" : ""}`}
               />
               {phase.label}
             </div>
