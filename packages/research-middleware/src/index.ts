@@ -30,6 +30,15 @@ export type {
   ToolExecutor,
 } from "./types.js";
 
+export type {
+  TracingContext,
+  SpanHandle,
+  GenerationHandle,
+  GenerationUsage,
+  CreateTracingContextOptions,
+} from "./tracing.js";
+
+export { createTracingContext } from "./tracing.js";
 export { MiddlewareChain } from "./runtime.js";
 export { MiddlewareRegistry } from "./registry.js";
 export { PassthroughMiddleware } from "./middleware/passthrough.js";
