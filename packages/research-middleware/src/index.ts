@@ -42,3 +42,10 @@ export { createTracingContext } from "./tracing.js";
 export { MiddlewareChain } from "./runtime.js";
 export { MiddlewareRegistry } from "./registry.js";
 export { PassthroughMiddleware } from "./middleware/passthrough.js";
+export {
+  ClarificationMiddleware,
+  CLARIFICATION_RESULT_TYPE,
+  CLARIFICATION_BLOCKED_TYPE,
+  type ClarificationResult,
+  type ClarificationBlockedResult,
+} from "./middleware/clarification.js";

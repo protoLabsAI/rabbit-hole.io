@@ -8,6 +8,27 @@ import { Badge } from "@proto/ui/atoms";
 
 import { ChatMarkdown } from "./ChatMarkdown";
 
+// ─── Clarification Card ─────────────────────────────────────────────
+
+/**
+ * Renders a clarification question as a distinct interactive card.
+ * Used when the agent returns a `clarification_requested` tool result.
+ */
+function ClarificationCard({ question }: { question: string }) {
+  return (
+    <div className="rounded-lg border border-primary/30 bg-primary/5 px-4 py-3 space-y-2">
+      <div className="flex items-center gap-2 text-xs font-medium text-primary/80">
+        <Icon name="HelpCircle" className="h-3.5 w-3.5 flex-shrink-0" />
+        <span>Clarification needed</span>
+      </div>
+      <p className="text-sm text-foreground leading-snug">{question}</p>
+      <p className="text-[11px] text-muted-foreground">
+        Type your answer in the input below to continue.
+      </p>
+    </div>
+  );
+}
+
 // ─── Tool Card Config ───────────────────────────────────────────────
 
 const TOOL_CONFIG: Record<
@@ -28,6 +49,11 @@ const TOOL_CONFIG: Record<
     icon: "BookOpen",
     label: "Wikipedia",
     activeLabel: "Reading Wikipedia...",
+  },
+  askClarification: {
+    icon: "HelpCircle",
+    label: "Clarification",
+    activeLabel: "Asking for clarification...",
   },
 };
 
@@ -135,6 +161,16 @@ function ToolCallCard({
     label: toolName,
     activeLabel: `Running ${toolName}...`,
   };
+
+  // Render clarification results as a distinct interactive card
+  const isDoneState = state === "result" || state === "output-available";
+  if (
+    isDoneState &&
+    output?.__type === "clarification_requested" &&
+    typeof output.question === "string"
+  ) {
+    return <ClarificationCard question={output.question} />;
+  }
   const isRunning =
     state === "partial-call" ||
     state === "call" ||
