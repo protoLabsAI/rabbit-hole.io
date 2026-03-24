@@ -26,12 +26,14 @@ interface AtlasNode {
   name: string;
   type: string;
   color: string;
+  size: number;
 }
 
 interface AtlasLink {
   source: string;
   target: string;
-  color?: string;
+  color: string;
+  width: number;
 }
 
 interface GraphData {
@@ -62,6 +64,7 @@ async function fetchGraphData(
       name: n.name,
       type: n.type,
       color: getEntityColor(n.type),
+      size: getEntitySize(n.type),
     })
   );
 
@@ -72,32 +75,27 @@ async function fetchGraphData(
       (e: { source: string; target: string }) =>
         nodeIds.has(e.source) && nodeIds.has(e.target)
     )
-    .map((e: { source: string; target: string; display?: { color?: string } }) => ({
-      source: e.source,
-      target: e.target,
-      color: e.display?.color ?? "#334155",
-    }));
+    .map((e: { source: string; target: string; type?: string; sentiment?: string; display?: { color?: string } }) => {
+      const visual = getRelationshipVisual(e.type ?? "RELATED_TO", e.sentiment);
+      return {
+        source: e.source,
+        target: e.target,
+        color: e.display?.color ?? visual.color,
+        width: visual.width,
+      };
+    });
 
   return { nodes, links };
 }
 
-// ─── Entity Colors (inline for now, matches entity-styling.ts) ──────
-
-const ENTITY_COLORS: Record<string, string> = {
-  person: "#60A5FA",
-  organization: "#F59E0B",
-  technology: "#10B981",
-  concept: "#8B5CF6",
-  event: "#EF4444",
-  location: "#EC4899",
-  country: "#14B8A6",
-  platform: "#F97316",
-  movement: "#A855F7",
-  publication: "#6366F1",
-};
+import { getEntityVisual, getRelationshipVisual } from "./lib/atlas-schema";
 
 function getEntityColor(type: string): string {
-  return ENTITY_COLORS[type?.toLowerCase()] ?? "#6B7280";
+  return getEntityVisual(type).color;
+}
+
+function getEntitySize(type: string): number {
+  return getEntityVisual(type).size;
 }
 
 // ─── Component ──────────────────────────────────────────────────────
@@ -160,19 +158,30 @@ export default function Atlas3DClient() {
           pointIdBy="id"
           pointLabelBy="name"
           pointColorBy="color"
+          pointSizeBy="size"
           linkSourceBy="source"
           linkTargetBy="target"
           linkColorBy="color"
+          linkWidthBy="width"
           backgroundColor="#000011"
-          pointSize={4}
-          linkWidth={0.5}
+          pointSize={3}
+          pointSizeScale={1.5}
+          linkWidth={0.3}
           linkArrows={false}
-          simulationGravity={0.1}
-          simulationRepulsion={1.0}
+          linkGreyoutOpacity={0.15}
+          // GPU force layout — tuned for knowledge graph topology
+          simulationGravity={0.15}
+          simulationRepulsion={0.8}
           simulationFriction={0.85}
+          simulationLinkSpring={0.3}
+          simulationLinkDistance={10}
+          simulationDecay={3000}
+          // Labels: show top N closest nodes (LOD)
           fitViewOnInit={true}
-          showLabelsFor={100}
+          showLabelsFor={150}
+          // Interactivity
           onClick={handleNodeClick}
+          hoveredPointRingColor="#ffffff"
         />
       )}
 
