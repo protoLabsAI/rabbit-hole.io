@@ -399,32 +399,57 @@ function ToolCallCard({
 
 // ─── Extract follow-up suggestions from answer text ─────────────────
 
+/**
+ * Extract related searches from the structured <RELATED_SEARCHES> block.
+ * Falls back to scanning the last few lines if no block is found.
+ */
 function extractSuggestions(text: string): string[] {
   if (!text) return [];
-  const lines = text.split("\n").filter((l) => l.trim());
-  const suggestions: string[] = [];
 
-  // Scan the last ~8 lines for search-query-style items
-  // These are short phrases in list items at the end of the answer
-  for (let i = lines.length - 1; i >= Math.max(0, lines.length - 8); i--) {
-    const line = lines[i]
-      .replace(/^[-*•\d.)\s]+/, "") // strip list markers
-      .replace(/\*\*/g, "") // strip bold
-      .replace(/^[""]|[""]$/g, "") // strip quotes
-      .trim();
-    // Match search queries: short phrases (not full sentences with periods mid-text)
-    if (
-      line.length > 5 &&
-      line.length < 100 &&
-      !line.startsWith("#") &&
-      !line.startsWith("http") &&
-      !line.includes(". ") // not a full sentence
-    ) {
-      suggestions.unshift(line);
-    }
+  // Try structured block first
+  const blockMatch = text.match(
+    /<RELATED_SEARCHES>\s*\n([\s\S]*?)\n\s*<\/RELATED_SEARCHES>/
+  );
+  if (blockMatch) {
+    return blockMatch[1]
+      .split("\n")
+      .map((l) => l.replace(/^[-*•\d.)\s`]+/, "").replace(/`+$/, "").trim())
+      .filter((l) => l.length > 3 && l.length < 120)
+      .slice(0, 3);
   }
 
-  return suggestions.slice(0, 3);
+  // Fallback: scan last lines for "Related searches:" section
+  const relatedIdx = text.lastIndexOf("Related searches:");
+  if (relatedIdx !== -1) {
+    const tail = text.slice(relatedIdx + "Related searches:".length);
+    return tail
+      .split("\n")
+      .map((l) => l.replace(/^[-*•\d.)\s`]+/, "").replace(/`+$/, "").trim())
+      .filter((l) => l.length > 3 && l.length < 120)
+      .slice(0, 3);
+  }
+
+  return [];
+}
+
+/**
+ * Strip the related searches section from the response text so it
+ * doesn't render as ugly markdown. The searches are displayed as
+ * clickable SuggestionPills instead.
+ */
+function stripRelatedSearches(text: string): string {
+  if (!text) return text;
+  // Strip structured block
+  let cleaned = text.replace(
+    /<RELATED_SEARCHES>\s*\n[\s\S]*?\n\s*<\/RELATED_SEARCHES>\s*/,
+    ""
+  );
+  // Strip "Related searches:" freeform section at end
+  cleaned = cleaned.replace(
+    /\n*(?:#{0,3}\s*)?Related searches:?\s*\n[\s\S]*$/i,
+    ""
+  );
+  return cleaned.trimEnd();
 }
 
 // ─── Suggestion Pills ───────────────────────────────────────────────
@@ -567,7 +592,7 @@ export function ChatMessage({
       {textContent && (
         <div>
           <ChatMarkdown
-            content={textContent}
+            content={isComplete ? stripRelatedSearches(textContent) : textContent}
             isStreaming={isStreaming && isLast}
           />
           {isStreaming && isLast && (
