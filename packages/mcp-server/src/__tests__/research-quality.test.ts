@@ -4,6 +4,7 @@
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
+
 import {
   computeMetrics,
   evaluateQuality,
@@ -31,7 +32,12 @@ function makeResults(overrides: Partial<SearchResults> = {}): SearchResults {
     },
     tavilySearch: {
       results: [
-        { title: "Tavily 1", url: "https://news.com/1", content: "content", score: 0.8 },
+        {
+          title: "Tavily 1",
+          url: "https://news.com/1",
+          content: "content",
+          score: 0.8,
+        },
       ],
     },
     extraction: {
@@ -48,20 +54,60 @@ function makeResults(overrides: Partial<SearchResults> = {}): SearchResults {
         { uid: "org:bigcorp", name: "BigCorp", type: "organization" },
       ],
       relationships: [
-        { uid: "rel:alice_works_at_acme", type: "WORKS_AT", source: "person:alice", target: "org:acme" },
-        { uid: "rel:bob_works_at_techco", type: "WORKS_AT", source: "person:bob", target: "org:techco" },
-        { uid: "rel:carol_founded_acme", type: "FOUNDED", source: "person:carol", target: "org:acme" },
-        { uid: "rel:widget_part_of_techco", type: "PART_OF", source: "software:widget", target: "org:techco" },
-        { uid: "rel:dave_works_at_bigcorp", type: "WORKS_AT", source: "person:dave", target: "org:bigcorp" },
+        {
+          uid: "rel:alice_works_at_acme",
+          type: "WORKS_AT",
+          source: "person:alice",
+          target: "org:acme",
+        },
+        {
+          uid: "rel:bob_works_at_techco",
+          type: "WORKS_AT",
+          source: "person:bob",
+          target: "org:techco",
+        },
+        {
+          uid: "rel:carol_founded_acme",
+          type: "FOUNDED",
+          source: "person:carol",
+          target: "org:acme",
+        },
+        {
+          uid: "rel:widget_part_of_techco",
+          type: "PART_OF",
+          source: "software:widget",
+          target: "org:techco",
+        },
+        {
+          uid: "rel:dave_works_at_bigcorp",
+          type: "WORKS_AT",
+          source: "person:dave",
+          target: "org:bigcorp",
+        },
       ],
     },
     entityCitations: {
       "person:alice": [
-        { claimText: "Alice found", sourceUrl: "https://en.wikipedia.org", excerpt: "...", confidence: 0.7 },
-        { claimText: "Alice mentioned", sourceUrl: "https://news.com/1", excerpt: "...", confidence: 0.8 },
+        {
+          claimText: "Alice found",
+          sourceUrl: "https://en.wikipedia.org",
+          excerpt: "...",
+          confidence: 0.7,
+        },
+        {
+          claimText: "Alice mentioned",
+          sourceUrl: "https://news.com/1",
+          excerpt: "...",
+          confidence: 0.8,
+        },
       ],
       "org:acme": [
-        { claimText: "Acme Corp", sourceUrl: "https://en.wikipedia.org", excerpt: "...", confidence: 0.7 },
+        {
+          claimText: "Acme Corp",
+          sourceUrl: "https://en.wikipedia.org",
+          excerpt: "...",
+          confidence: 0.7,
+        },
       ],
     },
     ...overrides,
@@ -124,9 +170,24 @@ describe("computeMetrics", () => {
       extraction: {
         entities: [{ uid: "person:a", name: "A", type: "person" }],
         relationships: [
-          { uid: "rel:1", type: "RELATED", source: "person:a", target: "person:a" },
-          { uid: "rel:2", type: "RELATED", source: "person:a", target: "person:a" },
-          { uid: "rel:3", type: "RELATED", source: "person:a", target: "person:a" },
+          {
+            uid: "rel:1",
+            type: "RELATED",
+            source: "person:a",
+            target: "person:a",
+          },
+          {
+            uid: "rel:2",
+            type: "RELATED",
+            source: "person:a",
+            target: "person:a",
+          },
+          {
+            uid: "rel:3",
+            type: "RELATED",
+            source: "person:a",
+            target: "person:a",
+          },
         ],
       },
     });
@@ -202,7 +263,12 @@ describe("evaluateQuality", () => {
     const results = makeResults({
       entityCitations: {
         "person:alice": [
-          { claimText: "c", sourceUrl: "https://x.com", excerpt: "...", confidence: 0.3 },
+          {
+            claimText: "c",
+            sourceUrl: "https://x.com",
+            excerpt: "...",
+            confidence: 0.3,
+          },
         ],
       },
     });
@@ -243,42 +309,80 @@ describe("evaluateQuality", () => {
 
 describe("analyzeGaps", () => {
   it("identifies entity count gap", () => {
-    const metrics = { entityCount: 2, relationshipCoverage: 0.5, sourceDiversity: 2, confidenceScore: 0.8 };
+    const metrics = {
+      entityCount: 2,
+      relationshipCoverage: 0.5,
+      sourceDiversity: 2,
+      confidenceScore: 0.8,
+    };
     const gaps = analyzeGaps(metrics, "detailed");
-    expect(gaps.descriptions.some((d) => d.includes("Entity count"))).toBe(true);
+    expect(gaps.descriptions.some((d) => d.includes("Entity count"))).toBe(
+      true
+    );
     expect(gaps.suggestedQueries.length).toBeGreaterThan(0);
   });
 
   it("identifies source diversity gap", () => {
-    const metrics = { entityCount: 10, relationshipCoverage: 0.5, sourceDiversity: 1, confidenceScore: 0.8 };
+    const metrics = {
+      entityCount: 10,
+      relationshipCoverage: 0.5,
+      sourceDiversity: 1,
+      confidenceScore: 0.8,
+    };
     const gaps = analyzeGaps(metrics, "detailed");
     expect(gaps.descriptions.some((d) => d.includes("diversity"))).toBe(true);
   });
 
   it("identifies confidence score gap", () => {
-    const metrics = { entityCount: 10, relationshipCoverage: 0.5, sourceDiversity: 2, confidenceScore: 0.3 };
+    const metrics = {
+      entityCount: 10,
+      relationshipCoverage: 0.5,
+      sourceDiversity: 2,
+      confidenceScore: 0.3,
+    };
     const gaps = analyzeGaps(metrics, "detailed");
     expect(gaps.descriptions.some((d) => d.includes("Confidence"))).toBe(true);
   });
 
   it("returns empty descriptions when all thresholds met", () => {
-    const metrics = { entityCount: 10, relationshipCoverage: 0.5, sourceDiversity: 3, confidenceScore: 0.8 };
+    const metrics = {
+      entityCount: 10,
+      relationshipCoverage: 0.5,
+      sourceDiversity: 3,
+      confidenceScore: 0.8,
+    };
     const gaps = analyzeGaps(metrics, "detailed");
     // entity count >=8, diversity >=2, confidence >=0.6 → no gaps except possibly relationship coverage
-    const mainGaps = gaps.descriptions.filter((d) => !d.includes("Relationship"));
+    const mainGaps = gaps.descriptions.filter(
+      (d) => !d.includes("Relationship")
+    );
     expect(mainGaps).toHaveLength(0);
   });
 
   it("flags sparse relationship coverage", () => {
-    const metrics = { entityCount: 10, relationshipCoverage: 0.1, sourceDiversity: 3, confidenceScore: 0.8 };
+    const metrics = {
+      entityCount: 10,
+      relationshipCoverage: 0.1,
+      sourceDiversity: 3,
+      confidenceScore: 0.8,
+    };
     const gaps = analyzeGaps(metrics, "detailed");
-    expect(gaps.descriptions.some((d) => d.includes("Relationship coverage"))).toBe(true);
+    expect(
+      gaps.descriptions.some((d) => d.includes("Relationship coverage"))
+    ).toBe(true);
   });
 
   it("does not flag relationship coverage when entity count is 0", () => {
-    const metrics = { entityCount: 0, relationshipCoverage: 0, sourceDiversity: 0, confidenceScore: 0 };
+    const metrics = {
+      entityCount: 0,
+      relationshipCoverage: 0,
+      sourceDiversity: 0,
+      confidenceScore: 0,
+    };
     const gaps = analyzeGaps(metrics, "basic");
-    expect(gaps.descriptions.some((d) => d.includes("Relationship coverage"))).toBe(false);
+    expect(
+      gaps.descriptions.some((d) => d.includes("Relationship coverage"))
+    ).toBe(false);
   });
 });
 
@@ -328,7 +432,10 @@ describe("BudgetTracker", () => {
   });
 
   it("respects custom budget", () => {
-    const custom = new BudgetTracker({ maxAdditionalRounds: 1, maxTotalSources: 2 });
+    const custom = new BudgetTracker({
+      maxAdditionalRounds: 1,
+      maxTotalSources: 2,
+    });
     custom.recordRound();
     expect(custom.isExhausted()).toBe(true);
   });
