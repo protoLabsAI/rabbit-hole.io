@@ -1,7 +1,7 @@
 "use client";
 
 import type { UIMessage } from "ai";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 
 import { Icon } from "@proto/icon-system";
 import { Badge } from "@proto/ui/atoms";
@@ -333,12 +333,22 @@ function ToolCallCard({
       />
     );
   }
-  const isRunning =
-    state === "partial-call" ||
-    state === "call" ||
-    state === "input-streaming" ||
-    state === "input-available";
+  const isStreaming = state === "partial-call" || state === "input-streaming";
+  const isRunning = state === "call" || state === "input-available";
   const isDone = state === "result" || state === "output-available";
+  const isError = state === "error";
+  const isActive = isStreaming || isRunning;
+
+  // Status badge
+  const statusBadge = isStreaming
+    ? { label: "streaming", color: "text-blue-400 bg-blue-400/10" }
+    : isRunning
+      ? { label: "running", color: "text-primary bg-primary/10" }
+      : isError
+        ? { label: "error", color: "text-destructive bg-destructive/10" }
+        : isDone
+          ? { label: "done", color: "text-green-500 bg-green-500/10" }
+          : null;
 
   let summary = "";
   if (isDone && output) {
@@ -366,8 +376,10 @@ function ToolCallCard({
         onClick={() => setExpanded(!expanded)}
         className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
       >
-        {isRunning ? (
+        {isActive ? (
           <Icon name="Loader2" className="h-3 w-3 animate-spin text-primary" />
+        ) : isError ? (
+          <Icon name="AlertCircle" className="h-3 w-3 text-destructive" />
         ) : (
           <Icon
             name={config.icon as any}
@@ -375,12 +387,17 @@ function ToolCallCard({
           />
         )}
         <span className="font-medium">
-          {isRunning ? config.activeLabel : config.label}
+          {isActive ? config.activeLabel : config.label}
         </span>
-        {summary && !isRunning && (
+        {statusBadge && (
+          <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded-full ${statusBadge.color}`}>
+            {statusBadge.label}
+          </span>
+        )}
+        {summary && !isActive && (
           <span className="text-muted-foreground/50">— {summary}</span>
         )}
-        {input?.query && isRunning && (
+        {input?.query && isActive && (
           <span className="text-primary/60 italic truncate max-w-[200px]">
             &quot;{input.query}&quot;
           </span>
@@ -452,6 +469,73 @@ function stripRelatedSearches(text: string): string {
   return cleaned.trimEnd();
 }
 
+// ─── Sources Summary ────────────────────────────────────────────────
+
+function SourcesSummary({
+  sources,
+}: {
+  sources: Array<{ title: string; url: string; type: string; snippet?: string }>;
+}) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div className="pt-1">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground/70 hover:text-foreground transition-colors"
+      >
+        <Icon name="BookOpen" className="h-3 w-3" />
+        <span>
+          Used {sources.length} source{sources.length !== 1 ? "s" : ""}
+        </span>
+        <Icon
+          name="ChevronDown"
+          className={`h-3 w-3 transition-transform ${expanded ? "rotate-180" : ""}`}
+        />
+      </button>
+      {expanded && (
+        <div className="mt-2 space-y-1.5">
+          {sources.map((s, i) => {
+            let domain = "";
+            try {
+              domain = new URL(s.url).hostname.replace(/^www\./, "");
+            } catch {
+              /* ignore */
+            }
+            return (
+              <a
+                key={i}
+                href={s.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted/50 transition-colors group"
+              >
+                {domain && (
+                  <img
+                    src={`https://www.google.com/s2/favicons?domain=${domain}&sz=16`}
+                    className="w-4 h-4 flex-shrink-0 rounded-sm"
+                    alt=""
+                  />
+                )}
+                <div className="min-w-0 flex-1">
+                  <span className="text-xs text-foreground group-hover:text-primary truncate block">
+                    {s.title}
+                  </span>
+                  {domain && (
+                    <span className="text-[10px] text-muted-foreground/50">
+                      {domain}
+                    </span>
+                  )}
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Suggestion Pills ───────────────────────────────────────────────
 
 function SuggestionPills({
@@ -463,14 +547,14 @@ function SuggestionPills({
 }) {
   if (suggestions.length === 0) return null;
   return (
-    <div className="flex flex-wrap gap-2 pt-2">
+    <div className="flex gap-2 pt-2 overflow-x-auto scrollbar-none pb-1">
       {suggestions.map((s, i) => (
         <button
           key={i}
           onClick={() => onSelect(s)}
-          className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-primary/5 transition-colors"
+          className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-primary/5 transition-colors whitespace-nowrap flex-shrink-0"
         >
-          <Icon name="ArrowRight" className="h-3 w-3" />
+          <Icon name="Search" className="h-3 w-3" />
           {s}
         </button>
       ))}
@@ -569,6 +653,25 @@ export function ChatMessage({
       (p.type.startsWith("tool-") && "toolName" in p)
   );
 
+  // Extract sources from tool results for citation badges
+  const sources = useMemo(() => {
+    const result: Array<{ title: string; url: string; type: "web" | "wikipedia" | "graph"; snippet?: string }> = [];
+    for (const t of allTools) {
+      const output = t.output ?? t.result;
+      if (!output) continue;
+      if (t.toolName === "searchWeb" && Array.isArray(output.results)) {
+        for (const r of output.results) {
+          if (r.url && r.title) {
+            result.push({ title: r.title, url: r.url, type: "web", snippet: r.snippet });
+          }
+        }
+      } else if (t.toolName === "searchWikipedia" && output.url && output.title) {
+        result.push({ title: output.title, url: output.url, type: "wikipedia", snippet: output.text?.slice(0, 200) });
+      }
+    }
+    return result;
+  }, [allTools]);
+
   const isComplete = !isStreaming || !isLast;
 
   return (
@@ -594,11 +697,17 @@ export function ChatMessage({
           <ChatMarkdown
             content={isComplete ? stripRelatedSearches(textContent) : textContent}
             isStreaming={isStreaming && isLast}
+            sources={sources.length > 0 ? sources : undefined}
           />
           {isStreaming && isLast && (
             <span className="inline-block w-1.5 h-4 bg-primary/70 animate-pulse ml-0.5 align-text-bottom rounded-sm" />
           )}
         </div>
+      )}
+
+      {/* Sources summary — collapsible list */}
+      {isComplete && sources.length > 0 && (
+        <SourcesSummary sources={sources} />
       )}
 
       {/* Actions */}
