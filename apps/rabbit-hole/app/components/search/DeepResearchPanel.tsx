@@ -677,30 +677,34 @@ export function DeepResearchPanel({
                   isStreaming={status === "running"}
                   sources={sources}
                 />
+                {status === "running" && phase === "synthesis" && (
+                  <span className="inline-block w-1.5 h-4 bg-primary/70 animate-pulse ml-0.5 align-text-bottom rounded-sm" />
+                )}
 
-                {/* Action buttons */}
+                {/* Action buttons — matches basic search ChatMessage style */}
                 {status === "completed" && (
-                  <div className="mt-6 pt-4 border-t border-border/30 flex flex-wrap items-center gap-2">
-                    <button
-                      onClick={handleIngest}
-                      className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-md hover:bg-muted/50 border border-border"
-                    >
-                      <Icon name="DatabaseZap" className="h-3.5 w-3.5" />
-                      Add to Knowledge Graph
-                    </button>
+                  <div className="mt-4 pt-3 border-t border-border/30 flex items-center gap-0.5">
                     <button
                       onClick={handleCopyReport}
-                      className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-md hover:bg-muted/50 border border-border"
+                      className="p-1.5 text-muted-foreground/60 hover:text-foreground transition-colors rounded-md hover:bg-muted/50"
+                      title="Copy report"
                     >
                       <Icon name="Copy" className="h-3.5 w-3.5" />
-                      Copy Report
                     </button>
                     <button
                       onClick={handleDownloadMd}
-                      className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-md hover:bg-muted/50 border border-border"
+                      className="p-1.5 text-muted-foreground/60 hover:text-foreground transition-colors rounded-md hover:bg-muted/50"
+                      title="Download markdown"
                     >
                       <Icon name="Download" className="h-3.5 w-3.5" />
-                      Download Markdown
+                    </button>
+                    <div className="w-px h-4 bg-border/40 mx-1" />
+                    <button
+                      onClick={handleIngest}
+                      className="flex items-center gap-1 text-[11px] text-muted-foreground/60 hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-muted/50"
+                    >
+                      <Icon name="DatabaseZap" className="h-3.5 w-3.5" />
+                      Add to Knowledge Graph
                     </button>
                   </div>
                 )}
@@ -733,10 +737,11 @@ export function DeepResearchPanel({
               </>
             ) : status === "running" ? (
               <div className="flex flex-col items-center justify-center py-20 text-center">
-                <Icon
-                  name="Loader2"
-                  className="h-8 w-8 animate-spin text-primary mb-4"
-                />
+                <div className="flex items-center gap-1 mb-4">
+                  <span className="w-2 h-2 rounded-full bg-primary animate-bounce [animation-delay:0ms]" />
+                  <span className="w-2 h-2 rounded-full bg-primary animate-bounce [animation-delay:150ms]" />
+                  <span className="w-2 h-2 rounded-full bg-primary animate-bounce [animation-delay:300ms]" />
+                </div>
                 <p className="text-sm text-muted-foreground">
                   {phase === "synthesis"
                     ? "Writing report..."
