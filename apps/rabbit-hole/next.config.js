@@ -1,4 +1,27 @@
+import { readFileSync, existsSync } from "node:fs";
+import { resolve } from "node:path";
+
 import baseConfig from "@proto/config-next/base.config.js";
+
+// Load .env.research from the monorepo root (provides API keys + Langfuse config).
+// Next.js only auto-loads .env / .env.local — this ensures research env vars are
+// available during `pnpm dev` without manual sourcing or symlinking.
+const envResearchPath = resolve(import.meta.dirname, "../../.env.research");
+if (existsSync(envResearchPath)) {
+  const content = readFileSync(envResearchPath, "utf-8");
+  for (const line of content.split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const eqIdx = trimmed.indexOf("=");
+    if (eqIdx === -1) continue;
+    const key = trimmed.slice(0, eqIdx);
+    const value = trimmed.slice(eqIdx + 1);
+    // Don't override existing env vars (e.g., from .env.local or shell)
+    if (!process.env[key]) {
+      process.env[key] = value;
+    }
+  }
+}
 
 /** @type {import('next').NextConfig} */
 export default {
