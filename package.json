@@ -48,6 +48,7 @@
     "build:storybook": "storybook build",
     "start:rabbit-hole": "cd apps/rabbit-hole && pnpm start",
     "type-check": "pnpm run type-check:app && pnpm run type-check:packages",
+    "typecheck": "pnpm run type-check",
     "type-check:app": "cd apps/rabbit-hole && NODE_OPTIONS='--max-old-space-size=8192' tsc --noEmit --skipLibCheck --incremental",
     "type-check:packages": "turbo run type-check --filter='./packages/*'",
     "type-check:all": "turbo run type-check",
