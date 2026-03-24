@@ -183,6 +183,7 @@ function getLangfuse(): import("langfuse").Langfuse | null {
       _langfuseInstance = new Langfuse({
         publicKey,
         secretKey,
+        baseUrl: process.env["LANGFUSE_BASE_URL"] || undefined,
         // Disable automatic flushing on shutdown — we call flushAsync ourselves.
         flushAt: 100,
         flushInterval: 10_000,

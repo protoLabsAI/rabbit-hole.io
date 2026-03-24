@@ -26,21 +26,38 @@ The active surface is the **Search Engine** at `/`. Everything else (Atlas, Rese
 
 **Frontend**: `useChat` from `@ai-sdk/react` + `DefaultChatTransport` → `POST /api/chat`
 
-**Backend**: AI SDK v6 `streamText` with 3 tools:
+**Backend**: AI SDK v6 `streamText` with 4 tools:
 - `searchGraph` — Neo4j full-text search via Lucene index
 - `searchWeb` — Tavily advanced search
 - `searchWikipedia` — Wikipedia article fetch
+- `askClarification` — Ask user a clarifying question (intercepted by middleware)
 
 The agent decides tool order and iteration. `stopWhen: stepCountIs(5)`.
 
-**Graph ingestion is user-triggered** — not automatic. Users click "Add to Knowledge Graph" on a message, which calls `POST /api/chat/ingest` to extract entities and ingest via `/api/ingest-bundle`.
+**Middleware pipeline** (`@proto/research-middleware`): DeerFlow-inspired composable middleware wraps the streamText agent loop. Hooks fire at lifecycle points: `beforeAgent`, `beforeModel`, `afterModel`, `wrapToolCall`, `afterAgent`. Middleware registered in `app/lib/middleware-config.ts`:
+
+| Middleware | Hook | Purpose |
+|---|---|---|
+| EntityMemory | beforeAgent | Queries Neo4j for prior knowledge, flags stale entities |
+| ResearchPlanner | beforeAgent | Generates 3-5 step research plan for complex queries |
+| Clarification | wrapToolCall | Intercepts askClarification, returns question to user |
+| LoopDetection | wrapToolCall | Hashes tool calls, warns at repeat 2, blocks at 3 |
+| Reflection | afterModel | Evaluates evidence quality, guides gap-filling |
+| ParallelDecomposition | beforeAgent | Decomposes complex queries into focused sub-queries |
+| StructuredExtraction | afterAgent | Extracts entities/relationships for "Add to Graph" preview |
+| DeferredToolLoading | beforeAgent | Deferred tool schema loading (disabled by default) |
+
+**Langfuse tracing**: Every middleware hook, tool call, and LLM call produces Langfuse traces when `LANGFUSE_PUBLIC_KEY` is set. Traces include session ID, query, token usage, and quality metrics. Set `LANGFUSE_BASE_URL` for self-hosted instances.
+
+**Graph ingestion is user-triggered** — not automatic. Users click "Add to Knowledge Graph" on a message, which calls `POST /api/chat/ingest` to extract entities and ingest via `/api/ingest-bundle`. The StructuredExtractionMiddleware now pre-computes extraction previews using full research context.
 
 **Shared search utilities**: `app/lib/search.ts` is the single source of truth for `searchGraph`, `searchWeb`, `searchWikipedia`, `buildLuceneQuery`, and `withRetry`. Both `/api/chat` and `/api/research/deep` import from here.
 
 **Key files:**
 - `app/page.tsx` — Search engine UI (useChat + ChatMessage)
 - `app/lib/search.ts` — Shared search utilities (graph, web, wiki, retry)
-- `app/api/chat/route.ts` — Agentic search endpoint (streamText + tools)
+- `app/lib/middleware-config.ts` — Middleware registry (all middleware wired here)
+- `app/api/chat/route.ts` — Agentic search endpoint (streamText + middleware + tools)
 - `app/api/chat/ingest/route.ts` — Manual entity extraction + ingest
 - `app/api/entity-search/route.ts` — Neo4j full-text entity lookup
 - `app/hooks/useChatSearch.ts` — useChat wrapper
@@ -49,6 +66,7 @@ The agent decides tool order and iteration. `stopWhen: stepCountIs(5)`.
 - `app/components/search/ChatMarkdown.tsx` — Markdown renderer with inline citation support
 - `app/components/search/SearchInput.tsx` — Input with file attach
 - `app/components/search/SearchSidebar.tsx` — Session history + nav
+- `packages/research-middleware/` — Middleware runtime, chain, registry, tracing, all middleware
 - `packages/llm-providers/src/server/ai-sdk.ts` — AI SDK provider adapter
 
 ## Deep Research Architecture
@@ -85,4 +103,6 @@ The agent decides tool order and iteration. `stopWhen: stepCountIs(5)`.
 
 - `/research`, `/ingest`, `/graph` commands
 - Tools: `graph_search`, `research_entity`, `extract_entities`, `validate_bundle`, `ingest_bundle`, `wikipedia_search`, `tavily_search`, `web_search`
-- Env: `RABBIT_HOLE_ROOT`, `ANTHROPIC_API_KEY`, `TAVILY_API_KEY`, `GROQ_API_KEY`
+- `research_entity` runs Wikipedia/DuckDuckGo/Tavily in parallel (`Promise.allSettled`) with 10s per-source timeout, source health tracking (3 failures in 10min = auto-disable), and adaptive depth (quality-based follow-up rounds with configurable budget)
+- Langfuse tracing per `research_entity` call when `LANGFUSE_PUBLIC_KEY` is set
+- Env: `RABBIT_HOLE_ROOT`, `ANTHROPIC_API_KEY`, `TAVILY_API_KEY`, `GROQ_API_KEY`, `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_BASE_URL`
