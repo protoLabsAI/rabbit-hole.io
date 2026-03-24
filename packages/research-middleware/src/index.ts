@@ -50,3 +50,16 @@ export {
   type ClarificationResult,
   type ClarificationBlockedResult,
 } from "./middleware/clarification.js";
+export {
+  ReflectionMiddleware,
+  detectSourceType,
+  computeMetrics,
+  detectGaps,
+  detectSufficiency,
+  buildReflectionPrompt,
+  buildGapFillingGuidance,
+  buildSynthesisGuidance,
+  type EvidenceSource,
+  type EvidenceMetrics,
+  type SourceType,
+} from "./middleware/reflection.js";

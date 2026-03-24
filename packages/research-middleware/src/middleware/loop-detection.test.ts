@@ -39,7 +39,12 @@ describe("LoopDetectionMiddleware", () => {
     const ctx = makeCtx();
     const execute: ToolExecutor = vi.fn().mockResolvedValue("tool-result");
 
-    const result = await mw.wrapToolCall(ctx, "search", { q: "hello" }, execute);
+    const result = await mw.wrapToolCall(
+      ctx,
+      "search",
+      { q: "hello" },
+      execute
+    );
 
     expect(execute).toHaveBeenCalledTimes(1);
     expect(execute).toHaveBeenCalledWith({ q: "hello" });
@@ -75,7 +80,12 @@ describe("LoopDetectionMiddleware", () => {
     const execute: ToolExecutor = vi.fn().mockResolvedValue("original result");
 
     await mw.wrapToolCall(ctx, "search", { q: "hello" }, execute);
-    const result = await mw.wrapToolCall(ctx, "search", { q: "hello" }, execute);
+    const result = await mw.wrapToolCall(
+      ctx,
+      "search",
+      { q: "hello" },
+      execute
+    );
 
     expect(typeof result).toBe("string");
     expect(result as string).toContain("original result");
@@ -88,10 +98,17 @@ describe("LoopDetectionMiddleware", () => {
     const execute: ToolExecutor = vi.fn().mockResolvedValue(toolResult);
 
     await mw.wrapToolCall(ctx, "search", { q: "hello" }, execute);
-    const result = await mw.wrapToolCall(ctx, "search", { q: "hello" }, execute);
+    const result = await mw.wrapToolCall(
+      ctx,
+      "search",
+      { q: "hello" },
+      execute
+    );
 
     expect(result).toEqual(expect.objectContaining({ result: toolResult }));
-    expect((result as { warning: string }).warning).toMatch(/loop detection warning/i);
+    expect((result as { warning: string }).warning).toMatch(
+      /loop detection warning/i
+    );
   });
 
   it("emits a loop-detection:warning span at count 2 with hash and count metadata", async () => {
@@ -134,7 +151,12 @@ describe("LoopDetectionMiddleware", () => {
 
     await mw.wrapToolCall(ctx, "search", { q: "hello" }, execute);
     await mw.wrapToolCall(ctx, "search", { q: "hello" }, execute);
-    const result = await mw.wrapToolCall(ctx, "search", { q: "hello" }, execute);
+    const result = await mw.wrapToolCall(
+      ctx,
+      "search",
+      { q: "hello" },
+      execute
+    );
 
     expect(typeof result).toBe("string");
     expect(result as string).toMatch(/synthesize/i);
@@ -195,12 +217,19 @@ describe("LoopDetectionMiddleware", () => {
 
     // Same logical args, different key order — should hash identically
     await mw.wrapToolCall(ctx, "search", { q: "hello", lang: "en" }, execute);
-    const result = await mw.wrapToolCall(ctx, "search", { lang: "en", q: "hello" }, execute);
+    const result = await mw.wrapToolCall(
+      ctx,
+      "search",
+      { lang: "en", q: "hello" },
+      execute
+    );
 
     // Count should be 2 → warning
-    expect(typeof result === "string" ? result : (result as { warning: string }).warning).toMatch(
-      /loop detection warning/i
-    );
+    expect(
+      typeof result === "string"
+        ? result
+        : (result as { warning: string }).warning
+    ).toMatch(/loop detection warning/i);
   });
 
   it("treats different tools with same args as distinct calls", async () => {
@@ -209,7 +238,7 @@ describe("LoopDetectionMiddleware", () => {
 
     await mw.wrapToolCall(ctx, "search", { q: "hello" }, execute);
     await mw.wrapToolCall(ctx, "search", { q: "hello" }, execute); // count 2 for "search"
-    await mw.wrapToolCall(ctx, "fetch", { q: "hello" }, execute);  // count 1 for "fetch" — no warning
+    await mw.wrapToolCall(ctx, "fetch", { q: "hello" }, execute); // count 1 for "fetch" — no warning
 
     // Call 3 (fetch with same args as search) should NOT be warned
     expect(execute).toHaveBeenCalledTimes(3);
@@ -232,7 +261,12 @@ describe("LoopDetectionMiddleware", () => {
     await mw.wrapToolCall(ctx, "search", { q: "new-query" }, execute);
 
     // query-0 was evicted: re-using it starts a fresh count of 1 (no warning)
-    const result1 = await mw.wrapToolCall(ctx, "search", { q: "query-0" }, execute);
+    const result1 = await mw.wrapToolCall(
+      ctx,
+      "search",
+      { q: "query-0" },
+      execute
+    );
 
     // First re-use after eviction → count 1, should pass through cleanly
     expect(result1).toBe("result");
@@ -258,11 +292,21 @@ describe("LoopDetectionMiddleware", () => {
     await mw.wrapToolCall(ctx, "search", { q: "new-query" }, execute);
 
     // query-1 was evicted; using it again gives count 1 (no warning)
-    const result = await mw.wrapToolCall(ctx, "search", { q: "query-1" }, execute);
+    const result = await mw.wrapToolCall(
+      ctx,
+      "search",
+      { q: "query-1" },
+      execute
+    );
     expect(result).toBe("result");
 
     // query-0 is still in the window with count 2; using it again gives count 3 → blocked
-    const blocked = await mw.wrapToolCall(ctx, "search", { q: "query-0" }, execute);
+    const blocked = await mw.wrapToolCall(
+      ctx,
+      "search",
+      { q: "query-0" },
+      execute
+    );
     expect(blocked as string).toMatch(/synthesize/i);
   });
 
@@ -281,7 +325,12 @@ describe("LoopDetectionMiddleware", () => {
     await mw.wrapToolCall(ctx1, "search", { q: "hello" }, execute);
 
     // ctx2 is independent — first call should pass through cleanly
-    const result = await mw.wrapToolCall(ctx2, "search", { q: "hello" }, execute);
+    const result = await mw.wrapToolCall(
+      ctx2,
+      "search",
+      { q: "hello" },
+      execute
+    );
     expect(result).toBe("result");
   });
 });

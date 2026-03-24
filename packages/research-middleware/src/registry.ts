@@ -82,9 +82,7 @@ export class MiddlewareRegistry {
    * Returns only the enabled middleware implementations, in registration order.
    */
   getEnabled(): ResearchMiddleware[] {
-    return this.entries
-      .filter((e) => e.enabled)
-      .map((e) => e.middleware);
+    return this.entries.filter((e) => e.enabled).map((e) => e.middleware);
   }
 
   /**

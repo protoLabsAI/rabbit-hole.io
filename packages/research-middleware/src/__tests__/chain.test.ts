@@ -22,13 +22,16 @@ import type {
 const nullTracing = createTracingContext({ agentId: "test-agent" });
 
 function makeCtx(overrides?: Partial<MiddlewareContext>): MiddlewareContext {
-  return { agentId: "test-agent", state: {}, tracing: nullTracing, ...overrides };
+  return {
+    agentId: "test-agent",
+    state: {},
+    tracing: nullTracing,
+    ...overrides,
+  };
 }
 
 const noopResult: AgentResult = { text: "done", finishReason: "stop" };
-const baseMessages: ModelMessage[] = [
-  { role: "user", content: "hello" },
-];
+const baseMessages: ModelMessage[] = [{ role: "user", content: "hello" }];
 const baseResponse: ModelResponse = { text: "hi", usage: { totalTokens: 10 } };
 
 // ---------------------------------------------------------------------------
@@ -59,13 +62,20 @@ describe("PassthroughMiddleware", () => {
 
   it("afterModel resolves without error", async () => {
     const mw = new PassthroughMiddleware();
-    await expect(mw.afterModel(makeCtx(), baseResponse)).resolves.toBeUndefined();
+    await expect(
+      mw.afterModel(makeCtx(), baseResponse)
+    ).resolves.toBeUndefined();
   });
 
   it("wrapToolCall delegates to execute", async () => {
     const mw = new PassthroughMiddleware();
     const execute: ToolExecutor = vi.fn().mockResolvedValue("tool-result");
-    const result = await mw.wrapToolCall(makeCtx(), "myTool", { a: 1 }, execute);
+    const result = await mw.wrapToolCall(
+      makeCtx(),
+      "myTool",
+      { a: 1 },
+      execute
+    );
     expect(execute).toHaveBeenCalledWith({ a: 1 });
     expect(result).toBe("tool-result");
   });
@@ -86,30 +96,54 @@ describe("MiddlewareChain — ordering", () => {
 
     mw1 = {
       id: "mw1",
-      async beforeAgent() { callOrder.push("mw1:beforeAgent"); },
-      async afterAgent() { callOrder.push("mw1:afterAgent"); },
-      async beforeModel(_ctx, messages) { callOrder.push("mw1:beforeModel"); return messages; },
-      async afterModel() { callOrder.push("mw1:afterModel"); },
+      async beforeAgent() {
+        callOrder.push("mw1:beforeAgent");
+      },
+      async afterAgent() {
+        callOrder.push("mw1:afterAgent");
+      },
+      async beforeModel(_ctx, messages) {
+        callOrder.push("mw1:beforeModel");
+        return messages;
+      },
+      async afterModel() {
+        callOrder.push("mw1:afterModel");
+      },
     };
 
     mw2 = {
       id: "mw2",
-      async beforeAgent() { callOrder.push("mw2:beforeAgent"); },
-      async afterAgent() { callOrder.push("mw2:afterAgent"); },
-      async beforeModel(_ctx, messages) { callOrder.push("mw2:beforeModel"); return messages; },
-      async afterModel() { callOrder.push("mw2:afterModel"); },
+      async beforeAgent() {
+        callOrder.push("mw2:beforeAgent");
+      },
+      async afterAgent() {
+        callOrder.push("mw2:afterAgent");
+      },
+      async beforeModel(_ctx, messages) {
+        callOrder.push("mw2:beforeModel");
+        return messages;
+      },
+      async afterModel() {
+        callOrder.push("mw2:afterModel");
+      },
     };
 
     mw3 = {
       id: "mw3",
-      async beforeAgent() { callOrder.push("mw3:beforeAgent"); },
+      async beforeAgent() {
+        callOrder.push("mw3:beforeAgent");
+      },
     };
   });
 
   it("calls beforeAgent in registration order", async () => {
     const chain = new MiddlewareChain([mw1, mw2, mw3]);
     await chain.beforeAgent(makeCtx());
-    expect(callOrder).toEqual(["mw1:beforeAgent", "mw2:beforeAgent", "mw3:beforeAgent"]);
+    expect(callOrder).toEqual([
+      "mw1:beforeAgent",
+      "mw2:beforeAgent",
+      "mw3:beforeAgent",
+    ]);
   });
 
   it("calls afterAgent in registration order", async () => {
@@ -134,7 +168,9 @@ describe("MiddlewareChain — ordering", () => {
   it("skips hooks that are not implemented by a middleware", async () => {
     // mw3 only has beforeAgent — other hooks should be silently skipped
     const chain = new MiddlewareChain([mw1, mw3]);
-    await expect(chain.afterAgent(makeCtx(), noopResult)).resolves.toBeUndefined();
+    await expect(
+      chain.afterAgent(makeCtx(), noopResult)
+    ).resolves.toBeUndefined();
     expect(callOrder).toEqual(["mw1:afterAgent"]);
   });
 });
@@ -152,14 +188,19 @@ describe("MiddlewareChain — beforeModel message threading", () => {
       beforeModel: async (_ctx, messages) => [extra, ...messages],
     };
 
-    const spy = vi.fn(async (_ctx: MiddlewareContext, messages: ModelMessage[]) => messages);
+    const spy = vi.fn(
+      async (_ctx: MiddlewareContext, messages: ModelMessage[]) => messages
+    );
     const observer: ResearchMiddleware = { id: "observer", beforeModel: spy };
 
     const chain = new MiddlewareChain([injector, observer]);
     const result = await chain.beforeModel(makeCtx(), baseMessages);
 
     expect(result).toEqual([extra, ...baseMessages]);
-    expect(spy).toHaveBeenCalledWith(expect.anything(), [extra, ...baseMessages]);
+    expect(spy).toHaveBeenCalledWith(expect.anything(), [
+      extra,
+      ...baseMessages,
+    ]);
   });
 
   it("returns original messages when no middleware modifies them", async () => {
@@ -201,9 +242,19 @@ describe("MiddlewareChain — wrapToolCall onion composition", () => {
     const realExecute: ToolExecutor = vi.fn().mockResolvedValue("real-result");
 
     const chain = new MiddlewareChain([outer, inner]);
-    const result = await chain.wrapToolCall(makeCtx(), "myTool", {}, realExecute);
+    const result = await chain.wrapToolCall(
+      makeCtx(),
+      "myTool",
+      {},
+      realExecute
+    );
 
-    expect(order).toEqual(["outer-before", "inner-before", "inner-after", "outer-after"]);
+    expect(order).toEqual([
+      "outer-before",
+      "inner-before",
+      "inner-after",
+      "outer-after",
+    ]);
     expect(result).toBe("real-result");
     expect(realExecute).toHaveBeenCalledTimes(1);
   });
@@ -312,11 +363,15 @@ describe("MiddlewareRegistry", () => {
     const order: string[] = [];
     const mwA: ResearchMiddleware = {
       id: "a",
-      async beforeAgent() { order.push("a"); },
+      async beforeAgent() {
+        order.push("a");
+      },
     };
     const mwB: ResearchMiddleware = {
       id: "b",
-      async beforeAgent() { order.push("b"); },
+      async beforeAgent() {
+        order.push("b");
+      },
     };
 
     const registry = new MiddlewareRegistry({

@@ -82,7 +82,11 @@ describe("createTracingContext — no-op mode (LANGFUSE_PUBLIC_KEY not set)", ()
     const ctx = createTracingContext({ agentId: "a1" });
     const gen = ctx.createGeneration("llm-call", "gpt-4o", "hello");
     expect(() =>
-      gen.end("world", { promptTokens: 10, completionTokens: 5, totalTokens: 15 })
+      gen.end("world", {
+        promptTokens: 10,
+        completionTokens: 5,
+        totalTokens: 15,
+      })
     ).not.toThrow();
   });
 
