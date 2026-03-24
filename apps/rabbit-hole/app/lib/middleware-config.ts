@@ -9,6 +9,7 @@
  */
 
 import {
+  ClarificationMiddleware,
   MiddlewareRegistry,
   PassthroughMiddleware,
 } from "@proto/research-middleware";
@@ -27,6 +28,11 @@ export function getMiddlewareRegistry(): MiddlewareRegistry {
           id: "passthrough",
           enabled: true,
           middleware: new PassthroughMiddleware(),
+        },
+        {
+          id: "clarification",
+          enabled: true,
+          middleware: new ClarificationMiddleware(),
         },
       ],
     });
