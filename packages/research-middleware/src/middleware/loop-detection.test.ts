@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { LoopDetectionMiddleware } from "./loop-detection.js";
+
 import { createTracingContext } from "../tracing.js";
 import type { MiddlewareContext, ToolExecutor } from "../types.js";
+
+import { LoopDetectionMiddleware } from "./loop-detection.js";
 
 // ---------------------------------------------------------------------------
 // Helpers
