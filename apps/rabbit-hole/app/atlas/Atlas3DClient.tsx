@@ -112,20 +112,32 @@ export default function Atlas3DClient() {
   const [selectedNode, setSelectedNode] = useState<AtlasNode | null>(null);
   const [dimensions, setDimensions] = useState<{ width: number; height: number } | null>(null);
 
-  // Responsive canvas — ResizeObserver fires once the container has real dimensions
+  // Responsive canvas — measure after layout with ResizeObserver + fallback
   useEffect(() => {
-    if (!containerRef.current) return;
-    const ro = new ResizeObserver((entries) => {
-      const entry = entries[0];
-      if (entry) {
-        setDimensions({
-          width: Math.floor(entry.contentRect.width),
-          height: Math.floor(entry.contentRect.height),
-        });
+    const el = containerRef.current;
+    if (!el) return;
+
+    const measure = () => {
+      const w = el.clientWidth || window.innerWidth;
+      const h = el.clientHeight || window.innerHeight - 45; // 45px header
+      if (w > 0 && h > 0) {
+        setDimensions({ width: w, height: h });
       }
-    });
-    ro.observe(containerRef.current);
-    return () => ro.disconnect();
+    };
+
+    // ResizeObserver for ongoing updates
+    const ro = new ResizeObserver(() => measure());
+    ro.observe(el);
+
+    // Immediate fallback in case ResizeObserver is slow
+    measure();
+    // Also re-measure after a short delay (flex layout may not be computed yet)
+    const timer = setTimeout(measure, 100);
+
+    return () => {
+      ro.disconnect();
+      clearTimeout(timer);
+    };
   }, []);
 
   // Fetch graph data
@@ -237,7 +249,7 @@ export default function Atlas3DClient() {
         nodeCount={graphData?.nodes.length}
         linkCount={graphData?.links.length}
       />
-      <div ref={containerRef} className="flex-1 relative">
+      <div ref={containerRef} className="flex-1 relative min-h-0" style={{ height: "calc(100vh - 45px)" }}>
         {graphData && dimensions && (
           <ForceGraph3D
             ref={graphRef}
