@@ -687,6 +687,22 @@ export function ChatMessage({
     return result;
   }, [allTools]);
 
+  // Extract graph entity UIDs from searchGraph results for "View in Atlas" CTA
+  const graphEntities = useMemo(() => {
+    const uids: string[] = [];
+    for (const t of allTools) {
+      if (t.toolName === "searchGraph") {
+        const output = t.output ?? t.result;
+        if (Array.isArray(output)) {
+          for (const entity of output) {
+            if (entity?.uid) uids.push(entity.uid);
+          }
+        }
+      }
+    }
+    return uids;
+  }, [allTools]);
+
   const isComplete = !isStreaming || !isLast;
 
   return (
@@ -802,6 +818,17 @@ export function ChatMessage({
               />
               {ingesting ? "Adding..." : "Add to Knowledge Graph"}
             </button>
+          )}
+
+          {/* View in Atlas — show when graph entities were found */}
+          {graphEntities.length > 0 && (
+            <a
+              href={`/atlas?centerEntity=${graphEntities[0]}`}
+              className="flex items-center gap-1 text-[11px] text-muted-foreground/60 hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-muted/50"
+            >
+              <Icon name="Globe" className="h-3.5 w-3.5" />
+              View in Atlas
+            </a>
           )}
         </div>
       )}
