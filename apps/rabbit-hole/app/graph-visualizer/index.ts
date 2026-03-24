@@ -1,14 +1,8 @@
 /**
  * Graph Visualizer Component Library
  *
- * Modular, configurable graph visualization components extracted from Atlas monolith.
- * Provides reusable Cytoscape-based visualization with performance optimizations.
+ * Modular, configurable graph visualization components.
  */
-
-export { GraphVisualizerWrapper } from "./components/GraphVisualizerWrapper";
-export { GraphVisualizationContainer } from "./components/GraphVisualizationContainer";
-
-export { useCytoscape } from "./hooks/useCytoscape";
 
 // NodeHover component exports
 export { NodeHover, useNodeHover } from "./components/NodeHover";
@@ -29,12 +23,6 @@ export {
   BaseDomainPopover,
   PopoverSection,
 } from "./components/domain-cards";
-
-export {
-  type GraphVisualizerProps,
-  type GraphVisualizationConfig,
-  type GraphEventHandlers,
-} from "./components/types";
 
 // NodeHover type exports
 export {
