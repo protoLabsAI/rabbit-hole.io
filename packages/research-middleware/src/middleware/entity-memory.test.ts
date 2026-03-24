@@ -13,6 +13,8 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
+import { getGlobalNeo4jClient } from "@proto/database";
+
 import { createTracingContext } from "../tracing";
 import type { AgentResult, MiddlewareContext } from "../types";
 
@@ -31,8 +33,6 @@ import {
 vi.mock("@proto/database", () => ({
   getGlobalNeo4jClient: vi.fn(),
 }));
-
-import { getGlobalNeo4jClient } from "@proto/database";
 
 // ---------------------------------------------------------------------------
 // Helpers

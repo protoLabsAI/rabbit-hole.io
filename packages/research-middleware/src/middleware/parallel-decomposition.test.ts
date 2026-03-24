@@ -12,13 +12,15 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
+
+import { createTracingContext } from "../tracing";
+import type { MiddlewareContext, ModelMessage } from "../types";
+
 import {
   ParallelDecompositionMiddleware,
   SUBQUERY_PLAN_TYPE,
   type SubQueryPlanResult,
 } from "./parallel-decomposition";
-import { createTracingContext } from "../tracing";
-import type { MiddlewareContext, ModelMessage } from "../types";
 
 // ---------------------------------------------------------------------------
 // Helpers
