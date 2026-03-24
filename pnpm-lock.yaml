@@ -622,9 +622,6 @@ importers:
       '@copilotkit/runtime':
         specifier: ^1.9.3
         version: 1.10.4(f0d2a848dda29c38c4f2774d32da3d91)
-      '@cosmos.gl/graph':
-        specifier: ^2.6.4
-        version: 2.6.4
       '@dnd-kit/core':
         specifier: ^6.3.1
         version: 6.3.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
@@ -3074,10 +3071,6 @@ packages:
 
   '@copilotkit/shared@1.10.4':
     resolution: {integrity: sha512-vvF3vG03e5OZcUd0x7FdpIPRx60W3vyiK+0maGyEZoU1xUlBJbxaCkAED6gAH3JBZl/BZNWoJKsYDxiQUY2V3A==}
-
-  '@cosmos.gl/graph@2.6.4':
-    resolution: {integrity: sha512-i+N9lSpAjGLTUPelo/bKNbQnKPDqt3k2UnRlfIWe2Lrambc4J3QFgOfpR8AalQ/1tgLRoeNtVBZ1GPpsNqae5w==}
-    engines: {node: '>=12.2.0', npm: '>=7.0.0'}
 
   '@csstools/color-helpers@5.1.0':
     resolution: {integrity: sha512-S11EXWJyy0Mz5SYvRmY8nJYTFFd1LCNV+7cXyAgQtOOuzb4EsgfqDufL+9esx72/eLhsRdGZwaldu/h+E4t4BA==}
@@ -10916,12 +10909,6 @@ packages:
   github-from-package@0.0.0:
     resolution: {integrity: sha512-SyHy3T1v2NUXn29OsWdxmK6RwHD+vkj3v8en8AOBZ1wBQ/hCAQ5bAQTD02kW4W9tUp/3Qh6J8r9EvntiyCmOOw==}
 
-  gl-bench@1.0.42:
-    resolution: {integrity: sha512-zuMsA/NCPmI8dPy6q3zTUH8OUM5cqKg7uVWwqzrtXJPBqoypM0XeFWEc8iFOqbf/1qtXieWOrbmgFEByKTQt4Q==}
-
-  gl-matrix@3.4.4:
-    resolution: {integrity: sha512-latSnyDNt/8zYUB6VIJ6PCh2jBjJX6gnDsoCZ7LyW7GkqrD51EWwa9qCoGixj8YqBtETQK/xY7OmpTF8xz1DdQ==}
-
   glob-parent@5.1.2:
     resolution: {integrity: sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==}
     engines: {node: '>= 6'}
@@ -13916,10 +13903,6 @@ packages:
       '@types/react-dom':
         optional: true
 
-  random@4.1.0:
-    resolution: {integrity: sha512-6Ajb7XmMSE9EFAMGC3kg9mvE7fGlBip25mYYuSMzw/uUSrmGilvZo2qwX3RnTRjwXkwkS+4swse9otZ92VjAtQ==}
-    engines: {node: '>=14'}
-
   randombytes@2.1.0:
     resolution: {integrity: sha512-vYl3iOX+4CKUWuxGi9Ukhie6fsqXqS9FE2Zaic4tNFD2N2QQaXOMFbuKK4QmDHC0JO6B1Zp41J0LpT0oR68amQ==}
 
@@ -14169,9 +14152,6 @@ packages:
     resolution: {integrity: sha512-NZQZdC5wOE/H3UT28fVGL+ikOZcEzfMGk/c3iN9UGxzWHMa1op7274oyiUVrAG4B2EuFhus8SvkaYnhvW92p9Q==}
     hasBin: true
 
-  regl@2.1.1:
-    resolution: {integrity: sha512-+IOGrxl3FZ8ZM9ixCWQZzFRiRn7Rzn9bu3iFHwg/yz4tlOUQgbO4PHLgG+1ZT60zcIV8tief6Qrmyl8qcoJP0g==}
-
   rehype-harden@1.1.8:
     resolution: {integrity: sha512-Qn7vR1xrf6fZCrkm9TDWi/AB4ylrHy+jqsNm1EHOAmbARYA6gsnVJBq/sdBh6kmT4NEZxH5vgIjrscefJAOXcw==}
 
@@ -14395,9 +14375,6 @@ packages:
 
   secure-json-parse@2.7.0:
     resolution: {integrity: sha512-6aU+Rwsezw7VR8/nyvKTx8QpWH9FrcYiXXlqC4z5d5XQBDRqtbfsRjnwGyqbi3gddNtWHuEk9OANUotL26qKUw==}
-
-  seedrandom@3.0.5:
-    resolution: {integrity: sha512-8OwmbklUNzwezjGInmZ+2clQmExQPvomqjL7LFqOYqtmuxRgQYqOD3mHaU+MvZn5FLUeVxVfQjwLZW/n/JFuqg==}
 
   select-hose@2.0.0:
     resolution: {integrity: sha512-mEugaLK+YfkijB4fx0e6kImuJdCIt2LxCRcbEYPqRGCs4F2ogyfZU5IAZRdjCP8JPq2AtdNoC/Dux63d9Kiryg==}
@@ -19188,22 +19165,6 @@ snapshots:
       zod-to-json-schema: 3.24.6(zod@3.25.76)
     transitivePeerDependencies:
       - encoding
-
-  '@cosmos.gl/graph@2.6.4':
-    dependencies:
-      d3-array: 3.2.4
-      d3-color: 3.1.0
-      d3-drag: 3.0.0
-      d3-ease: 3.0.1
-      d3-scale: 4.0.2
-      d3-selection: 3.0.0
-      d3-transition: 3.0.1(d3-selection@3.0.0)
-      d3-zoom: 3.0.0
-      dompurify: 3.3.1
-      gl-bench: 1.0.42
-      gl-matrix: 3.4.4
-      random: 4.1.0
-      regl: 2.1.1
 
   '@csstools/color-helpers@5.1.0': {}
 
@@ -28112,10 +28073,6 @@ snapshots:
 
   github-from-package@0.0.0: {}
 
-  gl-bench@1.0.42: {}
-
-  gl-matrix@3.4.4: {}
-
   glob-parent@5.1.2:
     dependencies:
       is-glob: 4.0.3
@@ -28646,7 +28603,7 @@ snapshots:
       isstream: 0.1.2
       jsonwebtoken: 9.0.2
       mime-types: 2.1.35
-      retry-axios: 2.6.0(axios@1.12.2(debug@4.4.3))
+      retry-axios: 2.6.0(axios@1.12.2)
       tough-cookie: 4.1.4
     transitivePeerDependencies:
       - supports-color
@@ -31812,10 +31769,6 @@ snapshots:
       '@types/react': 19.1.13
       '@types/react-dom': 19.1.9(@types/react@19.1.13)
 
-  random@4.1.0:
-    dependencies:
-      seedrandom: 3.0.5
-
   randombytes@2.1.0:
     dependencies:
       safe-buffer: 5.2.1
@@ -32144,8 +32097,6 @@ snapshots:
     dependencies:
       jsesc: 3.1.0
 
-  regl@2.1.1: {}
-
   rehype-harden@1.1.8:
     dependencies:
       unist-util-visit: 5.0.0
@@ -32284,7 +32235,7 @@ snapshots:
       onetime: 7.0.0
       signal-exit: 4.1.0
 
-  retry-axios@2.6.0(axios@1.12.2(debug@4.4.3)):
+  retry-axios@2.6.0(axios@1.12.2):
     dependencies:
       axios: 1.12.2(debug@4.4.3)
 
@@ -32448,8 +32399,6 @@ snapshots:
       ajv-keywords: 5.1.0(ajv@8.17.1)
 
   secure-json-parse@2.7.0: {}
-
-  seedrandom@3.0.5: {}
 
   select-hose@2.0.0: {}
 
