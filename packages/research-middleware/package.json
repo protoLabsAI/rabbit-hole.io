@@ -20,7 +20,9 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@proto/llm-providers": "workspace:*",
     "@proto/utils": "workspace:*",
+    "ai": "^6.0.116",
     "langfuse": "^3.38.6"
   },
   "devDependencies": {

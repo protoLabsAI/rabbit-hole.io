@@ -1479,9 +1479,15 @@ importers:
 
   packages/research-middleware:
     dependencies:
+      '@proto/llm-providers':
+        specifier: workspace:*
+        version: link:../llm-providers
       '@proto/utils':
         specifier: workspace:*
         version: link:../utils
+      ai:
+        specifier: ^6.0.116
+        version: 6.0.116(zod@4.1.12)
       langfuse:
         specifier: ^3.38.6
         version: 3.38.6
@@ -24429,7 +24435,7 @@ snapshots:
 
   '@vitest/expect@4.0.6':
     dependencies:
-      '@standard-schema/spec': 1.0.0
+      '@standard-schema/spec': 1.1.0
       '@types/chai': 5.2.2
       '@vitest/spy': 4.0.6
       '@vitest/utils': 4.0.6
@@ -27730,7 +27736,7 @@ snapshots:
       isstream: 0.1.2
       jsonwebtoken: 9.0.2
       mime-types: 2.1.35
-      retry-axios: 2.6.0(axios@1.12.2)
+      retry-axios: 2.6.0(axios@1.12.2(debug@4.4.3))
       tough-cookie: 4.1.4
     transitivePeerDependencies:
       - supports-color
@@ -31253,7 +31259,7 @@ snapshots:
       onetime: 7.0.0
       signal-exit: 4.1.0
 
-  retry-axios@2.6.0(axios@1.12.2):
+  retry-axios@2.6.0(axios@1.12.2(debug@4.4.3)):
     dependencies:
       axios: 1.12.2(debug@4.4.3)
 
