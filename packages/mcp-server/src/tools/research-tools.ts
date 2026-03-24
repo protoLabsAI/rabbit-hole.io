@@ -172,6 +172,23 @@ export const researchTools: Tool[] = [
             "Whether to automatically persist the research bundle to the knowledge graph after a successful run (default: true)",
           default: true,
         },
+        budget: {
+          type: "object",
+          description:
+            "Optional research budget configuration to cap adaptive depth rounds. Defaults to { maxAdditionalRounds: 3, maxTotalSources: 5 }.",
+          properties: {
+            maxAdditionalRounds: {
+              type: "number",
+              description: "Maximum number of additional search rounds beyond the initial parallel round (default: 3)",
+              default: 3,
+            },
+            maxTotalSources: {
+              type: "number",
+              description: "Maximum total number of source queries across all rounds (default: 5)",
+              default: 5,
+            },
+          },
+        },
       },
       required: ["query"],
     },
