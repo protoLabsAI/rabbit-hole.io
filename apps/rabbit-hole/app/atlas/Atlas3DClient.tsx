@@ -110,21 +110,22 @@ export default function Atlas3DClient() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedNode, setSelectedNode] = useState<AtlasNode | null>(null);
-  const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
+  const [dimensions, setDimensions] = useState<{ width: number; height: number } | null>(null);
 
-  // Responsive canvas
+  // Responsive canvas — ResizeObserver fires once the container has real dimensions
   useEffect(() => {
-    const update = () => {
-      if (containerRef.current) {
+    if (!containerRef.current) return;
+    const ro = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (entry) {
         setDimensions({
-          width: containerRef.current.clientWidth,
-          height: containerRef.current.clientHeight,
+          width: Math.floor(entry.contentRect.width),
+          height: Math.floor(entry.contentRect.height),
         });
       }
-    };
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
+    });
+    ro.observe(containerRef.current);
+    return () => ro.disconnect();
   }, []);
 
   // Fetch graph data
@@ -237,7 +238,7 @@ export default function Atlas3DClient() {
         linkCount={graphData?.links.length}
       />
       <div ref={containerRef} className="flex-1 relative">
-        {graphData && (
+        {graphData && dimensions && (
           <ForceGraph3D
             ref={graphRef}
             width={dimensions.width}
