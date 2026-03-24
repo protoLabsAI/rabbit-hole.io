@@ -58,6 +58,13 @@ export {
   type ParallelDecompositionOptions,
 } from "./middleware/parallel-decomposition.js";
 export {
+  EntityMemoryMiddleware,
+  buildLuceneQuery as buildEntityLuceneQuery,
+  isStale as isEntityStale,
+  type PriorKnowledge,
+  type PriorKnowledgeEntity,
+} from "./middleware/entity-memory.js";
+export {
   ReflectionMiddleware,
   detectSourceType,
   computeMetrics,
