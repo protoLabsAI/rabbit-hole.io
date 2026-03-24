@@ -14,7 +14,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import {
   createTracingContext,
   _resetLangfuseSingleton,
-} from "./tracing.js";
+} from "./tracing";
 
 // ---------------------------------------------------------------------------
 // Helpers

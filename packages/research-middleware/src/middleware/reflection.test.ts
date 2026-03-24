@@ -17,7 +17,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { getAIModel } from "@proto/llm-providers/server";
 
-import type { MiddlewareContext, ModelResponse } from "../types.js";
+import type { MiddlewareContext, ModelResponse } from "../types";
 
 // ---------------------------------------------------------------------------
 // Mocks — hoisted by vitest regardless of position in file
@@ -40,7 +40,7 @@ import {
   detectSourceType,
   detectSufficiency,
   type EvidenceSource,
-} from "./reflection.js";
+} from "./reflection";
 
 // ---------------------------------------------------------------------------
 // Helpers

@@ -30,7 +30,7 @@ import type {
   ModelResponse,
   ResearchMiddleware,
   ToolExecutor,
-} from "../types.js";
+} from "../types";
 
 // ---------------------------------------------------------------------------
 // Types

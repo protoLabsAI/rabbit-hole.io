@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-import { PassthroughMiddleware } from "../middleware/passthrough.js";
-import { MiddlewareRegistry } from "../registry.js";
-import { MiddlewareChain } from "../runtime.js";
-import { createTracingContext } from "../tracing.js";
+import { PassthroughMiddleware } from "../middleware/passthrough";
+import { MiddlewareRegistry } from "../registry";
+import { MiddlewareChain } from "../runtime";
+import { createTracingContext } from "../tracing";
 import type {
   AgentResult,
   MiddlewareContext,
@@ -12,7 +12,7 @@ import type {
   ModelResponse,
   ResearchMiddleware,
   ToolExecutor,
-} from "../types.js";
+} from "../types";
 
 // ---------------------------------------------------------------------------
 // Helpers

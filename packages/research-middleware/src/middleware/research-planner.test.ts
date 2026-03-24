@@ -1,10 +1,10 @@
 import { generateText } from "ai";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-import { createTracingContext } from "../tracing.js";
-import type { MiddlewareContext } from "../types.js";
+import { createTracingContext } from "../tracing";
+import type { MiddlewareContext } from "../types";
 
-import { ResearchPlannerMiddleware } from "./research-planner.js";
+import { ResearchPlannerMiddleware } from "./research-planner";
 
 // ---------------------------------------------------------------------------
 // Mocks — vitest hoists vi.mock() calls above imports automatically

@@ -17,7 +17,7 @@ import type {
   MiddlewareContext,
   ModelMessage,
   ResearchMiddleware,
-} from "../types.js";
+} from "../types";
 
 // ---------------------------------------------------------------------------
 // Result types (for frontend rendering)

@@ -16,7 +16,7 @@ import type {
   ModelResponse,
   ResearchMiddleware,
   ToolExecutor,
-} from "../types.js";
+} from "../types";
 
 export class PassthroughMiddleware implements ResearchMiddleware {
   readonly id = "passthrough";

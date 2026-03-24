@@ -5,7 +5,7 @@
  * and modification at each stage of the agent loop.
  */
 
-import type { TracingContext } from "./tracing.js";
+import type { TracingContext } from "./tracing";
 
 // ---------------------------------------------------------------------------
 // Context

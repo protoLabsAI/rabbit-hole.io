@@ -12,8 +12,8 @@
 
 import { describe, it, expect, vi } from "vitest";
 
-import { createTracingContext } from "../tracing.js";
-import type { MiddlewareContext, ToolExecutor } from "../types.js";
+import { createTracingContext } from "../tracing";
+import type { MiddlewareContext, ToolExecutor } from "../types";
 
 import {
   DeferredToolLoadingMiddleware,
@@ -22,7 +22,7 @@ import {
   type ToolLoadedResult,
   type ToolNotFoundResult,
   type DeferredToolEntry,
-} from "./deferred-tools.js";
+} from "./deferred-tools";
 
 // ---------------------------------------------------------------------------
 // Helpers

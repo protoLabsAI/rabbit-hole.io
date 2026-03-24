@@ -9,8 +9,8 @@
 
 import { describe, it, expect, vi } from "vitest";
 
-import { createTracingContext } from "../tracing.js";
-import type { MiddlewareContext, ToolExecutor } from "../types.js";
+import { createTracingContext } from "../tracing";
+import type { MiddlewareContext, ToolExecutor } from "../types";
 
 import {
   ClarificationMiddleware,
@@ -18,7 +18,7 @@ import {
   CLARIFICATION_BLOCKED_TYPE,
   type ClarificationResult,
   type ClarificationBlockedResult,
-} from "./clarification.js";
+} from "./clarification";
 
 // ---------------------------------------------------------------------------
 // Helpers

@@ -6,12 +6,12 @@
  * the MiddlewareChain executor consumes.
  */
 
-import { MiddlewareChain } from "./runtime.js";
+import { MiddlewareChain } from "./runtime";
 import type {
   MiddlewareConfig,
   MiddlewareRegistryEntry,
   ResearchMiddleware,
-} from "./types.js";
+} from "./types";
 
 // ---------------------------------------------------------------------------
 // MiddlewareRegistry

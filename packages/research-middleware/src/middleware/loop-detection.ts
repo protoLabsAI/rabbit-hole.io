@@ -19,7 +19,7 @@ import type {
   MiddlewareContext,
   ResearchMiddleware,
   ToolExecutor,
-} from "../types.js";
+} from "../types";
 
 // ---------------------------------------------------------------------------
 // Constants

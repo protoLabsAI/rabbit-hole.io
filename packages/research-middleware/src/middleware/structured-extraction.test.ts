@@ -19,7 +19,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { getAIModel } from "@proto/llm-providers/server";
 
-import type { AgentResult, MiddlewareContext } from "../types.js";
+import type { AgentResult, MiddlewareContext } from "../types";
 
 // ---------------------------------------------------------------------------
 // Mocks — hoisted by vitest regardless of position in file
@@ -42,7 +42,7 @@ import {
   type ExtractedEntity,
   type ExtractedRelationship,
   type ToolCallRecord,
-} from "./structured-extraction.js";
+} from "./structured-extraction";
 
 // ---------------------------------------------------------------------------
 // Helpers

@@ -28,7 +28,7 @@ export type {
   ModelResponse,
   ResearchMiddleware,
   ToolExecutor,
-} from "./types.js";
+} from "./types";
 
 export type {
   TracingContext,
@@ -36,35 +36,35 @@ export type {
   GenerationHandle,
   GenerationUsage,
   CreateTracingContextOptions,
-} from "./tracing.js";
+} from "./tracing";
 
-export { createTracingContext } from "./tracing.js";
-export { MiddlewareChain } from "./runtime.js";
-export { MiddlewareRegistry } from "./registry.js";
-export { PassthroughMiddleware } from "./middleware/passthrough.js";
-export { LoopDetectionMiddleware } from "./middleware/loop-detection.js";
-export { ResearchPlannerMiddleware } from "./middleware/research-planner.js";
+export { createTracingContext } from "./tracing";
+export { MiddlewareChain } from "./runtime";
+export { MiddlewareRegistry } from "./registry";
+export { PassthroughMiddleware } from "./middleware/passthrough";
+export { LoopDetectionMiddleware } from "./middleware/loop-detection";
+export { ResearchPlannerMiddleware } from "./middleware/research-planner";
 export {
   ClarificationMiddleware,
   CLARIFICATION_RESULT_TYPE,
   CLARIFICATION_BLOCKED_TYPE,
   type ClarificationResult,
   type ClarificationBlockedResult,
-} from "./middleware/clarification.js";
+} from "./middleware/clarification";
 export {
   ParallelDecompositionMiddleware,
   SUBQUERY_PLAN_TYPE,
   type SubQueryPlanResult,
   type DecomposeFunction,
   type ParallelDecompositionOptions,
-} from "./middleware/parallel-decomposition.js";
+} from "./middleware/parallel-decomposition";
 export {
   EntityMemoryMiddleware,
   buildLuceneQuery as buildEntityLuceneQuery,
   isStale as isEntityStale,
   type PriorKnowledge,
   type PriorKnowledgeEntity,
-} from "./middleware/entity-memory.js";
+} from "./middleware/entity-memory";
 export {
   ReflectionMiddleware,
   detectSourceType,
@@ -77,7 +77,7 @@ export {
   type EvidenceSource,
   type EvidenceMetrics,
   type SourceType,
-} from "./middleware/reflection.js";
+} from "./middleware/reflection";
 export {
   DeferredToolLoadingMiddleware,
   TOOL_LOADED_TYPE,
@@ -86,7 +86,7 @@ export {
   type DeferredToolLoadingOptions,
   type ToolLoadedResult,
   type ToolNotFoundResult,
-} from "./middleware/deferred-tools.js";
+} from "./middleware/deferred-tools";
 export {
   StructuredExtractionMiddleware,
   buildExtractionContext,
@@ -96,4 +96,4 @@ export {
   type ExtractedEntity,
   type ExtractedRelationship,
   type ToolCallRecord,
-} from "./middleware/structured-extraction.js";
+} from "./middleware/structured-extraction";

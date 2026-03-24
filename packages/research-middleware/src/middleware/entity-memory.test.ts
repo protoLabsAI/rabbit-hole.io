@@ -13,15 +13,15 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-import { createTracingContext } from "../tracing.js";
-import type { AgentResult, MiddlewareContext } from "../types.js";
+import { createTracingContext } from "../tracing";
+import type { AgentResult, MiddlewareContext } from "../types";
 
 import {
   EntityMemoryMiddleware,
   buildLuceneQuery,
   isStale,
   type PriorKnowledge,
-} from "./entity-memory.js";
+} from "./entity-memory";
 
 // ---------------------------------------------------------------------------
 // Mocks

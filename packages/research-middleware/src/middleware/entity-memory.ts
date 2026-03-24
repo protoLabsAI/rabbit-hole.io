@@ -21,7 +21,7 @@ import type {
   AgentResult,
   MiddlewareContext,
   ResearchMiddleware,
-} from "../types.js";
+} from "../types";
 
 // ---------------------------------------------------------------------------
 // Constants
