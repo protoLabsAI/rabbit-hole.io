@@ -51,6 +51,13 @@ export {
   type ClarificationBlockedResult,
 } from "./middleware/clarification.js";
 export {
+  ParallelDecompositionMiddleware,
+  SUBQUERY_PLAN_TYPE,
+  type SubQueryPlanResult,
+  type DecomposeFunction,
+  type ParallelDecompositionOptions,
+} from "./middleware/parallel-decomposition.js";
+export {
   ReflectionMiddleware,
   detectSourceType,
   computeMetrics,
