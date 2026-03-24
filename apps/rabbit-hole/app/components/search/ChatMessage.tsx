@@ -8,6 +8,47 @@ import { Badge } from "@proto/ui/atoms";
 
 import { ChatMarkdown } from "./ChatMarkdown";
 
+// ─── Sub-Query Plan Card ─────────────────────────────────────────────
+
+/**
+ * Renders the decomposed research plan as a compact nested card.
+ * Used when the agent returns a `subquery_plan` tool result.
+ */
+function SubQueryPlanCard({
+  subQueries,
+  originalQuery,
+}: {
+  subQueries: string[];
+  originalQuery?: string;
+}) {
+  return (
+    <div className="rounded-lg border border-secondary/30 bg-secondary/5 px-4 py-3 space-y-2">
+      <div className="flex items-center gap-2 text-xs font-medium text-secondary-foreground/80">
+        <Icon name="GitBranch" className="h-3.5 w-3.5 flex-shrink-0" />
+        <span>Researching {subQueries.length} sub-topics</span>
+        {originalQuery && (
+          <span className="text-muted-foreground font-normal truncate max-w-[200px]">
+            — {originalQuery}
+          </span>
+        )}
+      </div>
+      <ol className="space-y-1">
+        {subQueries.map((q, i) => (
+          <li
+            key={i}
+            className="flex items-start gap-2 text-xs text-foreground/80"
+          >
+            <span className="flex-shrink-0 w-4 h-4 rounded-full bg-secondary/20 text-[10px] flex items-center justify-center font-medium">
+              {i + 1}
+            </span>
+            <span className="leading-snug">{q}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
 // ─── Clarification Card ─────────────────────────────────────────────
 
 /**
@@ -170,6 +211,24 @@ function ToolCallCard({
     typeof output.question === "string"
   ) {
     return <ClarificationCard question={output.question} />;
+  }
+
+  // Render sub-query plan as a nested research progress card
+  if (
+    isDoneState &&
+    output?.__type === "subquery_plan" &&
+    Array.isArray(output.subQueries)
+  ) {
+    return (
+      <SubQueryPlanCard
+        subQueries={output.subQueries as string[]}
+        originalQuery={
+          typeof output.originalQuery === "string"
+            ? output.originalQuery
+            : undefined
+        }
+      />
+    );
   }
   const isRunning =
     state === "partial-call" ||
