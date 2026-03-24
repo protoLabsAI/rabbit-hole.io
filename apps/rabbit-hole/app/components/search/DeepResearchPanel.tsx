@@ -341,7 +341,7 @@ function ReportToc({
   if (headings.length < 2) return null;
 
   return (
-    <div className="flex flex-wrap gap-1.5 px-1 py-2 mb-4 border-b border-border/30">
+    <div className="flex flex-wrap gap-1.5 px-1 py-2 mb-4 border-b border-border/30 sticky top-0 bg-background/95 backdrop-blur-sm z-10">
       {headings.map((heading) => (
         <button
           key={heading}
@@ -606,55 +606,26 @@ export function DeepResearchPanel({
       }
     >
       {/* Header */}
-      <header className="border-b border-border px-4 py-3 flex items-center gap-3">
+      <header className="border-b border-border px-4 py-2 flex items-center gap-3">
         {onClose && (
           <button
             onClick={onClose}
-            className="p-1.5 text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-muted/50"
+            className="p-1 text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-muted/50"
           >
             <Icon name="ArrowLeft" className="h-4 w-4" />
           </button>
         )}
-        <div className="flex-1 min-w-0">
-          <h1 className="text-sm font-semibold text-foreground truncate">
-            Deep Research: {query}
-          </h1>
-          <div className="flex items-center gap-3 mt-0.5">
-            <span className="text-[11px] text-muted-foreground tabular-nums">
-              {formatElapsed(elapsed)}
-            </span>
-            {status === "running" && (
-              <span className="text-[11px] text-primary flex items-center gap-1">
-                <Icon name="Loader2" className="h-3 w-3 animate-spin" />
-                In progress
-              </span>
-            )}
-            {status === "completed" && (
-              <span className="text-[11px] text-green-500 flex items-center gap-1">
-                <Icon name="CheckCircle2" className="h-3 w-3" />
-                Complete
-              </span>
-            )}
-            {status === "cancelled" && (
-              <span className="text-[11px] text-muted-foreground flex items-center gap-1">
-                <Icon name="XCircle" className="h-3 w-3" />
-                Cancelled
-              </span>
-            )}
-            {status === "failed" && (
-              <span className="text-[11px] text-destructive flex items-center gap-1">
-                <Icon name="AlertCircle" className="h-3 w-3" />
-                Failed
-              </span>
-            )}
-            {/* Running counters */}
-            {(searchCount > 0 || sources.length > 0) && (
-              <span className="text-[10px] text-muted-foreground/60">
-                {searchCount} searches &middot; {sources.length} sources
-              </span>
-            )}
-          </div>
-        </div>
+        <h1 className="text-xs font-medium text-foreground truncate max-w-[40vw]">
+          {query}
+        </h1>
+        <span className="text-[10px] text-muted-foreground/50 tabular-nums flex-shrink-0">
+          {formatElapsed(elapsed)}
+          {(searchCount > 0 || sources.length > 0) && (
+            <> &middot; {searchCount} searches &middot; {sources.length} sources</>
+          )}
+        </span>
+
+        <div className="flex-1" />
 
         <PhaseProgress currentPhase={phase} />
 
@@ -664,7 +635,7 @@ export function DeepResearchPanel({
             <button
               onClick={handleCancel}
               disabled={cancelling}
-              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-destructive transition-colors px-2.5 py-1.5 rounded-md hover:bg-destructive/5 border border-border"
+              className="flex items-center gap-1.5 text-[10px] text-muted-foreground hover:text-destructive transition-colors px-2 py-1 rounded-md hover:bg-destructive/5 border border-border"
             >
               <Icon name="Square" className="h-3 w-3" />
               {cancelling ? "Stopping..." : "Stop"}
@@ -672,12 +643,12 @@ export function DeepResearchPanel({
           )}
           <button
             onClick={() => setSourcePanelOpen(!sourcePanelOpen)}
-            className={`p-1.5 transition-colors rounded-lg hover:bg-muted/50 ${
+            className={`p-1 transition-colors rounded-lg hover:bg-muted/50 ${
               sourcePanelOpen
                 ? "text-primary"
                 : "text-muted-foreground hover:text-foreground"
             }`}
-            title="Toggle sources panel"
+            title="Toggle drawer"
           >
             <Icon name="PanelRight" className="h-4 w-4" />
           </button>
