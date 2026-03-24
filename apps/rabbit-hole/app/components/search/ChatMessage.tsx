@@ -7,6 +7,7 @@ import { Icon } from "@proto/icon-system";
 import { Badge } from "@proto/ui/atoms";
 
 import { ChatMarkdown } from "./ChatMarkdown";
+import { ReasoningBlock } from "./ReasoningBlock";
 
 // ─── Extraction Preview Types ────────────────────────────────────────
 
@@ -646,6 +647,18 @@ export function ChatMessage({
       (a as Record<string, unknown>)["type"] === "extraction_preview"
   ) as ExtractionPreview | undefined;
 
+  // Reasoning annotation: rendered as a collapsible "thinking" block when the
+  // model uses extended thinking. The server writes this as an annotation with
+  // { type: "reasoning", content: string, duration?: number }.
+  const reasoningAnnotation = (message.annotations ?? []).find(
+    (a): a is { type: "reasoning"; content: string; duration?: number } =>
+      typeof a === "object" &&
+      a !== null &&
+      !Array.isArray(a) &&
+      (a as Record<string, unknown>)["type"] === "reasoning" &&
+      typeof (a as Record<string, unknown>)["content"] === "string"
+  ) as { type: "reasoning"; content: string; duration?: number } | undefined;
+
   // Collect all tool-related parts
   const allTools = parts.filter(
     (p): p is any =>
@@ -676,6 +689,15 @@ export function ChatMessage({
 
   return (
     <div className="space-y-3 pb-2">
+      {/* Reasoning — collapsible thinking indicator */}
+      {reasoningAnnotation && (
+        <ReasoningBlock
+          content={reasoningAnnotation.content}
+          isStreaming={isStreaming && isLast}
+          duration={reasoningAnnotation.duration}
+        />
+      )}
+
       {/* Tool calls — compact cards */}
       {allTools.length > 0 && (
         <div className="space-y-1">
