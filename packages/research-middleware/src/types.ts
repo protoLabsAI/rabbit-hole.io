@@ -5,6 +5,8 @@
  * and modification at each stage of the agent loop.
  */
 
+import type { TracingContext } from "./tracing.js";
+
 // ---------------------------------------------------------------------------
 // Context
 // ---------------------------------------------------------------------------
@@ -25,6 +27,11 @@ export interface MiddlewareContext {
   readonly agentId: string;
   /** Mutable bag of cross-hook state. Middleware communicate through this. */
   state: Record<string, unknown>;
+  /**
+   * Tracing context for this invocation. Middleware can create child spans and
+   * generation records. When Langfuse is not configured this is a no-op stub.
+   */
+  readonly tracing: TracingContext;
 }
 
 // ---------------------------------------------------------------------------

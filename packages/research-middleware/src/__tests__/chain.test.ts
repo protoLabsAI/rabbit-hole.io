@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MiddlewareChain } from "../runtime.js";
 import { MiddlewareRegistry } from "../registry.js";
 import { PassthroughMiddleware } from "../middleware/passthrough.js";
+import { createTracingContext } from "../tracing.js";
 import type {
   AgentResult,
   MiddlewareContext,
@@ -16,8 +17,11 @@ import type {
 // Helpers
 // ---------------------------------------------------------------------------
 
+/** No-op tracing context for tests (LANGFUSE_PUBLIC_KEY is not set). */
+const nullTracing = createTracingContext({ agentId: "test-agent" });
+
 function makeCtx(overrides?: Partial<MiddlewareContext>): MiddlewareContext {
-  return { agentId: "test-agent", state: {}, ...overrides };
+  return { agentId: "test-agent", state: {}, tracing: nullTracing, ...overrides };
 }
 
 const noopResult: AgentResult = { text: "done", finishReason: "stop" };

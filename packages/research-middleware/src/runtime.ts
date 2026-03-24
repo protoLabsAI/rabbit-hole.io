@@ -5,6 +5,10 @@
  * pipeline. Each hook is called in registration order; `wrapToolCall` is
  * composed as an onion — outer middleware wraps inner middleware wraps the
  * real tool executor.
+ *
+ * Tracing: each hook execution and tool call automatically produces a span
+ * in the TracingContext attached to the MiddlewareContext. When tracing is
+ * not configured the spans are no-ops.
  */
 
 import type {
@@ -40,11 +44,19 @@ export class MiddlewareChain {
   /**
    * Calls `beforeAgent` on each middleware in registration order.
    * All hooks are awaited sequentially before proceeding.
+   * Each middleware invocation produces an auto-span in the TracingContext.
    */
   async beforeAgent(ctx: MiddlewareContext): Promise<void> {
     for (const mw of this.middleware) {
       if (mw.beforeAgent) {
-        await mw.beforeAgent(ctx);
+        const span = ctx.tracing.createSpan(`beforeAgent:${mw.id}`);
+        try {
+          await mw.beforeAgent(ctx);
+          span.end();
+        } catch (err) {
+          span.end({ error: String(err) });
+          throw err;
+        }
       }
     }
   }
@@ -55,11 +67,21 @@ export class MiddlewareChain {
 
   /**
    * Calls `afterAgent` on each middleware in registration order.
+   * Each middleware invocation produces an auto-span in the TracingContext.
    */
   async afterAgent(ctx: MiddlewareContext, result: AgentResult): Promise<void> {
     for (const mw of this.middleware) {
       if (mw.afterAgent) {
-        await mw.afterAgent(ctx, result);
+        const span = ctx.tracing.createSpan(`afterAgent:${mw.id}`, {
+          finishReason: result.finishReason,
+        });
+        try {
+          await mw.afterAgent(ctx, result);
+          span.end();
+        } catch (err) {
+          span.end({ error: String(err) });
+          throw err;
+        }
       }
     }
   }
@@ -72,6 +94,7 @@ export class MiddlewareChain {
    * Calls `beforeModel` on each middleware in registration order.
    * If a middleware returns a modified messages array, that array is passed
    * to subsequent middleware (and ultimately to the model).
+   * Each middleware invocation produces an auto-span in the TracingContext.
    */
   async beforeModel(
     ctx: MiddlewareContext,
@@ -80,9 +103,18 @@ export class MiddlewareChain {
     let current = messages;
     for (const mw of this.middleware) {
       if (mw.beforeModel) {
-        const result = await mw.beforeModel(ctx, current);
-        if (result !== undefined && result !== null) {
-          current = result;
+        const span = ctx.tracing.createSpan(`beforeModel:${mw.id}`, {
+          messageCount: current.length,
+        });
+        try {
+          const result = await mw.beforeModel(ctx, current);
+          if (result !== undefined && result !== null) {
+            current = result;
+          }
+          span.end();
+        } catch (err) {
+          span.end({ error: String(err) });
+          throw err;
         }
       }
     }
@@ -95,6 +127,7 @@ export class MiddlewareChain {
 
   /**
    * Calls `afterModel` on each middleware in registration order.
+   * Each middleware invocation produces an auto-span in the TracingContext.
    */
   async afterModel(
     ctx: MiddlewareContext,
@@ -102,7 +135,16 @@ export class MiddlewareChain {
   ): Promise<void> {
     for (const mw of this.middleware) {
       if (mw.afterModel) {
-        await mw.afterModel(ctx, response);
+        const span = ctx.tracing.createSpan(`afterModel:${mw.id}`, {
+          totalTokens: response.usage?.totalTokens,
+        });
+        try {
+          await mw.afterModel(ctx, response);
+          span.end();
+        } catch (err) {
+          span.end({ error: String(err) });
+          throw err;
+        }
       }
     }
   }
@@ -118,6 +160,8 @@ export class MiddlewareChain {
    * next, until the innermost middleware wraps the actual `execute` function.
    *
    * Middleware that do not implement `wrapToolCall` are transparently skipped.
+   *
+   * A span is automatically created for the overall tool call execution.
    */
   async wrapToolCall(
     ctx: MiddlewareContext,
@@ -125,6 +169,8 @@ export class MiddlewareChain {
     args: Record<string, unknown>,
     execute: ToolExecutor
   ): Promise<unknown> {
+    const span = ctx.tracing.createSpan(`tool:${toolName}`, { args });
+
     // Build the composed executor from innermost → outermost (reverse order).
     // At each layer, the previous layer's executor becomes the `execute`
     // argument passed to the current middleware.
@@ -141,6 +187,13 @@ export class MiddlewareChain {
           mw.wrapToolCall!(ctx, toolName, callArgs, inner);
       }, execute);
 
-    return composed(args);
+    try {
+      const result = await composed(args);
+      span.end(result);
+      return result;
+    } catch (err) {
+      span.end({ error: String(err) });
+      throw err;
+    }
   }
 }
