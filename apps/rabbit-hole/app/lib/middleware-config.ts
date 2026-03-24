@@ -74,7 +74,7 @@ export function getMiddlewareRegistry(): MiddlewareRegistry {
         {
           id: "deferred-tools",
           enabled: false, // Enable when additional tools are registered
-          middleware: new DeferredToolLoadingMiddleware(),
+          middleware: new DeferredToolLoadingMiddleware({ deferredTools: [] }),
         },
       ],
     });
