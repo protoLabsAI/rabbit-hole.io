@@ -9,9 +9,12 @@
  *  - createTracingContext returns a fresh context each time
  */
 
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 
-import { createTracingContext, _resetLangfuseSingleton } from "./tracing.js";
+import {
+  createTracingContext,
+  _resetLangfuseSingleton,
+} from "./tracing.js";
 
 // ---------------------------------------------------------------------------
 // Helpers

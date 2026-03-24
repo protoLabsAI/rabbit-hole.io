@@ -16,6 +16,9 @@
   "references": [
     {
       "path": "../utils"
+    },
+    {
+      "path": "../llm-providers"
     }
   ]
 }

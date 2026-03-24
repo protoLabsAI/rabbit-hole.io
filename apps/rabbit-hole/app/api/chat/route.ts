@@ -31,8 +31,8 @@ import {
 } from "@proto/research-middleware";
 import { generateSecureId } from "@proto/utils";
 
-import { searchGraph, searchWeb, searchWikipedia } from "../../lib/search";
 import { getMiddlewareRegistry } from "../../lib/middleware-config";
+import { searchGraph, searchWeb, searchWikipedia } from "../../lib/search";
 
 // ─── Tool Definitions ───────────────────────────────────────────────
 
@@ -131,7 +131,9 @@ export async function POST(request: Request) {
   const agentId = generateSecureId();
 
   // Extract the last user message as the query for tracing context.
-  const lastUserMessage = [...messages].reverse().find((m) => m.role === "user");
+  const lastUserMessage = [...messages]
+    .reverse()
+    .find((m) => m.role === "user");
   const query =
     typeof lastUserMessage?.content === "string"
       ? lastUserMessage.content

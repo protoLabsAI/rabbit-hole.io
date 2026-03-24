@@ -15,7 +15,7 @@ export default defineConfig({
   splitting: false,
   sourcemap: true,
   minify: false,
-  external: ["@proto/utils"],
+  external: ["@proto/utils", "@proto/llm-providers", "ai"],
   banner: {
     js: "/* @proto/research-middleware - Middleware pipeline for AI SDK streamText tool calls */",
   },
