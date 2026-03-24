@@ -31,8 +31,8 @@ import {
 } from "@proto/research-middleware";
 import { generateSecureId } from "@proto/utils";
 
-import { searchGraph, searchWeb, searchWikipedia } from "../../lib/search";
 import { getMiddlewareRegistry } from "../../lib/middleware-config";
+import { searchGraph, searchWeb, searchWikipedia } from "../../lib/search";
 
 // ─── Tool Definitions ───────────────────────────────────────────────
 
@@ -77,6 +77,22 @@ const searchTools = {
       };
     },
   }),
+
+  askClarification: tool({
+    description:
+      "Ask the user a clarifying question when their query has multiple valid interpretations, references ambiguous entities (e.g. 'Mercury' — planet or element?), or when intent is unclear. Use at most once per turn.",
+    inputSchema: z.object({
+      question: z
+        .string()
+        .describe("The specific clarifying question to ask the user"),
+    }),
+    // The ClarificationMiddleware intercepts this before execute runs.
+    // This fallback only fires if the middleware chain is not configured.
+    execute: async (input: { question: string }) => ({
+      __type: "clarification_requested" as const,
+      question: input.question,
+    }),
+  }),
 };
 
 // ─── System Prompt ──────────────────────────────────────────────────
@@ -95,7 +111,13 @@ const SYSTEM_PROMPT = `You are Rabbit Hole, an AI search engine powered by a liv
 - Mention knowledge graph entities by name when relevant
 - Use markdown for readability
 - If information is uncertain, say so
-- End with 2-3 related search queries (not questions for the user — short phrases they'd type into a search engine, like "DORA four key metrics" or "Continuous Delivery by Jez Humble")`;
+- End with 2-3 related search queries (not questions for the user — short phrases they'd type into a search engine, like "DORA four key metrics" or "Continuous Delivery by Jez Humble")
+
+## Clarification
+- Use askClarification when the query has multiple valid interpretations or references ambiguous entities (e.g. "Mercury" — planet, element, or car brand?)
+- Use askClarification when the user's intent is unclear and searching without clarification would likely miss the mark
+- After calling askClarification, stop and wait for the user's response — do not call any other tools or emit a final answer
+- Limit: 1 clarification per conversation turn. If you have already asked one, proceed with your best interpretation`;
 
 // ─── Route Handler ──────────────────────────────────────────────────
 
@@ -109,7 +131,9 @@ export async function POST(request: Request) {
   const agentId = generateSecureId();
 
   // Extract the last user message as the query for tracing context.
-  const lastUserMessage = [...messages].reverse().find((m) => m.role === "user");
+  const lastUserMessage = [...messages]
+    .reverse()
+    .find((m) => m.role === "user");
   const query =
     typeof lastUserMessage?.content === "string"
       ? lastUserMessage.content
@@ -153,6 +177,16 @@ export async function POST(request: Request) {
           "searchWikipedia",
           input as Record<string, unknown>,
           searchTools.searchWikipedia.execute as unknown as ToolExecutor
+        ),
+    },
+    askClarification: {
+      ...searchTools.askClarification,
+      execute: async (input: { question: string }) =>
+        chain.wrapToolCall(
+          ctx,
+          "ask_clarification",
+          input as Record<string, unknown>,
+          searchTools.askClarification.execute as unknown as ToolExecutor
         ),
     },
   };
