@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { MiddlewareChain } from "../runtime.js";
-import { MiddlewareRegistry } from "../registry.js";
+
 import { PassthroughMiddleware } from "../middleware/passthrough.js";
+import { MiddlewareRegistry } from "../registry.js";
+import { MiddlewareChain } from "../runtime.js";
 import { createTracingContext } from "../tracing.js";
 import type {
   AgentResult,
