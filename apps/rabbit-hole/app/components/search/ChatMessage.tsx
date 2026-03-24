@@ -457,11 +457,13 @@ function extractSuggestions(text: string): string[] {
  */
 function stripRelatedSearches(text: string): string {
   if (!text) return text;
-  // Strip structured block
+  // Strip complete structured block
   let cleaned = text.replace(
     /<RELATED_SEARCHES>\s*\n[\s\S]*?\n\s*<\/RELATED_SEARCHES>\s*/,
     ""
   );
+  // Strip partial block (streaming — closing tag hasn't arrived yet)
+  cleaned = cleaned.replace(/<RELATED_SEARCHES>[\s\S]*$/, "");
   // Strip "Related searches:" freeform section at end
   cleaned = cleaned.replace(
     /\n*(?:#{0,3}\s*)?Related searches:?\s*\n[\s\S]*$/i,
@@ -717,7 +719,7 @@ export function ChatMessage({
       {textContent && (
         <div>
           <ChatMarkdown
-            content={isComplete ? stripRelatedSearches(textContent) : textContent}
+            content={stripRelatedSearches(textContent)}
             isStreaming={isStreaming && isLast}
             sources={sources.length > 0 ? sources : undefined}
           />
