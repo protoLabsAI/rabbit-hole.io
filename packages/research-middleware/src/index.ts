@@ -70,3 +70,12 @@ export {
   type EvidenceMetrics,
   type SourceType,
 } from "./middleware/reflection.js";
+export {
+  DeferredToolLoadingMiddleware,
+  TOOL_LOADED_TYPE,
+  TOOL_NOT_FOUND_TYPE,
+  type DeferredToolEntry,
+  type DeferredToolLoadingOptions,
+  type ToolLoadedResult,
+  type ToolNotFoundResult,
+} from "./middleware/deferred-tools.js";

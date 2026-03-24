@@ -26,6 +26,7 @@ import { z } from "zod";
 import { getAIModel } from "@proto/llm-providers/server";
 import {
   createTracingContext,
+  DeferredToolLoadingMiddleware,
   type MiddlewareContext,
   type ToolExecutor,
 } from "@proto/research-middleware";
@@ -93,6 +94,23 @@ const searchTools = {
       question: input.question,
     }),
   }),
+
+  toolSearch: tool({
+    description:
+      "Activate a deferred tool by name so it becomes available for use. Call this when you see a tool listed in the 'Additional tools available' note in your context. Pass the exact tool name as the select argument.",
+    inputSchema: z.object({
+      select: z
+        .string()
+        .describe("The exact name of the deferred tool to activate"),
+    }),
+    // The DeferredToolLoadingMiddleware intercepts this before execute runs.
+    // This fallback only fires if the middleware chain is not configured.
+    execute: async (input: { select: string }) => ({
+      __type: "tool_not_found" as const,
+      requestedName: input.select,
+      reason: "DeferredToolLoadingMiddleware is not configured.",
+    }),
+  }),
 };
 
 // ─── System Prompt ──────────────────────────────────────────────────
@@ -143,6 +161,17 @@ export async function POST(request: Request) {
   const ctx: MiddlewareContext = { agentId, state: {}, tracing };
 
   const registry = getMiddlewareRegistry();
+
+  // Register deferred tool loading middleware.
+  // Additional tools (MCP tools, domain-specific extractors, etc.) can be
+  // added here. Only name + description are needed at registration time;
+  // the full schema is bound on demand when the agent calls tool_search.
+  registry.register({
+    id: "deferred-tool-loading",
+    enabled: true,
+    middleware: new DeferredToolLoadingMiddleware({ deferredTools: [] }),
+  });
+
   const chain = registry.buildChain();
 
   // Wrap each tool's execute function through the middleware chain.
@@ -187,6 +216,16 @@ export async function POST(request: Request) {
           "ask_clarification",
           input as Record<string, unknown>,
           searchTools.askClarification.execute as unknown as ToolExecutor
+        ),
+    },
+    toolSearch: {
+      ...searchTools.toolSearch,
+      execute: async (input: { select: string }) =>
+        chain.wrapToolCall(
+          ctx,
+          "tool_search",
+          input as Record<string, unknown>,
+          searchTools.toolSearch.execute as unknown as ToolExecutor
         ),
     },
   };
