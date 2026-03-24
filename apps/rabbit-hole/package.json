@@ -27,6 +27,7 @@
     "@hocuspocus/provider": "3.2.5",
     "@hookform/resolvers": "^3.10.0",
     "@proto/api-utils": "workspace:*",
+    "@proto/research-middleware": "workspace:*",
     "@proto/auth": "workspace:*",
     "@proto/charts": "workspace:*",
     "@proto/database": "workspace:*",

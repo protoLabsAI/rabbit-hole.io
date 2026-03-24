@@ -21,6 +21,7 @@
         "../../packages/utils/src/tenancy-server"
       ],
       "@proto/api-utils": ["../../packages/api-utils/src"],
+      "@proto/research-middleware": ["../../packages/research-middleware/src"],
       "@proto/logger": ["../../packages/logger/src"],
       "@proto/sidequest-utils": ["../../packages/sidequest-utils/src"],
       "@proto/sidequest-utils/client": [
@@ -71,6 +72,7 @@
     { "path": "../../packages/proto-llm-tools" },
     { "path": "../../packages/llm-providers" },
     { "path": "../../packages/sidequest-utils" },
-    { "path": "../../packages/charts" }
+    { "path": "../../packages/charts" },
+    { "path": "../../packages/research-middleware" }
   ]
 }
