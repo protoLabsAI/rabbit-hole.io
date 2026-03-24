@@ -217,11 +217,13 @@ function PhaseProgress({ currentPhase }: { currentPhase: string }) {
             )}
             <div
               className={`flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-medium transition-colors ${
-                isActive
-                  ? "bg-primary/10 text-primary"
-                  : isDone
-                    ? "text-green-500"
-                    : "text-muted-foreground/40"
+                isActive && phase.key === "complete"
+                  ? "text-green-500"
+                  : isActive
+                    ? "bg-primary/10 text-primary"
+                    : isDone
+                      ? "text-green-500"
+                      : "text-muted-foreground/40"
               }`}
             >
               <Icon
