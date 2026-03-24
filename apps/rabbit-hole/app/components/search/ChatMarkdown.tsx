@@ -98,8 +98,8 @@ function CitationBadge({ index, source }: { index: number; source?: Source }) {
         {index}
       </button>
       {showTooltip && source && (
-        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-card border border-border rounded-lg shadow-lg text-xs z-50 pointer-events-none">
-          <div className="flex items-center gap-2 mb-1">
+        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-card border border-border rounded-lg shadow-lg text-xs z-50 pointer-events-none block">
+          <span className="flex items-center gap-2 mb-1">
             {domain && !source.url.startsWith("#") && (
               <img
                 src={`https://www.google.com/s2/favicons?domain=${domain}&sz=16`}
@@ -110,17 +110,17 @@ function CitationBadge({ index, source }: { index: number; source?: Source }) {
             <span className="font-medium truncate text-foreground">
               {source.title}
             </span>
-          </div>
+          </span>
           {domain && (
             <span className="text-[10px] text-muted-foreground">{domain}</span>
           )}
           {source.snippet && (
-            <p className="mt-1.5 text-muted-foreground line-clamp-3 leading-relaxed">
+            <span className="mt-1.5 text-muted-foreground line-clamp-3 leading-relaxed block">
               {source.snippet.slice(0, 150)}
               {(source.snippet.length ?? 0) > 150 ? "..." : ""}
-            </p>
+            </span>
           )}
-        </div>
+        </span>
       )}
     </span>
   );
