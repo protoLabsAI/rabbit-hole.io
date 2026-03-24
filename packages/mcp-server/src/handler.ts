@@ -5,6 +5,124 @@
  * Tools call external services (job-processor, search APIs) directly.
  */
 
+// ─── Langfuse (optional tracing) ────────────────────────────────────
+// Imported lazily so the server starts fine without LANGFUSE_* env vars.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let _langfuseClient: any = null;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getLangfuse(): any | null {
+  if (!process.env.LANGFUSE_PUBLIC_KEY || !process.env.LANGFUSE_SECRET_KEY) {
+    return null;
+  }
+  if (!_langfuseClient) {
+    try {
+      // Dynamic require so the module is optional at startup.
+      // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+      const { Langfuse } = require("langfuse");
+      _langfuseClient = new Langfuse({
+        publicKey: process.env.LANGFUSE_PUBLIC_KEY,
+        secretKey: process.env.LANGFUSE_SECRET_KEY,
+        baseUrl: process.env.LANGFUSE_BASE_URL,
+      });
+    } catch {
+      console.warn("[MCP] langfuse package not available — tracing disabled");
+      return null;
+    }
+  }
+  return _langfuseClient;
+}
+
+// ─── Source Health Tracking ──────────────────────────────────────────
+
+const HEALTH_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
+const MAX_FAILURES = 3;
+const SOURCE_TIMEOUT_MS = 10_000; // 10 seconds per source
+
+interface SourceHealthState {
+  failures: number;
+  lastFailure: number | null;
+  disabled: boolean;
+}
+
+const sourceHealth = new Map<string, SourceHealthState>([
+  ["wikipedia", { failures: 0, lastFailure: null, disabled: false }],
+  ["duckduckgo", { failures: 0, lastFailure: null, disabled: false }],
+  ["tavily", { failures: 0, lastFailure: null, disabled: false }],
+]);
+
+export function isSourceEnabled(source: string): boolean {
+  const health = sourceHealth.get(source);
+  if (!health) return true;
+  if (!health.disabled) return true;
+  // Auto-recover after the health window elapses
+  if (health.lastFailure !== null && Date.now() - health.lastFailure > HEALTH_WINDOW_MS) {
+    health.failures = 0;
+    health.disabled = false;
+    return true;
+  }
+  return false;
+}
+
+export function recordSourceFailure(source: string): void {
+  const existing = sourceHealth.get(source);
+  const health: SourceHealthState = existing ?? { failures: 0, lastFailure: null, disabled: false };
+  const now = Date.now();
+
+  // Reset counter if the previous failure is outside the tracking window
+  if (health.lastFailure !== null && now - health.lastFailure > HEALTH_WINDOW_MS) {
+    health.failures = 0;
+    health.disabled = false;
+  }
+
+  health.failures++;
+  health.lastFailure = now;
+
+  if (health.failures >= MAX_FAILURES) {
+    health.disabled = true;
+    console.warn(
+      `[MCP] Source "${source}" temporarily disabled after ${health.failures} failures within ${HEALTH_WINDOW_MS / 60_000} minutes`
+    );
+  }
+
+  sourceHealth.set(source, health);
+}
+
+export function recordSourceSuccess(source: string): void {
+  const health = sourceHealth.get(source);
+  if (health) {
+    health.failures = 0;
+    health.disabled = false;
+  }
+}
+
+/** Reset health state — used in tests. */
+export function resetSourceHealth(): void {
+  for (const [key] of sourceHealth) {
+    sourceHealth.set(key, { failures: 0, lastFailure: null, disabled: false });
+  }
+}
+
+/** Expose health state for tests. */
+export function getSourceHealthState(source: string): SourceHealthState | undefined {
+  return sourceHealth.get(source);
+}
+
+// ─── Timeout Wrapper ────────────────────────────────────────────────
+
+export function withTimeout<T>(
+  promise: Promise<T>,
+  ms: number,
+  source: string
+): Promise<T> {
+  const timeout = new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new Error(`${source} timed out after ${ms}ms`)), ms)
+  );
+  return Promise.race([promise, timeout]);
+}
+
+// ─── Handler Config ──────────────────────────────────────────────────
+
 interface HandlerConfig {
   jobProcessorUrl: string;
   tavilyApiKey?: string;
@@ -408,13 +526,76 @@ async function researchEntity(
   config: HandlerConfig,
   persist: boolean = true
 ): Promise<unknown> {
+  const pipelineStart = Date.now();
   const results: Record<string, unknown> = { query, depth };
   const evidenceNodes: Array<Record<string, unknown>> = [];
   const entityCitations: Record<string, Array<Record<string, unknown>>> = {};
 
-  // Step 1: Search Wikipedia
-  const wiki = (await wikipediaSearch(query)) as Record<string, unknown>;
-  results.wikipedia = wiki;
+  // ── Langfuse trace ──────────────────────────────────────────────────
+  const langfuse = getLangfuse();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const trace = langfuse?.trace({
+    name: "research_entity",
+    input: { query, depth, entityType },
+    metadata: { persist },
+  });
+
+  // ── Step 1–3 (parallel): Wikipedia, DuckDuckGo, Tavily ──────────────
+  const wikiEnabled = isSourceEnabled("wikipedia");
+  const ddgEnabled = isSourceEnabled("duckduckgo");
+  const tavilyEnabled = isSourceEnabled("tavily") && !!config.tavilyApiKey;
+
+  const wikiStart = Date.now();
+  const ddgStart = Date.now();
+  const tavilyStart = Date.now();
+
+  const [wikiSettled, webSettled, tavilySettled] = await Promise.allSettled([
+    wikiEnabled
+      ? withTimeout(wikipediaSearch(query), SOURCE_TIMEOUT_MS, "wikipedia")
+      : Promise.reject(new Error("wikipedia source disabled")),
+    ddgEnabled
+      ? withTimeout(duckduckgoSearch(query), SOURCE_TIMEOUT_MS, "duckduckgo")
+      : Promise.reject(new Error("duckduckgo source disabled")),
+    tavilyEnabled
+      ? withTimeout(
+          tavilySearch(query, 5, config.tavilyApiKey),
+          SOURCE_TIMEOUT_MS,
+          "tavily"
+        )
+      : Promise.reject(
+          new Error(
+            config.tavilyApiKey
+              ? "tavily source disabled"
+              : "tavily not configured"
+          )
+        ),
+  ]);
+
+  const wikiLatency = Date.now() - wikiStart;
+  const ddgLatency = Date.now() - ddgStart;
+  const tavilyLatency = Date.now() - tavilyStart;
+
+  // ── Process Wikipedia result ────────────────────────────────────────
+  let wiki: Record<string, unknown> = {};
+  if (wikiSettled.status === "fulfilled") {
+    wiki = wikiSettled.value as Record<string, unknown>;
+    results.wikipedia = wiki;
+    if (!wiki.error) {
+      recordSourceSuccess("wikipedia");
+    } else {
+      recordSourceFailure("wikipedia");
+    }
+  } else {
+    if (wikiEnabled) recordSourceFailure("wikipedia");
+    results.wikipedia = {
+      error:
+        wikiSettled.reason instanceof Error
+          ? wikiSettled.reason.message
+          : "Wikipedia search failed",
+    };
+  }
+  const wikiResultCount =
+    wiki && !wiki.error && wiki.text ? 1 : 0;
 
   // Build Wikipedia evidence node
   if (wiki && !wiki.error && wiki.url) {
@@ -434,13 +615,48 @@ async function researchEntity(
     results._wikiEvidenceUid = wikiEvidenceUid;
   }
 
-  // Step 2: Web search for additional context
-  const webResults = (await duckduckgoSearch(query)) as Record<string, unknown>;
-  results.webSearch = webResults;
+  // Langfuse span: wikipedia
+  trace?.span({
+    name: "wikipedia",
+    startTime: new Date(pipelineStart),
+    endTime: new Date(pipelineStart + wikiLatency),
+    metadata: {
+      source: "wikipedia",
+      latencyMs: wikiLatency,
+      success: wikiSettled.status === "fulfilled" && !wiki.error,
+      resultCount: wikiResultCount,
+      error:
+        wikiSettled.status === "rejected"
+          ? (wikiSettled.reason as Error)?.message
+          : (wiki.error as string | undefined),
+    },
+  });
 
-  // Build web search evidence nodes from DuckDuckGo results
+  // ── Process DuckDuckGo result ───────────────────────────────────────
+  let webResults: Record<string, unknown> = {};
+  if (webSettled.status === "fulfilled") {
+    webResults = webSettled.value as Record<string, unknown>;
+    results.webSearch = webResults;
+    if (!webResults.error) {
+      recordSourceSuccess("duckduckgo");
+    } else {
+      recordSourceFailure("duckduckgo");
+    }
+  } else {
+    if (ddgEnabled) recordSourceFailure("duckduckgo");
+    results.webSearch = {
+      error:
+        webSettled.reason instanceof Error
+          ? webSettled.reason.message
+          : "DuckDuckGo search failed",
+    };
+  }
+
   const webResultItems =
     (webResults?.results as Array<Record<string, unknown>>) ?? [];
+  const ddgResultCount = webResultItems.length;
+
+  // Build web search evidence nodes from DuckDuckGo results
   for (let i = 0; i < Math.min(webResultItems.length, 3); i++) {
     const item = webResultItems[i];
     if (
@@ -462,15 +678,33 @@ async function researchEntity(
     }
   }
 
-  // Step 3: Tavily search if available
+  // Langfuse span: duckduckgo
+  trace?.span({
+    name: "duckduckgo",
+    startTime: new Date(pipelineStart),
+    endTime: new Date(pipelineStart + ddgLatency),
+    metadata: {
+      source: "duckduckgo",
+      latencyMs: ddgLatency,
+      success: webSettled.status === "fulfilled" && !webResults.error,
+      resultCount: ddgResultCount,
+      error:
+        webSettled.status === "rejected"
+          ? (webSettled.reason as Error)?.message
+          : (webResults.error as string | undefined),
+    },
+  });
+
+  // ── Process Tavily result ───────────────────────────────────────────
   let tavilyResults: Array<Record<string, unknown>> = [];
-  if (config.tavilyApiKey) {
-    const tavily = (await tavilySearch(
-      query,
-      5,
-      config.tavilyApiKey
-    )) as Record<string, unknown>;
+  if (tavilySettled.status === "fulfilled") {
+    const tavily = tavilySettled.value as Record<string, unknown>;
     results.tavilySearch = tavily;
+    if (!tavily.error) {
+      recordSourceSuccess("tavily");
+    } else {
+      recordSourceFailure("tavily");
+    }
 
     // Build Tavily evidence nodes
     tavilyResults = (tavily?.results as Array<Record<string, unknown>>) ?? [];
@@ -495,9 +729,59 @@ async function researchEntity(
         });
       }
     }
+  } else {
+    if (tavilyEnabled) recordSourceFailure("tavily");
+    if (config.tavilyApiKey) {
+      results.tavilySearch = {
+        error:
+          tavilySettled.reason instanceof Error
+            ? tavilySettled.reason.message
+            : "Tavily search failed",
+      };
+    }
   }
 
-  // Step 4: Extract entities from Wikipedia text
+  const tavilyResultCount = tavilyResults.length;
+
+  // Langfuse span: tavily
+  if (config.tavilyApiKey) {
+    trace?.span({
+      name: "tavily",
+      startTime: new Date(pipelineStart),
+      endTime: new Date(pipelineStart + tavilyLatency),
+      metadata: {
+        source: "tavily",
+        latencyMs: tavilyLatency,
+        success:
+          tavilySettled.status === "fulfilled" &&
+          !(tavilySettled.value as Record<string, unknown>)?.error,
+        resultCount: tavilyResultCount,
+        error:
+          tavilySettled.status === "rejected"
+            ? (tavilySettled.reason as Error)?.message
+            : undefined,
+      },
+    });
+  }
+
+  // ── Fail fast if ALL sources failed ────────────────────────────────
+  const allFailed =
+    wikiSettled.status === "rejected" &&
+    webSettled.status === "rejected" &&
+    tavilySettled.status === "rejected" &&
+    !wikiEnabled &&
+    !ddgEnabled &&
+    !tavilyEnabled;
+
+  if (allFailed) {
+    results.error = "All search sources failed or are disabled";
+    results.evidence = evidenceNodes;
+    results.entityCitations = entityCitations;
+    trace?.update({ output: results });
+    return results;
+  }
+
+  // ── Step 4: Extract entities from Wikipedia text ────────────────────
   if (config.anthropicApiKey && wiki.text) {
     const extraction = await extractEntities(
       wiki.text as string,
@@ -596,6 +880,15 @@ async function researchEntity(
   // Always include evidence and entityCitations in results
   results.evidence = evidenceNodes;
   results.entityCitations = entityCitations;
+  results._pipelineLatencyMs = Date.now() - pipelineStart;
+
+  // Finalise Langfuse trace
+  trace?.update({
+    output: {
+      evidenceCount: evidenceNodes.length,
+      pipelineLatencyMs: results._pipelineLatencyMs,
+    },
+  });
 
   return results;
 }
