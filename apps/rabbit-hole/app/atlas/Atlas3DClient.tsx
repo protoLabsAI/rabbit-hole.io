@@ -20,7 +20,11 @@ import type { ForceGraphMethods } from "react-force-graph-3d";
 import { Icon } from "@proto/icon-system";
 
 import { useGraphUpdates } from "./hooks/useGraphUpdates";
-import { getEntityVisual, getRelationshipVisual } from "./lib/atlas-schema";
+import {
+  getEntityVisual,
+  getRelationshipVisual,
+  getEntityLegend,
+} from "./lib/atlas-schema";
 
 // ─── LOD / Performance Constants ────────────────────────────────────
 
@@ -34,6 +38,41 @@ const LARGE_GRAPH_THRESHOLD = 5000;
 const ForceGraph3D = dynamic(() => import("react-force-graph-3d"), {
   ssr: false,
 });
+
+// ─── Settings ────────────────────────────────────────────────────────
+
+const SETTINGS_STORAGE_KEY = "atlas-settings";
+
+interface AtlasSettings {
+  showLabels: boolean;
+  particleSpeed: number;
+  linkOpacity: number;
+}
+
+const DEFAULT_SETTINGS: AtlasSettings = {
+  showLabels: true,
+  particleSpeed: 0.005,
+  linkOpacity: 0.4,
+};
+
+function loadSettings(): AtlasSettings {
+  if (typeof window === "undefined") return DEFAULT_SETTINGS;
+  try {
+    const raw = localStorage.getItem(SETTINGS_STORAGE_KEY);
+    if (!raw) return DEFAULT_SETTINGS;
+    return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
+  } catch {
+    return DEFAULT_SETTINGS;
+  }
+}
+
+function saveSettings(s: AtlasSettings) {
+  try {
+    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(s));
+  } catch {
+    // ignore storage errors
+  }
+}
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -131,6 +170,7 @@ export default function Atlas3DClient() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedNode, setSelectedNode] = useState<AtlasNode | null>(null);
+  const [settings, setSettings] = useState<AtlasSettings>(DEFAULT_SETTINGS);
   // Mutable ref tracking camera position — updated per-frame via onRenderFramePre
   // to drive LOD label and nodeVisibility callbacks without React re-renders.
   const cameraPositionRef = useRef({ x: 0, y: 0, z: 0 });
@@ -140,6 +180,11 @@ export default function Atlas3DClient() {
     height:
       typeof window !== "undefined" ? window.innerHeight - HEADER_HEIGHT : 800,
   });
+
+  // Load persisted settings on mount
+  useEffect(() => {
+    setSettings(loadSettings());
+  }, []);
 
   // Parse URL params — supports both ?centerEntity=uid and ?entities=uid1,uid2,uid3
   const searchParams = useSearchParams();
@@ -289,20 +334,25 @@ export default function Atlas3DClient() {
   // LOD label: return HTML tooltip only when the node is within
   // LOD_LABEL_DISTANCE of the camera. Returning an empty string suppresses
   // the label entirely — cheaper than rendering invisible DOM nodes.
-  const nodeLabel = useCallback((node: any) => {
-    const cam = cameraPositionRef.current;
-    const nx = node.x ?? 0;
-    const ny = node.y ?? 0;
-    const nz = node.z ?? 0;
-    const dist = Math.sqrt(
-      (cam.x - nx) ** 2 + (cam.y - ny) ** 2 + (cam.z - nz) ** 2
-    );
-    if (dist > LOD_LABEL_DISTANCE) return "";
-    return `<div style="background:rgba(0,0,0,0.85);padding:6px 10px;border-radius:6px;font-size:12px;color:#e2e8f0;border:1px solid rgba(255,255,255,0.1)">
+  // When showLabels is false, always return empty string.
+  const nodeLabelFn = useCallback(
+    (node: any) => {
+      if (!settings.showLabels) return "";
+      const cam = cameraPositionRef.current;
+      const nx = node.x ?? 0;
+      const ny = node.y ?? 0;
+      const nz = node.z ?? 0;
+      const dist = Math.sqrt(
+        (cam.x - nx) ** 2 + (cam.y - ny) ** 2 + (cam.z - nz) ** 2
+      );
+      if (dist > LOD_LABEL_DISTANCE) return "";
+      return `<div style="background:rgba(0,0,0,0.85);padding:6px 10px;border-radius:6px;font-size:12px;color:#e2e8f0;border:1px solid rgba(255,255,255,0.1)">
       <strong>${node.name}</strong>
       <br/><span style="color:#94a3b8;font-size:10px">${node.type}</span>
     </div>`;
-  }, []);
+    },
+    [settings.showLabels]
+  );
 
   // Lazy frustum culling: hide nodes that have drifted far behind the camera
   // to reduce per-frame geometry submissions on large graphs.
@@ -311,6 +361,15 @@ export default function Atlas3DClient() {
     // Cull nodes more than 3× LOD_LABEL_DISTANCE behind the camera along z.
     const nz = node.z ?? 0;
     return nz > cam.z - LOD_LABEL_DISTANCE * 3;
+  }, []);
+
+  // Settings updater — persists to localStorage
+  const updateSettings = useCallback((patch: Partial<AtlasSettings>) => {
+    setSettings((prev) => {
+      const next = { ...prev, ...patch };
+      saveSettings(next);
+      return next;
+    });
   }, []);
 
   // Derived performance settings based on current graph size.
@@ -358,6 +417,8 @@ export default function Atlas3DClient() {
       <AtlasHeader
         nodeCount={graphData?.nodes.length}
         linkCount={graphData?.links.length}
+        settings={settings}
+        onSettingsChange={updateSettings}
       />
       <div
         ref={containerRef}
@@ -385,17 +446,17 @@ export default function Atlas3DClient() {
                 ? (node.val ?? 1) * 1.6
                 : node.val ?? 1;
             }}
-            nodeLabel={nodeLabel}
+            nodeLabel={nodeLabelFn}
             nodeVisibility={nodeVisibility}
             nodeOpacity={0.9}
             nodeResolution={isLargeGraph ? 8 : 12}
             // Link rendering
             linkColor={(link: any) => link.color ?? "#334155"}
-            linkOpacity={0.4}
+            linkOpacity={settings.linkOpacity}
             linkWidth={0.5}
             linkDirectionalParticles={isLargeGraph ? 1 : 2}
             linkDirectionalParticleWidth={0.8}
-            linkDirectionalParticleSpeed={0.005}
+            linkDirectionalParticleSpeed={settings.particleSpeed}
             // Camera + controls
             enableNavigationControls={true}
             enablePointerInteraction={true}
@@ -452,6 +513,9 @@ export default function Atlas3DClient() {
           </div>
         )}
 
+        {/* Legend — collapsible, bottom-left, above stats */}
+        <AtlasLegend />
+
         {/* Stats */}
         <div className="absolute bottom-3 left-3 text-[10px] text-muted-foreground/40 tabular-nums z-10">
           {graphData
@@ -491,14 +555,193 @@ export default function Atlas3DClient() {
   );
 }
 
+// ─── Legend ─────────────────────────────────────────────────────────
+
+function AtlasLegend() {
+  const [open, setOpen] = useState(false);
+  const legend = getEntityLegend();
+
+  return (
+    <div className="absolute z-10" style={{ bottom: "28px", left: "12px" }}>
+      {open && (
+        <div className="mb-1.5 bg-card/90 backdrop-blur border border-border rounded-lg shadow-lg p-3 w-44">
+          <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-2">
+            Entity Types
+          </p>
+          <ul className="space-y-1.5">
+            {legend.map((entry) => (
+              <li key={entry.type} className="flex items-center gap-2">
+                <span
+                  className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                  style={{ backgroundColor: entry.color }}
+                />
+                <span className="text-[11px] text-foreground/80">
+                  {entry.label}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-1.5 bg-card/80 backdrop-blur border border-border rounded-md px-2 py-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors shadow-sm"
+        title={open ? "Hide legend" : "Show legend"}
+      >
+        <Icon name="Layers" className="h-3 w-3" />
+        Legend
+        <Icon
+          name={open ? "ChevronDown" : "ChevronUp"}
+          className="h-3 w-3 opacity-60"
+        />
+      </button>
+    </div>
+  );
+}
+
+// ─── Settings Panel ──────────────────────────────────────────────────
+
+function AtlasSettingsDropdown({
+  settings,
+  onChange,
+}: {
+  settings: AtlasSettings;
+  onChange: (patch: Partial<AtlasSettings>) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // Close on outside click
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  return (
+    <div ref={panelRef} className="relative">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className={`p-1.5 rounded-md transition-colors ${
+          open
+            ? "text-foreground bg-muted/70"
+            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+        }`}
+        title="Graph settings"
+        aria-label="Graph settings"
+      >
+        <Icon name="Settings" className="h-3.5 w-3.5" />
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-full mt-1.5 w-56 bg-card/95 backdrop-blur border border-border rounded-lg shadow-xl p-3 z-50">
+          <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-3">
+            Graph Settings
+          </p>
+
+          {/* Label visibility toggle */}
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-1.5">
+              <Icon
+                name={settings.showLabels ? "Eye" : "EyeOff"}
+                className="h-3 w-3 text-muted-foreground"
+              />
+              <span className="text-[11px] text-foreground/80">
+                Node Labels
+              </span>
+            </div>
+            <button
+              onClick={() => onChange({ showLabels: !settings.showLabels })}
+              className={`relative inline-flex h-4 w-7 items-center rounded-full transition-colors focus:outline-none ${
+                settings.showLabels ? "bg-primary" : "bg-muted"
+              }`}
+              role="switch"
+              aria-checked={settings.showLabels}
+            >
+              <span
+                className={`inline-block h-3 w-3 rounded-full bg-white shadow transition-transform ${
+                  settings.showLabels ? "translate-x-3.5" : "translate-x-0.5"
+                }`}
+              />
+            </button>
+          </div>
+
+          {/* Particle speed slider */}
+          <div className="mb-3">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[11px] text-foreground/80">
+                Particle Speed
+              </span>
+              <span className="text-[10px] text-muted-foreground tabular-nums">
+                {settings.particleSpeed.toFixed(3)}
+              </span>
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={0.02}
+              step={0.001}
+              value={settings.particleSpeed}
+              onChange={(e) =>
+                onChange({ particleSpeed: parseFloat(e.target.value) })
+              }
+              className="w-full h-1 accent-primary cursor-pointer"
+            />
+            <div className="flex justify-between text-[9px] text-muted-foreground/50 mt-0.5">
+              <span>0</span>
+              <span>0.02</span>
+            </div>
+          </div>
+
+          {/* Link opacity slider */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[11px] text-foreground/80">
+                Link Opacity
+              </span>
+              <span className="text-[10px] text-muted-foreground tabular-nums">
+                {settings.linkOpacity.toFixed(2)}
+              </span>
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={1}
+              step={0.05}
+              value={settings.linkOpacity}
+              onChange={(e) =>
+                onChange({ linkOpacity: parseFloat(e.target.value) })
+              }
+              className="w-full h-1 accent-primary cursor-pointer"
+            />
+            <div className="flex justify-between text-[9px] text-muted-foreground/50 mt-0.5">
+              <span>0</span>
+              <span>1</span>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Header ─────────────────────────────────────────────────────────
 
 function AtlasHeader({
   nodeCount,
   linkCount,
+  settings,
+  onSettingsChange,
 }: {
   nodeCount?: number;
   linkCount?: number;
+  settings?: AtlasSettings;
+  onSettingsChange?: (patch: Partial<AtlasSettings>) => void;
 }) {
   return (
     <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border">
@@ -520,6 +763,12 @@ function AtlasHeader({
           </span>
         )}
         <div className="ml-auto flex items-center gap-1">
+          {settings && onSettingsChange && (
+            <AtlasSettingsDropdown
+              settings={settings}
+              onChange={onSettingsChange}
+            />
+          )}
           <Link
             href="/"
             className="flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-muted/50"
