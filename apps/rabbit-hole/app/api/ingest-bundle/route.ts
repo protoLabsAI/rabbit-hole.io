@@ -331,19 +331,40 @@ const handleBundleIngest = async (
 
         // Execute query if we have one
         if (entityQuery) {
-          await client.executeWrite(entityQuery, queryParams);
+          try {
+            await client.executeWrite(entityQuery, queryParams);
 
-          // Emit live update event for connected Atlas clients
-          graphUpdateEmitter.emit("graph-update", {
-            type: "entity_created",
-            uid: entity.uid,
-            name: entity.name,
-            entityType: entity.type,
-            properties: entity.properties,
-            tags: entity.tags,
-            aliases: entity.aliases,
-            timestamp: new Date().toISOString(),
-          } satisfies GraphEntityEvent);
+            // Emit live update event for connected Atlas clients
+            graphUpdateEmitter.emit("graph-update", {
+              type: "entity_created",
+              uid: entity.uid,
+              name: entity.name,
+              entityType: entity.type,
+              properties: entity.properties,
+              tags: entity.tags,
+              aliases: entity.aliases,
+              timestamp: new Date().toISOString(),
+            } satisfies GraphEntityEvent);
+          } catch (writeError: any) {
+            // Treat unique constraint violations as "already exists" — keep local
+            if (
+              writeError?.code === "Neo.ClientError.Schema.ConstraintValidationFailed"
+            ) {
+              console.warn(
+                `⚠️ Entity uid conflict (constraint violation), keeping existing: ${entity.uid}`
+              );
+              // Undo the optimistic entitiesCreated count and treat as kept
+              summary.entitiesCreated--;
+              summary.entitiesKept++;
+              mergeResult = {
+                action: "kept_local",
+                entityId: entity.uid,
+                reason: "Unique constraint violation — entity already exists",
+              };
+            } else {
+              throw writeError;
+            }
+          }
         }
 
         summary.mergeResults.push(mergeResult);
