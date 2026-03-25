@@ -251,12 +251,10 @@ const handleBundleIngest = async (
 
         // Add source tracking to entity properties if not already present
         if (
-          !flattenedProperties.sources &&
+          !(flattenedProperties as Record<string, unknown>).sources &&
           !(entity.properties as any)?.sources
         ) {
-          (flattenedProperties as any).sources = [
-            `ingest:${Date.now()}`,
-          ];
+          (flattenedProperties as any).sources = [`ingest:${Date.now()}`];
         }
 
         // Step 1: Check uid exact match
@@ -370,8 +368,7 @@ const handleBundleIngest = async (
                   existingTags = (existing.get("tags") as string[]) ?? [];
                   existingConfidence =
                     (existing.get("confidence") as number) ?? 0;
-                  existingSources =
-                    (existing.get("sources") as string[]) ?? [];
+                  existingSources = (existing.get("sources") as string[]) ?? [];
                 }
               } catch (readErr) {
                 // Per deviation rules: log and continue with incoming values only
@@ -384,8 +381,7 @@ const handleBundleIngest = async (
               // Union arrays (aliases, tags, sources)
               const incomingAliases =
                 (flattenedProperties.aliases as string[]) ?? [];
-              const incomingTags =
-                (flattenedProperties.tags as string[]) ?? [];
+              const incomingTags = (flattenedProperties.tags as string[]) ?? [];
               const incomingConfidence =
                 (flattenedProperties as any).confidence ?? 0;
               const incomingSources =
@@ -478,7 +474,8 @@ const handleBundleIngest = async (
           } catch (writeError: any) {
             // Treat unique constraint violations as "already exists" — keep local
             if (
-              writeError?.code === "Neo.ClientError.Schema.ConstraintValidationFailed"
+              writeError?.code ===
+              "Neo.ClientError.Schema.ConstraintValidationFailed"
             ) {
               console.warn(
                 `⚠️ Entity uid conflict (constraint violation), keeping existing: ${effectiveUid}`

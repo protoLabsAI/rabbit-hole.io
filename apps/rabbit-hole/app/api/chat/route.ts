@@ -399,7 +399,7 @@ export async function POST(request: Request) {
             }),
           });
           if (ingestRes.ok) {
-            preview.autoIngested = true;
+            (preview as unknown as Record<string, unknown>).autoIngested = true;
             console.log(
               `[auto-ingest] ✅ Ingested ${preview.entities.length} entities (confidence: ${preview.confidence.toFixed(2)})`
             );
