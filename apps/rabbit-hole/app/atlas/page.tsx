@@ -10,9 +10,11 @@ import Atlas3DClient from "./Atlas3DClient";
 
 export default function AtlasPage() {
   return (
-    <Suspense fallback={<AtlasLoading />}>
-      <Atlas3DClient />
-    </Suspense>
+    <div className="h-screen w-screen overflow-hidden">
+      <Suspense fallback={<AtlasLoading />}>
+        <Atlas3DClient />
+      </Suspense>
+    </div>
   );
 }
 
