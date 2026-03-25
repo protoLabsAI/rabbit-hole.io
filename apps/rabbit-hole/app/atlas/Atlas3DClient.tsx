@@ -457,18 +457,23 @@ export default function Atlas3DClient() {
             linkColor={(link: any) => link.color ?? "#334155"}
             linkOpacity={settings.linkOpacity}
             linkWidth={0.5}
-            linkDirectionalParticles={isLargeGraph ? 1 : 2}
+            linkDirectionalParticles={isLargeGraph ? 0 : 2}
             linkDirectionalParticleWidth={0.8}
             linkDirectionalParticleSpeed={settings.particleSpeed}
             // Camera + controls
             enableNavigationControls={true}
             enablePointerInteraction={true}
             enableNodeDrag={!isLargeGraph}
-            // Force layout
-            warmupTicks={100}
-            cooldownTicks={200}
-            d3AlphaDecay={0.02}
-            d3VelocityDecay={0.3}
+            // Force layout — freeze after initial settle to save CPU
+            warmupTicks={isLargeGraph ? 200 : 100}
+            cooldownTicks={0}
+            cooldownTime={isLargeGraph ? 3000 : 8000}
+            d3AlphaDecay={isLargeGraph ? 0.05 : 0.02}
+            d3VelocityDecay={isLargeGraph ? 0.5 : 0.3}
+            onEngineStop={() => {
+              // Simulation frozen — no more per-frame physics
+              console.log("[atlas] Force simulation frozen");
+            }}
             // Events
             onNodeClick={handleNodeClick}
           />
