@@ -8,8 +8,9 @@
  * /api/atlas/graph-payload endpoint.
  */
 
-import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
+import { useEffect, useRef, useState, useCallback } from "react";
 import type { ForceGraphMethods } from "react-force-graph-3d";
 
 import { Icon } from "@proto/icon-system";
@@ -89,7 +90,10 @@ async function fetchGraphData(
         sentiment?: string;
         display?: { color?: string };
       }) => {
-        const visual = getRelationshipVisual(e.type ?? "RELATED_TO", e.sentiment);
+        const visual = getRelationshipVisual(
+          e.type ?? "RELATED_TO",
+          e.sentiment
+        );
         return {
           source: e.source,
           target: e.target,
@@ -113,7 +117,8 @@ export default function Atlas3DClient() {
   const HEADER_HEIGHT = 45;
   const [dimensions, setDimensions] = useState({
     width: typeof window !== "undefined" ? window.innerWidth : 1200,
-    height: typeof window !== "undefined" ? window.innerHeight - HEADER_HEIGHT : 800,
+    height:
+      typeof window !== "undefined" ? window.innerHeight - HEADER_HEIGHT : 800,
   });
 
   // Update on window resize
@@ -157,41 +162,38 @@ export default function Atlas3DClient() {
   }, []);
 
   // Node click → select + fly to
-  const handleNodeClick = useCallback(
-    (node: any) => {
-      if (!node || !graphRef.current) return;
-      setSelectedNode(node as AtlasNode);
-      graphRef.current.cameraPosition(
-        { x: node.x, y: node.y, z: node.z + 150 },
-        { x: node.x, y: node.y, z: node.z },
-        1000
-      );
-    },
-    []
-  );
+  const handleNodeClick = useCallback((node: any) => {
+    if (!node || !graphRef.current) return;
+    setSelectedNode(node as AtlasNode);
+    graphRef.current.cameraPosition(
+      { x: node.x, y: node.y, z: node.z + 150 },
+      { x: node.x, y: node.y, z: node.z },
+      1000
+    );
+  }, []);
 
   // Expand node → load neighbors and merge
-  const handleExpand = useCallback(
-    async (entityId: string) => {
-      const data = await fetchGraphData("ego", 50, entityId);
-      setGraphData((prev) => {
-        if (!prev) return data;
-        const existingIds = new Set(prev.nodes.map((n) => n.id));
-        const newNodes = data.nodes.filter((n) => !existingIds.has(n.id));
-        const existingLinks = new Set(
-          prev.links.map((l) => `${typeof l.source === "string" ? l.source : (l.source as any).id}-${typeof l.target === "string" ? l.target : (l.target as any).id}`)
-        );
-        const newLinks = data.links.filter(
-          (l) => !existingLinks.has(`${l.source}-${l.target}`)
-        );
-        return {
-          nodes: [...prev.nodes, ...newNodes],
-          links: [...prev.links, ...newLinks],
-        };
-      });
-    },
-    []
-  );
+  const handleExpand = useCallback(async (entityId: string) => {
+    const data = await fetchGraphData("ego", 50, entityId);
+    setGraphData((prev) => {
+      if (!prev) return data;
+      const existingIds = new Set(prev.nodes.map((n) => n.id));
+      const newNodes = data.nodes.filter((n) => !existingIds.has(n.id));
+      const existingLinks = new Set(
+        prev.links.map(
+          (l) =>
+            `${typeof l.source === "string" ? l.source : (l.source as any).id}-${typeof l.target === "string" ? l.target : (l.target as any).id}`
+        )
+      );
+      const newLinks = data.links.filter(
+        (l) => !existingLinks.has(`${l.source}-${l.target}`)
+      );
+      return {
+        nodes: [...prev.nodes, ...newNodes],
+        links: [...prev.links, ...newLinks],
+      };
+    });
+  }, []);
 
   // Node label on hover
   const nodeLabel = useCallback(
@@ -209,8 +211,13 @@ export default function Atlas3DClient() {
         <AtlasHeader />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <Icon name="Loader2" className="h-8 w-8 animate-spin text-primary mx-auto mb-3" />
-            <p className="text-sm text-muted-foreground">Loading knowledge graph...</p>
+            <Icon
+              name="Loader2"
+              className="h-8 w-8 animate-spin text-primary mx-auto mb-3"
+            />
+            <p className="text-sm text-muted-foreground">
+              Loading knowledge graph...
+            </p>
           </div>
         </div>
       </div>
@@ -223,7 +230,10 @@ export default function Atlas3DClient() {
         <AtlasHeader />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <Icon name="AlertCircle" className="h-8 w-8 text-destructive mx-auto mb-3" />
+            <Icon
+              name="AlertCircle"
+              className="h-8 w-8 text-destructive mx-auto mb-3"
+            />
             <p className="text-sm text-destructive">{error}</p>
           </div>
         </div>
@@ -237,7 +247,11 @@ export default function Atlas3DClient() {
         nodeCount={graphData?.nodes.length}
         linkCount={graphData?.links.length}
       />
-      <div ref={containerRef} className="flex-1 relative min-h-0" style={{ height: "calc(100vh - 45px)" }}>
+      <div
+        ref={containerRef}
+        className="flex-1 relative min-h-0"
+        style={{ height: "calc(100vh - 45px)" }}
+      >
         {graphData && (
           <ForceGraph3D
             ref={graphRef}
@@ -337,12 +351,12 @@ function AtlasHeader({
   return (
     <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border">
       <div className="px-4 py-2 flex items-center gap-3">
-        <a
+        <Link
           href="/"
           className="p-1 text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-muted/50"
         >
           <Icon name="ArrowLeft" className="h-4 w-4" />
-        </a>
+        </Link>
         <div className="flex items-center gap-2">
           <Icon name="Globe" className="h-4 w-4 text-primary" />
           <span className="text-xs font-medium text-foreground">Atlas</span>
@@ -354,13 +368,13 @@ function AtlasHeader({
           </span>
         )}
         <div className="ml-auto flex items-center gap-1">
-          <a
+          <Link
             href="/"
             className="flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-muted/50"
           >
             <Icon name="Search" className="h-3.5 w-3.5" />
             Search
-          </a>
+          </Link>
         </div>
       </div>
     </header>
