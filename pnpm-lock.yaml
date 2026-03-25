@@ -137,18 +137,9 @@ importers:
       '@radix-ui/react-toast':
         specifier: ^1.2.15
         version: 1.2.15(@types/react-dom@19.1.9(@types/react@19.1.13))(@types/react@19.1.13)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
-      '@react-sigma/core':
-        specifier: ^5.0.4
-        version: 5.0.4(graphology@0.26.0(graphology-types@0.24.8))(react@19.1.1)(sigma@3.0.2(graphology-types@0.24.8))
       '@sidequest/postgres-backend':
         specifier: 1.7.1
         version: 1.7.1(better-sqlite3@11.10.0)
-      '@sigma/layer-leaflet':
-        specifier: ^3.0.0
-        version: 3.0.0(leaflet@1.9.4)(sigma@3.0.2(graphology-types@0.24.8))
-      '@sigma/node-image':
-        specifier: ^3.0.0
-        version: 3.0.0(sigma@3.0.2(graphology-types@0.24.8))
       '@tanstack/react-query':
         specifier: ^5.90.2
         version: 5.90.2(react@19.1.1)
@@ -200,21 +191,6 @@ importers:
       clsx:
         specifier: ^2.1.0
         version: 2.1.1
-      cytoscape:
-        specifier: ^3.33.1
-        version: 3.33.1
-      cytoscape-cise:
-        specifier: ^2.0.1
-        version: 2.0.1(cytoscape@3.33.1)
-      cytoscape-cola:
-        specifier: ^2.5.1
-        version: 2.5.1(cytoscape@3.33.1)
-      cytoscape-layout-utilities:
-        specifier: ^1.1.1
-        version: 1.1.1(cytoscape@3.33.1)
-      cytoscape-popper:
-        specifier: ^4.0.1
-        version: 4.0.1(cytoscape@3.33.1)
       d3-force:
         specifier: ^3.0.0
         version: 3.0.0
@@ -341,9 +317,6 @@ importers:
       sidequest:
         specifier: 1.7.1
         version: 1.7.1(better-sqlite3@11.10.0)(pg@8.16.3)
-      sigma:
-        specifier: ^3.0.2
-        version: 3.0.2(graphology-types@0.24.8)
       sonner:
         specifier: ^2.0.7
         version: 2.0.7(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
@@ -745,21 +718,12 @@ importers:
       '@radix-ui/react-toast':
         specifier: ^1.2.15
         version: 1.2.15(@types/react-dom@19.1.9(@types/react@19.1.13))(@types/react@19.1.13)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
-      '@react-sigma/core':
-        specifier: ^5.0.4
-        version: 5.0.4(graphology@0.26.0(graphology-types@0.24.8))(react@19.1.1)(sigma@3.0.2(graphology-types@0.24.8))
       '@shikijs/transformers':
         specifier: ^3.15.0
         version: 3.15.0
       '@sidequest/postgres-backend':
         specifier: 1.7.1
         version: 1.7.1(better-sqlite3@11.10.0)
-      '@sigma/layer-leaflet':
-        specifier: ^3.0.0
-        version: 3.0.0(leaflet@1.9.4)(sigma@3.0.2(graphology-types@0.24.8))
-      '@sigma/node-image':
-        specifier: ^3.0.0
-        version: 3.0.0(sigma@3.0.2(graphology-types@0.24.8))
       '@tanstack/react-query':
         specifier: ^5.90.2
         version: 5.90.2(react@19.1.1)
@@ -799,18 +763,6 @@ importers:
       clsx:
         specifier: ^2.1.0
         version: 2.1.1
-      cytoscape:
-        specifier: ^3.33.1
-        version: 3.33.1
-      cytoscape-cise:
-        specifier: ^2.0.1
-        version: 2.0.1(cytoscape@3.33.1)
-      cytoscape-cola:
-        specifier: ^2.5.1
-        version: 2.5.1(cytoscape@3.33.1)
-      cytoscape-popper:
-        specifier: ^4.0.1
-        version: 4.0.1(cytoscape@3.33.1)
       d3-force:
         specifier: ^3.0.0
         version: 3.0.0
@@ -940,9 +892,6 @@ importers:
       sidequest:
         specifier: 1.7.1
         version: 1.7.1(better-sqlite3@11.10.0)(pg@8.16.3)
-      sigma:
-        specifier: ^3.0.2
-        version: 3.0.2(graphology-types@0.24.8)
       sonner:
         specifier: ^2.0.7
         version: 2.0.7(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
@@ -6243,13 +6192,6 @@ packages:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
       react-dom: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
 
-  '@react-sigma/core@5.0.4':
-    resolution: {integrity: sha512-C0hjr069x9oLlVe7t+Y1vE8Qi9UV1dhvrwxNi96TWxrFcTSHO5ntduj5yKTGnUF4SiIszAz6Xmjga8SHT/836Q==}
-    peerDependencies:
-      graphology: ^0.26.0
-      react: ^18.0.0 || ^19.0.0
-      sigma: ^3.0.2
-
   '@react-stately/flags@3.1.2':
     resolution: {integrity: sha512-2HjFcZx1MyQXoPqcBGALwWWmgFVUk2TuKVIQxCbRq7fPyWXIl6VHcakCLurdtYC2Iks7zizvz0Idv48MQ38DWg==}
 
@@ -6478,17 +6420,6 @@ packages:
 
   '@sidequest/postgres-backend@1.7.1':
     resolution: {integrity: sha512-o0m/rsK1QyqJpRmWBFZo9FcfCm/nZTIUGabgMO7paHU3dj7O0u+JGnyuDwsiY8Qu5xg2P08WdBMBamDCBpUofA==}
-
-  '@sigma/layer-leaflet@3.0.0':
-    resolution: {integrity: sha512-7sZvm8PKmVz5qTW66E1pVkPUZ/KaV5pWsSMzM3CeMxNqlwXXu+0JN3h4WRC1yl9jfJxk8r0+St2ymmJXfVPD/w==}
-    peerDependencies:
-      leaflet: ^1.9.4
-      sigma: '>=3.0.0-beta.10'
-
-  '@sigma/node-image@3.0.0':
-    resolution: {integrity: sha512-i4WLNPugDY4jgQEZtNSiSVj4HHXOraciXLtlgdygeUxMVEhH8PJ/+Q1vQ9f/SlKFnZQ+7vH3HnsSDW6FD9aP+g==}
-    peerDependencies:
-      sigma: '>=3.0.0-beta.10'
 
   '@sinclair/typebox@0.27.8':
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
@@ -7485,336 +7416,6 @@ packages:
   '@ts-morph/common@0.27.0':
     resolution: {integrity: sha512-Wf29UqxWDpc+i61k3oIOzcUfQt79PIT9y/MWfAGlrkjg6lBC1hwDECLXPVJAhWjiGbfBCxZd65F/LIZF3+jeJQ==}
 
-  '@turf/along@5.1.5':
-    resolution: {integrity: sha512-N7BN1xvj6VWMe3UpjQDdVI0j0oY/EZ0bWgOgBXc4DlJ411uEsKCh6iBv0b2MSxQ3YUXEez3oc5FcgO9eVSs7iQ==}
-
-  '@turf/area@5.1.5':
-    resolution: {integrity: sha512-lz16gqtvoz+j1jD9y3zj0Z5JnGNd3YfS0h+DQY1EcZymvi75Frm9i5YbEyth0RfxYZeOVufY7YIS3LXbJlI57g==}
-
-  '@turf/bbox-clip@5.1.5':
-    resolution: {integrity: sha512-KP64aoTvjcXxWHeM/Hs25vOQUBJgyJi7DlRVEoZofFJiR1kPnmDQrK7Xj+60lAk5cxuqzFnaPPxUk9Q+3v4p1Q==}
-
-  '@turf/bbox-polygon@5.1.5':
-    resolution: {integrity: sha512-PKVPF5LABFWZJud8KzzfesLGm5ihiwLbVa54HJjYySe6yqU/cr5q/qcN9TWptynOFhNktG1dr0KXVG0I2FZmfw==}
-
-  '@turf/bbox@5.1.5':
-    resolution: {integrity: sha512-sYQU4fqsOYYJoD8UndC1n2hy8hV/lGIAmMLKWuzwmPUWqWOuSKWUcoRWDi9mGB0GvQQe/ow2IxZr8UaVaGz3sQ==}
-
-  '@turf/bearing@5.1.5':
-    resolution: {integrity: sha512-PrvZuJjnXGseB8hUatIjsrK3tgD3wttyRnVYXTbSfXYJZzaOfHDMplgO4lxXQp7diraZhGhCdSlbMvRRXItbUQ==}
-
-  '@turf/bearing@6.5.0':
-    resolution: {integrity: sha512-dxINYhIEMzgDOztyMZc20I7ssYVNEpSv04VbMo5YPQsqa80KO3TFvbuCahMsCAW5z8Tncc8dwBlEFrmRjJG33A==}
-
-  '@turf/bezier-spline@5.1.5':
-    resolution: {integrity: sha512-Y9NoComaGgFFFe9TWWE/cEMg2+EnBfU1R3112ec2wlx21ygDmFGXs4boOS71WM4ySwm/dbS3wxnbVxs4j68sKw==}
-
-  '@turf/boolean-clockwise@5.1.5':
-    resolution: {integrity: sha512-FqbmEEOJ4rU4/2t7FKx0HUWmjFEVqR+NJrFP7ymGSjja2SQ7Q91nnBihGuT+yuHHl6ElMjQ3ttsB/eTmyCycxA==}
-
-  '@turf/boolean-contains@5.1.5':
-    resolution: {integrity: sha512-x2HeEieeE9vBQrTdCuj4swnAXlpKbj9ChxMdDTV479c0m2gVmfea83ocmkj3w+9cvAaS63L8WqFyNVSmkwqljQ==}
-
-  '@turf/boolean-crosses@5.1.5':
-    resolution: {integrity: sha512-odljvS7INr9k/8yXeyXQVry7GqEaChOmXawP0+SoTfGO3hgptiik59TLU/Yjn/SLFjE2Ul54Ga1jKFSL7vvH0Q==}
-
-  '@turf/boolean-disjoint@5.1.6':
-    resolution: {integrity: sha512-KHvUS6SBNYHBCLIJEJrg04pF5Oy+Fqn8V5G9U+9pti5vI9tyX7Ln2g7RSB7iJ1Cxsz8QAi6OukhXjEF2/8ZpGg==}
-
-  '@turf/boolean-equal@5.1.5':
-    resolution: {integrity: sha512-QEMbhDPV+J8PlRkMlVg6m5oSLaYUpOx2VUhDDekQ73FlpnhFBKRIlidhvHtS6CYnEw8d+/zA3h8Z18B4W4mq9Q==}
-
-  '@turf/boolean-overlap@5.1.5':
-    resolution: {integrity: sha512-lizojgU559KME0G705YAgWVa0B3/tsWNobMzOEWDx/1rABWTojCY4uxw2rFxpOsP++s8JJHrGWXRLh1PbdAvRQ==}
-
-  '@turf/boolean-parallel@5.1.5':
-    resolution: {integrity: sha512-eeuGgDhnas3nJ22A/DD8aiH0kg9dSzbQChIMAqYRPGg3pWNK41aGAbeh5z0GO5N/EVFX1+ga5a0vsPmiRgQB5g==}
-
-  '@turf/boolean-point-in-polygon@5.1.5':
-    resolution: {integrity: sha512-y+gbAhLmsAZH9uYhv+C68pu06mxsGIm3o7l0hzVkc/PXYdbkr+vKe7n7PfSN3xpVA3qoDLKLpCGOqeW8/ThaJA==}
-
-  '@turf/boolean-point-on-line@5.1.5':
-    resolution: {integrity: sha512-Zf4d28mckV2tYfLWf2iqxQ8eeLZqi2HGimM26mptf1OCEIwc1wfkKgLRRJXMu94Crvd/pJxjRAjoYGcGliP6Vg==}
-
-  '@turf/boolean-within@5.1.5':
-    resolution: {integrity: sha512-CNAtrvm4HiUwV/vhpGhvJzfhV9CN7VhPC5y4tTfQicK82fYY6ifPz0iaNpUOmshU6+TAot/fsVQVgDJ4t7HXcA==}
-
-  '@turf/buffer@5.1.5':
-    resolution: {integrity: sha512-U3LU0HF/JNFUNabpB5ArpNG6yPla7yR5XPrZvzZRH48vvbr/N0rkSRI0tJFRWTz7ntugVm9X0OD9Y382NTJRhA==}
-
-  '@turf/center-mean@5.1.5':
-    resolution: {integrity: sha512-XdkBXzFUuyCqu5EPlBwgkv8FLA8pIGBnt7xy5cxxhxKOYLMrKqwMPPHPA84TjeQpNti0gH0CVuOk2r1f/Pp8iQ==}
-
-  '@turf/center-median@5.1.5':
-    resolution: {integrity: sha512-M+O6bSNsIDKZ4utk/YzSOIg6W0isjLVWud+TCLWyrDCWTSERlSJlhOaVE1y7cObhG8nYBHvmszqZyoAY6nufQw==}
-
-  '@turf/center-of-mass@5.1.5':
-    resolution: {integrity: sha512-UvI7q6GgW3afCVIDOyTRuLT54v9Xwv65Xudxh4FIT6w7HNU4KUBtTGnx0NuhODZcgvZgWVWVakhmIcHQTMjYYA==}
-
-  '@turf/center@5.1.5':
-    resolution: {integrity: sha512-Dy1TvAv2oHKFddZcWqlVsanxurfcZV1Mmb1E+7H7GRKI+fXZTfRjwCdbiZCbO/tPwxt8jWQHWdLHn8E9lecc3A==}
-
-  '@turf/centroid@5.1.5':
-    resolution: {integrity: sha512-0m9ZAZJB4YXLDxF2fWGqlE/g9Y68cebeWaRNOMN+e6Bti1fz0JKQuaEqJV+J8xOmODPHSMbZZ1SqSDVRgVHP2Q==}
-
-  '@turf/circle@5.1.5':
-    resolution: {integrity: sha512-CNaEtvp38Q+TSFJHdzdl5iYNjBFZRluRTFikIuEcennSeMJD60nP0dMubP58TR/QQn541eNDUyED90V4KuOjyQ==}
-
-  '@turf/clean-coords@5.1.5':
-    resolution: {integrity: sha512-xd/iSM0McVUxbu81KCKDqirCsYkKk3EAwpDjYI8vIQ+eKf/MLSdteRcm3PB7wo2y6JcYp4dMGv2cr9IP7V+dXQ==}
-
-  '@turf/clone@5.1.5':
-    resolution: {integrity: sha512-//pITsQ8xUdcQ9pVb4JqXiSqG4dos5Q9N4sYFoWghX21tfOV2dhc5TGqYOhnHrQS7RiKQL1vQ48kIK34gQ5oRg==}
-
-  '@turf/clone@6.5.0':
-    resolution: {integrity: sha512-mzVtTFj/QycXOn6ig+annKrM6ZlimreKYz6f/GSERytOpgzodbQyOgkfwru100O1KQhhjSudKK4DsQ0oyi9cTw==}
-
-  '@turf/clusters-dbscan@5.1.5':
-    resolution: {integrity: sha512-X3qLLHJkwMuv+xdWQ08NtOc6BgeqCKKSAltyyAZ7iImE65f0C+sW024DfHSbTMsZVXBFst2Q6RQY8RVUf3QBeQ==}
-
-  '@turf/clusters-kmeans@5.1.5':
-    resolution: {integrity: sha512-W6raiv9+fRgmJxCvKrpSacbLXzh7beZUk0A1pjF82Fv3CFTrXAJbgAyIbdlmgXezYSXhOT5NMUugnbkUy2oBZw==}
-
-  '@turf/clusters@5.1.5':
-    resolution: {integrity: sha512-+rQe+g66xfbIXz58tveXQCDdE9hzqRJtDVSw5xth92TvCcL4J60ZKN8mHNUSn1ZZvpUHtVPe4dYcbtk5bW8fXQ==}
-
-  '@turf/collect@5.1.5':
-    resolution: {integrity: sha512-voFWu6EGPcNuIbAp43yvGf2Ip4/q8TTeWhOSJ2yDEHgOfbAwrNUwUJCclEjcUVsnc7ypKNrFn3/8bmR9tI0NQg==}
-
-  '@turf/combine@5.1.5':
-    resolution: {integrity: sha512-/RqmfCvduHquINVyNmzKOcZtZjfaEHMhghgmj8MYnzepN3ro+E2QXoaQGGrQ7nChAvGgWPAvN8EveVSc1MvzPg==}
-
-  '@turf/concave@5.1.5':
-    resolution: {integrity: sha512-NvR5vmAunmgjEPjNzmvjLRvPcj7C6WuqCf+vu/aqyc4h2c1B/x399bDsSM64iFT+PYesFuoS1ZhJHWivXG8Y5g==}
-
-  '@turf/convex@5.1.5':
-    resolution: {integrity: sha512-ZEk4kIAoYR/mjO3C8rMe2StgmwhdwmbxVvNxg3udeahe2m0ZzbfkRC4HiJAaBgfR4TLJUAEewynESReTPwASBQ==}
-
-  '@turf/destination@5.1.5':
-    resolution: {integrity: sha512-EWwZnd4wxUO9d8UWzJt88jQlFf6W/6SE1930MMzzIR9o+RfqhrS/BL1eUDrg5I5drsymf6PZsK0j/V0q6jqkFQ==}
-
-  '@turf/difference@5.1.5':
-    resolution: {integrity: sha512-hIjiUHS8WiDfnmADQrhh6QcXWc3zNtjIpPQ5g/2NZ3k1mjnOdmGBVObkSJG4WEUNqyj3PKlsZ8W9xnSu+lLF1Q==}
-
-  '@turf/dissolve@5.1.5':
-    resolution: {integrity: sha512-YcQgyp7pvhyZHCmbqqItVH6vHs43R9N0jzP/LnAG03oMiY4wves/BO1du6VDDbnJSXeRKf1afmY9tRGKYrm9ag==}
-
-  '@turf/distance@5.1.5':
-    resolution: {integrity: sha512-sYCAgYZ2MjNKMtx17EijHlK9qHwpA0MuuQWbR4P30LTCl52UlG/reBfV899wKyF3HuDL9ux78IbILwOfeQ4zgA==}
-
-  '@turf/distance@6.5.0':
-    resolution: {integrity: sha512-xzykSLfoURec5qvQJcfifw/1mJa+5UwByZZ5TZ8iaqjGYN0vomhV9aiSLeYdUGtYRESZ+DYC/OzY+4RclZYgMg==}
-
-  '@turf/ellipse@5.1.5':
-    resolution: {integrity: sha512-oVTzEyDOi3d9isgB7Ah+YiOoUKB1eHMtMDXVl1oT+vC/T+6KR2aq+HjjbF11A0cjuh3VhjSWUZaS+2TYY0pu0w==}
-
-  '@turf/envelope@5.1.5':
-    resolution: {integrity: sha512-Mxl5A2euAxq3RZVN65/MVyaO91kzGU8MJXfegPdep6SN4bONDadEp0olwW5qSRf2U3cJ8Jppl089X6AeifD3IA==}
-
-  '@turf/explode@5.1.5':
-    resolution: {integrity: sha512-v/hC9DB9RKRW9/ZjnKoQelIp08JNa5wew0889465s//tfgY8+JEGkSGMag2L2NnVARWmzI/vlLgMK36qwkyDIA==}
-
-  '@turf/flatten@5.1.5':
-    resolution: {integrity: sha512-aagHz5tjHmOtb8eMb5fd10+HJwdlhkhsPql1vRXQNnpv0Q9xL/4SsbvXZ6lPqkRAjiZuy087mvaz+ERml76/jg==}
-
-  '@turf/flip@5.1.5':
-    resolution: {integrity: sha512-7+IYM3QQAkV4co3wjEmM726/OkXqUCCHWWyIqrI9hiK+LR628qkoqP1hk6rQ4vZJrAYuvSlK+FZnr24OtgY0cw==}
-
-  '@turf/great-circle@5.1.5':
-    resolution: {integrity: sha512-k6FWwlt+YCQoD5VS1NybQjriNL7apYHO+tm2HbIFQ85blPUX4IyLppHIFevfD/k+K2bJqhFCze8JNVMBwdrzVw==}
-
-  '@turf/helpers@5.1.5':
-    resolution: {integrity: sha512-/lF+JR+qNDHZ8bF9d+Cp58nxtZWJ3sqFe6n3u3Vpj+/0cqkjk4nXKYBSY0azm+GIYB5mWKxUXvuP/m0ZnKj1bw==}
-
-  '@turf/helpers@6.5.0':
-    resolution: {integrity: sha512-VbI1dV5bLFzohYYdgqwikdMVpe7pJ9X3E+dlr425wa2/sMJqYDhTO++ec38/pcPvPE6oD9WEEeU3Xu3gza+VPw==}
-
-  '@turf/hex-grid@5.1.5':
-    resolution: {integrity: sha512-rwDL+DlUyxDNL1aVHIKKCmrt1131ZULF3irExYIO/um6/SwRzsBw+522/RcxD/mg/Shtrpozb6bz8aJJ/3RXHA==}
-
-  '@turf/interpolate@5.1.5':
-    resolution: {integrity: sha512-LfmvtIUWc3NVkqPkX6j3CAIjF7y1LAZqfDd+2Ii+0fN7XOOGMWcb1uiTTAb8zDQjhTsygcUYgaz6mMYDCWYKPg==}
-
-  '@turf/intersect@5.1.6':
-    resolution: {integrity: sha512-KXyNv/GXdoGAOy03qZF53rgtXC2tNhF/4jLwTKiVRrBQH6kcEpipGStdJ+QkYIlarQPa8f7I9UlVAB19et4MfQ==}
-
-  '@turf/invariant@5.1.5':
-    resolution: {integrity: sha512-4elbC8GVQ8XxrnWLWpFFXTK3qnzIYzIVtSkJrY9eefA8WNZzwcwT3WGFY3xte4BB48o5oEjihjoJharWRis78w==}
-
-  '@turf/invariant@6.5.0':
-    resolution: {integrity: sha512-Wv8PRNCtPD31UVbdJE/KVAWKe7l6US+lJItRR/HOEW3eh+U/JwRCSUl/KZ7bmjM/C+zLNoreM2TU6OoLACs4eg==}
-
-  '@turf/isobands@5.1.5':
-    resolution: {integrity: sha512-0n3NPfDYQyqjOch00I4hVCCqjKn9Sm+a8qlWOKbkuhmGa9dCDzsu2bZL0ahT+LjwlS4c8/owQXqe6KE2GWqT1Q==}
-
-  '@turf/isolines@5.1.5':
-    resolution: {integrity: sha512-Ehn5pJmiq4hAn2+2jPB2rLt3iF8DDp8zciw9z2pAt5IGVRU/K+x3z4aYG5ra5vbFB/E4G3aHr/X4QPIb9LCJtA==}
-
-  '@turf/kinks@5.1.5':
-    resolution: {integrity: sha512-G38sC8/+MYqQpVocT3XahhV42cqEAVJAZwUND9YOfKJZfjUn7FKmWhPURs5py95me48UuI0C0jLLAMzBkUc2nQ==}
-
-  '@turf/length@5.1.5':
-    resolution: {integrity: sha512-0ryx68h512wCoNfwyksLdabxEfwkGNTPg61/QiY+QfGFUOUNhHbP+QimViFpwF5hyX7qmroaSHVclLUqyLGRbg==}
-
-  '@turf/line-arc@5.1.5':
-    resolution: {integrity: sha512-Kz5RX/qRIHVrGNqF3BRlD3ACuuCr0G5lpaVyPjNvN+vA7Q4bEDyWIYeqm3DdTn7X2MXitpTNgr2uvX4WoUy4yA==}
-
-  '@turf/line-chunk@5.1.5':
-    resolution: {integrity: sha512-mKvTUMahnb3EsYUMI8tQmygsliQkgQ1FZAY915zoTrm+WV246loa+84+h7i5d8W2O8gGJWuY7jQTpM7toTeL5w==}
-
-  '@turf/line-intersect@5.1.5':
-    resolution: {integrity: sha512-9DajJbHhJauLI2qVMnqZ7SeFsinFroVICOSUheODk7j5teuwNABuZ2Z6WmKATzEsPkEJ1iVykqB+F9vGMVKB6g==}
-
-  '@turf/line-offset@5.1.5':
-    resolution: {integrity: sha512-VccGDgFfBSiCTqrHdQgxD7Rs9lnJmDOJ5gqQRculKPsCNUyRFMYIZud7l2dTs83g66evfOwkZCrTxtSoBY3Jxg==}
-
-  '@turf/line-overlap@5.1.5':
-    resolution: {integrity: sha512-hMz3XARXEbfGwLF9WXyErqQjzhZYMKvGQwlPGOoth+2o9Uga9mfWfevduJvozJAE1MKxtFttMjIXMzcShW3O8A==}
-
-  '@turf/line-segment@5.1.5':
-    resolution: {integrity: sha512-wIrRtWuLuLXhnSkqdVG1SDayTU0/CmZf+a+BBhEf0vFIsAedJnrY3a2cbCEvtfuk6ZsAbhOi7/kYiaR/F+rEzg==}
-
-  '@turf/line-slice-along@5.1.5':
-    resolution: {integrity: sha512-yKvSDtULztLtlPIMowm9l8pS6XLAEpCPmrARZA0sIWFX8XrcSzISBaXZbiMMzg3nxQJMXfGIgWDk10B7+J8Tqw==}
-
-  '@turf/line-slice@5.1.5':
-    resolution: {integrity: sha512-Fo+CuD+fj6T702BofHO+rgiXUgzCk0iO2JqMPtttMtgzfKkVTUOQoauMNS1LNNaG/7n/TfKGh5gRCEDRNaNwYA==}
-
-  '@turf/line-split@5.1.5':
-    resolution: {integrity: sha512-gtUUBwZL3hcSu5MpqHTl68hgAJBNHcr1APDj8E5o6iX5xFX+wvl4ohQXyMs5HOATCI8Iy83wLuggcY6maNw7LQ==}
-
-  '@turf/line-to-polygon@5.1.5':
-    resolution: {integrity: sha512-hGiDAPd6j986kZZLDgEAkVD7O6DmIqHQliBedspoKperPJOUJJzdzSnF6OAWSsxY+j8fWtQnIo5TTqdO/KfamA==}
-
-  '@turf/mask@5.1.5':
-    resolution: {integrity: sha512-2eOuxA3ammZAGsjlsy/H7IpeJxjl3hrgkcKM6kTKRJGft4QyKwCxqQP7RN5j0zIYvAurgs9JOLe/dpd5sE5HXQ==}
-
-  '@turf/meta@5.1.6':
-    resolution: {integrity: sha512-lv+6LCgoc3LVitQZ4TScN/8a/fcctq8bIoxBTMJVq4aU8xoHeY1851Dq8MCU37EzbH33utkx8/jENaQP+aeElg==}
-
-  '@turf/meta@6.5.0':
-    resolution: {integrity: sha512-RrArvtsV0vdsCBegoBtOalgdSOfkBrTJ07VkpiCnq/491W67hnMWmDu7e6Ztw0C3WldRYTXkg3SumfdzZxLBHA==}
-
-  '@turf/midpoint@5.1.5':
-    resolution: {integrity: sha512-0pDQAKHyK/zxlvUx3XNxwvqftf4sV32QxnHfqSs4AXaODUGUbPhzAD7aXgDScBeUOVLwpAzFRQfitUvUMTGC6A==}
-
-  '@turf/nearest-point-on-line@5.1.5':
-    resolution: {integrity: sha512-qT7BLTwToo8cq0oNoz921oLlRPJamyRg/rZgll+kNBadyDPmJI4W66riHcpM9RQcAJ6TPvDveIIBeGJH7iG88w==}
-
-  '@turf/nearest-point-to-line@5.1.6':
-    resolution: {integrity: sha512-ZSvDIEiHhifn/vNwLXZI/E8xmEz5yBPqfUR7BVHRZrB1cP7jLhKZvkbidjG//uW8Fr1Ulc+PFOXczLspIcx/lw==}
-
-  '@turf/nearest-point@5.1.5':
-    resolution: {integrity: sha512-tZQXI7OE7keNKK4OvYOJ5gervCEuu2pJ6psu59QW9yhe2Di3Gl+HAdLvVa6RZ8s5Fndr3u0JWKsmxve3fCxc9g==}
-
-  '@turf/planepoint@5.1.5':
-    resolution: {integrity: sha512-+Tp+SQ0Db2tqwLbxfXJPysT9IxcOHSMIin2dJb/j3Qn5+g0LRus6rczZl6dWNAIjqBPMawj/V/dZhMu6Q9O9wA==}
-
-  '@turf/point-grid@5.1.5':
-    resolution: {integrity: sha512-4ibozguP9YJ297Q7i9e8/ypGSycvt1re2jrPXTxeuZ4/L/NE5B1nOBLG+tw121nMjD+S+v2RWOtqD+FZ3Ga+ew==}
-
-  '@turf/point-on-feature@5.1.5':
-    resolution: {integrity: sha512-NTcpe5xZjybRh0aTL+7td1cm0s49GGbAt5u8Cdec4W9ix2PsehRcLUbmQIQsODN2kiVyUSpnhECIpsyN5MjX7A==}
-
-  '@turf/point-to-line-distance@5.1.6':
-    resolution: {integrity: sha512-PE3hiTeeDEi4ZLPtI8XAzFYW9nHo1EVsZGm/4ZVV8jo39d3X1oLVHxY3e1PkCmWwRapXy4QLqvnTQ7nU4wspNw==}
-
-  '@turf/points-within-polygon@5.1.5':
-    resolution: {integrity: sha512-nexe2AHVOY8wEBvs+CYSOp10NyOCkyZ1gkhIfsx0mzU8LPYBxD9ctjlKveheKh4AAldLcFupd/gSCBTKF1JS7A==}
-
-  '@turf/polygon-tangents@5.1.5':
-    resolution: {integrity: sha512-uoZfKvFhl6rf0+CDWucru9fZ4mJB5Nsg37TS/7emrzjoVxXyOdxc/s1HFCjcKflMue7MjU/gT6AitJyrvdztDg==}
-
-  '@turf/polygon-to-line@5.1.5':
-    resolution: {integrity: sha512-kVo0owPqyccy5+qZGvaxGvMsYkgueKE2OOgX2UV/HyrXF3uI3TomK1txjApqeFsLvwuSANxesvVbYLrYiIwvGw==}
-
-  '@turf/polygonize@5.1.5':
-    resolution: {integrity: sha512-qzhtuzoOhldqZHm+ZPsWAs9nDpnkcDfsr+I0twmBF+wjAmo0HKiy9++sRQ4kEePpdwbMpF07D/NdZqYdmOJkGQ==}
-
-  '@turf/projection@5.1.5':
-    resolution: {integrity: sha512-TWKJDFeEKQhI4Ce1+2PuOSDggn4cnMibqyUoCpIW+4KxUC1R88SE3/SYomqzwxMn00O09glHSycPkGD5JzHd8A==}
-
-  '@turf/projection@6.5.0':
-    resolution: {integrity: sha512-/Pgh9mDvQWWu8HRxqpM+tKz8OzgauV+DiOcr3FCjD6ubDnrrmMJlsf6fFJmggw93mtVPrZRL6yyi9aYCQBOIvg==}
-
-  '@turf/random@5.1.5':
-    resolution: {integrity: sha512-oitpBwEb6YXqoUkIAOVMK+vrTPxUi2rqITmtTa/FBHr6J8TDwMWq6bufE3Gmgjxsss50O2ITJunOksxrouWGDQ==}
-
-  '@turf/rewind@5.1.5':
-    resolution: {integrity: sha512-Gdem7JXNu+G4hMllQHXRFRihJl3+pNl7qY+l4qhQFxq+hiU1cQoVFnyoleIqWKIrdK/i2YubaSwc3SCM7N5mMw==}
-
-  '@turf/rhumb-bearing@5.1.5':
-    resolution: {integrity: sha512-zXTl2khjwf7mx2D1uPo5vgpGgP4sM2VrKDbJNKyulPu4TO4ELt8x7FsKyCBlRTzzQf284t/xnNcZOfUbkkd70g==}
-
-  '@turf/rhumb-bearing@6.5.0':
-    resolution: {integrity: sha512-jMyqiMRK4hzREjQmnLXmkJ+VTNTx1ii8vuqRwJPcTlKbNWfjDz/5JqJlb5NaFDcdMpftWovkW5GevfnuzHnOYA==}
-
-  '@turf/rhumb-destination@5.1.5':
-    resolution: {integrity: sha512-FdDUCSRfRAfsRmUaWjc76Wk32QYFJ6ckmSt6Ls6nEczO6eg/RgH1atF8CIYwR5ifl0Sk1rQzKiOSbpCyvVwQtw==}
-
-  '@turf/rhumb-distance@5.1.5':
-    resolution: {integrity: sha512-AGA/ky5/BJJZtzQqafy2GvJfcUXSzCCrPFp8sDRPSKBoUN4gMBHN15ijDWYYLFoWFFj0urcauVx7chQlHZ/Qfw==}
-
-  '@turf/rhumb-distance@6.5.0':
-    resolution: {integrity: sha512-oKp8KFE8E4huC2Z1a1KNcFwjVOqa99isxNOwfo4g3SUABQ6NezjKDDrnvC4yI5YZ3/huDjULLBvhed45xdCrzg==}
-
-  '@turf/sample@5.1.5':
-    resolution: {integrity: sha512-EJE8yx+5x7rXejTzwBdOKpvT4tOCS0jwYJfycyTVDuLUSh2rETeYdjy7EeJbofnxm9CRPXqWQMPWIBKWxNTjow==}
-
-  '@turf/sector@5.1.5':
-    resolution: {integrity: sha512-dnWVifL3xWTqPPs8mfbbV9muDimNJtxRk4ogrkOLEDQ9ZZ1ALQMtQdYrg7kI3iC+L+LscV37tl+E8bayWyX8YA==}
-
-  '@turf/shortest-path@5.1.5':
-    resolution: {integrity: sha512-ZGC8kSBj02GKWiI56Z5FNdrZ+fS0xyeOUNrPJWzudAlrv9wKGaRuWoIVRLGBu0j0OuO1HCwggic2c6WV/AhP0A==}
-
-  '@turf/simplify@5.1.5':
-    resolution: {integrity: sha512-IuBXEYdGSxbDOK3v949ajaPvs6NhjhTCTbKA6mSGuVbwGS7gzAuRiPSG4K/MvCVuQy3PKpkPcUGD+Uvt2Ov2PQ==}
-
-  '@turf/square-grid@5.1.5':
-    resolution: {integrity: sha512-/pusEL4FmOwNWLcZfIXUyqUe0fOdkfaLO4wLhDlg/ZL1jWr/wZjhVlMU0tQ27kVN6dJTvlzNc9e0JWNw6yt2eQ==}
-
-  '@turf/square@5.1.5':
-    resolution: {integrity: sha512-GgP2le9ksoW6vsVef5wFkjmWQiLPTJvcjGXqmoGWT4oMwDpvTJVQ91RBLs8qQbI4KACCQevz94N69klk3ah30Q==}
-
-  '@turf/standard-deviational-ellipse@5.1.5':
-    resolution: {integrity: sha512-GOaxGKeeJAXV1H3Zz2fjQ5XeSbMKz1OkFRlTDBUipiAawe/9qTCF55L87I2ZPnO80B5BaaIT+AN2n0lMcAklzA==}
-
-  '@turf/tag@5.1.5':
-    resolution: {integrity: sha512-XI3QFpva6tEsRnzFe1tJGdAAWlzjnXZPfJ9EKShTxEW8ZgPzm92b2odjiSAt2KuQusK82ltNfdw5Frlna5xGYQ==}
-
-  '@turf/tesselate@5.1.5':
-    resolution: {integrity: sha512-Rs/jAij26bcU4OzvFXkWDase1G3kSwyuuKZPFU0t7OmJu7eQJOR12WOZLGcVxd5oBlklo4xPE4EBQUqpQUsQgg==}
-
-  '@turf/tin@5.1.5':
-    resolution: {integrity: sha512-lDyCTYKoThBIKmkBxBMupqEpFbvTDAYuZIs8qrWnmux2vntSb8OFGi7ZbGPC6apS2hdVwZZae3YB88Tp+Fg+xw==}
-
-  '@turf/transform-rotate@5.1.5':
-    resolution: {integrity: sha512-3QKckeHKPXu5O5vEuT+nkszGDI6aknDD06ePb00+6H2oA7MZj7nj+fVQIJLs41MRb76IyKr4n5NvuKZU6idESA==}
-
-  '@turf/transform-scale@5.1.5':
-    resolution: {integrity: sha512-t1fCZX29ONA7DJiqCKA4YZy0+hCzhppWNOZhglBUv9vKHsWCFYZDUKfFInciaypUInsZyvm8eKxxixBVPdPGsw==}
-
-  '@turf/transform-translate@5.1.5':
-    resolution: {integrity: sha512-GdLFp7I7198oRQt311B8EjiqHupndeMSQ3Zclzki5L/niUrb1ptOIpo+mxSidSy03m+1Q5ylWlENroI1WBcQ3Q==}
-
-  '@turf/triangle-grid@5.1.5':
-    resolution: {integrity: sha512-jmCRcynI80xsVqd+0rv0YxP6mvZn4BAaJv8dwthg2T3WfHB9OD+rNUMohMuUY8HmI0zRT3s/Ypdy2Cdri9u/tw==}
-
-  '@turf/truncate@5.1.5':
-    resolution: {integrity: sha512-WjWGsRE6o1vUqULGb/O7O1eK6B4Eu6R/RBZWnF0rH0Os6WVel6tHktkeJdlKwz9WElIEO12wDIu6uKd54t7DDQ==}
-
-  '@turf/turf@5.1.6':
-    resolution: {integrity: sha512-NIjkt5jAbOrom+56ELw9ERZF6qsdf1xAIHyC9/PkDMIOQAxe7FVe2HaqbQ+x88F0q5FaSX4dtpIEf08md6h5/A==}
-
-  '@turf/union@5.1.5':
-    resolution: {integrity: sha512-wBy1ixxC68PpsTeEDebk/EfnbI1Za5dCyY7xFY9NMzrtVEOy0l0lQ5syOsaqY4Ire+dbsDM66p2GGxmefoyIEA==}
-
-  '@turf/unkink-polygon@5.1.5':
-    resolution: {integrity: sha512-lzSrgsfSuyxIc4pkE2qyM2dsHxR992e6oItoZAT8G58A2Ef4qc5gRocmXPWZakGx41fQobegSo7wlo4I49wyHg==}
-
-  '@turf/voronoi@5.1.5':
-    resolution: {integrity: sha512-Ad0HZAyYjOpMIZfDGV+Q+30M9PQHIirTyn32kWyTjEI1O6uhL5NOYjzSha4Sr77xOls3hGzKOj+JET7eDtOvsg==}
-
   '@tweenjs/tween.js@23.1.3':
     resolution: {integrity: sha512-vJmvvwFxYuGnF2axRtPYocag6Clbb5YS7kLL+SO/TeVFzHqDIWrNKYtcsPMibjDx9O+bu+psAy9NKfWklassUA==}
 
@@ -8643,12 +8244,6 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
-  affine-complement@1.0.0:
-    resolution: {integrity: sha512-NYA6ukh+coBTIjLV9q3MJEctRvOgmKP7JyDO2wwBk6D4qV7Fdz5gBvUYdWM8ZxeNc/L/SwtDnSMZFSnVnwCkRg==}
-
-  affine-hull@1.0.0:
-    resolution: {integrity: sha512-3QNG6+vFAwJvSZHsJYDJ/mt1Cxx9n5ffA+1Ohmj7udw0JuRgUVIXK0P9N9pCMuEdS3jCNt8GFX5q2fChq+GO3Q==}
-
   agent-base@6.0.2:
     resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
     engines: {node: '>= 6.0.0'}
@@ -8879,9 +8474,6 @@ packages:
     resolution: {integrity: sha512-wvUjBtSGN7+7SjNpq/9M2Tg350UZD3q62IFZLbRAR1bSMlCo1ZaeW+BJ+D090e4hIIZLBcTDWe4Mh4jvUDajzQ==}
     engines: {node: '>= 0.4'}
 
-  avsdf-base@1.0.0:
-    resolution: {integrity: sha512-APhZNUFJwIwrLsSfE95QjobEntdUhFQgfNtC/BrYmjUpwHh5Y2fbRv8lxAlMr1hdf/CuQYsqJxK3dRzcCL77qw==}
-
   aws-sign2@0.7.0:
     resolution: {integrity: sha512-08kcGqnYf/YmjoRhfxyu+CLxBjUtHLXLXX/vUfx9l2LYzG3c1m61nrpyFUZI6zeS+Li/wWMMidD9KgrqtGq3mA==}
 
@@ -8986,9 +8578,6 @@ packages:
 
   bindings@1.5.0:
     resolution: {integrity: sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==}
-
-  bit-twiddle@1.0.2:
-    resolution: {integrity: sha512-B9UhK0DKFZhoTFcfvAzhqsjStvGJp9vYWf3+6SNTtdSQnvIgfkHbgHrg/e4+TH71N2GDu8tpmCVoyfrL1d7ntA==}
 
   bl@4.1.0:
     resolution: {integrity: sha512-1W07cM9gS6DcLperZfFSj+bWLtaPGSOHWhPiGzXmvVJbRLdG82sH/Kn8EtW1VqWVA54AKf2h5k5BbnIbwF3h6w==}
@@ -9403,9 +8992,6 @@ packages:
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
 
-  concaveman@2.0.0:
-    resolution: {integrity: sha512-3a9C//4G44/boNehBPZMRh8XxrwBvTXlhENUim+GMm207WoDie/Vq89U5lkhLn3kKA+vxwmwfdQPWIRwjQWoLA==}
-
   concurrently@8.2.2:
     resolution: {integrity: sha512-1dP4gpXFhei8IOtlXRE/T/4H88ElHgTiUzh71YUmtjTEHMSRS2Z/fgOxHSxxusGHogsRfxNq1vyAwxSC+EVyDg==}
     engines: {node: ^14.13.0 || >=16.0.0}
@@ -9439,12 +9025,6 @@ packages:
 
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
-
-  convex-hull@1.0.3:
-    resolution: {integrity: sha512-24rZAoh81t41GHPLAxcsokgjH9XNoVqU2OiSi8iMHUn6HUURfiefcEWAPt1AfwZjBBWTKadOm1xUcUMnfFukhQ==}
-
-  convex-minkowski-sum@1.0.0:
-    resolution: {integrity: sha512-U8ht0Kv99vWT1+EgOWEBIow/CrxI/USBhHuFANzpaJ94mtFgKJlzOqe+q1O/tFx1W7gw9NpC6CUfGi2vKSXHvw==}
 
   cookie-signature@1.0.6:
     resolution: {integrity: sha512-QADzlaHc8icV8I7vbaJXJwod9HWYp8uCqf1xa4OfNu1T7JVxQIrUgOWtHdNDtPiywmFbiS12VjotIXLrKM3orQ==}
@@ -9572,16 +9152,6 @@ packages:
     engines: {node: ^20.1.0 || ^22.0.0 || >=24.0.0}
     hasBin: true
 
-  cytoscape-cise@2.0.1:
-    resolution: {integrity: sha512-3nNq5z0UnVFmcFo2VtngIJqmmLwa6NGei9c9eXa8AwqNs3Fi7Cav1QEDKgQqtmxdq7hMKN7xIXYRye2x2cH5vA==}
-    peerDependencies:
-      cytoscape: ^3.2.0
-
-  cytoscape-cola@2.5.1:
-    resolution: {integrity: sha512-4/2S9bW1LvdsEPmxXN1OEAPFPbk7DvCx2c9d+TblkQAAvptGaSgtPWCByTEGgT8UxCxcVqes2aFPO5pzwo7R2w==}
-    peerDependencies:
-      cytoscape: ^3.2.0
-
   cytoscape-cose-bilkent@4.1.0:
     resolution: {integrity: sha512-wgQlVIUJF13Quxiv5e1gstZ08rnZj2XaLHGoFMYXz7SkNfCDOOteKBE6SYRfA9WxxI/iBc3ajfDoc6hb/MRAHQ==}
     peerDependencies:
@@ -9589,16 +9159,6 @@ packages:
 
   cytoscape-fcose@2.2.0:
     resolution: {integrity: sha512-ki1/VuRIHFCzxWNrsshHYPs6L7TvLu3DL+TyIGEsRcvVERmxokbf5Gdk7mFxZnTdiGtnA4cfSmjZJMviqSuZrQ==}
-    peerDependencies:
-      cytoscape: ^3.2.0
-
-  cytoscape-layout-utilities@1.1.1:
-    resolution: {integrity: sha512-JnTAVGMsNtYjmUiDvFYKN/5MHkHOrEvuK9rOt7bhYvSfUrOFziTdrZM/8B2tSQ9iwcMEX3nzNiZjUoYIJxWb4w==}
-    peerDependencies:
-      cytoscape: ^3.2.0
-
-  cytoscape-popper@4.0.1:
-    resolution: {integrity: sha512-u2gYDMMvGSlAJbNfKvMljOM/p+BrHu0A4VcpELa+xJf54HoMn+nV0iuhALZx+O89b74SKJRy7jYo2WfkD5uvsw==}
     peerDependencies:
       cytoscape: ^3.2.0
 
@@ -9636,22 +9196,13 @@ packages:
     resolution: {integrity: sha512-4EzFTRIikzs47RGmdxbeUvLWtGedDUNkTcmzoeyg4sP/dvCexO47AaQL7VKy/gul85TOxw+IBgA8US2xwbToNA==}
     engines: {node: '>=12'}
 
-  d3-delaunay@5.3.0:
-    resolution: {integrity: sha512-amALSrOllWVLaHTnDLHwMIiz0d1bBu9gZXd1FiLfXf8sHcX9jrcj81TVZOqD4UX7MgBZZ07c8GxzEgBpJqc74w==}
-
   d3-delaunay@6.0.4:
     resolution: {integrity: sha512-mdjtIZ1XLAM8bm/hx3WwjfHt6Sggek7qH043O8KEjDXN40xi3vx/6pYSVTwLjEgiXQTbvaouWKynLBiUZ6SK6A==}
     engines: {node: '>=12'}
 
-  d3-dispatch@1.0.6:
-    resolution: {integrity: sha512-fVjoElzjhCEy+Hbn8KygnmMS7Or0a9sI2UzGwoB7cCtvI1XpVN9GpoYlnb3xt2YV66oXYb1fLJ8GMvP4hdU1RA==}
-
   d3-dispatch@3.0.1:
     resolution: {integrity: sha512-rzUyPU/S7rwUflMyLc1ETDeBj0NRuHKKAcvukozwhshr6g6c5d8zh4c2gQjY2bZ0dXeGLWc1PF174P2tVvKhfg==}
     engines: {node: '>=12'}
-
-  d3-drag@1.2.5:
-    resolution: {integrity: sha512-rD1ohlkKQwMZYkQlYVCrSFxsWPzI97+W+PaEIBNTMxRuxz9RF0Hi5nJWHGVJ3Om9d2fRTe1yOBINJyy/ahV95w==}
 
   d3-drag@3.0.0:
     resolution: {integrity: sha512-pWbUJLdETVA8lQNJecMxoXfH6x+mO2UQo8rSmZ+QqxcbyA3hfeprFgIT//HW2nlHChWeIIMwS2Fq+gEARkhTkg==}
@@ -9681,9 +9232,6 @@ packages:
   d3-format@3.1.2:
     resolution: {integrity: sha512-AJDdYOdnyRDV5b6ArilzCPPwc1ejkHcoyFarqlPqT7zRYjhavcT3uSrqcMvsgh2CgoPbK3RCwyHaVyxYcP2Arg==}
     engines: {node: '>=12'}
-
-  d3-geo@1.7.1:
-    resolution: {integrity: sha512-O4AempWAr+P5qbk2bC2FuN/sDW4z+dN2wDf9QV3bxQt4M5HfOEeXLgJ/UKQW0+o1Dj8BE+L5kiDbdWUMjsmQpw==}
 
   d3-geo@3.1.1:
     resolution: {integrity: sha512-637ln3gXKXOwhalDzinUgY83KzNWZRKbYubaG+fGVuc/dxO64RRljtCTnf5ecMyE1RIdtqpkVcq0IbtU2S8j2Q==}
@@ -9730,9 +9278,6 @@ packages:
     resolution: {integrity: sha512-GZW464g1SH7ag3Y7hXjf8RoUuAFIqklOAq3MRl4OaWabTFJY9PN/E1YklhXLh+OQ3fM9yS2nOkCoS+WLZ6kvxQ==}
     engines: {node: '>=12'}
 
-  d3-selection@1.4.2:
-    resolution: {integrity: sha512-SJ0BqYihzOjDnnlfyeHT0e30k0K1+5sR3d5fNueCNeuhZTnGw4M4o8mqJchSwgKMXCNFo+e2VTChiSJ0vYtXkg==}
-
   d3-selection@3.0.0:
     resolution: {integrity: sha512-fmTRWbNMmsmWq6xJV8D19U/gw/bwrHfNXxrIN+HfZgnzqTHp9jOmKMhsTUjXOJnZOdZY9Q28y4yebKzqDKlxlQ==}
     engines: {node: '>=12'}
@@ -9752,9 +9297,6 @@ packages:
     resolution: {integrity: sha512-VqKjzBLejbSMT4IgbmVgDjpkYrNWUYJnbCGo874u7MMKIWsILRX+OpX/gTk8MqjpT1A/c6HY2dCA77ZN0lkQ2Q==}
     engines: {node: '>=12'}
 
-  d3-timer@1.0.10:
-    resolution: {integrity: sha512-B1JDm0XDaQC+uvo4DT79H0XmBskgS3l6Ve+1SBCfxgmtIb1AVrPIoqd+nPSv+loMX8szQ0sVUhGngL7D5QPiXw==}
-
   d3-timer@3.0.1:
     resolution: {integrity: sha512-ndfJ/JxxMd3nw31uyKoY2naivF+r29V+Lc0svZxe1JvvIRmi8hUsrMvdOwgS1o6uBHmiz91geQ0ylPP0aj1VUA==}
     engines: {node: '>=12'}
@@ -9764,9 +9306,6 @@ packages:
     engines: {node: '>=12'}
     peerDependencies:
       d3-selection: 2 - 3
-
-  d3-voronoi@1.1.2:
-    resolution: {integrity: sha512-RhGS1u2vavcO7ay7ZNAPo4xeDh/VYeGof3x5ZLJBQgYhLegxr3s5IykvWmJ94FTU6mcbtp4sloqZ54mP6R4Utw==}
 
   d3-zoom@3.0.0:
     resolution: {integrity: sha512-b8AmV3kfQaqWAuacbPuNbL6vahnOJflOhexLzMMNLga62+/nh0JzvJ0aO/5a5MVgUFGS7Hu1P9P03o3fJkDCyw==}
@@ -9904,10 +9443,6 @@ packages:
     resolution: {integrity: sha512-h5k/5U50IJJFpzfL6nO9jaaumfjO/f2NjK/oYB2Djzm4p9L+3T9qWpZqZ2hAbLPuuYq9wrU08WQyBTL5GbPk5Q==}
     engines: {node: '>=6'}
 
-  deep-equal@1.1.2:
-    resolution: {integrity: sha512-5tdhKF6DbU7iIzrIOa1AOUt39ZRm13cmL1cGEh//aqR8x9+tNfbywRf0n5FD/18OKMdo7DNEtrX2t22ZAkI+eg==}
-    engines: {node: '>= 0.4'}
-
   deep-extend@0.6.0:
     resolution: {integrity: sha512-LOHxIOaPYdHlJRtCQfDIVZtfw/ufM8+rVj649RIHzcm/vGwQRXFt6OPqIFWsm2XEMrNIEtWR64sY1LEKD2vAOA==}
     engines: {node: '>=4.0.0'}
@@ -9946,9 +9481,6 @@ packages:
     resolution: {integrity: sha512-QwGuEUouP2kVwQenAsOof5Fv8K9t3D8Ca8NxcXKrIpEHjTXK5J2nXLdP+ALI1cgv8wj7KuwBhTwBkOZSJKM5XQ==}
     engines: {node: '>=6'}
 
-  delaunator@4.0.1:
-    resolution: {integrity: sha512-WNPWi1IRKZfCt/qIDMfERkDp93+iZEmOxN2yy4Jg+Xhv8SLk2UTqqbe1sfiipn0and9QrE914/ihdx82Y/Giag==}
-
   delaunator@5.1.0:
     resolution: {integrity: sha512-AGrQ4QSgssa1NGmWmLPqN5NY2KajF5MqxetNEO+o0n3ZwZZeTmt7bBnvzHWrmkZFxGgr4HdyFgelzgi06otLuQ==}
 
@@ -9959,9 +9491,6 @@ packages:
   denque@2.1.0:
     resolution: {integrity: sha512-HVQE3AAb/pxF8fQAoiqpvg9i3evqug3hoiwakOyZAwJm+6vZehbkYXZ0l4JxS+I3QxM97v5aaRNhj8v5oBhekw==}
     engines: {node: '>=0.10'}
-
-  density-clustering@1.3.0:
-    resolution: {integrity: sha512-icpmBubVTwLnsaor9qH/4tG5+7+f61VcqMN3V3pm9sxxSCt2Jcs0zWOgwZW9ARJYaKD3FumIgHiMOcIMRRAzFQ==}
 
   depd@1.1.2:
     resolution: {integrity: sha512-7emPTl6Dpo6JRXOXjLRxck+FlLRX5847cLKEn00PLAgc3g2hTZZgr+e4c2v6QpSmLeFP3n5yUo7ft6avBK/5jQ==}
@@ -10085,9 +9614,6 @@ packages:
 
   duplexer@0.1.2:
     resolution: {integrity: sha512-jtD6YG370ZCIi/9GTaJKQxWTZD045+4R4hTk/x1UyoqadyJ9x9CgSi1RlVDQF8U2sxLLSnFkCaMihqljHIWgMg==}
-
-  earcut@2.2.4:
-    resolution: {integrity: sha512-/pjZsA1b4RPHbeWZQn66SWS8nZZWLQQ23oE3Eam7aroEFGEvwKAsJfZ9ytiEMycfzXWpca4FA9QIOehf7PocBQ==}
 
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
@@ -10800,9 +10326,6 @@ packages:
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
 
-  full-convex-hull@1.0.0:
-    resolution: {integrity: sha512-hLd/nsHAxjlIXpfKUBDAZ+o2HVtcFSNOUgNrtqcevhvtlY/H2DZZ1FXDrVUFNbqpaXG1uBOxbmkpXhsbdOdOUg==}
-
   function-bind@1.1.2:
     resolution: {integrity: sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==}
 
@@ -10834,18 +10357,9 @@ packages:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
     engines: {node: '>=6.9.0'}
 
-  geojson-equality@0.1.6:
-    resolution: {integrity: sha512-TqG8YbqizP3EfwP5Uw4aLu6pKkg6JQK9uq/XZ1lXQntvTHD1BBKJWhNpJ2M0ax6TuWMP3oyx6Oq7FCIfznrgpQ==}
-
-  geojson-rbush@2.1.0:
-    resolution: {integrity: sha512-9HvLGhmAJBYkYYDdPlCrlfkKGwNW3PapiS0xPekdJLobkZE4rjtduKJXsO7+kUr97SsUlz4VtMcPuSIbjjJaQg==}
-
   get-caller-file@2.0.5:
     resolution: {integrity: sha512-DyFP3BM/3YHTQOCUL/w0OZHR0lpKeGrxotcHWcqNEdnltqFwXVfhEBQ94eIo34AfQpo0rGki4cyIiftY06h2Fg==}
     engines: {node: 6.* || 8.* || >= 10.*}
-
-  get-closest@0.0.4:
-    resolution: {integrity: sha512-oMgZYUtnPMZB6XieXiUADpRIc5kfD+RPfpiYe9aIlEYGIcOx2mTGgKmUkctlLof/ANleypqOJRhQypbrh33DkA==}
 
   get-east-asian-width@1.4.0:
     resolution: {integrity: sha512-QZjmEOC+IT1uk6Rx0sX22V6uHWVwbdbxf1faPqJ1QhLdGgsRGCZoyaQBm/piRdJy/D2um6hM1UP7ZEeQ4EkP+Q==}
@@ -11355,9 +10869,6 @@ packages:
   imurmurhash@0.1.4:
     resolution: {integrity: sha512-JmXMZ6wuvDmLiHEml9ykzqO6lwFbof0GG4IkcGaENdCRDDmMVnny7s5HsIgHCbaq0w2MyPhDqkhTUgS2LU2PHA==}
     engines: {node: '>=0.8.19'}
-
-  incremental-convex-hull@1.0.1:
-    resolution: {integrity: sha512-mKRJDXtzo1R9LxCuB1TdwZXHaPaIEldoGPsXy2jrJc/kufyqp8y/VAQQxThSxM2aroLoh6uObexPk1ASJ7FB7Q==}
 
   indent-string@4.0.0:
     resolution: {integrity: sha512-EdDDZu4A2OyIK7Lr/2zG+w5jmbuk1DVBnEwREQvBzspBJkCEbRa8GxU1lghYcaGJCnRWibjDXlq779X1/y5xwg==}
@@ -12209,9 +11720,6 @@ packages:
     resolution: {integrity: sha512-/vlFKAoH5Cgt3Ie+JLhRbwOsCQePABiU3tJ1egGvyQ+33R/vcwM2Zl2QR/LzjsBeItPt3oSVXapn+m4nQDvpzw==}
     engines: {node: '>=14'}
 
-  lineclip@1.1.5:
-    resolution: {integrity: sha512-KlA/wRSjpKl7tS9iRUdlG72oQ7qZ1IlVbVgHwoO10TBR/4gQ86uhKow6nlzMAJJhjCWKto8OeoAzzIzKSmN25A==}
-
   lines-and-columns@1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
 
@@ -12803,9 +12311,6 @@ packages:
   module-details-from-path@1.0.4:
     resolution: {integrity: sha512-EGWKgxALGMgzvxYF1UyGTy0HXX/2vHLkw6+NvDKW2jypWbHpjQuj4UMcqQWXHERJhVGKikolT06G3bcKe4fi7w==}
 
-  monotone-convex-hull-2d@1.0.1:
-    resolution: {integrity: sha512-ixQ3qdXTVHvR7eAoOjKY8kGxl9YjOFtzi7qOjwmFFPfBqZHVOjUFOBy/Dk9dusamRSPJe9ggyfSypRbs0Bl8BA==}
-
   morgan@1.10.1:
     resolution: {integrity: sha512-223dMRJtI/l25dJKWpgij2cMtywuG/WiUKXdvwfbhGKBhy1puASqXwFzmWZ7+K73vUPoR7SS2Qz2cI/g9MKw0A==}
     engines: {node: '>= 0.8.0'}
@@ -13094,10 +12599,6 @@ packages:
 
   object-inspect@1.13.4:
     resolution: {integrity: sha512-W67iLl4J2EXEGTbfeHCffrjDfitvLANg0UlX3wFUUSTx92KXRFegMHUVgSqE+wvhAbi4WqjGg9czysTV2Epbew==}
-    engines: {node: '>= 0.4'}
-
-  object-is@1.1.6:
-    resolution: {integrity: sha512-F8cZ+KfGlSGi09lJT7/Nd6KJZ9ygtvYC0/UYYLI9nmQKLMnydpB9yvbv9K1uSkEu7FU9vYPmVwLg328tX+ot3Q==}
     engines: {node: '>= 0.4'}
 
   object-keys@1.1.1:
@@ -13554,9 +13055,6 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  point-in-polygon@1.1.0:
-    resolution: {integrity: sha512-3ojrFwjnnw8Q9242TzgXuTD+eKiutbzyslcq1ydfu82Db2y+Ogbmyrkpv0Hgj31qwT3lbS9+QAAO/pIQM35XRw==}
-
   points-on-curve@0.2.0:
     resolution: {integrity: sha512-0mYKnYYe9ZcqMCWhUjItv/oHjvgEsfKvnUTg8sAtnHr3GVy7rGkXCb6d5cSyqrWqL4k81b9CPg3urd+T7aop3A==}
 
@@ -13884,12 +13382,6 @@ packages:
   quick-format-unescaped@4.0.4:
     resolution: {integrity: sha512-tYC1Q1hgyRuHgloV/YXs2w15unPVh8qfu/qCTfhTYamaw7fyhumKa2yGpdSo87vY32rIclj+4fWYQXUMs9EHvg==}
 
-  quickselect@1.1.1:
-    resolution: {integrity: sha512-qN0Gqdw4c4KGPsBOQafj6yj/PA6c/L63f6CaZ/DCF/xF4Esu3jVmKLUDYxghFx8Kb/O7y9tI7x2RjTSXwdK1iQ==}
-
-  quickselect@3.0.0:
-    resolution: {integrity: sha512-XdjUArbK4Bm5fLLvlm5KpTFOiOThgfWWI4axAZDWg4E/0mKdZyI9tNEfds27qCi1ze/vwTR16kvmmGhRra3c2g==}
-
   radix-ui@1.4.3:
     resolution: {integrity: sha512-aWizCQiyeAenIdUbqEpXgRA1ya65P13NKn/W8rWkcN0OPkRDxdBVLWnIEDsS2RpwCK2nobI7oMUSmexzTDyAmA==}
     peerDependencies:
@@ -13917,12 +13409,6 @@ packages:
   raw-body@3.0.1:
     resolution: {integrity: sha512-9G8cA+tuMS75+6G/TzW8OtLzmBDMo8p1JRxN5AZ+LAp8uxGA8V8GZm4GQ4/N5QNQEnLmg6SS7wyuSmbKepiKqA==}
     engines: {node: '>= 0.10'}
-
-  rbush@2.0.2:
-    resolution: {integrity: sha512-XBOuALcTm+O/H8G90b6pzu6nX6v2zCKiFG4BJho8a+bY6AER6t8uQUZdi5bomQc0AprCWhEGa7ncAbbRap0bRA==}
-
-  rbush@4.0.1:
-    resolution: {integrity: sha512-IP0UpfeWQujYC8Jg162rMNc01Rf0gWMMAb2Uxus/Q0qOFw4lCcq6ZnQEZwUoJqWyUGJ9th7JjwI4yIWo+uvoAQ==}
 
   rc@1.2.8:
     resolution: {integrity: sha512-y3bGgqKj3QBdxLbLkomlohkvsA8gdAiUQlSBJnBhfn+BPxg4bc62d8TcBW15wavDfgexCgccckhcZvywyQYPOw==}
@@ -14266,20 +13752,8 @@ packages:
     deprecated: Rimraf versions prior to v4 are no longer supported
     hasBin: true
 
-  robust-orientation@1.2.1:
-    resolution: {integrity: sha512-FuTptgKwY6iNuU15nrIJDLjXzCChWB+T4AvksRtwPS/WZ3HuP1CElCm1t+OBfgQKfWbtZIawip+61k7+buRKAg==}
-
   robust-predicates@3.0.2:
     resolution: {integrity: sha512-IXgzBWvWQwE6PrDI05OvmXUIruQTcoMDzRsOd5CDvHCVLcLHMTSYvOK5Cm46kWqlV3yAbuSpBZdJ5oP5OUoStg==}
-
-  robust-scale@1.0.2:
-    resolution: {integrity: sha512-jBR91a/vomMAzazwpsPTPeuTPPmWBacwA+WYGNKcRGSh6xweuQ2ZbjRZ4v792/bZOhRKXRiQH0F48AvuajY0tQ==}
-
-  robust-subtract@1.0.0:
-    resolution: {integrity: sha512-xhKUno+Rl+trmxAIVwjQMiVdpF5llxytozXJOdoT4eTIqmqsndQqFb1A0oiW3sZGlhMRhOi6pAD4MF1YYW6o/A==}
-
-  robust-sum@1.0.0:
-    resolution: {integrity: sha512-AvLExwpaqUqD1uwLU6MwzzfRdaI6VEZsyvQ3IAQ0ZJ08v1H+DTyqskrf2ZJyh0BDduFVLN7H04Zmc+qTiahhAw==}
 
   rollup-plugin-terser@7.0.2:
     resolution: {integrity: sha512-w3iIaU4OxcF52UUXiZNsNeuXIMDvFrr+ZXK6bFZ0Q60qyVfq4uLptoS4bbq3paG3x216eQllFZX7zt6TIImguQ==}
@@ -14498,9 +13972,6 @@ packages:
   siginfo@2.0.0:
     resolution: {integrity: sha512-ybx0WO1/8bSBLEWXZvEd7gMW3Sn3JFlW3TvX1nREbDLRNQNaeNN8WK0meBwPdAaOI7TtRRRJn/Es1zhrrCHu7g==}
 
-  sigma@3.0.2:
-    resolution: {integrity: sha512-/BUbeOwPGruiBOm0YQQ6ZMcLIZ6tf/W+Jcm7dxZyAX0tK3WP9/sq7/NAWBxPIxVahdGjCJoGwej0Gdrv0DxlQQ==}
-
   signal-exit@3.0.7:
     resolution: {integrity: sha512-wnD2ZE+l+SPC/uoS0vXeE9L1+0wuaMqKlfz9AMUo38JsyLSBWSFcHR1Rri62LZc12vLr1gb3jl7iwQhgwpAbGQ==}
 
@@ -14524,9 +13995,6 @@ packages:
   simple-wcswidth@1.1.2:
     resolution: {integrity: sha512-j7piyCjAeTDSjzTSQ7DokZtMNwNlEAyxqSZeCS+CXH7fJ4jx3FuJ/mTW3mE+6JLs4VJBbcll0Kjn+KXI5t21Iw==}
 
-  simplicial-complex@1.0.0:
-    resolution: {integrity: sha512-mHauIKSOy3GquM5VnYEiu7eP5y4A8BiaN9ezUUgyYFz1k68PqDYcyaH3kenp2cyvWZE96QKE3nrxYw65Allqiw==}
-
   sirv@2.0.4:
     resolution: {integrity: sha512-94Bdh3cC2PKrbgSOUqTiGPWVZeSiXfKOVZNJniWoqrWrRkB1CJzBU3NEbiTsPcYy1lDsANA/THzS+9WBiy5nfQ==}
     engines: {node: '>= 10'}
@@ -14540,9 +14008,6 @@ packages:
 
   size-sensor@1.0.2:
     resolution: {integrity: sha512-2NCmWxY7A9pYKGXNBfteo4hy14gWu47rg5692peVMst6lQLPKrVjhY+UTEsPI5ceFRJSl3gVgMYaUi/hKuaiKw==}
-
-  skmeans@0.9.7:
-    resolution: {integrity: sha512-hNj1/oZ7ygsfmPZ7ZfN5MUBRoGg1gtpnImuJBgLO0ljQ67DtJuiQaiYdS4lUA6s0KCwnPhGivtC/WRwIZLkHyg==}
 
   slash@3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
@@ -15073,9 +14538,6 @@ packages:
     resolution: {integrity: sha512-Zba82s87IFq9A9XmjiX5uZA/ARWDrB03OHlq+Vw1fSdt0I+4/Kutwy8BP4Y/y/aORMo61FQ0vIb5j44vSo5Pkg==}
     engines: {node: ^18.0.0 || >=20.0.0}
 
-  tinyqueue@3.0.0:
-    resolution: {integrity: sha512-gRa9gwYU3ECmQYv3lslts5hxuIa90veaEcxDYuu3QGOIAEM2mOZkVHp48ANJuu1CURtRdHKUBY5Lm1tHV+sD4g==}
-
   tinyrainbow@1.2.0:
     resolution: {integrity: sha512-weEDEq7Z5eTHPDh4xjX789+fHfF+P8boiFB+0vbWzpbnbsEr/GRaohi/uMKxg8RZMXnl1ItAi/IUHWMsjDV7kQ==}
     engines: {node: '>=14.0.0'}
@@ -15138,14 +14600,6 @@ packages:
   token-types@4.2.1:
     resolution: {integrity: sha512-6udB24Q737UD/SDsKAHI9FCRP7Bqc9D/MQUV02ORQg5iskjtLJlZJNdN4kKtcdtwCeWIwIHDGaUsTsCCAa8sFQ==}
     engines: {node: '>=10'}
-
-  topojson-client@3.1.0:
-    resolution: {integrity: sha512-605uxS6bcYxGXw9qi62XyrV6Q3xwbndjachmNxu8HWTtVPxZfEJN9fd/SZS1Q54Sn2y0TMyMxFj/cJINqGHrKw==}
-    hasBin: true
-
-  topojson-server@3.0.1:
-    resolution: {integrity: sha512-/VS9j/ffKr2XAOjlZ9CgyyeLmgJ9dMwq6Y0YEON8O7p/tGGk+dCWnrE03zEdu7i4L7YsFZLEPZPzCvcB7lEEXw==}
-    hasBin: true
 
   totalist@3.0.1:
     resolution: {integrity: sha512-sf4i37nQ2LBx4m3wB74y+ubopq6W/dIzXg0FDGjsYnZHVa1Da8FH853wlL2gtUhg+xJXjfk3kUZS3BRoQeoQBQ==}
@@ -15307,17 +14761,8 @@ packages:
     resolution: {integrity: sha512-5c9Fdsr9qfpT3hA0EyYSFRZj1dVVsb6KIWubA9JBYZ/9ZEAijgUEae0BBR/Xl/wekt4w65/lYLTFaP3JmwSO8w==}
     hasBin: true
 
-  turf-jsts@1.2.3:
-    resolution: {integrity: sha512-Ja03QIJlPuHt4IQ2FfGex4F4JAr8m3jpaHbFbQrgwr7s7L6U8ocrHiF3J1+wf9jzhGKxvDeaCAnGDot8OjGFyA==}
-
   tweetnacl@0.14.5:
     resolution: {integrity: sha512-KXXFFdAbFXY4geFIwoyNK+f5Z1b7swfXABfL7HXCmoIWMKU3dmS26672A4EeQtDzLKy7SXmfBu51JolvEKwtGA==}
-
-  two-product@1.0.2:
-    resolution: {integrity: sha512-vOyrqmeYvzjToVM08iU52OFocWT6eB/I5LUWYnxeAPGXAhAxXYU/Yr/R2uY5/5n4bvJQL9AQulIuxpIsMoT8XQ==}
-
-  two-sum@1.0.0:
-    resolution: {integrity: sha512-phP48e8AawgsNUjEY2WvoIWqdie8PoiDZGxTDv70LDr01uX5wLEQbOgSP7Z/B6+SW5oLtbe8qaYX2fKJs3CGTw==}
 
   type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
@@ -15444,12 +14889,6 @@ packages:
 
   unified@11.0.5:
     resolution: {integrity: sha512-xKvGhPWw3k84Qjh8bI3ZeJjqnyadK+GEFtazSfZv/rKeTkTjOJho6mFqh2SM96iIcZokxiOpg78GazTSg8+KHA==}
-
-  union-find@1.0.2:
-    resolution: {integrity: sha512-wFA9bMD/40k7ZcpKVXfu6X1qD3ri5ryO8HUsuA1RnxPCQl66Mu6DgkxyR+XNnd+osD0aLENixcJVFj+uf+O4gw==}
-
-  uniq@1.0.1:
-    resolution: {integrity: sha512-Gw+zz50YNKPDKXs+9d+aKAjVwpjNwqzvNpLigIruT4HA9lMZNdMqs9x07kKHB/L9WRzqp4+DlTU5s4wG2esdoA==}
 
   unique-string@2.0.0:
     resolution: {integrity: sha512-uNaeirEPvpZWSgzwsPGtU2zVSTrn/8L5q/IexZmH0eH6SA73CmAA5U4GwORTxQAZs95TAXLNqeLoPPNO5gZfWg==}
@@ -15921,9 +15360,6 @@ packages:
 
   web-vitals@5.1.0:
     resolution: {integrity: sha512-ArI3kx5jI0atlTtmV0fWU3fjpLmq/nD3Zr1iFFlJLaqa5wLBkUSzINwBPySCX/8jRyjlmy1Volw1kz1g9XE4Jg==}
-
-  webcola@3.4.0:
-    resolution: {integrity: sha512-4BiLXjXw3SJHo3Xd+rF+7fyClT6n7I+AR6TkBqyQ4kTsePSAMDLRCXY1f3B/kXJeP9tYn4G1TblxTO+jAt0gaw==}
 
   webidl-conversions@3.0.1:
     resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}
@@ -17787,7 +17223,7 @@ snapshots:
       '@babel/types': 7.29.0
       '@jridgewell/remapping': 2.3.5
       convert-source-map: 2.0.0
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       gensync: 1.0.0-beta.2
       json5: 2.2.3
       semver: 6.3.1
@@ -17839,7 +17275,7 @@ snapshots:
       '@babel/core': 7.28.4
       '@babel/helper-compilation-targets': 7.27.2
       '@babel/helper-plugin-utils': 7.27.1
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       lodash.debounce: 4.0.8
       resolve: 1.22.10
     transitivePeerDependencies:
@@ -18463,7 +17899,7 @@ snapshots:
       '@babel/parser': 7.29.0
       '@babel/template': 7.28.6
       '@babel/types': 7.29.0
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -18946,7 +18382,7 @@ snapshots:
       '@copilotkit/shared': 1.10.4
       '@graphql-yoga/plugin-defer-stream': 3.16.0(graphql-yoga@5.16.0(graphql@16.11.0))(graphql@16.11.0)
       '@langchain/aws': 0.1.15(@langchain/core@0.3.77(@opentelemetry/api@1.9.0)(@opentelemetry/exporter-trace-otlp-proto@0.208.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(openai@4.104.0(ws@8.18.3)(zod@3.25.76)))
-      '@langchain/community': 0.3.56(1a99fdbc38e0f9f312c2fc56d3973a6a)
+      '@langchain/community': 0.3.56(e1dda9f0e5753843cefdb4206e352114)
       '@langchain/core': 0.3.77(@opentelemetry/api@1.9.0)(@opentelemetry/exporter-trace-otlp-proto@0.208.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(openai@4.104.0(ws@8.18.3)(zod@3.25.76))
       '@langchain/google-gauth': 0.1.8(@langchain/core@0.3.77(@opentelemetry/api@1.9.0)(@opentelemetry/exporter-trace-otlp-proto@0.208.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(openai@4.104.0(ws@8.18.3)(zod@3.25.76)))(zod@3.25.76)
       '@langchain/langgraph-sdk': 0.0.70(@langchain/core@0.3.77(@opentelemetry/api@1.9.0)(@opentelemetry/exporter-trace-otlp-proto@0.208.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(openai@4.104.0(ws@8.18.3)(zod@3.25.76)))(react@19.1.1)
@@ -19488,7 +18924,7 @@ snapshots:
   '@eslint/config-array@0.21.0':
     dependencies:
       '@eslint/object-schema': 2.1.6
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       minimatch: 3.1.2
     transitivePeerDependencies:
       - supports-color
@@ -19502,7 +18938,7 @@ snapshots:
   '@eslint/eslintrc@3.3.1':
     dependencies:
       ajv: 6.12.6
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       espree: 10.4.0
       globals: 14.0.0
       ignore: 5.3.2
@@ -20117,70 +19553,6 @@ snapshots:
       - openai
       - ws
 
-  '@langchain/community@0.3.56(1a99fdbc38e0f9f312c2fc56d3973a6a)':
-    dependencies:
-      '@browserbasehq/stagehand': 1.14.0(@playwright/test@1.55.1)(deepmerge@4.3.1)(dotenv@17.2.3)(openai@4.104.0(ws@8.18.3)(zod@4.1.12))(zod@4.1.12)
-      '@ibm-cloud/watsonx-ai': 1.6.13
-      '@langchain/core': 0.3.77(@opentelemetry/api@1.9.0)(@opentelemetry/exporter-trace-otlp-proto@0.208.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(openai@4.104.0(ws@8.18.3)(zod@3.25.76))
-      '@langchain/openai': 0.4.9(@langchain/core@0.3.77(@opentelemetry/api@1.9.0)(@opentelemetry/exporter-trace-otlp-proto@0.208.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(openai@4.104.0(ws@8.18.3)(zod@3.25.76)))(ws@8.18.3)
-      '@langchain/weaviate': 0.2.3(@langchain/core@0.3.77(@opentelemetry/api@1.9.0)(@opentelemetry/exporter-trace-otlp-proto@0.208.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(openai@4.104.0(ws@8.18.3)(zod@3.25.76)))
-      binary-extensions: 2.3.0
-      expr-eval: 2.0.2
-      flat: 5.0.2
-      ibm-cloud-sdk-core: 5.4.3
-      js-yaml: 4.1.0
-      langchain: 0.3.34(3a2d52c197605c78ff92d4a99c844a3f)
-      langsmith: 0.3.82(@opentelemetry/api@1.9.0)(@opentelemetry/exporter-trace-otlp-proto@0.208.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(openai@4.104.0(ws@8.18.3)(zod@3.25.76))
-      openai: 4.104.0(ws@8.18.3)(zod@3.25.76)
-      uuid: 10.0.0
-      zod: 3.25.76
-    optionalDependencies:
-      '@aws-crypto/sha256-js': 5.2.0
-      '@aws-sdk/client-bedrock-agent-runtime': 3.896.0
-      '@aws-sdk/client-bedrock-runtime': 3.896.0
-      '@aws-sdk/client-kendra': 3.896.0
-      '@aws-sdk/client-s3': 3.901.0
-      '@aws-sdk/credential-provider-node': 3.932.0
-      '@browserbasehq/sdk': 2.6.0
-      '@smithy/util-utf8': 2.3.0
-      '@supabase/supabase-js': 2.100.0
-      better-sqlite3: 11.10.0
-      crypto-js: 4.2.0
-      fast-xml-parser: 5.2.5
-      google-auth-library: 8.9.0
-      ignore: 5.3.2
-      ioredis: 5.8.1
-      jsdom: 27.3.0(canvas@3.2.0)(postcss@8.5.6)
-      jsonwebtoken: 9.0.2
-      lodash: 4.17.21
-      mammoth: 1.11.0
-      neo4j-driver: 5.28.2
-      pdf-parse: 1.1.1
-      pg: 8.16.3
-      playwright: 1.55.1
-      weaviate-client: 3.8.1
-      ws: 8.18.3
-    transitivePeerDependencies:
-      - '@langchain/anthropic'
-      - '@langchain/aws'
-      - '@langchain/cerebras'
-      - '@langchain/cohere'
-      - '@langchain/deepseek'
-      - '@langchain/google-genai'
-      - '@langchain/google-vertexai'
-      - '@langchain/google-vertexai-web'
-      - '@langchain/groq'
-      - '@langchain/mistralai'
-      - '@langchain/ollama'
-      - '@langchain/xai'
-      - '@opentelemetry/api'
-      - '@opentelemetry/exporter-trace-otlp-proto'
-      - '@opentelemetry/sdk-trace-base'
-      - axios
-      - encoding
-      - handlebars
-      - peggy
-
   '@langchain/community@0.3.56(5a02d5ad76b42ba8967953d41dcd1037)':
     dependencies:
       '@browserbasehq/stagehand': 1.14.0(@playwright/test@1.55.1)(deepmerge@4.3.1)(dotenv@17.2.3)(openai@6.6.0(ws@8.18.3)(zod@4.1.12))(zod@4.1.12)
@@ -20215,6 +19587,70 @@ snapshots:
       ignore: 5.3.2
       ioredis: 5.8.1
       jsdom: 26.1.0(canvas@3.2.0)
+      jsonwebtoken: 9.0.2
+      lodash: 4.17.21
+      mammoth: 1.11.0
+      neo4j-driver: 5.28.2
+      pdf-parse: 1.1.1
+      pg: 8.16.3
+      playwright: 1.55.1
+      weaviate-client: 3.8.1
+      ws: 8.18.3
+    transitivePeerDependencies:
+      - '@langchain/anthropic'
+      - '@langchain/aws'
+      - '@langchain/cerebras'
+      - '@langchain/cohere'
+      - '@langchain/deepseek'
+      - '@langchain/google-genai'
+      - '@langchain/google-vertexai'
+      - '@langchain/google-vertexai-web'
+      - '@langchain/groq'
+      - '@langchain/mistralai'
+      - '@langchain/ollama'
+      - '@langchain/xai'
+      - '@opentelemetry/api'
+      - '@opentelemetry/exporter-trace-otlp-proto'
+      - '@opentelemetry/sdk-trace-base'
+      - axios
+      - encoding
+      - handlebars
+      - peggy
+
+  '@langchain/community@0.3.56(e1dda9f0e5753843cefdb4206e352114)':
+    dependencies:
+      '@browserbasehq/stagehand': 1.14.0(@playwright/test@1.55.1)(deepmerge@4.3.1)(dotenv@17.2.3)(openai@4.104.0(ws@8.18.3)(zod@4.1.12))(zod@4.1.12)
+      '@ibm-cloud/watsonx-ai': 1.6.13
+      '@langchain/core': 0.3.77(@opentelemetry/api@1.9.0)(@opentelemetry/exporter-trace-otlp-proto@0.208.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(openai@4.104.0(ws@8.18.3)(zod@3.25.76))
+      '@langchain/openai': 0.4.9(@langchain/core@0.3.77(@opentelemetry/api@1.9.0)(@opentelemetry/exporter-trace-otlp-proto@0.208.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(openai@4.104.0(ws@8.18.3)(zod@3.25.76)))(ws@8.18.3)
+      '@langchain/weaviate': 0.2.3(@langchain/core@0.3.77(@opentelemetry/api@1.9.0)(@opentelemetry/exporter-trace-otlp-proto@0.208.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(openai@4.104.0(ws@8.18.3)(zod@3.25.76)))
+      binary-extensions: 2.3.0
+      expr-eval: 2.0.2
+      flat: 5.0.2
+      ibm-cloud-sdk-core: 5.4.3
+      js-yaml: 4.1.0
+      langchain: 0.3.34(3a2d52c197605c78ff92d4a99c844a3f)
+      langsmith: 0.3.82(@opentelemetry/api@1.9.0)(@opentelemetry/exporter-trace-otlp-proto@0.208.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(openai@4.104.0(ws@8.18.3)(zod@3.25.76))
+      openai: 4.104.0(ws@8.18.3)(zod@3.25.76)
+      uuid: 10.0.0
+      zod: 3.25.76
+    optionalDependencies:
+      '@aws-crypto/sha256-js': 5.2.0
+      '@aws-sdk/client-bedrock-agent-runtime': 3.896.0
+      '@aws-sdk/client-bedrock-runtime': 3.896.0
+      '@aws-sdk/client-kendra': 3.896.0
+      '@aws-sdk/client-s3': 3.901.0
+      '@aws-sdk/credential-provider-node': 3.932.0
+      '@browserbasehq/sdk': 2.6.0
+      '@smithy/util-utf8': 2.3.0
+      '@supabase/supabase-js': 2.100.0
+      better-sqlite3: 11.10.0
+      crypto-js: 4.2.0
+      fast-xml-parser: 5.2.5
+      google-auth-library: 8.9.0
+      ignore: 5.3.2
+      ioredis: 5.8.1
+      jsdom: 27.3.0(canvas@3.2.0)(postcss@8.5.6)
       jsonwebtoken: 9.0.2
       lodash: 4.17.21
       mammoth: 1.11.0
@@ -20476,7 +19912,7 @@ snapshots:
       dotenv: 16.6.1
       execa: 9.6.0
       exit-hook: 4.0.0
-      extract-zip: 2.0.1
+      extract-zip: 2.0.1(supports-color@8.1.1)
       langsmith: 0.3.82(@opentelemetry/api@1.9.0)(@opentelemetry/exporter-trace-otlp-proto@0.208.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(openai@6.6.0(ws@8.18.3)(zod@4.1.12))
       open: 10.2.0
       package-manager-detector: 1.4.1
@@ -21930,12 +21366,6 @@ snapshots:
       react: 19.1.1
       react-dom: 19.1.1(react@19.1.1)
 
-  '@react-sigma/core@5.0.4(graphology@0.26.0(graphology-types@0.24.8))(react@19.1.1)(sigma@3.0.2(graphology-types@0.24.8))':
-    dependencies:
-      graphology: 0.26.0(graphology-types@0.24.8)
-      react: 19.1.1
-      sigma: 3.0.2(graphology-types@0.24.8)
-
   '@react-stately/flags@3.1.2':
     dependencies:
       '@swc/helpers': 0.5.17
@@ -22201,15 +21631,6 @@ snapshots:
       - sqlite3
       - supports-color
       - tedious
-
-  '@sigma/layer-leaflet@3.0.0(leaflet@1.9.4)(sigma@3.0.2(graphology-types@0.24.8))':
-    dependencies:
-      leaflet: 1.9.4
-      sigma: 3.0.2(graphology-types@0.24.8)
-
-  '@sigma/node-image@3.0.0(sigma@3.0.2(graphology-types@0.24.8))':
-    dependencies:
-      sigma: 3.0.2(graphology-types@0.24.8)
 
   '@sinclair/typebox@0.27.8': {}
 
@@ -23582,829 +23003,6 @@ snapshots:
       minimatch: 10.0.3
       path-browserify: 1.0.1
 
-  '@turf/along@5.1.5':
-    dependencies:
-      '@turf/bearing': 5.1.5
-      '@turf/destination': 5.1.5
-      '@turf/distance': 5.1.5
-      '@turf/helpers': 5.1.5
-
-  '@turf/area@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/meta': 5.1.6
-
-  '@turf/bbox-clip@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-      lineclip: 1.1.5
-
-  '@turf/bbox-polygon@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-
-  '@turf/bbox@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/meta': 5.1.6
-
-  '@turf/bearing@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-
-  '@turf/bearing@6.5.0':
-    dependencies:
-      '@turf/helpers': 6.5.0
-      '@turf/invariant': 6.5.0
-
-  '@turf/bezier-spline@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-
-  '@turf/boolean-clockwise@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-
-  '@turf/boolean-contains@5.1.5':
-    dependencies:
-      '@turf/bbox': 5.1.5
-      '@turf/boolean-point-in-polygon': 5.1.5
-      '@turf/boolean-point-on-line': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-
-  '@turf/boolean-crosses@5.1.5':
-    dependencies:
-      '@turf/boolean-point-in-polygon': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-      '@turf/line-intersect': 5.1.5
-      '@turf/polygon-to-line': 5.1.5
-
-  '@turf/boolean-disjoint@5.1.6':
-    dependencies:
-      '@turf/boolean-point-in-polygon': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/line-intersect': 5.1.5
-      '@turf/meta': 5.1.6
-      '@turf/polygon-to-line': 5.1.5
-
-  '@turf/boolean-equal@5.1.5':
-    dependencies:
-      '@turf/clean-coords': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-      geojson-equality: 0.1.6
-
-  '@turf/boolean-overlap@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-      '@turf/line-intersect': 5.1.5
-      '@turf/line-overlap': 5.1.5
-      '@turf/meta': 5.1.6
-      geojson-equality: 0.1.6
-
-  '@turf/boolean-parallel@5.1.5':
-    dependencies:
-      '@turf/clean-coords': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/line-segment': 5.1.5
-      '@turf/rhumb-bearing': 5.1.5
-
-  '@turf/boolean-point-in-polygon@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-
-  '@turf/boolean-point-on-line@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-
-  '@turf/boolean-within@5.1.5':
-    dependencies:
-      '@turf/bbox': 5.1.5
-      '@turf/boolean-point-in-polygon': 5.1.5
-      '@turf/boolean-point-on-line': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-
-  '@turf/buffer@5.1.5':
-    dependencies:
-      '@turf/bbox': 5.1.5
-      '@turf/center': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/meta': 5.1.6
-      '@turf/projection': 5.1.5
-      d3-geo: 1.7.1
-      turf-jsts: 1.2.3
-
-  '@turf/center-mean@5.1.5':
-    dependencies:
-      '@turf/bbox': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/meta': 5.1.6
-
-  '@turf/center-median@5.1.5':
-    dependencies:
-      '@turf/center-mean': 5.1.5
-      '@turf/centroid': 5.1.5
-      '@turf/distance': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/meta': 5.1.6
-
-  '@turf/center-of-mass@5.1.5':
-    dependencies:
-      '@turf/centroid': 5.1.5
-      '@turf/convex': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-      '@turf/meta': 5.1.6
-
-  '@turf/center@5.1.5':
-    dependencies:
-      '@turf/bbox': 5.1.5
-      '@turf/helpers': 5.1.5
-
-  '@turf/centroid@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/meta': 5.1.6
-
-  '@turf/circle@5.1.5':
-    dependencies:
-      '@turf/destination': 5.1.5
-      '@turf/helpers': 5.1.5
-
-  '@turf/clean-coords@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-
-  '@turf/clone@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-
-  '@turf/clone@6.5.0':
-    dependencies:
-      '@turf/helpers': 6.5.0
-
-  '@turf/clusters-dbscan@5.1.5':
-    dependencies:
-      '@turf/clone': 5.1.5
-      '@turf/distance': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-      '@turf/meta': 5.1.6
-      density-clustering: 1.3.0
-
-  '@turf/clusters-kmeans@5.1.5':
-    dependencies:
-      '@turf/clone': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-      '@turf/meta': 5.1.6
-      skmeans: 0.9.7
-
-  '@turf/clusters@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/meta': 5.1.6
-
-  '@turf/collect@5.1.5':
-    dependencies:
-      '@turf/bbox': 5.1.5
-      '@turf/boolean-point-in-polygon': 5.1.5
-      '@turf/helpers': 5.1.5
-      rbush: 2.0.2
-
-  '@turf/combine@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/meta': 5.1.6
-
-  '@turf/concave@5.1.5':
-    dependencies:
-      '@turf/clone': 5.1.5
-      '@turf/distance': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-      '@turf/meta': 5.1.6
-      '@turf/tin': 5.1.5
-      topojson-client: 3.1.0
-      topojson-server: 3.0.1
-
-  '@turf/convex@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/meta': 5.1.6
-      concaveman: 2.0.0
-
-  '@turf/destination@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-
-  '@turf/difference@5.1.5':
-    dependencies:
-      '@turf/area': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-      '@turf/meta': 5.1.6
-      turf-jsts: 1.2.3
-
-  '@turf/dissolve@5.1.5':
-    dependencies:
-      '@turf/boolean-overlap': 5.1.5
-      '@turf/clone': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-      '@turf/line-intersect': 5.1.5
-      '@turf/meta': 5.1.6
-      '@turf/union': 5.1.5
-      geojson-rbush: 2.1.0
-      get-closest: 0.0.4
-
-  '@turf/distance@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-
-  '@turf/distance@6.5.0':
-    dependencies:
-      '@turf/helpers': 6.5.0
-      '@turf/invariant': 6.5.0
-
-  '@turf/ellipse@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-      '@turf/rhumb-destination': 5.1.5
-      '@turf/transform-rotate': 5.1.5
-
-  '@turf/envelope@5.1.5':
-    dependencies:
-      '@turf/bbox': 5.1.5
-      '@turf/bbox-polygon': 5.1.5
-      '@turf/helpers': 5.1.5
-
-  '@turf/explode@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/meta': 5.1.6
-
-  '@turf/flatten@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/meta': 5.1.6
-
-  '@turf/flip@5.1.5':
-    dependencies:
-      '@turf/clone': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/meta': 5.1.6
-
-  '@turf/great-circle@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-
-  '@turf/helpers@5.1.5': {}
-
-  '@turf/helpers@6.5.0': {}
-
-  '@turf/hex-grid@5.1.5':
-    dependencies:
-      '@turf/distance': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/intersect': 5.1.6
-      '@turf/invariant': 5.1.5
-
-  '@turf/interpolate@5.1.5':
-    dependencies:
-      '@turf/bbox': 5.1.5
-      '@turf/centroid': 5.1.5
-      '@turf/clone': 5.1.5
-      '@turf/distance': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/hex-grid': 5.1.5
-      '@turf/invariant': 5.1.5
-      '@turf/meta': 5.1.6
-      '@turf/point-grid': 5.1.5
-      '@turf/square-grid': 5.1.5
-      '@turf/triangle-grid': 5.1.5
-
-  '@turf/intersect@5.1.6':
-    dependencies:
-      '@turf/clean-coords': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-      '@turf/truncate': 5.1.5
-      turf-jsts: 1.2.3
-
-  '@turf/invariant@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-
-  '@turf/invariant@6.5.0':
-    dependencies:
-      '@turf/helpers': 6.5.0
-
-  '@turf/isobands@5.1.5':
-    dependencies:
-      '@turf/area': 5.1.5
-      '@turf/bbox': 5.1.5
-      '@turf/boolean-point-in-polygon': 5.1.5
-      '@turf/explode': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-      '@turf/meta': 5.1.6
-
-  '@turf/isolines@5.1.5':
-    dependencies:
-      '@turf/bbox': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-      '@turf/meta': 5.1.6
-
-  '@turf/kinks@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-
-  '@turf/length@5.1.5':
-    dependencies:
-      '@turf/distance': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/meta': 5.1.6
-
-  '@turf/line-arc@5.1.5':
-    dependencies:
-      '@turf/circle': 5.1.5
-      '@turf/destination': 5.1.5
-      '@turf/helpers': 5.1.5
-
-  '@turf/line-chunk@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/length': 5.1.5
-      '@turf/line-slice-along': 5.1.5
-      '@turf/meta': 5.1.6
-
-  '@turf/line-intersect@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-      '@turf/line-segment': 5.1.5
-      '@turf/meta': 5.1.6
-      geojson-rbush: 2.1.0
-
-  '@turf/line-offset@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-      '@turf/meta': 5.1.6
-
-  '@turf/line-overlap@5.1.5':
-    dependencies:
-      '@turf/boolean-point-on-line': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-      '@turf/line-segment': 5.1.5
-      '@turf/meta': 5.1.6
-      '@turf/nearest-point-on-line': 5.1.5
-      geojson-rbush: 2.1.0
-
-  '@turf/line-segment@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-      '@turf/meta': 5.1.6
-
-  '@turf/line-slice-along@5.1.5':
-    dependencies:
-      '@turf/bearing': 5.1.5
-      '@turf/destination': 5.1.5
-      '@turf/distance': 5.1.5
-      '@turf/helpers': 5.1.5
-
-  '@turf/line-slice@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-      '@turf/nearest-point-on-line': 5.1.5
-
-  '@turf/line-split@5.1.5':
-    dependencies:
-      '@turf/bbox': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-      '@turf/line-intersect': 5.1.5
-      '@turf/line-segment': 5.1.5
-      '@turf/meta': 5.1.6
-      '@turf/nearest-point-on-line': 5.1.5
-      '@turf/square': 5.1.5
-      '@turf/truncate': 5.1.5
-      geojson-rbush: 2.1.0
-
-  '@turf/line-to-polygon@5.1.5':
-    dependencies:
-      '@turf/bbox': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-
-  '@turf/mask@5.1.5':
-    dependencies:
-      '@turf/bbox': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/meta': 5.1.6
-      '@turf/union': 5.1.5
-      rbush: 2.0.2
-
-  '@turf/meta@5.1.6':
-    dependencies:
-      '@turf/helpers': 5.1.5
-
-  '@turf/meta@6.5.0':
-    dependencies:
-      '@turf/helpers': 6.5.0
-
-  '@turf/midpoint@5.1.5':
-    dependencies:
-      '@turf/bearing': 5.1.5
-      '@turf/destination': 5.1.5
-      '@turf/distance': 5.1.5
-      '@turf/helpers': 5.1.5
-
-  '@turf/nearest-point-on-line@5.1.5':
-    dependencies:
-      '@turf/bearing': 5.1.5
-      '@turf/destination': 5.1.5
-      '@turf/distance': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-      '@turf/line-intersect': 5.1.5
-      '@turf/meta': 5.1.6
-
-  '@turf/nearest-point-to-line@5.1.6':
-    dependencies:
-      '@turf/helpers': 6.5.0
-      '@turf/invariant': 6.5.0
-      '@turf/meta': 6.5.0
-      '@turf/point-to-line-distance': 5.1.6
-      object-assign: 4.1.1
-
-  '@turf/nearest-point@5.1.5':
-    dependencies:
-      '@turf/clone': 5.1.5
-      '@turf/distance': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/meta': 5.1.6
-
-  '@turf/planepoint@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-
-  '@turf/point-grid@5.1.5':
-    dependencies:
-      '@turf/boolean-within': 5.1.5
-      '@turf/distance': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-
-  '@turf/point-on-feature@5.1.5':
-    dependencies:
-      '@turf/boolean-point-in-polygon': 5.1.5
-      '@turf/center': 5.1.5
-      '@turf/explode': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/nearest-point': 5.1.5
-
-  '@turf/point-to-line-distance@5.1.6':
-    dependencies:
-      '@turf/bearing': 6.5.0
-      '@turf/distance': 6.5.0
-      '@turf/helpers': 6.5.0
-      '@turf/invariant': 6.5.0
-      '@turf/meta': 6.5.0
-      '@turf/projection': 6.5.0
-      '@turf/rhumb-bearing': 6.5.0
-      '@turf/rhumb-distance': 6.5.0
-
-  '@turf/points-within-polygon@5.1.5':
-    dependencies:
-      '@turf/boolean-point-in-polygon': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/meta': 5.1.6
-
-  '@turf/polygon-tangents@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-
-  '@turf/polygon-to-line@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-
-  '@turf/polygonize@5.1.5':
-    dependencies:
-      '@turf/boolean-point-in-polygon': 5.1.5
-      '@turf/envelope': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-      '@turf/meta': 5.1.6
-
-  '@turf/projection@5.1.5':
-    dependencies:
-      '@turf/clone': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/meta': 5.1.6
-
-  '@turf/projection@6.5.0':
-    dependencies:
-      '@turf/clone': 6.5.0
-      '@turf/helpers': 6.5.0
-      '@turf/meta': 6.5.0
-
-  '@turf/random@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-
-  '@turf/rewind@5.1.5':
-    dependencies:
-      '@turf/boolean-clockwise': 5.1.5
-      '@turf/clone': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-      '@turf/meta': 5.1.6
-
-  '@turf/rhumb-bearing@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-
-  '@turf/rhumb-bearing@6.5.0':
-    dependencies:
-      '@turf/helpers': 6.5.0
-      '@turf/invariant': 6.5.0
-
-  '@turf/rhumb-destination@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-
-  '@turf/rhumb-distance@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-
-  '@turf/rhumb-distance@6.5.0':
-    dependencies:
-      '@turf/helpers': 6.5.0
-      '@turf/invariant': 6.5.0
-
-  '@turf/sample@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-
-  '@turf/sector@5.1.5':
-    dependencies:
-      '@turf/circle': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-      '@turf/line-arc': 5.1.5
-      '@turf/meta': 5.1.6
-
-  '@turf/shortest-path@5.1.5':
-    dependencies:
-      '@turf/bbox': 5.1.5
-      '@turf/bbox-polygon': 5.1.5
-      '@turf/boolean-point-in-polygon': 5.1.5
-      '@turf/clean-coords': 5.1.5
-      '@turf/distance': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-      '@turf/meta': 5.1.6
-      '@turf/transform-scale': 5.1.5
-
-  '@turf/simplify@5.1.5':
-    dependencies:
-      '@turf/clean-coords': 5.1.5
-      '@turf/clone': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/meta': 5.1.6
-
-  '@turf/square-grid@5.1.5':
-    dependencies:
-      '@turf/boolean-contains': 5.1.5
-      '@turf/boolean-overlap': 5.1.5
-      '@turf/distance': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/intersect': 5.1.6
-      '@turf/invariant': 5.1.5
-
-  '@turf/square@5.1.5':
-    dependencies:
-      '@turf/distance': 5.1.5
-      '@turf/helpers': 5.1.5
-
-  '@turf/standard-deviational-ellipse@5.1.5':
-    dependencies:
-      '@turf/center-mean': 5.1.5
-      '@turf/ellipse': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-      '@turf/meta': 5.1.6
-      '@turf/points-within-polygon': 5.1.5
-
-  '@turf/tag@5.1.5':
-    dependencies:
-      '@turf/boolean-point-in-polygon': 5.1.5
-      '@turf/clone': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/meta': 5.1.6
-
-  '@turf/tesselate@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      earcut: 2.2.4
-
-  '@turf/tin@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-
-  '@turf/transform-rotate@5.1.5':
-    dependencies:
-      '@turf/centroid': 5.1.5
-      '@turf/clone': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-      '@turf/meta': 5.1.6
-      '@turf/rhumb-bearing': 5.1.5
-      '@turf/rhumb-destination': 5.1.5
-      '@turf/rhumb-distance': 5.1.5
-
-  '@turf/transform-scale@5.1.5':
-    dependencies:
-      '@turf/bbox': 5.1.5
-      '@turf/center': 5.1.5
-      '@turf/centroid': 5.1.5
-      '@turf/clone': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-      '@turf/meta': 5.1.6
-      '@turf/rhumb-bearing': 5.1.5
-      '@turf/rhumb-destination': 5.1.5
-      '@turf/rhumb-distance': 5.1.5
-
-  '@turf/transform-translate@5.1.5':
-    dependencies:
-      '@turf/clone': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-      '@turf/meta': 5.1.6
-      '@turf/rhumb-destination': 5.1.5
-
-  '@turf/triangle-grid@5.1.5':
-    dependencies:
-      '@turf/distance': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/intersect': 5.1.6
-      '@turf/invariant': 5.1.5
-
-  '@turf/truncate@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/meta': 5.1.6
-
-  '@turf/turf@5.1.6':
-    dependencies:
-      '@turf/along': 5.1.5
-      '@turf/area': 5.1.5
-      '@turf/bbox': 5.1.5
-      '@turf/bbox-clip': 5.1.5
-      '@turf/bbox-polygon': 5.1.5
-      '@turf/bearing': 5.1.5
-      '@turf/bezier-spline': 5.1.5
-      '@turf/boolean-clockwise': 5.1.5
-      '@turf/boolean-contains': 5.1.5
-      '@turf/boolean-crosses': 5.1.5
-      '@turf/boolean-disjoint': 5.1.6
-      '@turf/boolean-equal': 5.1.5
-      '@turf/boolean-overlap': 5.1.5
-      '@turf/boolean-parallel': 5.1.5
-      '@turf/boolean-point-in-polygon': 5.1.5
-      '@turf/boolean-point-on-line': 5.1.5
-      '@turf/boolean-within': 5.1.5
-      '@turf/buffer': 5.1.5
-      '@turf/center': 5.1.5
-      '@turf/center-mean': 5.1.5
-      '@turf/center-median': 5.1.5
-      '@turf/center-of-mass': 5.1.5
-      '@turf/centroid': 5.1.5
-      '@turf/circle': 5.1.5
-      '@turf/clean-coords': 5.1.5
-      '@turf/clone': 5.1.5
-      '@turf/clusters': 5.1.5
-      '@turf/clusters-dbscan': 5.1.5
-      '@turf/clusters-kmeans': 5.1.5
-      '@turf/collect': 5.1.5
-      '@turf/combine': 5.1.5
-      '@turf/concave': 5.1.5
-      '@turf/convex': 5.1.5
-      '@turf/destination': 5.1.5
-      '@turf/difference': 5.1.5
-      '@turf/dissolve': 5.1.5
-      '@turf/distance': 5.1.5
-      '@turf/ellipse': 5.1.5
-      '@turf/envelope': 5.1.5
-      '@turf/explode': 5.1.5
-      '@turf/flatten': 5.1.5
-      '@turf/flip': 5.1.5
-      '@turf/great-circle': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/hex-grid': 5.1.5
-      '@turf/interpolate': 5.1.5
-      '@turf/intersect': 5.1.6
-      '@turf/invariant': 5.1.5
-      '@turf/isobands': 5.1.5
-      '@turf/isolines': 5.1.5
-      '@turf/kinks': 5.1.5
-      '@turf/length': 5.1.5
-      '@turf/line-arc': 5.1.5
-      '@turf/line-chunk': 5.1.5
-      '@turf/line-intersect': 5.1.5
-      '@turf/line-offset': 5.1.5
-      '@turf/line-overlap': 5.1.5
-      '@turf/line-segment': 5.1.5
-      '@turf/line-slice': 5.1.5
-      '@turf/line-slice-along': 5.1.5
-      '@turf/line-split': 5.1.5
-      '@turf/line-to-polygon': 5.1.5
-      '@turf/mask': 5.1.5
-      '@turf/meta': 5.1.6
-      '@turf/midpoint': 5.1.5
-      '@turf/nearest-point': 5.1.5
-      '@turf/nearest-point-on-line': 5.1.5
-      '@turf/nearest-point-to-line': 5.1.6
-      '@turf/planepoint': 5.1.5
-      '@turf/point-grid': 5.1.5
-      '@turf/point-on-feature': 5.1.5
-      '@turf/point-to-line-distance': 5.1.6
-      '@turf/points-within-polygon': 5.1.5
-      '@turf/polygon-tangents': 5.1.5
-      '@turf/polygon-to-line': 5.1.5
-      '@turf/polygonize': 5.1.5
-      '@turf/projection': 5.1.5
-      '@turf/random': 5.1.5
-      '@turf/rewind': 5.1.5
-      '@turf/rhumb-bearing': 5.1.5
-      '@turf/rhumb-destination': 5.1.5
-      '@turf/rhumb-distance': 5.1.5
-      '@turf/sample': 5.1.5
-      '@turf/sector': 5.1.5
-      '@turf/shortest-path': 5.1.5
-      '@turf/simplify': 5.1.5
-      '@turf/square': 5.1.5
-      '@turf/square-grid': 5.1.5
-      '@turf/standard-deviational-ellipse': 5.1.5
-      '@turf/tag': 5.1.5
-      '@turf/tesselate': 5.1.5
-      '@turf/tin': 5.1.5
-      '@turf/transform-rotate': 5.1.5
-      '@turf/transform-scale': 5.1.5
-      '@turf/transform-translate': 5.1.5
-      '@turf/triangle-grid': 5.1.5
-      '@turf/truncate': 5.1.5
-      '@turf/union': 5.1.5
-      '@turf/unkink-polygon': 5.1.5
-      '@turf/voronoi': 5.1.5
-
-  '@turf/union@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      turf-jsts: 1.2.3
-
-  '@turf/unkink-polygon@5.1.5':
-    dependencies:
-      '@turf/area': 5.1.5
-      '@turf/boolean-point-in-polygon': 5.1.5
-      '@turf/helpers': 5.1.5
-      '@turf/meta': 5.1.6
-      rbush: 2.0.2
-
-  '@turf/voronoi@5.1.5':
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/invariant': 5.1.5
-      d3-voronoi: 1.1.2
-
   '@tweenjs/tween.js@23.1.3': {}
 
   '@tweenjs/tween.js@25.0.0': {}
@@ -24881,7 +23479,7 @@ snapshots:
       '@typescript-eslint/types': 8.44.1
       '@typescript-eslint/typescript-estree': 8.44.1(typescript@5.9.2)
       '@typescript-eslint/visitor-keys': 8.44.1
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       eslint: 9.36.0(jiti@2.6.1)
       typescript: 5.9.2
     transitivePeerDependencies:
@@ -24891,7 +23489,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/tsconfig-utils': 8.44.1(typescript@5.9.2)
       '@typescript-eslint/types': 8.44.1
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       typescript: 5.9.2
     transitivePeerDependencies:
       - supports-color
@@ -24910,7 +23508,7 @@ snapshots:
       '@typescript-eslint/types': 8.44.1
       '@typescript-eslint/typescript-estree': 8.44.1(typescript@5.9.2)
       '@typescript-eslint/utils': 8.44.1(eslint@9.36.0(jiti@2.6.1))(typescript@5.9.2)
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       eslint: 9.36.0(jiti@2.6.1)
       ts-api-utils: 2.1.0(typescript@5.9.2)
       typescript: 5.9.2
@@ -24925,7 +23523,7 @@ snapshots:
       '@typescript-eslint/tsconfig-utils': 8.44.1(typescript@5.9.2)
       '@typescript-eslint/types': 8.44.1
       '@typescript-eslint/visitor-keys': 8.44.1
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       fast-glob: 3.3.3
       is-glob: 4.0.3
       minimatch: 9.0.5
@@ -24953,7 +23551,7 @@ snapshots:
 
   '@typescript/vfs@1.6.2(typescript@5.9.2)':
     dependencies:
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       typescript: 5.9.2
     transitivePeerDependencies:
       - supports-color
@@ -25049,7 +23647,7 @@ snapshots:
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 0.2.3
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       istanbul-lib-coverage: 3.2.2
       istanbul-lib-report: 3.0.1
       istanbul-lib-source-maps: 5.0.6
@@ -25068,7 +23666,7 @@ snapshots:
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 0.2.3
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       istanbul-lib-coverage: 3.2.2
       istanbul-lib-report: 3.0.1
       istanbul-lib-source-maps: 5.0.6
@@ -25444,17 +24042,9 @@ snapshots:
 
   acorn@8.15.0: {}
 
-  affine-complement@1.0.0:
-    dependencies:
-      robust-orientation: 1.2.1
-
-  affine-hull@1.0.0:
-    dependencies:
-      robust-orientation: 1.2.1
-
   agent-base@6.0.2:
     dependencies:
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -25701,10 +24291,6 @@ snapshots:
     dependencies:
       possible-typed-array-names: 1.1.0
 
-  avsdf-base@1.0.0:
-    dependencies:
-      layout-base: 1.0.2
-
   aws-sign2@0.7.0: {}
 
   aws4@1.13.2: {}
@@ -25803,8 +24389,6 @@ snapshots:
       file-uri-to-path: 1.0.0
     optional: true
 
-  bit-twiddle@1.0.2: {}
-
   bl@4.1.0:
     dependencies:
       buffer: 5.7.1
@@ -25842,7 +24426,7 @@ snapshots:
     dependencies:
       bytes: 3.1.2
       content-type: 1.0.5
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       http-errors: 2.0.0
       iconv-lite: 0.6.3
       on-finished: 2.4.1
@@ -26225,13 +24809,6 @@ snapshots:
 
   concat-map@0.0.1: {}
 
-  concaveman@2.0.0:
-    dependencies:
-      point-in-polygon: 1.1.0
-      rbush: 4.0.1
-      robust-predicates: 3.0.2
-      tinyqueue: 3.0.0
-
   concurrently@8.2.2:
     dependencies:
       chalk: 4.1.2
@@ -26265,17 +24842,6 @@ snapshots:
   content-type@1.0.5: {}
 
   convert-source-map@2.0.0: {}
-
-  convex-hull@1.0.3:
-    dependencies:
-      affine-hull: 1.0.0
-      incremental-convex-hull: 1.0.1
-      monotone-convex-hull-2d: 1.0.1
-
-  convex-minkowski-sum@1.0.0:
-    dependencies:
-      full-convex-hull: 1.0.0
-      uniq: 1.0.1
 
   cookie-signature@1.0.6: {}
 
@@ -26336,7 +24902,7 @@ snapshots:
       '@commander-js/extra-typings': 13.1.0(commander@13.1.0)
       commander: 13.1.0
       dedent: 1.7.0
-      extract-zip: 2.0.1
+      extract-zip: 2.0.1(supports-color@8.1.1)
       picocolors: 1.1.1
     transitivePeerDependencies:
       - babel-plugin-macros
@@ -26449,17 +25015,6 @@ snapshots:
       untildify: 4.0.0
       yauzl: 2.10.0
 
-  cytoscape-cise@2.0.1(cytoscape@3.33.1):
-    dependencies:
-      avsdf-base: 1.0.0
-      cose-base: 2.2.0
-      cytoscape: 3.33.1
-
-  cytoscape-cola@2.5.1(cytoscape@3.33.1):
-    dependencies:
-      cytoscape: 3.33.1
-      webcola: 3.4.0
-
   cytoscape-cose-bilkent@4.1.0(cytoscape@3.33.1):
     dependencies:
       cose-base: 1.0.3
@@ -26468,19 +25023,6 @@ snapshots:
   cytoscape-fcose@2.2.0(cytoscape@3.33.1):
     dependencies:
       cose-base: 2.2.0
-      cytoscape: 3.33.1
-
-  cytoscape-layout-utilities@1.1.1(cytoscape@3.33.1):
-    dependencies:
-      '@babel/runtime': 7.28.4
-      '@turf/turf': 5.1.6
-      '@types/d3-delaunay': 5.3.4
-      convex-minkowski-sum: 1.0.0
-      cytoscape: 3.33.1
-      d3-delaunay: 5.3.0
-
-  cytoscape-popper@4.0.1(cytoscape@3.33.1):
-    dependencies:
       cytoscape: 3.33.1
 
   cytoscape@3.33.1: {}
@@ -26513,22 +25055,11 @@ snapshots:
     dependencies:
       d3-array: 3.2.4
 
-  d3-delaunay@5.3.0:
-    dependencies:
-      delaunator: 4.0.1
-
   d3-delaunay@6.0.4:
     dependencies:
       delaunator: 5.1.0
 
-  d3-dispatch@1.0.6: {}
-
   d3-dispatch@3.0.1: {}
-
-  d3-drag@1.2.5:
-    dependencies:
-      d3-dispatch: 1.0.6
-      d3-selection: 1.4.2
 
   d3-drag@3.0.0:
     dependencies:
@@ -26562,10 +25093,6 @@ snapshots:
       d3-timer: 3.0.1
 
   d3-format@3.1.2: {}
-
-  d3-geo@1.7.1:
-    dependencies:
-      d3-array: 1.2.4
 
   d3-geo@3.1.1:
     dependencies:
@@ -26607,8 +25134,6 @@ snapshots:
       d3-time: 3.1.0
       d3-time-format: 4.1.0
 
-  d3-selection@1.4.2: {}
-
   d3-selection@3.0.0: {}
 
   d3-shape@1.3.7:
@@ -26627,8 +25152,6 @@ snapshots:
     dependencies:
       d3-array: 3.2.4
 
-  d3-timer@1.0.10: {}
-
   d3-timer@3.0.1: {}
 
   d3-transition@3.0.1(d3-selection@3.0.0):
@@ -26639,8 +25162,6 @@ snapshots:
       d3-interpolate: 3.0.1
       d3-selection: 3.0.0
       d3-timer: 3.0.1
-
-  d3-voronoi@1.1.2: {}
 
   d3-zoom@3.0.0:
     dependencies:
@@ -26795,15 +25316,6 @@ snapshots:
 
   deep-eql@5.0.2: {}
 
-  deep-equal@1.1.2:
-    dependencies:
-      is-arguments: 1.2.0
-      is-date-object: 1.1.0
-      is-regex: 1.2.1
-      object-is: 1.1.6
-      object-keys: 1.1.1
-      regexp.prototype.flags: 1.5.4
-
   deep-extend@0.6.0: {}
 
   deep-is@0.1.4: {}
@@ -26859,8 +25371,6 @@ snapshots:
       pify: 4.0.1
       rimraf: 2.7.1
 
-  delaunator@4.0.1: {}
-
   delaunator@5.1.0:
     dependencies:
       robust-predicates: 3.0.2
@@ -26869,8 +25379,6 @@ snapshots:
 
   denque@2.1.0:
     optional: true
-
-  density-clustering@1.3.0: {}
 
   depd@1.1.2: {}
 
@@ -26976,8 +25484,6 @@ snapshots:
       gopd: 1.2.0
 
   duplexer@0.1.2: {}
-
-  earcut@2.2.4: {}
 
   eastasianwidth@0.2.0: {}
 
@@ -27275,7 +25781,7 @@ snapshots:
   eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0)(eslint@9.36.0(jiti@2.6.1)):
     dependencies:
       '@nolyfill/is-core-module': 1.0.39
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       eslint: 9.36.0(jiti@2.6.1)
       get-tsconfig: 4.10.1
       is-bun-module: 2.0.0
@@ -27445,7 +25951,7 @@ snapshots:
       ajv: 6.12.6
       chalk: 4.1.2
       cross-spawn: 7.0.6
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       escape-string-regexp: 4.0.0
       eslint-scope: 8.4.0
       eslint-visitor-keys: 4.2.1
@@ -27644,7 +26150,7 @@ snapshots:
       content-type: 1.0.5
       cookie: 0.7.2
       cookie-signature: 1.2.2
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       encodeurl: 2.0.0
       escape-html: 1.0.3
       etag: 1.8.1
@@ -27671,16 +26177,6 @@ snapshots:
   extend@3.0.2: {}
 
   extendable-error@0.1.7: {}
-
-  extract-zip@2.0.1:
-    dependencies:
-      debug: 4.4.3(supports-color@5.5.0)
-      get-stream: 5.2.0
-      yauzl: 2.10.0
-    optionalDependencies:
-      '@types/yauzl': 2.10.3
-    transitivePeerDependencies:
-      - supports-color
 
   extract-zip@2.0.1(supports-color@8.1.1):
     dependencies:
@@ -27816,7 +26312,7 @@ snapshots:
 
   finalhandler@2.1.0:
     dependencies:
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       encodeurl: 2.0.0
       escape-html: 1.0.3
       on-finished: 2.4.1
@@ -27871,7 +26367,7 @@ snapshots:
 
   follow-redirects@1.15.11(debug@4.4.3):
     optionalDependencies:
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
 
   for-each@0.3.5:
     dependencies:
@@ -27950,13 +26446,6 @@ snapshots:
   fsevents@2.3.3:
     optional: true
 
-  full-convex-hull@1.0.0:
-    dependencies:
-      affine-complement: 1.0.0
-      affine-hull: 1.0.0
-      convex-hull: 1.0.3
-      simplicial-complex: 1.0.0
-
   function-bind@1.1.2: {}
 
   function.prototype.name@1.1.8:
@@ -27998,19 +26487,7 @@ snapshots:
 
   gensync@1.0.0-beta.2: {}
 
-  geojson-equality@0.1.6:
-    dependencies:
-      deep-equal: 1.1.2
-
-  geojson-rbush@2.1.0:
-    dependencies:
-      '@turf/helpers': 5.1.5
-      '@turf/meta': 5.1.6
-      rbush: 4.0.1
-
   get-caller-file@2.0.5: {}
-
-  get-closest@0.0.4: {}
 
   get-east-asian-width@1.4.0: {}
 
@@ -28526,7 +27003,7 @@ snapshots:
   http-proxy-agent@7.0.2:
     dependencies:
       agent-base: 7.1.4
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -28559,14 +27036,14 @@ snapshots:
   https-proxy-agent@5.0.1:
     dependencies:
       agent-base: 6.0.2
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
 
   https-proxy-agent@7.0.6:
     dependencies:
       agent-base: 7.1.4
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -28595,7 +27072,7 @@ snapshots:
       '@types/tough-cookie': 4.0.5
       axios: 1.12.2(debug@4.4.3)
       camelcase: 6.3.0
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       dotenv: 16.6.1
       extend: 3.0.2
       file-type: 16.5.4
@@ -28660,11 +27137,6 @@ snapshots:
 
   imurmurhash@0.1.4: {}
 
-  incremental-convex-hull@1.0.1:
-    dependencies:
-      robust-orientation: 1.2.1
-      simplicial-complex: 1.0.0
-
   indent-string@4.0.0: {}
 
   inflight@1.0.6:
@@ -28698,7 +27170,7 @@ snapshots:
     dependencies:
       '@ioredis/commands': 1.4.0
       cluster-key-slot: 1.1.2
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       denque: 2.1.0
       lodash.defaults: 4.2.0
       lodash.isarguments: 3.1.0
@@ -28982,7 +27454,7 @@ snapshots:
   istanbul-lib-source-maps@5.0.6:
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       istanbul-lib-coverage: 3.2.2
     transitivePeerDependencies:
       - supports-color
@@ -29520,8 +27992,6 @@ snapshots:
       lightningcss-win32-x64-msvc: 1.30.2
 
   lilconfig@3.1.3: {}
-
-  lineclip@1.1.5: {}
 
   lines-and-columns@1.2.4: {}
 
@@ -30334,7 +28804,7 @@ snapshots:
   micromark@3.2.0:
     dependencies:
       '@types/debug': 4.1.12
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       decode-named-character-reference: 1.2.0
       micromark-core-commonmark: 1.1.0
       micromark-factory-space: 1.1.0
@@ -30356,7 +28826,7 @@ snapshots:
   micromark@4.0.2:
     dependencies:
       '@types/debug': 4.1.12
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       decode-named-character-reference: 1.2.0
       devlop: 1.1.0
       micromark-core-commonmark: 2.0.3
@@ -30459,10 +28929,6 @@ snapshots:
   module-alias@2.2.3: {}
 
   module-details-from-path@1.0.4: {}
-
-  monotone-convex-hull-2d@1.0.1:
-    dependencies:
-      robust-orientation: 1.2.1
 
   morgan@1.10.1:
     dependencies:
@@ -30857,11 +29323,6 @@ snapshots:
   object-hash@3.0.0: {}
 
   object-inspect@1.13.4: {}
-
-  object-is@1.1.6:
-    dependencies:
-      call-bind: 1.0.8
-      define-properties: 1.2.1
 
   object-keys@1.1.1: {}
 
@@ -31336,8 +29797,6 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.2
 
-  point-in-polygon@1.1.0: {}
-
   points-on-curve@0.2.0: {}
 
   points-on-path@0.2.1:
@@ -31702,10 +30161,6 @@ snapshots:
 
   quick-format-unescaped@4.0.4: {}
 
-  quickselect@1.1.1: {}
-
-  quickselect@3.0.0: {}
-
   radix-ui@1.4.3(@types/react-dom@19.1.9(@types/react@19.1.13))(@types/react@19.1.13)(react-dom@19.1.1(react@19.1.1))(react@19.1.1):
     dependencies:
       '@radix-ui/primitive': 1.1.3
@@ -31788,14 +30243,6 @@ snapshots:
       http-errors: 2.0.0
       iconv-lite: 0.7.0
       unpipe: 1.0.0
-
-  rbush@2.0.2:
-    dependencies:
-      quickselect: 1.1.1
-
-  rbush@4.0.1:
-    dependencies:
-      quickselect: 3.0.0
 
   rc@1.2.8:
     dependencies:
@@ -32200,7 +30647,7 @@ snapshots:
 
   require-in-the-middle@8.0.1:
     dependencies:
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       module-details-from-path: 1.0.4
     transitivePeerDependencies:
       - supports-color
@@ -32251,23 +30698,7 @@ snapshots:
     dependencies:
       glob: 7.2.3
 
-  robust-orientation@1.2.1:
-    dependencies:
-      robust-scale: 1.0.2
-      robust-subtract: 1.0.0
-      robust-sum: 1.0.0
-      two-product: 1.0.2
-
   robust-predicates@3.0.2: {}
-
-  robust-scale@1.0.2:
-    dependencies:
-      two-product: 1.0.2
-      two-sum: 1.0.0
-
-  robust-subtract@1.0.0: {}
-
-  robust-sum@1.0.0: {}
 
   rollup-plugin-terser@7.0.2(rollup@2.79.2):
     dependencies:
@@ -32320,7 +30751,7 @@ snapshots:
 
   router@2.2.0:
     dependencies:
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       depd: 2.0.0
       is-promise: 4.0.0
       parseurl: 1.3.3
@@ -32433,7 +30864,7 @@ snapshots:
 
   send@1.2.0:
     dependencies:
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       encodeurl: 2.0.0
       escape-html: 1.0.3
       etag: 1.8.1
@@ -32676,13 +31107,6 @@ snapshots:
 
   siginfo@2.0.0: {}
 
-  sigma@3.0.2(graphology-types@0.24.8):
-    dependencies:
-      events: 3.3.0
-      graphology-utils: 2.5.2(graphology-types@0.24.8)
-    transitivePeerDependencies:
-      - graphology-types
-
   signal-exit@3.0.7: {}
 
   signal-exit@4.1.0: {}
@@ -32705,11 +31129,6 @@ snapshots:
 
   simple-wcswidth@1.1.2: {}
 
-  simplicial-complex@1.0.0:
-    dependencies:
-      bit-twiddle: 1.0.2
-      union-find: 1.0.2
-
   sirv@2.0.4:
     dependencies:
       '@polka/url': 1.0.0-next.29
@@ -32725,8 +31144,6 @@ snapshots:
   sisteransi@1.0.5: {}
 
   size-sensor@1.0.2: {}
-
-  skmeans@0.9.7: {}
 
   slash@3.0.0: {}
 
@@ -32792,7 +31209,7 @@ snapshots:
 
   spdy-transport@3.0.0:
     dependencies:
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       detect-node: 2.1.0
       hpack.js: 2.1.6
       obuf: 1.1.2
@@ -32803,7 +31220,7 @@ snapshots:
 
   spdy@4.0.2:
     dependencies:
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       handle-thing: 2.0.1
       http-deceiver: 1.2.7
       select-hose: 2.0.0
@@ -33343,8 +31760,6 @@ snapshots:
 
   tinypool@1.1.1: {}
 
-  tinyqueue@3.0.0: {}
-
   tinyrainbow@1.2.0: {}
 
   tinyrainbow@2.0.0: {}
@@ -33407,14 +31822,6 @@ snapshots:
     dependencies:
       '@tokenizer/token': 0.3.0
       ieee754: 1.2.1
-
-  topojson-client@3.1.0:
-    dependencies:
-      commander: 2.20.3
-
-  topojson-server@3.0.1:
-    dependencies:
-      commander: 2.20.3
 
   totalist@3.0.1: {}
 
@@ -33505,7 +31912,7 @@ snapshots:
       cac: 6.7.14
       chokidar: 4.0.3
       consola: 3.4.2
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       esbuild: 0.25.10
       fix-dts-default-cjs-exports: 1.0.1
       joycon: 3.1.1
@@ -33533,7 +31940,7 @@ snapshots:
       cac: 6.7.14
       chokidar: 4.0.3
       consola: 3.4.2
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       esbuild: 0.25.10
       fix-dts-default-cjs-exports: 1.0.1
       joycon: 3.1.1
@@ -33593,13 +32000,7 @@ snapshots:
       turbo-windows-64: 2.5.8
       turbo-windows-arm64: 2.5.8
 
-  turf-jsts@1.2.3: {}
-
   tweetnacl@0.14.5: {}
-
-  two-product@1.0.2: {}
-
-  two-sum@1.0.0: {}
 
   type-check@0.4.0:
     dependencies:
@@ -33732,10 +32133,6 @@ snapshots:
       is-plain-obj: 4.1.0
       trough: 2.2.0
       vfile: 6.0.3
-
-  union-find@1.0.2: {}
-
-  uniq@1.0.1: {}
 
   unique-string@2.0.0:
     dependencies:
@@ -33967,7 +32364,7 @@ snapshots:
   vite-node@1.6.1(@types/node@22.18.6)(lightningcss@1.30.2)(terser@5.44.0):
     dependencies:
       cac: 6.7.14
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       pathe: 1.1.2
       picocolors: 1.1.1
       vite: 5.4.20(@types/node@22.18.6)(lightningcss@1.30.2)(terser@5.44.0)
@@ -33985,7 +32382,7 @@ snapshots:
   vite-node@1.6.1(@types/node@22.19.1)(lightningcss@1.30.2)(terser@5.44.0):
     dependencies:
       cac: 6.7.14
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       pathe: 1.1.2
       picocolors: 1.1.1
       vite: 5.4.20(@types/node@22.19.1)(lightningcss@1.30.2)(terser@5.44.0)
@@ -34003,7 +32400,7 @@ snapshots:
   vite-node@2.1.9(@types/node@20.19.17)(lightningcss@1.30.2)(terser@5.44.0):
     dependencies:
       cac: 6.7.14
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       es-module-lexer: 1.7.0
       pathe: 1.1.2
       vite: 5.4.20(@types/node@20.19.17)(lightningcss@1.30.2)(terser@5.44.0)
@@ -34021,7 +32418,7 @@ snapshots:
   vite-node@3.2.4(@types/node@22.18.6)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1):
     dependencies:
       cac: 6.7.14
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       es-module-lexer: 1.7.0
       pathe: 2.0.3
       vite: 7.2.6(@types/node@22.18.6)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1)
@@ -34042,7 +32439,7 @@ snapshots:
   vite-node@3.2.4(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1):
     dependencies:
       cac: 6.7.14
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       es-module-lexer: 1.7.0
       pathe: 2.0.3
       vite: 7.2.6(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1)
@@ -34077,7 +32474,7 @@ snapshots:
 
   vite-tsconfig-paths@5.1.4(typescript@5.9.2)(vite@7.2.6(@types/node@22.18.6)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1)):
     dependencies:
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       globrex: 0.1.2
       tsconfck: 3.1.6(typescript@5.9.2)
     optionalDependencies:
@@ -34162,7 +32559,7 @@ snapshots:
       '@vitest/utils': 1.6.1
       acorn-walk: 8.3.4
       chai: 4.5.0
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       execa: 8.0.1
       local-pkg: 0.5.1
       magic-string: 0.30.21
@@ -34198,7 +32595,7 @@ snapshots:
       '@vitest/utils': 1.6.1
       acorn-walk: 8.3.4
       chai: 4.5.0
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       execa: 8.0.1
       local-pkg: 0.5.1
       magic-string: 0.30.21
@@ -34234,7 +32631,7 @@ snapshots:
       '@vitest/utils': 1.6.1
       acorn-walk: 8.3.4
       chai: 4.5.0
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       execa: 8.0.1
       local-pkg: 0.5.1
       magic-string: 0.30.21
@@ -34271,7 +32668,7 @@ snapshots:
       '@vitest/spy': 2.1.9
       '@vitest/utils': 2.1.9
       chai: 5.3.3
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       expect-type: 1.2.2
       magic-string: 0.30.21
       pathe: 1.1.2
@@ -34309,7 +32706,7 @@ snapshots:
       '@vitest/spy': 3.2.4
       '@vitest/utils': 3.2.4
       chai: 5.3.3
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       expect-type: 1.2.2
       magic-string: 0.30.21
       pathe: 2.0.3
@@ -34353,7 +32750,7 @@ snapshots:
       '@vitest/spy': 3.2.4
       '@vitest/utils': 3.2.4
       chai: 5.3.3
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       expect-type: 1.2.2
       magic-string: 0.30.21
       pathe: 2.0.3
@@ -34397,7 +32794,7 @@ snapshots:
       '@vitest/spy': 3.2.4
       '@vitest/utils': 3.2.4
       chai: 5.3.3
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       expect-type: 1.2.2
       magic-string: 0.30.21
       pathe: 2.0.3
@@ -34439,7 +32836,7 @@ snapshots:
       '@vitest/snapshot': 4.0.6
       '@vitest/spy': 4.0.6
       '@vitest/utils': 4.0.6
-      debug: 4.4.3(supports-color@5.5.0)
+      debug: 4.4.3(supports-color@8.1.1)
       es-module-lexer: 1.7.0
       expect-type: 1.2.2
       magic-string: 0.30.19
@@ -34530,13 +32927,6 @@ snapshots:
   web-streams-polyfill@4.0.0-beta.3: {}
 
   web-vitals@5.1.0: {}
-
-  webcola@3.4.0:
-    dependencies:
-      d3-dispatch: 1.0.6
-      d3-drag: 1.2.5
-      d3-shape: 1.3.7
-      d3-timer: 1.0.10
 
   webidl-conversions@3.0.1: {}
 
