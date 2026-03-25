@@ -6,6 +6,9 @@
  * Three.js WebGL rendering with d3-force-3d physics. Supports orbit/zoom/pan
  * camera controls, node click-to-inspect, and real Neo4j data from the existing
  * /api/atlas/graph-payload endpoint.
+ *
+ * Post-ingestion live updates are streamed via SSE from /api/atlas/graph-updates
+ * and merged into graphData in real-time without a page refresh.
  */
 
 import dynamic from "next/dynamic";
@@ -15,7 +18,16 @@ import type { ForceGraphMethods } from "react-force-graph-3d";
 
 import { Icon } from "@proto/icon-system";
 
+import { useGraphUpdates } from "./hooks/useGraphUpdates";
 import { getEntityVisual, getRelationshipVisual } from "./lib/atlas-schema";
+
+// ─── LOD / Performance Constants ────────────────────────────────────
+
+/** Nodes beyond this distance from the camera suppress their text label. */
+const LOD_LABEL_DISTANCE = 500;
+
+/** Node count threshold above which large-graph performance mode activates. */
+const LARGE_GRAPH_THRESHOLD = 5000;
 
 // react-force-graph-3d requires WebGL — disable SSR
 const ForceGraph3D = dynamic(() => import("react-force-graph-3d"), {
@@ -30,6 +42,10 @@ interface AtlasNode {
   type: string;
   color: string;
   val: number;
+  // Injected by react-force-graph-3d at simulation time
+  x?: number;
+  y?: number;
+  z?: number;
 }
 
 interface AtlasLink {
@@ -114,12 +130,19 @@ export default function Atlas3DClient() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedNode, setSelectedNode] = useState<AtlasNode | null>(null);
+  // Mutable ref tracking camera position — updated per-frame via onRenderFramePre
+  // to drive LOD label and nodeVisibility callbacks without React re-renders.
+  const cameraPositionRef = useRef({ x: 0, y: 0, z: 0 });
   const HEADER_HEIGHT = 45;
   const [dimensions, setDimensions] = useState({
     width: typeof window !== "undefined" ? window.innerWidth : 1200,
     height:
       typeof window !== "undefined" ? window.innerHeight - HEADER_HEIGHT : 800,
   });
+
+  // SSE subscription — merges new nodes/links from ingest events in real-time
+  const { connected, outOfSync, recentEntityCount, clearOutOfSync } =
+    useGraphUpdates(setGraphData, graphRef);
 
   // Update on window resize
   useEffect(() => {
@@ -195,15 +218,57 @@ export default function Atlas3DClient() {
     });
   }, []);
 
-  // Node label on hover
-  const nodeLabel = useCallback(
-    (node: any) =>
-      `<div style="background:rgba(0,0,0,0.85);padding:6px 10px;border-radius:6px;font-size:12px;color:#e2e8f0;border:1px solid rgba(255,255,255,0.1)">
-        <strong>${node.name}</strong>
-        <br/><span style="color:#94a3b8;font-size:10px">${node.type}</span>
-      </div>`,
-    []
-  );
+  // Sync camera position ref via requestAnimationFrame loop so LOD callbacks
+  // always read a fresh position without triggering React re-renders.
+  // Runs only while graphData is loaded; cancelled on unmount.
+  useEffect(() => {
+    if (!graphData) return;
+    let rafId: number;
+    const tick = () => {
+      const cam = (graphRef.current as any)?.camera?.();
+      if (cam) {
+        cameraPositionRef.current = {
+          x: cam.position.x,
+          y: cam.position.y,
+          z: cam.position.z,
+        };
+      }
+      rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
+  }, [graphData]);
+
+  // LOD label: return HTML tooltip only when the node is within
+  // LOD_LABEL_DISTANCE of the camera. Returning an empty string suppresses
+  // the label entirely — cheaper than rendering invisible DOM nodes.
+  const nodeLabel = useCallback((node: any) => {
+    const cam = cameraPositionRef.current;
+    const nx = node.x ?? 0;
+    const ny = node.y ?? 0;
+    const nz = node.z ?? 0;
+    const dist = Math.sqrt(
+      (cam.x - nx) ** 2 + (cam.y - ny) ** 2 + (cam.z - nz) ** 2
+    );
+    if (dist > LOD_LABEL_DISTANCE) return "";
+    return `<div style="background:rgba(0,0,0,0.85);padding:6px 10px;border-radius:6px;font-size:12px;color:#e2e8f0;border:1px solid rgba(255,255,255,0.1)">
+      <strong>${node.name}</strong>
+      <br/><span style="color:#94a3b8;font-size:10px">${node.type}</span>
+    </div>`;
+  }, []);
+
+  // Lazy frustum culling: hide nodes that have drifted far behind the camera
+  // to reduce per-frame geometry submissions on large graphs.
+  const nodeVisibility = useCallback((node: any): boolean => {
+    const cam = cameraPositionRef.current;
+    // Cull nodes more than 3× LOD_LABEL_DISTANCE behind the camera along z.
+    const nz = node.z ?? 0;
+    return nz > cam.z - LOD_LABEL_DISTANCE * 3;
+  }, []);
+
+  // Derived performance settings based on current graph size.
+  const nodeCount = graphData?.nodes.length ?? 0;
+  const isLargeGraph = nodeCount > LARGE_GRAPH_THRESHOLD;
 
   if (loading) {
     return (
@@ -264,18 +329,20 @@ export default function Atlas3DClient() {
             nodeColor={(node: any) => node.color ?? "#6B7280"}
             nodeVal={(node: any) => node.val ?? 1}
             nodeLabel={nodeLabel}
+            nodeVisibility={nodeVisibility}
             nodeOpacity={0.9}
-            nodeResolution={12}
+            nodeResolution={isLargeGraph ? 8 : 12}
             // Link rendering
             linkColor={(link: any) => link.color ?? "#334155"}
             linkOpacity={0.4}
             linkWidth={0.5}
-            linkDirectionalParticles={2}
+            linkDirectionalParticles={isLargeGraph ? 1 : 2}
             linkDirectionalParticleWidth={0.8}
             linkDirectionalParticleSpeed={0.005}
             // Camera + controls
             enableNavigationControls={true}
             enablePointerInteraction={true}
+            enableNodeDrag={!isLargeGraph}
             // Force layout
             warmupTicks={100}
             cooldownTicks={200}
@@ -334,6 +401,34 @@ export default function Atlas3DClient() {
             ? `${graphData.nodes.length.toLocaleString()} nodes · ${graphData.links.length.toLocaleString()} edges`
             : ""}
         </div>
+
+        {/* Live indicator — shown while SSE is connected and entities arrived */}
+        {connected && recentEntityCount > 0 && (
+          <div className="absolute bottom-3 right-3 flex items-center gap-1.5 text-[10px] text-emerald-400/70 z-10">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400" />
+            </span>
+            Live
+          </div>
+        )}
+
+        {/* Out-of-sync banner — shown when SSE connection drops */}
+        {outOfSync && (
+          <div className="absolute bottom-3 right-3 flex items-center gap-2 bg-card/90 backdrop-blur border border-amber-500/30 text-amber-400 text-[11px] px-3 py-1.5 rounded-lg shadow z-10">
+            <Icon name="WifiOff" className="h-3.5 w-3.5 flex-shrink-0" />
+            <span>Atlas out of sync</span>
+            <button
+              onClick={() => {
+                clearOutOfSync();
+                window.location.reload();
+              }}
+              className="ml-1 underline underline-offset-2 hover:text-amber-300 transition-colors"
+            >
+              Refresh
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
