@@ -2,7 +2,28 @@
 
 import { useEffect, useRef, useCallback, useState } from "react";
 
-import { getEntityColor, getEntityImage } from "@proto/utils/atlas";
+import { getEntityVisual, getRelationshipVisual } from "../lib/atlas-schema";
+
+// ─── Types ───────────────────────────────────────────────────────────
+
+interface AtlasNode {
+  id: string;
+  name: string;
+  type: string;
+  color: string;
+  val: number;
+}
+
+interface AtlasLink {
+  source: string;
+  target: string;
+  color: string;
+}
+
+interface GraphData {
+  nodes: AtlasNode[];
+  links: AtlasLink[];
+}
 
 interface GraphEntityEvent {
   type: "entity_created";
@@ -38,127 +59,129 @@ type GraphUpdateEvent =
   | GraphRelationshipEvent
   | GraphBundleCompleteEvent;
 
+// ─── Hook Return ─────────────────────────────────────────────────────
+
 export interface GraphUpdatesState {
   connected: boolean;
+  outOfSync: boolean;
   recentEntityCount: number;
+  clearOutOfSync: () => void;
 }
 
+// ─── Hook ────────────────────────────────────────────────────────────
+
+/**
+ * Subscribe to the /api/atlas/graph-updates SSE stream and merge incoming
+ * node/link events into the 3D force-graph's graphData state.
+ *
+ * @param setGraphData - React setter from Atlas3DClient's useState<GraphData>
+ * @param graphRef - ref to the ForceGraph3D instance (for reheatSimulation)
+ * @param onBundleComplete - optional callback after a bundle_complete event
+ */
 export function useGraphUpdates(
-  cyRef: React.RefObject<any>,
+  setGraphData: React.Dispatch<React.SetStateAction<GraphData | null>>,
+  graphRef: React.RefObject<any>,
   onBundleComplete?: () => void
 ): GraphUpdatesState {
   const onBundleCompleteRef = useRef(onBundleComplete);
   onBundleCompleteRef.current = onBundleComplete;
 
   const [connected, setConnected] = useState(false);
+  const [outOfSync, setOutOfSync] = useState(false);
   const [recentEntityCount, setRecentEntityCount] = useState(0);
 
-  const pendingNodesRef = useRef<string[]>([]);
-  const placeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Track current node IDs so we can deduplicate without reading state in callbacks
+  const nodeIdsRef = useRef<Set<string>>(new Set());
+  // Track link keys (source-target) for deduplication
+  const linkKeysRef = useRef<Set<string>>(new Set());
 
-  const placeNewNodes = useCallback(() => {
-    const cy = cyRef.current;
-    if (!cy || cy.destroyed() || pendingNodesRef.current.length === 0) return;
-
-    try {
-      const layoutUtils = cy.layoutUtilities({
-        idealEdgeLength: 100,
-        offset: 30,
-      });
-
-      const newNodes = cy.collection();
-      for (const uid of pendingNodesRef.current) {
-        const node = cy.getElementById(uid);
-        if (node.length > 0) {
-          newNodes.merge(node);
-        }
-      }
-
-      if (newNodes.length > 0) {
-        layoutUtils.placeNewNodes(newNodes);
-        console.log(
-          `Positioned ${newNodes.length} new nodes via layout-utilities`
-        );
-      }
-    } catch (err) {
-      console.warn("Layout utilities not available, skipping placement:", err);
-    }
-
-    pendingNodesRef.current = [];
-  }, [cyRef]);
-
-  const schedulePlacement = useCallback(() => {
-    if (placeTimeoutRef.current) {
-      clearTimeout(placeTimeoutRef.current);
-    }
-    placeTimeoutRef.current = setTimeout(placeNewNodes, 200);
-  }, [placeNewNodes]);
-
-  const addEntityToGraph = useCallback(
+  const addNode = useCallback(
     (event: GraphEntityEvent) => {
-      const cy = cyRef.current;
-      if (!cy || cy.destroyed()) return;
+      if (nodeIdsRef.current.has(event.uid)) return;
 
-      if (cy.getElementById(event.uid).length > 0) return;
+      const visual = getEntityVisual(event.entityType);
+      const newNode: AtlasNode = {
+        id: event.uid,
+        name: event.name,
+        type: event.entityType,
+        color: visual.color,
+        val: visual.size,
+      };
 
-      const color = getEntityColor(event.entityType);
-      const image = getEntityImage(event.entityType);
+      nodeIdsRef.current.add(event.uid);
 
-      cy.add({
-        group: "nodes" as const,
-        data: {
-          id: event.uid,
-          label: event.name,
-          type: event.entityType,
-          image,
-          color,
-          size: 35,
-          connections: 0,
-        },
-        classes: `entity-${event.entityType}`,
+      setGraphData((prev) => {
+        if (!prev) return prev;
+        // Double-check dedup inside setter (prev could be stale in ref)
+        if (prev.nodes.some((n) => n.id === event.uid)) return prev;
+        return { ...prev, nodes: [...prev.nodes, newNode] };
       });
-
-      pendingNodesRef.current.push(event.uid);
-      schedulePlacement();
     },
-    [cyRef, schedulePlacement]
+    [setGraphData]
   );
 
-  const addRelationshipToGraph = useCallback(
+  const addLink = useCallback(
     (event: GraphRelationshipEvent) => {
-      const cy = cyRef.current;
-      if (!cy || cy.destroyed()) return;
+      const linkKey = `${event.source}-${event.target}`;
+      if (linkKeysRef.current.has(linkKey)) return;
 
-      if (cy.getElementById(event.uid).length > 0) return;
-
+      // Only add link if both nodes exist
       if (
-        cy.getElementById(event.source).length === 0 ||
-        cy.getElementById(event.target).length === 0
+        !nodeIdsRef.current.has(event.source) ||
+        !nodeIdsRef.current.has(event.target)
       ) {
         return;
       }
 
-      cy.add({
-        group: "edges" as const,
-        data: {
-          id: event.uid,
-          source: event.source,
-          target: event.target,
-          label: event.relationshipType,
-          type: event.relationshipType,
-          color: "#888",
-          sentiment: "neutral",
-        },
+      const visual = getRelationshipVisual(event.relationshipType);
+      const newLink: AtlasLink = {
+        source: event.source,
+        target: event.target,
+        color: visual.color,
+      };
+
+      linkKeysRef.current.add(linkKey);
+
+      setGraphData((prev) => {
+        if (!prev) return prev;
+        // Double-check dedup inside setter
+        const alreadyExists = prev.links.some((l) => {
+          const src =
+            typeof l.source === "string" ? l.source : (l.source as any).id;
+          const tgt =
+            typeof l.target === "string" ? l.target : (l.target as any).id;
+          return src === event.source && tgt === event.target;
+        });
+        if (alreadyExists) return prev;
+        return { ...prev, links: [...prev.links, newLink] };
       });
     },
-    [cyRef]
+    [setGraphData]
   );
+
+  const reheatSimulation = useCallback(() => {
+    const fg = graphRef.current;
+    if (!fg) return;
+    try {
+      // react-force-graph-3d exposes d3Force — bump alpha to re-settle
+      const simulation = fg.d3Force?.("simulation");
+      if (simulation) {
+        simulation.alpha(0.3).restart();
+      } else {
+        // Fallback: use reheatSimulation if available in newer versions
+        fg.d3ReheatSimulation?.();
+      }
+    } catch {
+      // Silently ignore — simulation may not be accessible
+    }
+  }, [graphRef]);
 
   useEffect(() => {
     const es = new EventSource("/api/atlas/graph-updates");
 
     es.onopen = () => {
       setConnected(true);
+      setOutOfSync(false);
     };
 
     es.onmessage = (messageEvent) => {
@@ -167,35 +190,38 @@ export function useGraphUpdates(
 
         switch (data.type) {
           case "entity_created":
-            addEntityToGraph(data);
+            addNode(data);
             setRecentEntityCount((prev) => prev + 1);
             break;
+
           case "relationship_created":
-            addRelationshipToGraph(data);
+            addLink(data);
             break;
+
           case "bundle_complete":
-            placeNewNodes();
+            // Re-settle the force simulation after new nodes land
+            reheatSimulation();
             setRecentEntityCount(data.entitiesCreated);
             onBundleCompleteRef.current?.();
             break;
         }
       } catch {
-        // Ignore parse errors (keepalive comments, etc.)
+        // Ignore parse errors (keepalive comments send no data)
       }
     };
 
     es.onerror = () => {
       setConnected(false);
+      setOutOfSync(true);
     };
 
     return () => {
       es.close();
       setConnected(false);
-      if (placeTimeoutRef.current) {
-        clearTimeout(placeTimeoutRef.current);
-      }
     };
-  }, [addEntityToGraph, addRelationshipToGraph, placeNewNodes]);
+  }, [addNode, addLink, reheatSimulation]);
 
-  return { connected, recentEntityCount };
+  const clearOutOfSync = useCallback(() => setOutOfSync(false), []);
+
+  return { connected, outOfSync, recentEntityCount, clearOutOfSync };
 }

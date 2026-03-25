@@ -362,6 +362,29 @@ export function createNeo4jClient(config?: Partial<Neo4jConfig>): Neo4jClient {
 }
 
 /**
+ * Create UNIQUE constraints on Entity.uid and RELATED_TO.uid to prevent
+ * duplicate writes under concurrent load. Uses IF NOT EXISTS so this is
+ * safe to run on every startup.
+ */
+async function ensureSchemaConstraints(client: Neo4jClient): Promise<void> {
+  const session = client.getSession();
+  try {
+    // Schema DDL must run in an auto-commit transaction (session.run directly)
+    await session.run(
+      "CREATE CONSTRAINT entity_uid_unique IF NOT EXISTS FOR (n:Entity) REQUIRE n.uid IS UNIQUE"
+    );
+    await session.run(
+      "CREATE CONSTRAINT rel_uid_unique IF NOT EXISTS FOR ()-[r:RELATED_TO]-() REQUIRE r.uid IS UNIQUE"
+    );
+    console.log("✅ Neo4j schema constraints ensured (entity_uid_unique, rel_uid_unique)");
+  } catch (error) {
+    console.warn("⚠️ Failed to ensure Neo4j schema constraints:", error);
+  } finally {
+    await session.close();
+  }
+}
+
+/**
  * Singleton client instance for API routes
  */
 let globalClient: Neo4jClient | null = null;
@@ -369,6 +392,10 @@ let globalClient: Neo4jClient | null = null;
 export function getGlobalNeo4jClient(): Neo4jClient {
   if (!globalClient) {
     globalClient = createNeo4jClient();
+    // Fire-and-forget: create UNIQUE constraints on first use
+    ensureSchemaConstraints(globalClient).catch((err) =>
+      console.warn("Neo4j constraint setup failed:", err)
+    );
   }
   return globalClient;
 }

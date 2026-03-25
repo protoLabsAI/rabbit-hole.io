@@ -21,6 +21,7 @@ import {
   type ImportSummary,
   type MergeResult,
 } from "@proto/types";
+import { areSimilarStrings } from "@proto/utils";
 
 import { initializeDomains } from "../../domain-loader";
 import {
@@ -248,7 +249,15 @@ const handleBundleIngest = async (
             )),
         };
 
-        // Check if entity exists before applying merge strategy
+        // Add source tracking to entity properties if not already present
+        if (
+          !(flattenedProperties as Record<string, unknown>).sources &&
+          !(entity.properties as any)?.sources
+        ) {
+          (flattenedProperties as any).sources = [`ingest:${Date.now()}`];
+        }
+
+        // Step 1: Check uid exact match
         const existsQuery = `
           MATCH (e {uid: $uid})
           RETURN e.uid as uid
@@ -257,7 +266,33 @@ const handleBundleIngest = async (
         const existsResult = await client.executeRead(existsQuery, {
           uid: entity.uid,
         });
-        const entityExists = existsResult.records.length > 0;
+        let entityExists = existsResult.records.length > 0;
+        let effectiveUid = entity.uid;
+
+        // Step 2: If no uid match, try fuzzy name+type dedup (threshold 0.85)
+        if (!entityExists && entity.name && entity.type) {
+          try {
+            const fuzzyResult = await client.executeRead(
+              `MATCH (e:Entity) WHERE e.type = $type AND e.name IS NOT NULL RETURN e.uid, e.name LIMIT 100`,
+              { type: entity.type }
+            );
+            for (const record of fuzzyResult.records) {
+              const existingName = record.get("name") as string;
+              const existingUid = record.get("uid") as string;
+              if (areSimilarStrings(entity.name, existingName, 0.85)) {
+                effectiveUid = existingUid;
+                entityExists = true;
+                console.log(
+                  `🔍 Fuzzy dedup: "${entity.name}" → "${existingName}" (uid: ${existingUid})`
+                );
+                break;
+              }
+            }
+          } catch (fuzzyErr) {
+            // Per deviation rules: log and skip fuzzy check, proceed with uid-only dedup
+            console.warn(`⚠️ Fuzzy dedup query failed, skipping:`, fuzzyErr);
+          }
+        }
 
         let mergeResult: MergeResult;
         let entityQuery: string;
@@ -287,7 +322,7 @@ const handleBundleIngest = async (
               summary.entitiesKept++;
               mergeResult = {
                 action: "kept_local",
-                entityId: entity.uid,
+                entityId: effectiveUid,
                 reason: "Local entity preserved",
               };
               entityQuery = ""; // No-op
@@ -303,25 +338,116 @@ const handleBundleIngest = async (
                 ${options.preserveTimestamps ? "SET e.updatedAt = datetime()" : "SET e.createdAt = datetime(), e.updatedAt = datetime()"}
               `;
               queryParams = {
-                uid: entity.uid,
-                properties: flattenedProperties,
+                uid: effectiveUid,
+                properties: { ...flattenedProperties, uid: effectiveUid },
                 orgId: orgId,
               };
               summary.entitiesCreated++; // Count as "created" (replaced)
               mergeResult = {
                 action: "replaced",
-                entityId: entity.uid,
+                entityId: effectiveUid,
                 reason: "Replaced with incoming entity",
               };
               break;
 
+            case "merge_smart": {
+              // Read existing entity's arrays and confidence for smart merge
+              let existingAliases: string[] = [];
+              let existingTags: string[] = [];
+              let existingConfidence = 0;
+              let existingSources: string[] = [];
+
+              try {
+                const readResult = await client.executeRead(
+                  `MATCH (e {uid: $uid}) RETURN e.aliases AS aliases, e.tags AS tags, e.confidence AS confidence, e.sources AS sources LIMIT 1`,
+                  { uid: effectiveUid }
+                );
+                const existing = readResult.records[0];
+                if (existing) {
+                  existingAliases = (existing.get("aliases") as string[]) ?? [];
+                  existingTags = (existing.get("tags") as string[]) ?? [];
+                  existingConfidence =
+                    (existing.get("confidence") as number) ?? 0;
+                  existingSources = (existing.get("sources") as string[]) ?? [];
+                }
+              } catch (readErr) {
+                // Per deviation rules: log and continue with incoming values only
+                console.warn(
+                  `⚠️ Could not read existing entity for merge_smart, using incoming values:`,
+                  readErr
+                );
+              }
+
+              // Union arrays (aliases, tags, sources)
+              const incomingAliases =
+                (flattenedProperties.aliases as string[]) ?? [];
+              const incomingTags = (flattenedProperties.tags as string[]) ?? [];
+              const incomingConfidence =
+                (flattenedProperties as any).confidence ?? 0;
+              const incomingSources =
+                (flattenedProperties as any).sources ?? [];
+
+              const mergedAliases = [
+                ...new Set([...existingAliases, ...incomingAliases]),
+              ];
+              const mergedTags = [
+                ...new Set([...existingTags, ...incomingTags]),
+              ];
+              const mergedSources = [
+                ...new Set([...existingSources, ...incomingSources]),
+              ];
+              // Keep highest confidence value
+              const mergedConfidence = Math.max(
+                existingConfidence,
+                incomingConfidence
+              );
+
+              // Build merged properties: incoming values override existing for non-null scalars
+              const mergedProperties = {
+                ...flattenedProperties,
+                uid: effectiveUid,
+                aliases: mergedAliases,
+                tags: mergedTags,
+                sources: mergedSources,
+                confidence: mergedConfidence,
+              };
+
+              entityQuery = `
+                MATCH (e {uid: $uid})
+                SET e += $properties
+                SET e.aliases = $aliases
+                SET e.tags = $tags
+                SET e.sources = $sources
+                SET e.confidence = $confidence
+                SET e:Entity:${labels.join(":")}:${namespace}
+                SET e.clerk_org_id = $orgId
+                SET e.createdAt = COALESCE(e.createdAt, datetime())
+                SET e.updatedAt = datetime()
+              `;
+              queryParams = {
+                uid: effectiveUid,
+                properties: mergedProperties,
+                aliases: mergedAliases,
+                tags: mergedTags,
+                sources: mergedSources,
+                confidence: mergedConfidence,
+                orgId: orgId,
+              };
+              summary.entitiesCreated++; // Count as "created" (merged)
+              mergeResult = {
+                action: "merged",
+                entityId: effectiveUid,
+                reason: `Smart merge applied (confidence: ${mergedConfidence.toFixed(2)})`,
+              };
+              break;
+            }
+
             default:
-              // Future merge strategies (smart, append, etc.)
-              // For now, default to keep_local
+              // Unknown strategies default to keep_local
               summary.entitiesKept++;
               mergeResult = {
                 action: "kept_local",
-                entityId: entity.uid,
+                entityId: effectiveUid,
                 reason: "Strategy not implemented, kept local",
               };
               entityQuery = "";
@@ -331,19 +457,41 @@ const handleBundleIngest = async (
 
         // Execute query if we have one
         if (entityQuery) {
-          await client.executeWrite(entityQuery, queryParams);
+          try {
+            await client.executeWrite(entityQuery, queryParams);
 
-          // Emit live update event for connected Atlas clients
-          graphUpdateEmitter.emit("graph-update", {
-            type: "entity_created",
-            uid: entity.uid,
-            name: entity.name,
-            entityType: entity.type,
-            properties: entity.properties,
-            tags: entity.tags,
-            aliases: entity.aliases,
-            timestamp: new Date().toISOString(),
-          } satisfies GraphEntityEvent);
+            // Emit live update event for connected Atlas clients
+            graphUpdateEmitter.emit("graph-update", {
+              type: "entity_created",
+              uid: effectiveUid,
+              name: entity.name,
+              entityType: entity.type,
+              properties: entity.properties,
+              tags: entity.tags,
+              aliases: entity.aliases,
+              timestamp: new Date().toISOString(),
+            } satisfies GraphEntityEvent);
+          } catch (writeError: any) {
+            // Treat unique constraint violations as "already exists" — keep local
+            if (
+              writeError?.code ===
+              "Neo.ClientError.Schema.ConstraintValidationFailed"
+            ) {
+              console.warn(
+                `⚠️ Entity uid conflict (constraint violation), keeping existing: ${effectiveUid}`
+              );
+              // Undo the optimistic entitiesCreated count and treat as kept
+              summary.entitiesCreated--;
+              summary.entitiesKept++;
+              mergeResult = {
+                action: "kept_local",
+                entityId: effectiveUid,
+                reason: "Unique constraint violation — entity already exists",
+              };
+            } else {
+              throw writeError;
+            }
+          }
         }
 
         summary.mergeResults.push(mergeResult);

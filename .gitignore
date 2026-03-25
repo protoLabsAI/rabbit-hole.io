@@ -110,3 +110,4 @@ storybook-static
 !.automaker/settings.json
 !.automaker/worktree-init.sh
 !.automaker/categories.json
+.automaker-lock
