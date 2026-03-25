@@ -30,10 +30,10 @@ import {
 // ─── LOD / Performance Constants ────────────────────────────────────
 
 /** Nodes beyond this distance from the camera suppress their text label. */
-const LOD_LABEL_DISTANCE = 500;
+const LOD_LABEL_DISTANCE = 300;
 
 /** Node count threshold above which large-graph performance mode activates. */
-const LARGE_GRAPH_THRESHOLD = 5000;
+const LARGE_GRAPH_THRESHOLD = 2000;
 
 // react-force-graph-3d requires WebGL — disable SSR
 const ForceGraph3D = dynamic(() => import("react-force-graph-3d"), {
@@ -230,7 +230,7 @@ export default function Atlas3DClient() {
     const viewMode = centerEntity ? "ego" : "full-atlas";
 
     setLoading(true);
-    fetchGraphData(viewMode, 2000, centerEntity)
+    fetchGraphData(viewMode, 5000, centerEntity)
       .then((data) => {
         setGraphData(data);
         if (isMultiHighlight) {
@@ -452,11 +452,12 @@ export default function Atlas3DClient() {
             nodeLabel={nodeLabelFn}
             nodeVisibility={nodeVisibility}
             nodeOpacity={0.9}
-            nodeResolution={isLargeGraph ? 8 : 12}
+            nodeResolution={isLargeGraph ? 6 : 12}
+            nodeRelSize={isLargeGraph ? 3 : 4}
             // Link rendering
             linkColor={(link: any) => link.color ?? "#334155"}
             linkOpacity={settings.linkOpacity}
-            linkWidth={0.5}
+            linkWidth={isLargeGraph ? 0.3 : 0.5}
             linkDirectionalParticles={isLargeGraph ? 0 : 2}
             linkDirectionalParticleWidth={0.8}
             linkDirectionalParticleSpeed={settings.particleSpeed}
@@ -465,11 +466,11 @@ export default function Atlas3DClient() {
             enablePointerInteraction={true}
             enableNodeDrag={!isLargeGraph}
             // Force layout — freeze after initial settle to save CPU
-            warmupTicks={isLargeGraph ? 200 : 100}
+            warmupTicks={isLargeGraph ? 300 : 100}
             cooldownTicks={0}
-            cooldownTime={isLargeGraph ? 3000 : 8000}
-            d3AlphaDecay={isLargeGraph ? 0.05 : 0.02}
-            d3VelocityDecay={isLargeGraph ? 0.5 : 0.3}
+            cooldownTime={isLargeGraph ? 2000 : 8000}
+            d3AlphaDecay={isLargeGraph ? 0.08 : 0.02}
+            d3VelocityDecay={isLargeGraph ? 0.6 : 0.3}
             onEngineStop={() => {
               // Simulation frozen — no more per-frame physics
               console.log("[atlas] Force simulation frozen");
