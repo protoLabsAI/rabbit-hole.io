@@ -19,6 +19,8 @@ import {
   tool,
   convertToModelMessages,
   stepCountIs,
+  createUIMessageStream,
+  createUIMessageStreamResponse,
   type UIMessage,
 } from "ai";
 import { z } from "zod";
@@ -29,6 +31,7 @@ import {
   DeferredToolLoadingMiddleware,
   type MiddlewareContext,
   type ToolExecutor,
+  type ExtractionPreview,
 } from "@proto/research-middleware";
 import { generateSecureId } from "@proto/utils";
 
@@ -143,6 +146,59 @@ These should be short phrases a user would type into a search engine (like "DORA
 - After calling askClarification, stop and wait for the user's response — do not call any other tools or emit a final answer
 - Limit: 1 clarification per conversation turn. If you have already asked one, proceed with your best interpretation`;
 
+// ─── Auto-ingest threshold ───────────────────────────────────────────
+
+/** Minimum extraction confidence to trigger automatic entity ingestion. */
+const AUTO_INGEST_CONFIDENCE_THRESHOLD = 0.7;
+
+// ─── Bundle builder for auto-ingest ─────────────────────────────────
+
+/**
+ * Converts an ExtractionPreview into a RabbitHoleBundleData-compatible
+ * payload for the ingest-bundle endpoint.
+ */
+function buildAutoIngestBundle(preview: ExtractionPreview) {
+  const timestamp = Date.now();
+  return {
+    entities: preview.entities.map((entity) => ({
+      uid: entity.uid,
+      type: entity.type,
+      name: entity.name,
+      aliases: entity.aliases ?? [],
+      tags: [],
+      properties: {
+        ...(entity.properties ?? {}),
+        // Source tracking: record provenance as auto-extracted from search
+        sources: [`auto-extract:${timestamp}`],
+      },
+    })),
+    relationships: preview.relationships.map((rel) => ({
+      uid: rel.uid,
+      type: rel.type,
+      source: rel.source,
+      target: rel.target,
+      ...(rel.confidence !== undefined && { confidence: rel.confidence }),
+      properties: {},
+    })),
+    evidence:
+      preview.citations.length > 0
+        ? [
+            {
+              uid: `evidence:auto-ingest-${timestamp}`,
+              kind: "research",
+              title: "Auto-extracted from search agent",
+              publisher: "Rabbit Hole Search Agent",
+              date: new Date().toISOString().slice(0, 10),
+              reliability: preview.confidence,
+              notes: `Auto-ingested with ${Math.round(preview.confidence * 100)}% confidence`,
+            },
+          ]
+        : [],
+    files: [],
+    content: [],
+  };
+}
+
 // ─── Route Handler ──────────────────────────────────────────────────
 
 export async function POST(request: Request) {
@@ -241,6 +297,16 @@ export async function POST(request: Request) {
 
   const modelMessages = await convertToModelMessages(messages);
 
+  // Promise that resolves with the extraction preview after afterAgent runs.
+  // This allows createUIMessageStream to inject the preview as message
+  // metadata after the AI stream completes — without blocking the response.
+  let resolveExtractionPreview!: (preview: ExtractionPreview | null) => void;
+  const extractionPreviewPromise = new Promise<ExtractionPreview | null>(
+    (resolve) => {
+      resolveExtractionPreview = resolve;
+    }
+  );
+
   const result = streamText({
     model,
     system: SYSTEM_PROMPT,
@@ -289,7 +355,8 @@ export async function POST(request: Request) {
     },
 
     // afterAgent: fires when the full agent loop completes.
-    // Tracing is flushed asynchronously — no latency impact on the response.
+    // Runs afterAgent middleware (including StructuredExtractionMiddleware),
+    // then auto-ingests high-confidence entities if applicable.
     onFinish: async (event) => {
       await chain.afterAgent(ctx, {
         text: event.text,
@@ -305,10 +372,81 @@ export async function POST(request: Request) {
         },
       });
 
+      const preview = ctx.state["extractionPreview"] as
+        | ExtractionPreview
+        | undefined;
+
+      // Auto-ingest high-confidence entities (>= 0.7) without user action.
+      // Low-confidence extractions are left for manual "Add to Graph".
+      if (
+        preview &&
+        typeof preview.confidence === "number" &&
+        preview.confidence >= AUTO_INGEST_CONFIDENCE_THRESHOLD
+      ) {
+        try {
+          const rabbitHoleUrl =
+            process.env.RABBIT_HOLE_URL || "http://localhost:3000";
+          const bundle = buildAutoIngestBundle(preview);
+          const ingestRes = await fetch(`${rabbitHoleUrl}/api/ingest-bundle`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              data: bundle,
+              mergeOptions: {
+                strategy: "merge_smart",
+                preserveTimestamps: true,
+              },
+            }),
+          });
+          if (ingestRes.ok) {
+            preview.autoIngested = true;
+            console.log(
+              `[auto-ingest] ✅ Ingested ${preview.entities.length} entities (confidence: ${preview.confidence.toFixed(2)})`
+            );
+          } else {
+            console.warn(
+              `[auto-ingest] ⚠️ Ingest endpoint returned ${ingestRes.status}`
+            );
+          }
+        } catch (err) {
+          // Per deviation rules: log error, do not block the response
+          console.error(`[auto-ingest] ❌ Failed:`, err);
+        }
+      }
+
+      // Resolve the preview promise so createUIMessageStream can inject metadata.
+      resolveExtractionPreview(preview ?? null);
+
       // Flush Langfuse trace in the background — never blocks the response.
       tracing.flush().catch(() => {});
     },
   });
 
-  return result.toUIMessageStreamResponse();
+  // Use createUIMessageStream to inject the extraction preview as message
+  // metadata after the AI stream completes. This allows the client to:
+  // 1. Show "Auto-ingested" status for high-confidence extractions
+  // 2. Show manual "Add to Graph" button for low-confidence extractions
+  const uiStream = createUIMessageStream({
+    execute: async ({ writer }) => {
+      // Merge the AI stream (without its finish event — we send our own).
+      writer.merge(result.toUIMessageStream({ sendFinish: false }));
+
+      // Wait for afterAgent to complete and resolve the extraction preview.
+      const preview = await extractionPreviewPromise;
+
+      // Inject the extraction preview as message metadata so the client
+      // can display auto-ingest status without a separate API call.
+      if (preview) {
+        writer.write({
+          type: "message-metadata",
+          messageMetadata: { extractionPreview: preview },
+        });
+      }
+
+      // Send finish to close the message on the client.
+      writer.write({ type: "finish" });
+    },
+  });
+
+  return createUIMessageStreamResponse({ stream: uiStream });
 }

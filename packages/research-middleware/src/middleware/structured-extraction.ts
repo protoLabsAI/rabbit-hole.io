@@ -81,6 +81,12 @@ export interface ExtractionPreview {
   citations: string[];
   /** Overall extraction confidence in [0, 1]. */
   confidence: number;
+  /**
+   * Set to true by the auto-ingest pipeline when high-confidence entities
+   * (>= 0.7) have been automatically ingested into Neo4j after the agent
+   * completes. Low-confidence extractions leave this undefined/false.
+   */
+  autoIngested?: boolean;
 }
 
 // ---------------------------------------------------------------------------
