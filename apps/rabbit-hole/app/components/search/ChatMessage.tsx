@@ -14,7 +14,12 @@ import { ReasoningBlock } from "./ReasoningBlock";
 /** Matches ExtractionPreview from @proto/research-middleware */
 interface ExtractionPreview {
   entities: Array<{ uid: string; type: string; name: string }>;
-  relationships: Array<{ uid: string; type: string; source: string; target: string }>;
+  relationships: Array<{
+    uid: string;
+    type: string;
+    source: string;
+    target: string;
+  }>;
   evidence: string[];
   citations: string[];
   confidence: number;
@@ -102,10 +107,15 @@ function ExtractionPreviewCard({
             name={confirmed ? "Check" : ingesting ? "Loader2" : "DatabaseZap"}
             className={`h-3.5 w-3.5 ${ingesting ? "animate-spin" : ""}`}
           />
-          {confirmed ? "Added to Graph" : ingesting ? "Adding..." : "Add to Knowledge Graph"}
+          {confirmed
+            ? "Added to Graph"
+            : ingesting
+              ? "Adding..."
+              : "Add to Knowledge Graph"}
         </button>
         <p className="text-[10px] text-muted-foreground">
-          Extracted from full research context — higher quality than manual ingest
+          Extracted from full research context — higher quality than manual
+          ingest
         </p>
       </div>
     </div>
@@ -391,7 +401,9 @@ function ToolCallCard({
           {isActive ? config.activeLabel : config.label}
         </span>
         {statusBadge && (
-          <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded-full ${statusBadge.color}`}>
+          <span
+            className={`text-[9px] font-medium px-1.5 py-0.5 rounded-full ${statusBadge.color}`}
+          >
             {statusBadge.label}
           </span>
         )}
@@ -431,7 +443,12 @@ function extractSuggestions(text: string): string[] {
   if (blockMatch) {
     return blockMatch[1]
       .split("\n")
-      .map((l) => l.replace(/^[-*•\d.)\s`]+/, "").replace(/`+$/, "").trim())
+      .map((l) =>
+        l
+          .replace(/^[-*•\d.)\s`]+/, "")
+          .replace(/`+$/, "")
+          .trim()
+      )
       .filter((l) => l.length > 3 && l.length < 120)
       .slice(0, 3);
   }
@@ -442,7 +459,12 @@ function extractSuggestions(text: string): string[] {
     const tail = text.slice(relatedIdx + "Related searches:".length);
     return tail
       .split("\n")
-      .map((l) => l.replace(/^[-*•\d.)\s`]+/, "").replace(/`+$/, "").trim())
+      .map((l) =>
+        l
+          .replace(/^[-*•\d.)\s`]+/, "")
+          .replace(/`+$/, "")
+          .trim()
+      )
       .filter((l) => l.length > 3 && l.length < 120)
       .slice(0, 3);
   }
@@ -477,7 +499,12 @@ function stripRelatedSearches(text: string): string {
 function SourcesSummary({
   sources,
 }: {
-  sources: Array<{ title: string; url: string; type: string; snippet?: string }>;
+  sources: Array<{
+    title: string;
+    url: string;
+    type: string;
+    snippet?: string;
+  }>;
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -641,7 +668,11 @@ export function ChatMessage({
   // Extraction preview: read from message annotations (populated by the server
   // after afterAgent completes). The server writes this as a data annotation via
   // the middleware pipeline; the user must explicitly confirm to ingest.
-  const extractionPreview = (message.annotations ?? []).find(
+  // NOTE: AI SDK v6 dropped .annotations from UIMessage — cast through to
+  // preserve runtime compatibility until the annotation pipeline is migrated.
+  const annotations = ((message as unknown as Record<string, unknown>)
+    .annotations ?? []) as unknown[];
+  const extractionPreview = annotations.find(
     (a): a is ExtractionPreview & { type: string } =>
       typeof a === "object" &&
       a !== null &&
@@ -652,7 +683,7 @@ export function ChatMessage({
   // Reasoning annotation: rendered as a collapsible "thinking" block when the
   // model uses extended thinking. The server writes this as an annotation with
   // { type: "reasoning", content: string, duration?: number }.
-  const reasoningAnnotation = (message.annotations ?? []).find(
+  const reasoningAnnotation = annotations.find(
     (a): a is { type: "reasoning"; content: string; duration?: number } =>
       typeof a === "object" &&
       a !== null &&
@@ -670,18 +701,37 @@ export function ChatMessage({
 
   // Extract sources from tool results for citation badges
   const sources = useMemo(() => {
-    const result: Array<{ title: string; url: string; type: "web" | "wikipedia" | "graph"; snippet?: string }> = [];
+    const result: Array<{
+      title: string;
+      url: string;
+      type: "web" | "wikipedia" | "graph";
+      snippet?: string;
+    }> = [];
     for (const t of allTools) {
       const output = t.output ?? t.result;
       if (!output) continue;
       if (t.toolName === "searchWeb" && Array.isArray(output.results)) {
         for (const r of output.results) {
           if (r.url && r.title) {
-            result.push({ title: r.title, url: r.url, type: "web", snippet: r.snippet });
+            result.push({
+              title: r.title,
+              url: r.url,
+              type: "web",
+              snippet: r.snippet,
+            });
           }
         }
-      } else if (t.toolName === "searchWikipedia" && output.url && output.title) {
-        result.push({ title: output.title, url: output.url, type: "wikipedia", snippet: output.text?.slice(0, 200) });
+      } else if (
+        t.toolName === "searchWikipedia" &&
+        output.url &&
+        output.title
+      ) {
+        result.push({
+          title: output.title,
+          url: output.url,
+          type: "wikipedia",
+          snippet: output.text?.slice(0, 200),
+        });
       }
     }
     return result;
@@ -746,9 +796,7 @@ export function ChatMessage({
       )}
 
       {/* Sources summary — collapsible list */}
-      {isComplete && sources.length > 0 && (
-        <SourcesSummary sources={sources} />
-      )}
+      {isComplete && sources.length > 0 && <SourcesSummary sources={sources} />}
 
       {/* Actions */}
       {isComplete && textContent && (

@@ -159,9 +159,9 @@ export async function POST(request: Request) {
     .reverse()
     .find((m) => m.role === "user");
   const query =
-    typeof lastUserMessage?.content === "string"
-      ? lastUserMessage.content
-      : undefined;
+    lastUserMessage?.parts?.find(
+      (p): p is Extract<typeof p, { type: "text" }> => p.type === "text"
+    )?.text ?? undefined;
 
   const tracing = createTracingContext({ agentId, query });
   const ctx: MiddlewareContext = { agentId, state: {}, tracing };
@@ -275,7 +275,7 @@ export async function POST(request: Request) {
         toolCalls: step.toolCalls?.map((tc) => ({
           toolCallId: tc.toolCallId,
           toolName: tc.toolName,
-          args: tc.args as Record<string, unknown>,
+          args: ("args" in tc ? tc.args : {}) as Record<string, unknown>,
         })),
         usage: {
           promptTokens: step.usage?.inputTokens ?? undefined,
