@@ -275,25 +275,18 @@ export default function Atlas3DClient() {
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Node click → select + fly to (panel stays closed unless double-clicked)
+  // Node click → select + fly to + open detail panel
   const handleNodeClick = useCallback((node: any) => {
     if (!node || !graphRef.current) return;
     setSelectedNode(node as AtlasNode);
+    setDetailPanelOpen(true);
     graphRef.current.cameraPosition(
       { x: node.x, y: node.y, z: node.z + 150 },
       { x: node.x, y: node.y, z: node.z },
       1000
     );
-  }, []);
-
-  // Node double-click → open detail panel
-  const handleNodeDoubleClick = useCallback((node: any) => {
-    if (!node) return;
-    setSelectedNode(node as AtlasNode);
-    setDetailPanelOpen(true);
   }, []);
 
   // Expand node → load neighbors and merge
@@ -447,14 +440,14 @@ export default function Atlas3DClient() {
             nodeColor={(node: any) => {
               if (highlightedUids.size === 0) return node.color ?? "#6B7280";
               return highlightedUids.has(node.id)
-                ? node.color ?? "#6B7280"
+                ? (node.color ?? "#6B7280")
                 : "#1e2130";
             }}
             nodeVal={(node: any) => {
               if (highlightedUids.size === 0) return node.val ?? 1;
               return highlightedUids.has(node.id)
                 ? (node.val ?? 1) * 1.6
-                : node.val ?? 1;
+                : (node.val ?? 1);
             }}
             nodeLabel={nodeLabelFn}
             nodeVisibility={nodeVisibility}
@@ -478,60 +471,10 @@ export default function Atlas3DClient() {
             d3VelocityDecay={0.3}
             // Events
             onNodeClick={handleNodeClick}
-            onNodeRightClick={handleNodeDoubleClick}
           />
         )}
 
-        {/* Selected node mini-card — bottom-left quick actions */}
-        {selectedNode && !detailPanelOpen && (
-          <div className="absolute bottom-14 left-3 w-60 bg-[#0d0d18]/95 backdrop-blur border border-white/[0.07] rounded-lg shadow-lg p-3 z-10">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-xs font-semibold text-foreground truncate">
-                {selectedNode.name}
-              </h3>
-              <button
-                onClick={() => setSelectedNode(null)}
-                className="p-0.5 text-muted-foreground hover:text-foreground transition-colors rounded"
-              >
-                <Icon name="X" className="h-3 w-3" />
-              </button>
-            </div>
-            <div className="flex items-center gap-1.5 mb-2.5">
-              <span
-                className="w-2 h-2 rounded-full flex-shrink-0"
-                style={{ backgroundColor: selectedNode.color }}
-              />
-              <span className="text-[11px] text-muted-foreground capitalize">
-                {selectedNode.type}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setDetailPanelOpen(true)}
-                className="flex items-center gap-1 text-[11px] text-primary hover:text-primary/80 transition-colors"
-              >
-                <Icon name="PanelRight" className="h-3 w-3" />
-                Details
-              </button>
-              <button
-                onClick={() => handleExpand(selectedNode.id)}
-                className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <Icon name="Maximize2" className="h-3 w-3" />
-                Expand
-              </button>
-              <a
-                href={`/atlas?viewMode=ego&centerEntity=${selectedNode.id}`}
-                className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <Icon name="Focus" className="h-3 w-3" />
-                Ego
-              </a>
-            </div>
-          </div>
-        )}
-
-        {/* Full-detail slide-out panel */}
+        {/* Full-detail slide-out panel — opens on node click */}
         <Atlas3DDetailPanel
           entityId={detailPanelOpen ? (selectedNode?.id ?? null) : null}
           entityName={selectedNode?.name}
@@ -541,6 +484,17 @@ export default function Atlas3DClient() {
           onExpand={(id) => {
             handleExpand(id);
             setDetailPanelOpen(false);
+          }}
+          onEntityNavigate={(uid, _name) => {
+            const node = graphData?.nodes.find((n) => n.id === uid);
+            if (node && graphRef.current) {
+              setSelectedNode(node);
+              graphRef.current.cameraPosition(
+                { x: node.x ?? 0, y: node.y ?? 0, z: (node.z ?? 0) + 150 },
+                { x: node.x ?? 0, y: node.y ?? 0, z: node.z ?? 0 },
+                1000
+              );
+            }
           }}
         />
 

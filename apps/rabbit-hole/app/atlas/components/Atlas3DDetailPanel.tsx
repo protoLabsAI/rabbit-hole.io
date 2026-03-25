@@ -12,6 +12,10 @@ import {
 } from "../../components/ui/sheet";
 import { getEntityVisual } from "../lib/atlas-schema";
 
+import { EntityActions } from "./EntityActions";
+import { EntityRelationships } from "./EntityRelationships";
+import { RelatedEntities } from "./RelatedEntities";
+
 // ─── Types ──────────────────────────────────────────────────────────
 
 interface EntityDetails {
@@ -54,6 +58,7 @@ interface Atlas3DDetailPanelProps {
   entityColor?: string;
   onClose: () => void;
   onExpand?: (entityId: string) => void;
+  onEntityNavigate?: (uid: string, name: string) => void;
 }
 
 // ─── Prominent properties ordered by entity type ─────────────────────
@@ -88,15 +93,21 @@ export default function Atlas3DDetailPanel({
   entityColor,
   onClose,
   onExpand,
+  onEntityNavigate,
 }: Atlas3DDetailPanelProps) {
   const [details, setDetails] = useState<EntityDetails | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showAllProps, setShowAllProps] = useState(false);
 
+  // AI summary state
+  const [summary, setSummary] = useState<string | null>(null);
+  const [summaryLoading, setSummaryLoading] = useState(false);
+
   // Reset expanded state when entity changes
   useEffect(() => {
     setShowAllProps(false);
+    setSummary(null);
   }, [entityId]);
 
   // Fetch entity details when panel opens
@@ -120,6 +131,28 @@ export default function Atlas3DDetailPanel({
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
+  }, [entityId]);
+
+  // Fetch AI summary
+  useEffect(() => {
+    if (!entityId) {
+      setSummary(null);
+      return;
+    }
+
+    setSummaryLoading(true);
+
+    fetch(`/api/atlas/entity-summary/${encodeURIComponent(entityId)}`)
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.summary) {
+          setSummary(json.summary);
+        }
+      })
+      .catch(() => {
+        // Non-fatal — summary is optional
+      })
+      .finally(() => setSummaryLoading(false));
   }, [entityId]);
 
   const open = entityId !== null;
@@ -151,6 +184,13 @@ export default function Atlas3DDetailPanel({
     : 0;
 
   const displayName = details?.entity.label ?? entityName ?? "Loading…";
+
+  // Entity navigate handler — navigates in graph and keeps panel open on same entity
+  const handleEntityNavigate = (uid: string, name: string) => {
+    if (onEntityNavigate) {
+      onEntityNavigate(uid, name);
+    }
+  };
 
   return (
     <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
@@ -198,6 +238,28 @@ export default function Atlas3DDetailPanel({
             </div>
           )}
 
+          {/* ── AI Summary ────────────────────────────────── */}
+          {entityId && (summaryLoading || summary) && (
+            <section>
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-2">
+                Summary
+              </p>
+              {summaryLoading && !summary ? (
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Icon
+                    name="Loader2"
+                    className="h-3.5 w-3.5 animate-spin flex-shrink-0"
+                  />
+                  Generating summary…
+                </div>
+              ) : summary ? (
+                <p className="text-xs text-muted-foreground/80 leading-relaxed">
+                  {summary}
+                </p>
+              ) : null}
+            </section>
+          )}
+
           {!loading && !error && details && (
             <>
               {/* ── Metrics row ───────────────────────────────── */}
@@ -212,12 +274,7 @@ export default function Atlas3DDetailPanel({
                   value={relTypeCount}
                   icon="Shuffle"
                 />
-                <KpiCard
-                  label="Sources"
-                  value={0}
-                  icon="BookOpen"
-                  muted
-                />
+                <KpiCard label="Sources" value={0} icon="BookOpen" muted />
               </div>
 
               {/* ── Bio block ──────────────────────────────────── */}
@@ -311,6 +368,32 @@ export default function Atlas3DDetailPanel({
             </>
           )}
 
+          {/* ── Relationships ───────────────────────────────── */}
+          {entityId && (
+            <section>
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-2.5">
+                Relationships
+              </p>
+              <EntityRelationships
+                entityUid={entityId}
+                onEntityClick={handleEntityNavigate}
+              />
+            </section>
+          )}
+
+          {/* ── Related Entities ────────────────────────────── */}
+          {entityId && (
+            <section>
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-2.5">
+                Related
+              </p>
+              <RelatedEntities
+                entityUid={entityId}
+                onEntityClick={handleEntityNavigate}
+              />
+            </section>
+          )}
+
           {/* Placeholder content while loading first-time (entity name known) */}
           {!loading && !error && !details && entityId && (
             <div className="flex items-center justify-center py-12 text-muted-foreground text-sm">
@@ -320,24 +403,13 @@ export default function Atlas3DDetailPanel({
         </div>
 
         {/* ── Footer actions ──────────────────────────────────── */}
-        <div className="flex-shrink-0 px-5 py-3 border-t border-white/[0.06] flex items-center gap-2">
-          {onExpand && entityId && (
-            <button
-              onClick={() => onExpand(entityId)}
-              className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors px-3 py-1.5 rounded-md bg-primary/10 hover:bg-primary/15"
-            >
-              <Icon name="Maximize2" className="h-3.5 w-3.5" />
-              Expand Neighborhood
-            </button>
-          )}
+        <div className="flex-shrink-0 px-5 py-3 border-t border-white/[0.06]">
           {entityId && (
-            <a
-              href={`/atlas?viewMode=ego&centerEntity=${entityId}`}
-              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-md hover:bg-white/[0.04]"
-            >
-              <Icon name="Focus" className="h-3.5 w-3.5" />
-              Ego view
-            </a>
+            <EntityActions
+              entityUid={entityId}
+              entityName={displayName}
+              onExpand={() => onExpand?.(entityId)}
+            />
           )}
         </div>
       </SheetContent>
