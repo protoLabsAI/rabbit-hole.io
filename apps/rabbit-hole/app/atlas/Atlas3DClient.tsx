@@ -13,7 +13,8 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import type { ForceGraphMethods } from "react-force-graph-3d";
 
 import { Icon } from "@proto/icon-system";
@@ -140,6 +141,27 @@ export default function Atlas3DClient() {
       typeof window !== "undefined" ? window.innerHeight - HEADER_HEIGHT : 800,
   });
 
+  // Parse URL params — supports both ?centerEntity=uid and ?entities=uid1,uid2,uid3
+  const searchParams = useSearchParams();
+  const centerEntity = searchParams.get("centerEntity") ?? undefined;
+  const entitiesParam = searchParams.get("entities") ?? undefined;
+
+  // Build the set of highlighted UIDs from either param
+  const highlightedUids = useMemo<Set<string>>(() => {
+    const uids = new Set<string>();
+    if (centerEntity) uids.add(centerEntity);
+    if (entitiesParam) {
+      entitiesParam.split(",").forEach((uid) => {
+        const trimmed = uid.trim();
+        if (trimmed) uids.add(trimmed);
+      });
+    }
+    return uids;
+  }, [centerEntity, entitiesParam]);
+
+  // Whether multi-entity highlight mode is active
+  const isMultiHighlight = highlightedUids.size > 1;
+
   // SSE subscription — merges new nodes/links from ingest events in real-time
   const { connected, outOfSync, recentEntityCount, clearOutOfSync } =
     useGraphUpdates(setGraphData, graphRef);
@@ -158,16 +180,40 @@ export default function Atlas3DClient() {
 
   // Fetch graph data
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const centerEntity = params.get("centerEntity") ?? undefined;
     const viewMode = centerEntity ? "ego" : "full-atlas";
 
     setLoading(true);
     fetchGraphData(viewMode, 2000, centerEntity)
       .then((data) => {
         setGraphData(data);
-        // Fly to center entity if specified
-        if (centerEntity) {
+        if (isMultiHighlight) {
+          // For multi-entity mode: fit camera to contain all highlighted nodes
+          setTimeout(() => {
+            if (!graphRef.current) return;
+            const highlighted = data.nodes.filter((n) =>
+              highlightedUids.has(n.id)
+            );
+            if (highlighted.length === 0) return;
+            // Compute bounding box centroid
+            const xs = highlighted.map((n) => (n as any).x ?? 0);
+            const ys = highlighted.map((n) => (n as any).y ?? 0);
+            const zs = highlighted.map((n) => (n as any).z ?? 0);
+            const cx = (Math.min(...xs) + Math.max(...xs)) / 2;
+            const cy = (Math.min(...ys) + Math.max(...ys)) / 2;
+            const cz = (Math.min(...zs) + Math.max(...zs)) / 2;
+            const spread = Math.max(
+              Math.max(...xs) - Math.min(...xs),
+              Math.max(...ys) - Math.min(...ys),
+              100
+            );
+            graphRef.current.cameraPosition(
+              { x: cx, y: cy, z: cz + spread * 2 + 300 },
+              { x: cx, y: cy, z: cz },
+              1500
+            );
+          }, 2500);
+        } else if (centerEntity) {
+          // Single entity: fly to it
           setTimeout(() => {
             const node = data.nodes.find((n) => n.id === centerEntity);
             if (node && graphRef.current) {
@@ -182,6 +228,7 @@ export default function Atlas3DClient() {
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Node click → select + fly to
@@ -325,9 +372,19 @@ export default function Atlas3DClient() {
             graphData={graphData}
             backgroundColor="#0a0a12"
             showNavInfo={false}
-            // Node rendering
-            nodeColor={(node: any) => node.color ?? "#6B7280"}
-            nodeVal={(node: any) => node.val ?? 1}
+            // Node rendering — highlight matching nodes when ?entities= is set
+            nodeColor={(node: any) => {
+              if (highlightedUids.size === 0) return node.color ?? "#6B7280";
+              return highlightedUids.has(node.id)
+                ? node.color ?? "#6B7280"
+                : "#1e2130";
+            }}
+            nodeVal={(node: any) => {
+              if (highlightedUids.size === 0) return node.val ?? 1;
+              return highlightedUids.has(node.id)
+                ? (node.val ?? 1) * 1.6
+                : node.val ?? 1;
+            }}
             nodeLabel={nodeLabel}
             nodeVisibility={nodeVisibility}
             nodeOpacity={0.9}

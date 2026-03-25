@@ -1,6 +1,7 @@
 "use client";
 
 import type { UIMessage } from "ai";
+import Link from "next/link";
 import { useState, useCallback, useMemo } from "react";
 
 import { Icon } from "@proto/icon-system";
@@ -8,6 +9,25 @@ import { Badge } from "@proto/ui/atoms";
 
 import { ChatMarkdown } from "./ChatMarkdown";
 import { ReasoningBlock } from "./ReasoningBlock";
+
+// ─── Entity type → dot color (mirrors atlas-schema ENTITY_VISUALS) ──
+
+const ENTITY_TYPE_COLORS: Record<string, string> = {
+  person: "#60A5FA",
+  organization: "#F59E0B",
+  technology: "#10B981",
+  concept: "#8B5CF6",
+  event: "#EF4444",
+  location: "#EC4899",
+  country: "#14B8A6",
+  platform: "#F97316",
+  movement: "#A855F7",
+  publication: "#6366F1",
+  law: "#D946EF",
+  product: "#22D3EE",
+  disease: "#FB7185",
+  species: "#4ADE80",
+};
 
 // ─── Extraction Preview Types ────────────────────────────────────────
 
@@ -749,20 +769,28 @@ export function ChatMessage({
     return result;
   }, [allTools]);
 
-  // Extract graph entity UIDs from searchGraph results for "View in Atlas" CTA
+  // Extract graph entities from searchGraph results for "View in Atlas" CTA
   const graphEntities = useMemo(() => {
-    const uids: string[] = [];
+    const seen = new Set<string>();
+    const entities: Array<{ uid: string; name: string; type: string }> = [];
     for (const t of allTools) {
       if (t.toolName === "searchGraph") {
         const output = t.output ?? t.result;
         if (Array.isArray(output)) {
           for (const entity of output) {
-            if (entity?.uid) uids.push(entity.uid);
+            if (entity?.uid && !seen.has(entity.uid)) {
+              seen.add(entity.uid);
+              entities.push({
+                uid: entity.uid,
+                name: entity.name ?? entity.uid,
+                type: entity.type ?? "",
+              });
+            }
           }
         }
       }
     }
-    return uids;
+    return entities;
   }, [allTools]);
 
   const isComplete = !isStreaming || !isLast;
@@ -880,15 +908,37 @@ export function ChatMessage({
             </button>
           )}
 
-          {/* View in Atlas — show when graph entities were found */}
+          {/* View in Atlas — entity chips + view-all button */}
           {graphEntities.length > 0 && (
-            <a
-              href={`/atlas?centerEntity=${graphEntities[0]}`}
-              className="flex items-center gap-1 text-[11px] text-muted-foreground/60 hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-muted/50"
-            >
-              <Icon name="Globe" className="h-3.5 w-3.5" />
-              View in Atlas
-            </a>
+            <>
+              <div className="w-px h-4 bg-border/40 mx-1" />
+              <div className="flex items-center gap-1 flex-wrap">
+                {graphEntities.slice(0, 5).map((entity) => (
+                  <Link
+                    key={entity.uid}
+                    href={`/atlas?centerEntity=${entity.uid}`}
+                    className="inline-flex items-center gap-1 text-[11px] text-muted-foreground/70 hover:text-foreground transition-colors px-2 py-0.5 rounded-md hover:bg-muted/50 border border-border/40 hover:border-primary/30"
+                  >
+                    <span
+                      className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                      style={{
+                        backgroundColor: ENTITY_TYPE_COLORS[entity.type?.toLowerCase()] ?? "#6B7280",
+                      }}
+                    />
+                    {entity.name}
+                  </Link>
+                ))}
+                {graphEntities.length > 1 && (
+                  <Link
+                    href={`/atlas?entities=${graphEntities.map((e) => e.uid).join(",")}`}
+                    className="inline-flex items-center gap-1 text-[11px] text-primary/70 hover:text-primary transition-colors px-2 py-0.5 rounded-md hover:bg-primary/5 border border-primary/20 hover:border-primary/40"
+                  >
+                    <Icon name="Globe" className="h-3 w-3" />
+                    View all in Atlas
+                  </Link>
+                )}
+              </div>
+            </>
           )}
         </div>
       )}
