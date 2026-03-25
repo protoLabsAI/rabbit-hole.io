@@ -19,6 +19,7 @@ import type { ForceGraphMethods } from "react-force-graph-3d";
 
 import { Icon } from "@proto/icon-system";
 
+import Atlas3DDetailPanel from "./components/Atlas3DDetailPanel";
 import { useGraphUpdates } from "./hooks/useGraphUpdates";
 import {
   getEntityVisual,
@@ -170,6 +171,7 @@ export default function Atlas3DClient() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedNode, setSelectedNode] = useState<AtlasNode | null>(null);
+  const [detailPanelOpen, setDetailPanelOpen] = useState(false);
   const [settings, setSettings] = useState<AtlasSettings>(DEFAULT_SETTINGS);
   // Mutable ref tracking camera position — updated per-frame via onRenderFramePre
   // to drive LOD label and nodeVisibility callbacks without React re-renders.
@@ -276,7 +278,7 @@ export default function Atlas3DClient() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Node click → select + fly to
+  // Node click → select + fly to (panel stays closed unless double-clicked)
   const handleNodeClick = useCallback((node: any) => {
     if (!node || !graphRef.current) return;
     setSelectedNode(node as AtlasNode);
@@ -285,6 +287,13 @@ export default function Atlas3DClient() {
       { x: node.x, y: node.y, z: node.z },
       1000
     );
+  }, []);
+
+  // Node double-click → open detail panel
+  const handleNodeDoubleClick = useCallback((node: any) => {
+    if (!node) return;
+    setSelectedNode(node as AtlasNode);
+    setDetailPanelOpen(true);
   }, []);
 
   // Expand node → load neighbors and merge
@@ -346,9 +355,10 @@ export default function Atlas3DClient() {
         (cam.x - nx) ** 2 + (cam.y - ny) ** 2 + (cam.z - nz) ** 2
       );
       if (dist > LOD_LABEL_DISTANCE) return "";
-      return `<div style="background:rgba(0,0,0,0.85);padding:6px 10px;border-radius:6px;font-size:12px;color:#e2e8f0;border:1px solid rgba(255,255,255,0.1)">
-      <strong>${node.name}</strong>
-      <br/><span style="color:#94a3b8;font-size:10px">${node.type}</span>
+      return `<div style="background:rgba(13,13,24,0.92);padding:8px 10px;border-radius:8px;font-size:12px;color:#e2e8f0;border:1px solid rgba(255,255,255,0.08);backdrop-filter:blur(8px)">
+      <strong style="display:block;margin-bottom:3px">${node.name}</strong>
+      <span style="color:#94a3b8;font-size:10px;display:block;margin-bottom:6px">${node.type}</span>
+      <span style="display:inline-block;font-size:10px;color:#a78bfa;background:rgba(167,139,250,0.12);border:1px solid rgba(167,139,250,0.25);border-radius:4px;padding:2px 6px;cursor:pointer" data-node-details="${node.id}">Details →</span>
     </div>`;
     },
     [settings.showLabels]
@@ -468,36 +478,44 @@ export default function Atlas3DClient() {
             d3VelocityDecay={0.3}
             // Events
             onNodeClick={handleNodeClick}
+            onNodeRightClick={handleNodeDoubleClick}
           />
         )}
 
-        {/* Selected node detail card */}
-        {selectedNode && (
-          <div className="absolute top-4 right-4 w-72 bg-card/95 backdrop-blur border border-border rounded-lg shadow-lg p-4 z-10">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-foreground truncate">
+        {/* Selected node mini-card — bottom-left quick actions */}
+        {selectedNode && !detailPanelOpen && (
+          <div className="absolute bottom-14 left-3 w-60 bg-[#0d0d18]/95 backdrop-blur border border-white/[0.07] rounded-lg shadow-lg p-3 z-10">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-xs font-semibold text-foreground truncate">
                 {selectedNode.name}
               </h3>
               <button
                 onClick={() => setSelectedNode(null)}
-                className="p-1 text-muted-foreground hover:text-foreground transition-colors rounded"
+                className="p-0.5 text-muted-foreground hover:text-foreground transition-colors rounded"
               >
-                <Icon name="X" className="h-3.5 w-3.5" />
+                <Icon name="X" className="h-3 w-3" />
               </button>
             </div>
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-1.5 mb-2.5">
               <span
-                className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                className="w-2 h-2 rounded-full flex-shrink-0"
                 style={{ backgroundColor: selectedNode.color }}
               />
-              <span className="text-xs text-muted-foreground capitalize">
+              <span className="text-[11px] text-muted-foreground capitalize">
                 {selectedNode.type}
               </span>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setDetailPanelOpen(true)}
+                className="flex items-center gap-1 text-[11px] text-primary hover:text-primary/80 transition-colors"
+              >
+                <Icon name="PanelRight" className="h-3 w-3" />
+                Details
+              </button>
               <button
                 onClick={() => handleExpand(selectedNode.id)}
-                className="flex items-center gap-1 text-[11px] text-primary hover:text-primary/80 transition-colors"
+                className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
               >
                 <Icon name="Maximize2" className="h-3 w-3" />
                 Expand
@@ -507,11 +525,24 @@ export default function Atlas3DClient() {
                 className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
               >
                 <Icon name="Focus" className="h-3 w-3" />
-                Ego view
+                Ego
               </a>
             </div>
           </div>
         )}
+
+        {/* Full-detail slide-out panel */}
+        <Atlas3DDetailPanel
+          entityId={detailPanelOpen ? (selectedNode?.id ?? null) : null}
+          entityName={selectedNode?.name}
+          entityType={selectedNode?.type}
+          entityColor={selectedNode?.color}
+          onClose={() => setDetailPanelOpen(false)}
+          onExpand={(id) => {
+            handleExpand(id);
+            setDetailPanelOpen(false);
+          }}
+        />
 
         {/* Legend — collapsible, bottom-left, above stats */}
         <AtlasLegend />
