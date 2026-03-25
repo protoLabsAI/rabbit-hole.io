@@ -23,6 +23,8 @@ interface ExtractionPreview {
   evidence: string[];
   citations: string[];
   confidence: number;
+  /** Set by server when entities were auto-ingested (confidence >= 0.7). */
+  autoIngested?: boolean;
 }
 
 // ─── Add to Graph Card ───────────────────────────────────────────────
@@ -30,7 +32,10 @@ interface ExtractionPreview {
 /**
  * Renders a pre-computed extraction preview as an "Add to Graph" card.
  * The extraction was produced by the middleware using the full research context.
- * User must explicitly confirm to ingest — extraction is never auto-ingested.
+ *
+ * - If `preview.autoIngested` is true: entities were automatically ingested
+ *   (confidence >= 0.7). Shows a read-only status card.
+ * - Otherwise (confidence < 0.7): shows a manual "Add to Knowledge Graph" button.
  */
 function ExtractionPreviewCard({
   preview,
@@ -59,7 +64,11 @@ function ExtractionPreviewCard({
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-xs font-medium text-emerald-600 dark:text-emerald-400">
           <Icon name="DatabaseZap" className="h-3.5 w-3.5 flex-shrink-0" />
-          <span>Knowledge Graph Extraction Ready</span>
+          <span>
+            {preview.autoIngested
+              ? "Auto-ingested to Knowledge Graph"
+              : "Knowledge Graph Extraction Ready"}
+          </span>
         </div>
         <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
           <span>{preview.entities.length} entities</span>
@@ -94,28 +103,40 @@ function ExtractionPreviewCard({
       )}
 
       <div className="flex items-center gap-2">
-        <button
-          onClick={handleConfirm}
-          disabled={confirmed || ingesting}
-          className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md transition-colors ${
-            confirmed
-              ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 cursor-default"
-              : "bg-emerald-500 text-white hover:bg-emerald-600 disabled:opacity-50"
-          }`}
-        >
-          <Icon
-            name={confirmed ? "Check" : ingesting ? "Loader2" : "DatabaseZap"}
-            className={`h-3.5 w-3.5 ${ingesting ? "animate-spin" : ""}`}
-          />
-          {confirmed
-            ? "Added to Graph"
-            : ingesting
-              ? "Adding..."
-              : "Add to Knowledge Graph"}
-        </button>
+        {preview.autoIngested ? (
+          /* Auto-ingested: show read-only indicator */
+          <div className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md bg-emerald-500/20 text-emerald-600 dark:text-emerald-400">
+            <Icon name="Check" className="h-3.5 w-3.5" />
+            Added to Graph automatically
+          </div>
+        ) : (
+          /* Low-confidence: show manual confirm button */
+          <button
+            onClick={handleConfirm}
+            disabled={confirmed || ingesting}
+            className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md transition-colors ${
+              confirmed
+                ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 cursor-default"
+                : "bg-emerald-500 text-white hover:bg-emerald-600 disabled:opacity-50"
+            }`}
+          >
+            <Icon
+              name={
+                confirmed ? "Check" : ingesting ? "Loader2" : "DatabaseZap"
+              }
+              className={`h-3.5 w-3.5 ${ingesting ? "animate-spin" : ""}`}
+            />
+            {confirmed
+              ? "Added to Graph"
+              : ingesting
+                ? "Adding..."
+                : "Add to Knowledge Graph"}
+          </button>
+        )}
         <p className="text-[10px] text-muted-foreground">
-          Extracted from full research context — higher quality than manual
-          ingest
+          {preview.autoIngested
+            ? "High-confidence extraction — added automatically"
+            : "Extracted from full research context — higher quality than manual ingest"}
         </p>
       </div>
     </div>
@@ -665,32 +686,23 @@ export function ChatMessage({
     .map((p) => p.text)
     .join("");
 
-  // Extraction preview: read from message annotations (populated by the server
-  // after afterAgent completes). The server writes this as a data annotation via
-  // the middleware pipeline; the user must explicitly confirm to ingest.
-  // NOTE: AI SDK v6 dropped .annotations from UIMessage — cast through to
-  // preserve runtime compatibility until the annotation pipeline is migrated.
-  const annotations = ((message as unknown as Record<string, unknown>)
-    .annotations ?? []) as unknown[];
-  const extractionPreview = annotations.find(
-    (a): a is ExtractionPreview & { type: string } =>
-      typeof a === "object" &&
-      a !== null &&
-      !Array.isArray(a) &&
-      (a as Record<string, unknown>)["type"] === "extraction_preview"
-  ) as ExtractionPreview | undefined;
+  // Extraction preview: read from message.metadata (populated by the server
+  // via the message-metadata stream chunk sent after afterAgent completes).
+  // High-confidence extractions (>= 0.7) are auto-ingested; the preview
+  // reflects their autoIngested status. Low-confidence extractions show
+  // a manual "Add to Graph" button.
+  const extractionPreview = (
+    message.metadata as { extractionPreview?: ExtractionPreview } | undefined
+  )?.extractionPreview;
 
   // Reasoning annotation: rendered as a collapsible "thinking" block when the
-  // model uses extended thinking. The server writes this as an annotation with
-  // { type: "reasoning", content: string, duration?: number }.
-  const reasoningAnnotation = annotations.find(
-    (a): a is { type: "reasoning"; content: string; duration?: number } =>
-      typeof a === "object" &&
-      a !== null &&
-      !Array.isArray(a) &&
-      (a as Record<string, unknown>)["type"] === "reasoning" &&
-      typeof (a as Record<string, unknown>)["content"] === "string"
-  ) as { type: "reasoning"; content: string; duration?: number } | undefined;
+  // model uses extended thinking. Read from message.metadata (same source as
+  // the extraction preview — populated via message-metadata stream chunks).
+  const reasoningAnnotation = (
+    message.metadata as
+      | { reasoning?: { content: string; duration?: number } }
+      | undefined
+  )?.reasoning;
 
   // Collect all tool-related parts
   const allTools = parts.filter(
