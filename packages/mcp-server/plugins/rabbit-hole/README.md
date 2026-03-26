@@ -91,7 +91,7 @@ Agent(subagent_type: "rabbit-hole:entity-extractor",
       prompt: "Extract entities from ./document.txt")
 ```
 
-## Available MCP Tools (11)
+## Available MCP Tools (12)
 
 | Tool | Description | Requires |
 |------|-------------|----------|
@@ -101,11 +101,35 @@ Agent(subagent_type: "rabbit-hole:entity-extractor",
 | `extract_entities` | LLM entity extraction from text | ANTHROPIC_API_KEY |
 | `validate_bundle` | Bundle integrity validation | Nothing |
 | `ingest_bundle` | Ingest bundle into Neo4j graph | App running |
+| `graph_search` | Search existing entities in Neo4j | App running |
 | `research_entity` | Full research pipeline | ANTHROPIC_API_KEY |
 | `ingest_url` | Ingest content from URL | Docker services |
 | `ingest_file` | Ingest local file | Docker services |
 | `transcribe_audio` | Audio transcription | Docker + GROQ_API_KEY |
 | `extract_pdf` | PDF text extraction | Docker services |
+
+## Network Access (HTTP Transport)
+
+The MCP server also supports Streamable HTTP transport for network agents. Start the HTTP server on port 3398:
+
+```bash
+MCP_AUTH_TOKEN=$(openssl rand -hex 32) pnpm --filter @proto/mcp-server start:http
+```
+
+Remote clients connect via:
+
+```json
+{
+  "mcpServers": {
+    "rabbit-hole": {
+      "url": "http://<host>:3398/mcp",
+      "headers": { "Authorization": "Bearer <token>" }
+    }
+  }
+}
+```
+
+OpenAPI spec available at `GET /openapi.json` for agent framework auto-discovery.
 
 ## Media Processing (Optional)
 

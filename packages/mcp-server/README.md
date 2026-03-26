@@ -2,6 +2,10 @@
 
 MCP server for deep research and media processing. Lets any MCP client (Claude Code, Cursor, custom agents) search the web, extract entities, build knowledge graphs, and ingest media — all via tool calls.
 
+Supports two transports:
+- **stdio** — for local MCP clients (Claude Code, Cursor)
+- **HTTP** — for network agents via [Streamable HTTP transport](https://modelcontextprotocol.io/specification/2025-03-26/basic/transports) (spec 2025-03-26)
+
 ## Quick Start
 
 ```bash
@@ -10,9 +14,43 @@ pnpm install
 pnpm build
 ```
 
-## Claude Code Setup
+## Transport Options
 
-Add to your project's `.claude/settings.json`:
+### 1. stdio (local)
+
+For Claude Code or any local MCP client:
+
+```bash
+node dist/index.js
+```
+
+### 2. HTTP (network)
+
+For agents and apps across your network:
+
+```bash
+# Development
+pnpm dev:http
+
+# Production
+MCP_AUTH_TOKEN=$(openssl rand -hex 32) pnpm start:http
+```
+
+Server starts on port 3398 (configurable via `MCP_PORT`).
+
+| Endpoint | Method | Auth | Purpose |
+|----------|--------|------|---------|
+| `/mcp` | POST | Bearer | MCP JSON-RPC (initialize, tool calls) |
+| `/mcp` | GET | Bearer | SSE stream for server-initiated messages |
+| `/mcp` | DELETE | Bearer | Session teardown |
+| `/health` | GET | None | Server status, uptime, tool count |
+| `/openapi.json` | GET | None | Auto-generated OpenAPI 3.1 spec |
+
+## Client Configuration
+
+### Claude Code (stdio)
+
+Add to your project's `.mcp.json`:
 
 ```json
 {
@@ -31,23 +69,29 @@ Add to your project's `.claude/settings.json`:
 }
 ```
 
-Or globally in `~/.claude/claude_desktop_config.json`:
+### Remote MCP Client (HTTP)
+
+Any MCP client that supports Streamable HTTP transport:
 
 ```json
 {
   "mcpServers": {
     "rabbit-hole": {
-      "command": "node",
-      "args": ["/absolute/path/to/rabbit-hole.io/packages/mcp-server/dist/index.js"],
-      "env": {
-        "JOB_PROCESSOR_URL": "http://localhost:8680",
-        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}",
-        "TAVILY_API_KEY": "${TAVILY_API_KEY}",
-        "GROQ_API_KEY": "${GROQ_API_KEY}"
+      "url": "http://<host>:3398/mcp",
+      "headers": {
+        "Authorization": "Bearer <MCP_AUTH_TOKEN>"
       }
     }
   }
 }
+```
+
+### Agent Frameworks (OpenAPI)
+
+For LangChain, CrewAI, or other frameworks, import the OpenAPI spec:
+
+```
+GET http://<host>:3398/openapi.json
 ```
 
 ## Environment Variables
@@ -55,107 +99,110 @@ Or globally in `~/.claude/claude_desktop_config.json`:
 | Variable | Required | Default | Purpose |
 |----------|----------|---------|---------|
 | `ANTHROPIC_API_KEY` | For entity extraction | — | Powers LLM-based entity extraction |
-| `JOB_PROCESSOR_URL` | For media ingestion | `http://localhost:8680` | Job processor API for media processing |
-| `TAVILY_API_KEY` | No | — | Premium web search (optional, free tier via DuckDuckGo) |
+| `JOB_PROCESSOR_URL` | For media ingestion | `http://localhost:8680` | Job processor API |
+| `RABBIT_HOLE_URL` | For bundle ingest | `http://localhost:3399` | Rabbit Hole app URL |
+| `TAVILY_API_KEY` | No | — | Premium web search |
 | `GROQ_API_KEY` | No | — | Free audio transcription via Groq |
+| `MCP_PORT` | No | `3398` | HTTP server port |
+| `MCP_AUTH_TOKEN` | For HTTP production | — | Bearer token for HTTP auth |
+| `LANGFUSE_PUBLIC_KEY` | No | — | Langfuse tracing |
+| `LANGFUSE_SECRET_KEY` | No | — | Langfuse tracing |
+| `LANGFUSE_BASE_URL` | No | — | Langfuse self-hosted URL |
 
-## Available Tools (10)
+## Available Tools (12)
 
-### Research Tools
+### Research Tools (8)
 
-| Tool | Description |
-|------|-------------|
-| `wikipedia_search` | Fetch Wikipedia articles for any topic. Returns article text (up to 8K chars), URL, and related articles. |
-| `web_search` | DuckDuckGo instant answers. No API key needed. Returns 5-8 results with snippets. |
-| `tavily_search` | Premium web search with credibility scoring. Requires `TAVILY_API_KEY`. |
-| `extract_entities` | LLM-based entity extraction from text. Identifies entities, types, properties, and relationships. Returns structured JSON. |
-| `validate_bundle` | Validates a research bundle's structural integrity — entity schemas, relationship refs, completeness metrics. |
-| `research_entity` | **Full pipeline.** Searches multiple sources → extracts entities → validates bundle. One tool call for complete research. |
+| Tool | Description | Requires |
+|------|-------------|----------|
+| `wikipedia_search` | Fetch Wikipedia articles (up to 8K chars) | Nothing |
+| `web_search` | DuckDuckGo instant answers, 5-8 results | Nothing |
+| `tavily_search` | Premium web search with credibility scoring | `TAVILY_API_KEY` |
+| `extract_entities` | LLM-based entity extraction from text | `ANTHROPIC_API_KEY` |
+| `validate_bundle` | Bundle structural integrity check | Nothing |
+| `ingest_bundle` | Ingest bundle into Neo4j knowledge graph | App running |
+| `graph_search` | Search existing entities in Neo4j | App running |
+| `research_entity` | Full pipeline: search → extract → validate | `ANTHROPIC_API_KEY` |
 
-### Media Processing Tools
+### Media Processing Tools (4)
 
-| Tool | Description |
-|------|-------------|
-| `ingest_url` | Ingest any URL — auto-detects format (HTML, PDF, YouTube, audio). Extracts text and metadata. |
-| `ingest_file` | Ingest a local file. Supports text, PDF, DOCX, audio (mp3/wav/flac), video (mp4/mov). |
-| `transcribe_audio` | Transcribe audio with timestamps. Supports Groq (free), OpenAI, or local Whisper. |
-| `extract_pdf` | Extract text from PDF with per-page output and document metadata. |
+| Tool | Description | Requires |
+|------|-------------|----------|
+| `ingest_url` | Ingest any URL (HTML, PDF, YouTube, audio) | Docker services |
+| `ingest_file` | Ingest local file (text, PDF, DOCX, audio, video) | Docker services |
+| `transcribe_audio` | Audio transcription with timestamps | Docker + `GROQ_API_KEY` |
+| `extract_pdf` | PDF text extraction with per-page output | Docker services |
 
-## Usage Examples
+## Deployment
 
-### Research an entity
+### PM2 (recommended)
+
+```bash
+# Build
+pnpm build
+
+# Start HTTP server with auth
+MCP_AUTH_TOKEN=$(openssl rand -hex 32) \
+MCP_PORT=3398 \
+JOB_PROCESSOR_URL=http://localhost:8680 \
+RABBIT_HOLE_URL=http://localhost:3399 \
+pm2 start packages/mcp-server/dist/http-server.js --name rabbit-hole-mcp
+
+# Save for auto-restart
+pm2 save
 ```
-Use the research_entity tool to research "Apollo space program" with detailed depth
-```
 
-### Search and extract
-```
-1. Use wikipedia_search to find info about "quantum computing"
-2. Use extract_entities on the Wikipedia text to get structured data
-3. Use validate_bundle to check the extraction quality
-```
+### Docker
 
-### Ingest media
-```
-Use ingest_url to extract text from https://example.com/paper.pdf
-```
-
-### Transcribe audio
-```
-Use transcribe_audio on /path/to/interview.mp3
-```
-
-## Infrastructure Requirements
-
-For media processing tools, the job processor must be running:
+The MCP server can also run inside the Docker Compose stack. Research tools work without Docker — they call external APIs directly. Media tools require the job processor:
 
 ```bash
 docker compose -f docker-compose.research.yml --env-file .env.research up -d
 ```
 
-This starts:
-- **Job Processor** (port 8680) — media ingestion pipeline
-- **PostgreSQL** (port 5432) — application database
-- **Neo4j** (port 7687) — graph database
-- **MinIO** (port 9000) — file storage
+## Architecture
 
-Research tools (`wikipedia_search`, `web_search`, `extract_entities`) work without Docker — they call external APIs directly.
+```
+┌──────────────────────────┐     ┌──────────────────────────┐
+│  Local MCP Client        │     │  Network MCP Client      │
+│  (Claude Code, Cursor)   │     │  (agents, apps, scripts) │
+└────────┬─────────────────┘     └────────┬─────────────────┘
+         │ stdio                           │ HTTP (port 3398)
+         │                                 │ Bearer token auth
+         ▼                                 ▼
+┌──────────────────────────────────────────────────────────┐
+│  MCP Server  (@proto/mcp-server)                         │
+│                                                          │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────┐  │
+│  │ index.ts    │  │ http-server │  │ openapi.ts      │  │
+│  │ (stdio)     │  │ (HTTP+SSE)  │  │ (spec gen)      │  │
+│  └─────────────┘  └─────────────┘  └─────────────────┘  │
+│                                                          │
+│  handler.ts → tool routing + source health tracking      │
+├──────────────────────────────────────────────────────────┤
+│  Research Tools        │  Media Tools                    │
+│  ├→ Wikipedia API      │  ├→ Job Processor (:8680)       │
+│  ├→ DuckDuckGo API     │  │  ├→ FFmpeg (video)           │
+│  ├→ Tavily API         │  │  ├→ Whisper/Groq (audio)     │
+│  ├→ Anthropic API      │  │  ├→ unpdf (PDF)              │
+│  └→ Rabbit Hole App    │  │  └→ yt-dlp (YouTube)         │
+│     ├→ /api/entity-search                                │
+│     └→ /api/ingest-bundle                                │
+└──────────────────────────────────────────────────────────┘
+```
 
 ## Development
 
 ```bash
-# Run in dev mode (auto-reload)
+# stdio mode (auto-reload)
 pnpm dev
+
+# HTTP mode (auto-reload)
+pnpm dev:http
 
 # Build for production
 pnpm build
 
-# Test tool listing
-echo '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | node dist/index.js
-```
-
-## Architecture
-
-```
-┌─────────────────────┐
-│  MCP Client         │
-│  (Claude Code, etc) │
-└────────┬────────────┘
-         │ stdio (JSON-RPC)
-         ▼
-┌─────────────────────┐
-│  MCP Server         │
-│  @proto/mcp-server  │
-├─────────────────────┤
-│  Research Tools     │──→ Wikipedia API, DuckDuckGo, Tavily, Anthropic
-│  Media Tools        │──→ Job Processor (localhost:8680)
-└─────────────────────┘
-                           │
-                    ┌──────┴──────┐
-                    ▼             ▼
-              ┌──────────┐  ┌──────────┐
-              │ FFmpeg   │  │ Whisper  │
-              │ yt-dlp   │  │ unpdf    │
-              │ mammoth  │  │ etc.     │
-              └──────────┘  └──────────┘
+# Run tests
+pnpm test
 ```
