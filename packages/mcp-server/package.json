@@ -4,12 +4,15 @@
   "type": "module",
   "description": "MCP server for Rabbit Hole research and media processing tools",
   "bin": {
-    "rabbit-hole-mcp": "./dist/index.js"
+    "rabbit-hole-mcp": "./dist/index.js",
+    "rabbit-hole-mcp-http": "./dist/http-server.js"
   },
   "scripts": {
     "build": "tsup",
     "dev": "tsx src/index.ts",
+    "dev:http": "tsx src/http-server.ts",
     "start": "node dist/index.js",
+    "start:http": "node dist/http-server.js",
     "test": "vitest run"
   },
   "dependencies": {
