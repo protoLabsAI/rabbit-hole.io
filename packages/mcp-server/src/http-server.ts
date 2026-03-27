@@ -214,6 +214,7 @@ async function handleMcpPost(req: IncomingMessage, res: ServerResponse) {
     const server = createMcpServer();
     const transport = new StreamableHTTPServerTransport({
       sessionIdGenerator: () => randomUUID(),
+      enableJsonResponse: true,
       onsessioninitialized: (sid) => {
         transports.set(sid, transport);
         servers.set(sid, server);
@@ -221,12 +222,16 @@ async function handleMcpPost(req: IncomingMessage, res: ServerResponse) {
       },
     });
 
+    // Only log on transport close — don't delete the session.
+    // Sessions are cleaned up explicitly via DELETE /mcp or shutdown.
+    // The transport.onclose fires when the underlying stream ends,
+    // which is normal for streamable HTTP (each request = new stream).
     transport.onclose = () => {
       const sid = transport.sessionId;
       if (sid) {
-        transports.delete(sid);
-        servers.delete(sid);
-        console.error(`[mcp-http] Session closed: ${sid.slice(0, 8)}…`);
+        console.error(
+          `[mcp-http] Transport closed for session: ${sid.slice(0, 8)}…`
+        );
       }
     };
 
