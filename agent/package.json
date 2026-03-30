@@ -29,7 +29,7 @@
     "typescript": "^5.6.3"
   },
   "dependencies": {
-    "@copilotkit/sdk-js": "^1.9.1",
+    "@copilotkit/sdk-js": "^1.54.1",
     "@langchain/anthropic": "^1.0.0",
     "@langchain/community": "^1.0.0",
     "@langchain/core": "^1.0.1",
@@ -40,7 +40,7 @@
     "@langfuse/langchain": "^4.4.2",
     "@langfuse/otel": "^4.4.2",
     "@opentelemetry/resources": "^2.2.0",
-    "@opentelemetry/sdk-node": "^0.208.0",
+    "@opentelemetry/sdk-node": "^0.214.0",
     "@opentelemetry/semantic-conventions": "^1.38.0",
     "@proto/deepagent": "workspace:*",
     "@proto/llm-providers": "workspace:*",
