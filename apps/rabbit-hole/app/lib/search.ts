@@ -103,7 +103,8 @@ export async function searchWeb(
   query: string,
   maxResults = 6
 ): Promise<WebSearchResult[]> {
-  const endpoint = process.env.SEARXNG_ENDPOINT ?? "http://localhost:8888";
+  const endpoint = process.env.SEARXNG_ENDPOINT;
+  if (!endpoint) return [];
 
   const url = new URL("/search", endpoint);
   url.searchParams.set("q", query);

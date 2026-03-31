@@ -40,6 +40,20 @@ import { searchGraph, searchWeb, searchWikipedia } from "../../lib/search";
 
 // ─── Tool Definitions ───────────────────────────────────────────────
 
+const SEARXNG_ENABLED = !!process.env.SEARXNG_ENDPOINT;
+
+const searchWebTool = tool({
+  description:
+    "Search the web using SearXNG for recent results. Use when the knowledge graph doesn't have enough information.",
+  inputSchema: z.object({
+    query: z.string().describe("Web search query"),
+  }),
+  execute: async (input: { query: string }) => {
+    const results = await searchWeb(input.query);
+    return { results };
+  },
+});
+
 const searchTools = {
   searchGraph: tool({
     description:
@@ -50,17 +64,7 @@ const searchTools = {
     execute: async (input: { query: string }) => searchGraph(input.query),
   }),
 
-  searchWeb: tool({
-    description:
-      "Search the web using SearXNG for recent results. Use when the knowledge graph doesn't have enough information.",
-    inputSchema: z.object({
-      query: z.string().describe("Web search query"),
-    }),
-    execute: async (input: { query: string }) => {
-      const results = await searchWeb(input.query);
-      return { results };
-    },
-  }),
+  ...(SEARXNG_ENABLED ? { searchWeb: searchWebTool } : {}),
 
   searchWikipedia: tool({
     description:
@@ -120,7 +124,7 @@ const SYSTEM_PROMPT = `You are Rabbit Hole, an AI search engine powered by a liv
 ## Workflow
 1. ALWAYS call searchGraph first to check existing knowledge
 2. If the graph has good results (3+ entities), use them to answer
-3. If the graph is thin, call searchWeb and/or searchWikipedia for more context
+3. ${SEARXNG_ENABLED ? "If the graph is thin, call searchWeb for more context" : "If the graph is thin, rely on your training knowledge and say so — web search is not available"}
 4. Synthesize all findings into a clear, well-cited answer
 
 ## Answer Format
@@ -129,6 +133,7 @@ const SYSTEM_PROMPT = `You are Rabbit Hole, an AI search engine powered by a liv
 - Mention knowledge graph entities by name when relevant
 - Use markdown for readability
 - If information is uncertain, say so
+- Do NOT use emojis in responses — the only exceptions are ✓ and ✗ when used to denote true/false or present/absent data in tables or lists
 - At the very end of your response, include a RELATED_SEARCHES block in this exact format (one per line, no bullets, no backticks):
 <RELATED_SEARCHES>
 first related search phrase
@@ -247,16 +252,20 @@ export async function POST(request: Request) {
           searchTools.searchGraph.execute as unknown as ToolExecutor
         ),
     },
-    searchWeb: {
-      ...searchTools.searchWeb,
-      execute: async (input: { query: string }) =>
-        chain.wrapToolCall(
-          ctx,
-          "searchWeb",
-          input as Record<string, unknown>,
-          searchTools.searchWeb.execute as unknown as ToolExecutor
-        ),
-    },
+    ...(SEARXNG_ENABLED
+      ? {
+          searchWeb: {
+            ...searchWebTool,
+            execute: async (input: { query: string }) =>
+              chain.wrapToolCall(
+                ctx,
+                "searchWeb",
+                input as Record<string, unknown>,
+                searchWebTool.execute as unknown as ToolExecutor
+              ),
+          },
+        }
+      : {}),
     searchWikipedia: {
       ...searchTools.searchWikipedia,
       execute: async (input: { query: string }) =>
@@ -330,15 +339,15 @@ export async function POST(request: Request) {
     onStepFinish: async (step) => {
       if (step.toolCalls?.length) {
         console.log(
-          `[search-agent] Step: ${step.toolCalls.map((t) => t.toolName).join(", ")}`
+          `[search-agent] Step: ${step.toolCalls.map((t) => t?.toolName).join(", ")}`
         );
       }
       await chain.afterModel(ctx, {
         text: step.text,
         toolCalls: step.toolCalls?.map((tc) => ({
-          toolCallId: tc.toolCallId,
-          toolName: tc.toolName,
-          args: ("args" in tc ? tc.args : {}) as Record<string, unknown>,
+          toolCallId: tc?.toolCallId ?? "",
+          toolName: tc?.toolName ?? "",
+          args: (tc && "args" in tc ? tc.args : {}) as Record<string, unknown>,
         })),
         usage: {
           promptTokens: step.usage?.inputTokens ?? undefined,

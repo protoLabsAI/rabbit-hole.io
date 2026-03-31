@@ -113,11 +113,25 @@ export const searxngSearchTool = tool(
     },
     config: ToolRunnableConfig
   ) => {
-    const endpoint = process.env.SEARXNG_ENDPOINT ?? "http://searxng:8888";
+    const endpoint = process.env.SEARXNG_ENDPOINT;
 
     const state = getCurrentTaskInput() as {
       files?: Record<string, string>;
     };
+
+    if (!endpoint) {
+      return new Command({
+        update: {
+          messages: [
+            new ToolMessage({
+              content:
+                "SearXNG is not configured (SEARXNG_ENDPOINT not set). Skipping web search.",
+              tool_call_id: config.toolCall?.id as string,
+            }),
+          ],
+        },
+      });
+    }
 
     try {
       const data = await fetchSearxng(input.query, endpoint, {
