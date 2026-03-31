@@ -34,3 +34,11 @@ export interface DeduplicationResult {
 }
 
 export type ResearchDepth = "basic" | "detailed" | "comprehensive";
+
+export interface SearxngInfobox {
+  infobox: string;
+  content: string;
+  attributes: Array<{ label: string; value: string }>;
+  urls: Array<{ url: string; title: string }>;
+  relatedTopics: Array<{ name: string }>;
+}

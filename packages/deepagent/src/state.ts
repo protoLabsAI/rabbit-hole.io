@@ -9,9 +9,9 @@ import { z } from "zod";
 
 import type { ResearchSessionConfig, PartialBundle } from "@proto/types";
 
-import type { Todo } from "./types";
+import type { Todo, SearxngInfobox } from "./types";
 
-export type { Todo } from "./types";
+export type { Todo, SearxngInfobox } from "./types";
 
 export const TodoSchema = z.object({
   content: z.string(),
@@ -42,6 +42,14 @@ export function stringsReducer(
   return [...(left ?? []), ...right];
 }
 
+export function infoboxesReducer(
+  left: SearxngInfobox[] | null | undefined,
+  right: SearxngInfobox[] | null | undefined
+): SearxngInfobox[] {
+  if (right == null) return left ?? [];
+  return [...(left ?? []), ...right];
+}
+
 export interface EntityResearchAgentState {
   messages: BaseMessage[];
   files: Record<string, string>;
@@ -59,6 +67,12 @@ export interface EntityResearchAgentState {
   completeness: number;
   bundle?: unknown;
   partialBundle?: PartialBundle;
+  // Multi-hop research loop tracking
+  pendingSuggestions: string[];
+  queriesExecuted: string[];
+  infoboxes: SearxngInfobox[];
+  hopCount: number;
+  maxHops: number;
 }
 
 export function partialBundleReducer(
@@ -114,6 +128,32 @@ export const EntityResearchAgentStateAnnotation = Annotation.Root({
   partialBundle: Annotation<PartialBundle | undefined>({
     reducer: partialBundleReducer,
     default: () => undefined,
+  }),
+
+  // Multi-hop research loop tracking
+  pendingSuggestions: Annotation<string[]>({
+    reducer: stringsReducer,
+    default: () => [],
+  }),
+
+  queriesExecuted: Annotation<string[]>({
+    reducer: stringsReducer,
+    default: () => [],
+  }),
+
+  infoboxes: Annotation<SearxngInfobox[]>({
+    reducer: infoboxesReducer,
+    default: () => [],
+  }),
+
+  hopCount: Annotation<number>({
+    reducer: (left, right) => right ?? left ?? 0,
+    default: () => 0,
+  }),
+
+  maxHops: Annotation<number>({
+    reducer: (left, right) => right ?? left ?? 6,
+    default: () => 6,
   }),
 });
 

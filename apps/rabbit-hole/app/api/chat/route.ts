@@ -3,7 +3,7 @@
  *
  * Uses streamText with tools for multi-step search:
  * - searchGraph: Neo4j full-text search
- * - searchWeb: Tavily advanced search
+ * - searchWeb: SearXNG self-hosted search
  * - searchWikipedia: Wikipedia article fetch
  *
  * The LLM decides which tools to call and in what order.
@@ -52,15 +52,12 @@ const searchTools = {
 
   searchWeb: tool({
     description:
-      "Search the web via Tavily for recent, high-quality results. Use when the knowledge graph doesn't have enough information.",
+      "Search the web using SearXNG for recent results. Use when the knowledge graph doesn't have enough information.",
     inputSchema: z.object({
       query: z.string().describe("Web search query"),
     }),
     execute: async (input: { query: string }) => {
       const results = await searchWeb(input.query);
-      if (results.length === 0 && !process.env.TAVILY_API_KEY) {
-        return { results: [], note: "TAVILY_API_KEY not set" };
-      }
       return { results };
     },
   }),

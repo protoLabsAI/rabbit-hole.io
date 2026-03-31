@@ -97,25 +97,21 @@ export async function searchGraph(
   }));
 }
 
-// ── Web Search (Tavily) ──────────────────────────────────────────────
+// ── Web Search (SearXNG) ─────────────────────────────────────────────
 
 export async function searchWeb(
   query: string,
   maxResults = 6
 ): Promise<WebSearchResult[]> {
-  const apiKey = process.env.TAVILY_API_KEY;
-  if (!apiKey) return [];
+  const endpoint = process.env.SEARXNG_ENDPOINT ?? "http://localhost:8888";
 
-  const res = await fetch("https://api.tavily.com/search", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      api_key: apiKey,
-      query,
-      max_results: maxResults,
-      search_depth: "advanced",
-      include_answer: false,
-    }),
+  const url = new URL("/search", endpoint);
+  url.searchParams.set("q", query);
+  url.searchParams.set("format", "json");
+  url.searchParams.set("pageno", "1");
+
+  const res = await fetch(url.toString(), {
+    headers: { Accept: "application/json" },
   });
   if (!res.ok) return [];
 
@@ -124,12 +120,12 @@ export async function searchWeb(
       title: string;
       url: string;
       content: string;
-      score: number;
+      score?: number;
     }>;
   };
 
   return (
-    data.results?.map((r) => ({
+    data.results?.slice(0, maxResults).map((r) => ({
       title: r.title,
       url: r.url,
       snippet: r.content?.slice(0, 500),

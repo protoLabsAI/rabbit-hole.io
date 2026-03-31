@@ -31,9 +31,6 @@ export {
   buildDeepAgentGraph,
   getDeepAgentGraph,
   resetDeepAgentGraph,
-  coordinatorNode,
-  resetCoordinatorModel,
-  routeFromCoordinator,
   buildSubagentGraph,
 } from "./graph";
 
@@ -64,7 +61,6 @@ export {
   readFile,
   writeFile,
   ls,
-  wikipediaFetchTool,
   langextractWrapperTool,
   batchFieldMappingLookupTool,
   validateBundleTool,
