@@ -22,6 +22,7 @@ import {
   type MergeResult,
 } from "@proto/types";
 import { areSimilarStrings } from "@proto/utils";
+import { upsertEntityVector } from "@proto/vector";
 
 import { initializeDomains } from "../../domain-loader";
 import {
@@ -471,6 +472,20 @@ const handleBundleIngest = async (
               aliases: entity.aliases,
               timestamp: new Date().toISOString(),
             } satisfies GraphEntityEvent);
+
+            // Upsert entity embedding to Qdrant (non-blocking, best-effort)
+            upsertEntityVector({
+              uid: effectiveUid,
+              name: entity.name,
+              type: entity.type,
+              tags: entity.tags ?? [],
+              aliases: entity.aliases ?? [],
+            }).catch((err) =>
+              console.warn(
+                `[vector] Embedding upsert failed for ${effectiveUid}:`,
+                err
+              )
+            );
           } catch (writeError: any) {
             // Treat unique constraint violations as "already exists" — keep local
             if (

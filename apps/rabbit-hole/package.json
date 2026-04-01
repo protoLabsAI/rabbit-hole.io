@@ -37,6 +37,7 @@
     "@proto/logger": "workspace:*",
     "@proto/observability": "workspace:*",
     "@proto/research-middleware": "workspace:*",
+    "@proto/vector": "workspace:*",
     "@proto/sidequest-utils": "workspace:*",
     "@proto/types": "workspace:*",
     "@proto/ui": "workspace:*",

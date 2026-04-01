@@ -73,6 +73,8 @@ export interface EntityResearchAgentState {
   infoboxes: SearxngInfobox[];
   hopCount: number;
   maxHops: number;
+  /** Session ID used to scope this research run's vector memory */
+  sessionId?: string;
 }
 
 export function partialBundleReducer(
@@ -154,6 +156,11 @@ export const EntityResearchAgentStateAnnotation = Annotation.Root({
   maxHops: Annotation<number>({
     reducer: (left, right) => right ?? left ?? 6,
     default: () => 6,
+  }),
+
+  sessionId: Annotation<string | undefined>({
+    reducer: (left, right) => right ?? left,
+    default: () => undefined,
   }),
 });
 

@@ -54,6 +54,7 @@
     "@proto/llm-providers": "workspace:*",
     "@proto/observability": "workspace:*",
     "@proto/types": "workspace:*",
+    "@proto/vector": "workspace:*",
     "zod": "^4.1.12"
   },
   "devDependencies": {

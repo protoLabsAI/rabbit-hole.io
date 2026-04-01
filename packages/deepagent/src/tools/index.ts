@@ -8,3 +8,4 @@ export { langextractWrapperTool } from "./langextract-wrapper";
 export { batchFieldMappingLookupTool } from "./batch-field-mapping";
 export { validateBundleTool } from "./validate-bundle";
 export { mediaIngestionTool } from "./media";
+export { vectorMemoryTool } from "./vector-memory";

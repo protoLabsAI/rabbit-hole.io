@@ -18,10 +18,11 @@ import {
 import type { BaseMessage } from "@langchain/core/messages";
 import type { RunnableConfig } from "@langchain/core/runnables";
 import type { StructuredTool } from "@langchain/core/tools";
-import { tool } from "@langchain/core/tools";
-import { z } from "zod";
+
+import { upsertResearchChunks } from "@proto/vector";
 
 import type { EntityResearchAgentStateType } from "../state";
+import { vectorMemoryTool } from "../tools/vector-memory";
 import type { SearxngInfobox } from "../types";
 import { getLangfuse, log } from "../utils";
 
@@ -34,63 +35,25 @@ const RESEARCH_LOOP_PROMPT = `You are a deep research agent executing multi-hop 
 Your goal: gather comprehensive evidence for the research brief by strategically searching with SearXNG.
 
 Available tools:
+- search_memory(query) — semantic search over prior findings from this session
 - searxng_search(query, category?, time_range?, pageno?) — search web/news/science/it categories
 - langextract_wrapper — extract structured entities from accumulated evidence files
-- search_graph — check Neo4j knowledge graph for existing data
 - read_file / write_file — read/write evidence files
 
 Research strategy:
-1. Start with search_graph to check what's already known
-2. Use searxng_search with appropriate categories:
+1. Call search_memory FIRST for any topic before searching externally — avoid redundant searches
+2. Only call searxng_search if memory doesn't have sufficient coverage
+3. Use searxng_search with appropriate categories:
    - general: broad web research
    - news: current events, recent developments (combine with time_range)
    - science: academic papers, research findings
    - it: code, technical documentation, GitHub
-3. Use bang syntax for targeted searches: !wp (Wikipedia), !scholar (Google Scholar), !gh (GitHub)
-4. After 2-3 searches, review pending suggestions and pursue the most relevant ones
-5. When evidence is rich enough, call langextract_wrapper to extract entities
-6. Stop when you have comprehensive coverage — don't search for the same thing twice
+4. Use bang syntax for targeted searches: !wp (Wikipedia), !scholar (Google Scholar), !gh (GitHub)
+5. After 2-3 searches, review pending suggestions and pursue the most relevant ones
+6. When evidence is rich enough, call langextract_wrapper to extract entities
+7. Stop when you have comprehensive coverage — don't search for the same thing twice
 
 The research context below shows what you've already covered. Do NOT re-query executed queries.`;
-
-// ---------------------------------------------------------------------------
-// search_graph stub tool
-// ---------------------------------------------------------------------------
-
-/**
- * Creates a search_graph tool. This is a stub that returns empty results
- * since Neo4j searchGraph is not yet wired into @proto/database as a
- * standalone function. When it becomes available, swap the implementation.
- */
-function createSearchGraphTool(): StructuredTool {
-  return tool(
-    async (input: { query: string; entityTypes?: string[] }) => {
-      // Stub implementation — Neo4j search not yet wired
-      log.debug("[search_graph] Stub called", { query: input.query });
-      return JSON.stringify({
-        results: [],
-        message: `No existing graph data found for "${input.query}". Proceed with web research.`,
-      });
-    },
-    {
-      name: "search_graph",
-      description:
-        "Search the Neo4j knowledge graph for existing entities and relationships. " +
-        "Returns known data so you can avoid redundant web searches.",
-      schema: z.object({
-        query: z
-          .string()
-          .describe("Search term to look up in the knowledge graph."),
-        entityTypes: z
-          .array(z.string())
-          .optional()
-          .describe(
-            "Optional entity type filter (e.g. ['Person', 'Organization'])."
-          ),
-      }),
-    }
-  );
-}
 
 // ---------------------------------------------------------------------------
 // Context builder
@@ -161,12 +124,11 @@ export function createResearchLoopNode(
   const langextractTool = toolsMap["langextract_wrapper"];
   const readFileTool = toolsMap["read_file"];
   const writeFileTool = toolsMap["write_file"];
-  const searchGraphTool = createSearchGraphTool();
 
   const tools: StructuredTool[] = [
+    vectorMemoryTool as unknown as StructuredTool,
     searxngTool,
     langextractTool,
-    searchGraphTool,
     readFileTool,
     writeFileTool,
   ].filter(Boolean) as StructuredTool[];
@@ -417,19 +379,36 @@ export function createResearchLoopNode(
           // Post-tool-call bookkeeping
           // ---------------------------------------------------------------
           if (toolName === "searxng_search") {
-            // Extract the query and track it
             const query = toolCall.args.query as string | undefined;
             if (query) {
               queriesExecuted.push(query);
             }
-            // Each search counts as a hop
             hopCount++;
 
             log.debug(
               `[research-loop] Search hop ${hopCount}/${maxHops}: "${query}"`
             );
 
-            // Check hop limit after incrementing
+            // Embed search results into vector memory for future hops.
+            // Fire-and-forget — never blocks the loop.
+            const sessionId = state.sessionId ?? threadId;
+            const newFileContent = Object.values(fileUpdates)
+              .slice(-1)
+              .join("\n")
+              .slice(0, 3000);
+            if (newFileContent) {
+              upsertResearchChunks([
+                {
+                  sessionId,
+                  content: newFileContent,
+                  source: `searxng:${query ?? "unknown"}`,
+                  hopIndex: hopCount,
+                },
+              ]).catch((err) =>
+                log.warn("[research-loop] Vector upsert failed", { err })
+              );
+            }
+
             if (hopCount >= maxHops) {
               log.debug("[research-loop] Max hops reached — terminating loop");
               break;
