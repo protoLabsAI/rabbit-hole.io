@@ -703,10 +703,10 @@ export function ChatMessage({
     return result;
   }, [allTools]);
 
-  // Extract graph entities from searchGraph results for "View in Atlas" CTA
+  // Extract graph entities from searchGraph results for "View in Atlas" CTA and source panel
   const graphEntities = useMemo(() => {
     const seen = new Set<string>();
-    const entities: Array<{ uid: string; name: string; type: string }> = [];
+    const entities: GraphEntity[] = [];
     for (const t of allTools) {
       if (t.toolName === "searchGraph") {
         const output = t.output ?? t.result;
@@ -718,6 +718,10 @@ export function ChatMessage({
                 uid: entity.uid,
                 name: entity.name ?? entity.uid,
                 type: entity.type ?? "",
+                tags: Array.isArray(entity.tags) ? entity.tags : [],
+                connectedEntities: Array.isArray(entity.connectedEntities)
+                  ? entity.connectedEntities
+                  : [],
               });
             }
           }
@@ -905,6 +909,7 @@ export function ChatMessage({
       {/* Source panel — collapsible right-side panel populated from tool results */}
       <ChatSourcePanel
         sources={sources}
+        entities={graphEntities}
         isStreaming={isStreaming && isLast}
         highlightedIndex={highlightedSourceIndex}
       />
