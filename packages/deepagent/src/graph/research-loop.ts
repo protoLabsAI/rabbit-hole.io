@@ -22,6 +22,7 @@ import type { StructuredTool } from "@langchain/core/tools";
 import { upsertResearchChunks } from "@proto/vector";
 
 import type { EntityResearchAgentStateType } from "../state";
+import { graphSearchTool } from "../tools/graph-search";
 import { vectorMemoryTool } from "../tools/vector-memory";
 import type { SearxngInfobox } from "../types";
 import { getLangfuse, log } from "../utils";
@@ -36,22 +37,24 @@ Your goal: gather comprehensive evidence for the research brief by strategically
 
 Available tools:
 - search_memory(query) — semantic search over prior findings from this session
+- search_graph(query) — hybrid BM25 + vector search over the knowledge graph (existing known entities)
 - searxng_search(query, category?, time_range?, pageno?) — search web/news/science/it categories
 - langextract_wrapper — extract structured entities from accumulated evidence files
 - read_file / write_file — read/write evidence files
 
 Research strategy:
 1. Call search_memory FIRST for any topic before searching externally — avoid redundant searches
-2. Only call searxng_search if memory doesn't have sufficient coverage
-3. Use searxng_search with appropriate categories:
+2. Call search_graph to check what is already known in the knowledge base before searching the web
+3. Only call searxng_search if memory and graph don't have sufficient coverage
+4. Use searxng_search with appropriate categories:
    - general: broad web research
    - news: current events, recent developments (combine with time_range)
    - science: academic papers, research findings
    - it: code, technical documentation, GitHub
-4. Use bang syntax for targeted searches: !wp (Wikipedia), !scholar (Google Scholar), !gh (GitHub)
-5. After 2-3 searches, review pending suggestions and pursue the most relevant ones
-6. When evidence is rich enough, call langextract_wrapper to extract entities
-7. Stop when you have comprehensive coverage — don't search for the same thing twice
+5. Use bang syntax for targeted searches: !wp (Wikipedia), !scholar (Google Scholar), !gh (GitHub)
+6. After 2-3 searches, review pending suggestions and pursue the most relevant ones
+7. When evidence is rich enough, call langextract_wrapper to extract entities
+8. Stop when you have comprehensive coverage — don't search for the same thing twice
 
 The research context below shows what you've already covered. Do NOT re-query executed queries.`;
 
@@ -127,6 +130,7 @@ export function createResearchLoopNode(
 
   const tools: StructuredTool[] = [
     vectorMemoryTool as unknown as StructuredTool,
+    graphSearchTool as unknown as StructuredTool,
     searxngTool,
     langextractTool,
     readFileTool,
