@@ -235,7 +235,7 @@ describe("createAnalyzeQueryNode", () => {
           depth: "comprehensive",
           maxEntities: 100,
           maxDepth: 5,
-          searchProviders: ["tavily", "duckduckgo", "wikipedia"],
+          searchProviders: ["searxng"],
         },
       },
       mockConfig

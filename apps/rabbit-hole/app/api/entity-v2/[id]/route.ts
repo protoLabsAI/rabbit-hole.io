@@ -60,7 +60,6 @@ export async function GET(
     const { query, params: queryParams } = buildEntityDetailsQuery({
       uid: id,
       limit: 100,
-      orgId: undefined, // No tenant filtering for public Atlas
     });
 
     const result = await client.executeRead(query, queryParams);

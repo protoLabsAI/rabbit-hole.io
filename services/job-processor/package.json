@@ -13,9 +13,11 @@
   },
   "dependencies": {
     "@proto/database": "workspace:*",
+    "@proto/llm-providers": "workspace:*",
     "@proto/sidequest-utils": "workspace:*",
     "@proto/types": "workspace:*",
     "@proto/utils": "workspace:*",
+    "@proto/vector": "workspace:*",
     "@sidequest/postgres-backend": "1.7.1",
     "busboy": "^1.6.0",
     "mammoth": "^1.11.0",

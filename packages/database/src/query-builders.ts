@@ -13,7 +13,6 @@ export interface EntityQueryParams {
   name?: string;
   entityType?: string;
   limit?: number;
-  orgId?: string;
 }
 
 export interface RelationshipQueryParams {
@@ -40,44 +39,22 @@ export interface GraphQueryParams {
  * Build entity details query with comprehensive relationship data
  */
 export function buildEntityDetailsQuery(params: EntityQueryParams) {
-  const { uid, id, limit = 100, orgId } = params;
+  const { uid, id, limit = 100 } = params;
 
-  // Handle both uid and id schemas
   const identifier = uid || id;
-  let matchClause: string;
-
-  // If orgId is provided, filter by public + tenant data
-  // If no orgId, show only public data (for non-authenticated/non-tenant contexts)
-  const tenantFilter = orgId
-    ? "(entity.clerk_org_id = 'public' OR entity.clerk_org_id = $orgId)"
-    : "entity.clerk_org_id = 'public'";
-  const neighborFilter = orgId
-    ? "AND (target.clerk_org_id = 'public' OR target.clerk_org_id = $orgId)"
-    : "AND target.clerk_org_id = 'public'";
-  const sourceFilter = orgId
-    ? "AND (source.clerk_org_id = 'public' OR source.clerk_org_id = $orgId)"
-    : "AND source.clerk_org_id = 'public'";
-
-  if (uid) {
-    // New schema with uid
-    matchClause = "MATCH (entity {uid: $identifier})";
-  } else {
-    // Legacy schema with id and GraphNode label
-    matchClause = "MATCH (entity:GraphNode {id: $identifier})";
-  }
+  const matchClause = uid
+    ? "MATCH (entity {uid: $identifier})"
+    : "MATCH (entity:GraphNode {id: $identifier})";
 
   const query = `
     ${matchClause}
-    WHERE ${tenantFilter}
-    
+
     // Get outgoing relationships
     OPTIONAL MATCH (entity)-[outgoing]->(target)
-    WHERE ${neighborFilter ? neighborFilter.replace(/^AND\s*/, "") : "true"}
-    
-    // Get incoming relationships  
+
+    // Get incoming relationships
     OPTIONAL MATCH (source)-[incoming]->(entity)
-    WHERE ${sourceFilter ? sourceFilter.replace(/^AND\s*/, "") : "true"}
-    
+
     WITH entity,
          collect(DISTINCT {
            relationship: outgoing,
@@ -85,11 +62,11 @@ export function buildEntityDetailsQuery(params: EntityQueryParams) {
            direction: 'outgoing'
          }) as outgoingRels,
          collect(DISTINCT {
-           relationship: incoming, 
+           relationship: incoming,
            target: source,
            direction: 'incoming'
          }) as incomingRels
-    
+
     RETURN {
       uid: coalesce(entity.uid, entity.id),
       name: entity.name,
@@ -99,22 +76,16 @@ export function buildEntityDetailsQuery(params: EntityQueryParams) {
       incomingRelationships: incomingRels,
       totalRelationships: size(outgoingRels) + size(incomingRels)
     } as entityData
-    
+
     LIMIT $limit
   `;
 
-  const queryParams: Record<string, any> = {
-    identifier,
-    limit: neo4j.int(limit),
-  };
-
-  if (orgId) {
-    queryParams.orgId = orgId;
-  }
-
   return {
     query: query.trim(),
-    params: queryParams,
+    params: {
+      identifier,
+      limit: neo4j.int(limit),
+    },
   };
 }
 

@@ -2,12 +2,17 @@
  * Shared search utilities — used by /api/chat and /api/research/deep.
  *
  * Single source of truth for graph, web, and Wikipedia search.
+ * searchGraph uses hybrid BM25 (Neo4j fulltext) + vector (Qdrant) with RRF fusion.
  */
-
-import { searchCommunitySummaries } from "@proto/vector";
 
 import { getGlobalNeo4jClient } from "@proto/database";
 import { createNeo4jClientWithIntegerConversion } from "@proto/utils";
+import {
+  searchKgVector,
+  reciprocalRankFusion,
+  searchCommunitySummaries,
+  type CommunitySearchResult,
+} from "@proto/vector";
 
 // ── Types ────────────────────────────────────────────────────────────
 
@@ -40,14 +45,6 @@ export interface WikiSearchResult {
   snippet: string;
 }
 
-export interface CommunitySearchResult {
-  communityId: number;
-  summary: string;
-  topEntities: string[];
-  entityCount: number;
-  score: number;
-}
-
 // ── Lucene Query Builder ─────────────────────────────────────────────
 
 export function buildLuceneQuery(rawQuery: string): string {
@@ -60,7 +57,11 @@ export function buildLuceneQuery(rawQuery: string): string {
   return parts.join(" ");
 }
 
-// ── Graph Search ─────────────────────────────────────────────────────
+// ── Graph Search (hybrid BM25 + vector, RRF) ─────────────────────────
+
+const QDRANT_ENABLED = !!(
+  process.env.QDRANT_URL && process.env.OLLAMA_ENDPOINT
+);
 
 export async function searchGraph(
   query: string,
@@ -70,62 +71,149 @@ export async function searchGraph(
   const client = createNeo4jClientWithIntegerConversion(baseClient);
   const ftQuery = buildLuceneQuery(query);
 
-  const result = await client.executeRead(
-    `
-    CALL db.index.fulltext.queryNodes('idx_entity_name_fulltext', $ftQuery)
-    YIELD node AS e, score
-    WHERE e.uid IS NOT NULL AND e.name IS NOT NULL
-    WITH e, score
-    OPTIONAL MATCH (e)-[r]-(connected)
-    WHERE connected.name IS NOT NULL
-    WITH e, score,
-         count(r) as relCount,
-         collect(DISTINCT {
-           name: connected.name,
-           type: labels(connected)[0],
-           relationship: type(r)
-         })[0..5] as connections
-    RETURN
-      e.uid as uid, e.name as name, labels(e)[0] as type,
-      COALESCE(e.tags, []) as tags, COALESCE(e.aliases, []) as aliases,
-      score, relCount, connections
-    ORDER BY score DESC, e.name ASC
-    LIMIT $limit
-    `,
-    { ftQuery, limit }
-  );
+  // Run BM25 fulltext and Qdrant vector in parallel
+  const [fulltextResults, vectorResults] = await Promise.all([
+    // BM25 leg: Neo4j fulltext with relationship context
+    client
+      .executeRead(
+        `
+        CALL db.index.fulltext.queryNodes('idx_entity_name_fulltext', $ftQuery)
+        YIELD node AS e, score
+        WHERE e.uid IS NOT NULL AND e.name IS NOT NULL
+        WITH e, score
+        OPTIONAL MATCH (e)-[r]-(connected)
+        WHERE connected.name IS NOT NULL
+        WITH e, score,
+             count(r) as relCount,
+             collect(DISTINCT {
+               name: connected.name,
+               type: labels(connected)[0],
+               relationship: type(r)
+             })[0..5] as connections
+        RETURN
+          e.uid as uid, e.name as name, labels(e)[0] as type,
+          COALESCE(e.tags, []) as tags, COALESCE(e.aliases, []) as aliases,
+          score, relCount, connections
+        ORDER BY score DESC, e.name ASC
+        LIMIT $limit
+        `,
+        { ftQuery, limit: limit * 2 }
+      )
+      .then((result) =>
+        result.records.map((r: any) => ({
+          uid: r.get("uid") as string,
+          name: r.get("name") as string,
+          type: r.get("type") as string,
+          tags: r.get("tags") as string[],
+          aliases: r.get("aliases") as string[],
+          score: r.get("score") as number,
+          relationshipCount: r.get("relCount") as number,
+          connectedEntities: r.get(
+            "connections"
+          ) as GraphSearchResult["connectedEntities"],
+        }))
+      ),
 
-  return result.records.map((r: any) => ({
-    uid: r.get("uid"),
-    name: r.get("name"),
-    type: r.get("type"),
-    tags: r.get("tags"),
-    aliases: r.get("aliases"),
-    score: r.get("score"),
-    relationshipCount: r.get("relCount"),
-    connectedEntities: r.get("connections"),
-  }));
+    // Vector leg: Qdrant semantic search (no-op if not configured)
+    QDRANT_ENABLED
+      ? searchKgVector(query, limit * 2).catch(() => [])
+      : Promise.resolve([]),
+  ]);
+
+  // If Qdrant not configured, return fulltext results as-is
+  if (!QDRANT_ENABLED || vectorResults.length === 0) {
+    return fulltextResults.slice(0, limit);
+  }
+
+  // Build RRF input lists
+  const bm25List = fulltextResults.map((r) => ({ uid: r.uid, score: r.score }));
+  const fused = reciprocalRankFusion(bm25List, vectorResults).slice(0, limit);
+
+  // Map of uid → full entity (from BM25 results, which carry relationship data)
+  const entityMap = new Map(fulltextResults.map((r) => [r.uid, r]));
+
+  // Fetch any vector-only hits (not in BM25 results) from Neo4j
+  const missingUids = fused
+    .map((r) => r.uid)
+    .filter((uid) => !entityMap.has(uid));
+
+  if (missingUids.length > 0) {
+    const fetched = await client
+      .executeRead(
+        `
+        MATCH (e:Entity)
+        WHERE e.uid IN $uids AND e.uid IS NOT NULL AND e.name IS NOT NULL
+        OPTIONAL MATCH (e)-[r]-(connected)
+        WHERE connected.name IS NOT NULL
+        WITH e,
+             count(r) as relCount,
+             collect(DISTINCT {
+               name: connected.name,
+               type: labels(connected)[0],
+               relationship: type(r)
+             })[0..5] as connections
+        RETURN
+          e.uid as uid, e.name as name, labels(e)[0] as type,
+          COALESCE(e.tags, []) as tags, COALESCE(e.aliases, []) as aliases,
+          0.5 as score, relCount, connections
+        `,
+        { uids: missingUids }
+      )
+      .then((result) =>
+        result.records.map((r: any) => ({
+          uid: r.get("uid") as string,
+          name: r.get("name") as string,
+          type: r.get("type") as string,
+          tags: r.get("tags") as string[],
+          aliases: r.get("aliases") as string[],
+          score: r.get("score") as number,
+          relationshipCount: r.get("relCount") as number,
+          connectedEntities: r.get(
+            "connections"
+          ) as GraphSearchResult["connectedEntities"],
+        }))
+      );
+
+    fetched.forEach((e) => entityMap.set(e.uid, e));
+  }
+
+  // Return in RRF order, dropping any uids with no entity data
+  return fused
+    .map((r) => entityMap.get(r.uid))
+    .filter((r): r is GraphSearchResult => r !== undefined);
 }
 
-// ── Web Search (Tavily) ──────────────────────────────────────────────
+// ── Community Search (GraphRAG global search) ───────────────────────
+
+export async function searchCommunities(
+  query: string,
+  limit = 5
+): Promise<CommunitySearchResult[]> {
+  if (!QDRANT_ENABLED) return [];
+
+  try {
+    return await searchCommunitySummaries(query, limit);
+  } catch {
+    return [];
+  }
+}
+
+// ── Web Search (SearXNG) ─────────────────────────────────────────────
 
 export async function searchWeb(
   query: string,
   maxResults = 6
 ): Promise<WebSearchResult[]> {
-  const apiKey = process.env.TAVILY_API_KEY;
-  if (!apiKey) return [];
+  const endpoint = process.env.SEARXNG_ENDPOINT;
+  if (!endpoint) return [];
 
-  const res = await fetch("https://api.tavily.com/search", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      api_key: apiKey,
-      query,
-      max_results: maxResults,
-      search_depth: "advanced",
-      include_answer: false,
-    }),
+  const url = new URL("/search", endpoint);
+  url.searchParams.set("q", query);
+  url.searchParams.set("format", "json");
+  url.searchParams.set("pageno", "1");
+
+  const res = await fetch(url.toString(), {
+    headers: { Accept: "application/json" },
   });
   if (!res.ok) return [];
 
@@ -134,12 +222,12 @@ export async function searchWeb(
       title: string;
       url: string;
       content: string;
-      score: number;
+      score?: number;
     }>;
   };
 
   return (
-    data.results?.map((r) => ({
+    data.results?.slice(0, maxResults).map((r) => ({
       title: r.title,
       url: r.url,
       snippet: r.content?.slice(0, 500),
@@ -179,15 +267,6 @@ export async function searchWikipedia(
     url,
     snippet: text.slice(0, 300),
   };
-}
-
-// ── Community Search ─────────────────────────────────────────────────
-
-export async function searchCommunities(
-  query: string,
-  limit = 5
-): Promise<CommunitySearchResult[]> {
-  return searchCommunitySummaries(query, limit);
 }
 
 // ── Retry Wrapper ────────────────────────────────────────────────────

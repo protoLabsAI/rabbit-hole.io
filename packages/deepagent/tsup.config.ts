@@ -23,6 +23,7 @@ export default defineConfig({
   external: [
     "@proto/types",
     "@proto/llm-providers",
+    "@proto/vector",
     "@langchain/core",
     "@langchain/langgraph",
     "@copilotkit/sdk-js",

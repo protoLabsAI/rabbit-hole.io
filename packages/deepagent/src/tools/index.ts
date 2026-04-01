@@ -3,10 +3,11 @@
  */
 
 export { writeTodos, readFile, writeFile, ls } from "./builtin-tools";
-export { wikipediaFetchTool } from "./wikipedia-fetch";
-export { duckduckgoSearchTool } from "./duckduckgo-search";
-export { tavilySearchTool } from "./tavily-search";
+export { searxngSearchTool } from "./searxng-search";
 export { langextractWrapperTool } from "./langextract-wrapper";
 export { batchFieldMappingLookupTool } from "./batch-field-mapping";
 export { validateBundleTool } from "./validate-bundle";
 export { mediaIngestionTool } from "./media";
+export { vectorMemoryTool } from "./vector-memory";
+export { graphSearchTool } from "./graph-search";
+export { communitySearchTool } from "./community-search";

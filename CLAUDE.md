@@ -99,10 +99,20 @@ The agent decides tool order and iteration. `stopWhen: stepCountIs(5)`.
 2. **3D Atlas** (NEXT) — Replace Cytoscape with modern 3D for millions of nodes.
 3. **Research App** (FUTURE) — Downloadable Tauri/Electron self-hostable app.
 
-## MCP Plugin
+## MCP Server
 
-- `/research`, `/ingest`, `/graph` commands
-- Tools: `graph_search`, `research_entity`, `extract_entities`, `validate_bundle`, `ingest_bundle`, `wikipedia_search`, `tavily_search`, `web_search`
+Two transports: **stdio** (local clients) and **HTTP** (network agents via Streamable HTTP transport, spec 2025-03-26).
+
+**HTTP server** runs on port 3398 with bearer token auth (`MCP_AUTH_TOKEN` env var):
+- `POST /mcp` — MCP JSON-RPC (initialize, tool calls)
+- `GET /mcp` — SSE stream for server-initiated messages
+- `DELETE /mcp` — Session teardown
+- `GET /health` — Server status
+- `GET /openapi.json` — Auto-generated OpenAPI 3.1 spec from tool definitions
+
+**12 tools** (8 research, 4 media): `graph_search`, `research_entity`, `extract_entities`, `validate_bundle`, `ingest_bundle`, `wikipedia_search`, `tavily_search`, `web_search`, `ingest_url`, `ingest_file`, `transcribe_audio`, `extract_pdf`
+
+- `/research`, `/ingest`, `/graph` plugin commands
 - `research_entity` runs Wikipedia/DuckDuckGo/Tavily in parallel (`Promise.allSettled`) with 10s per-source timeout, source health tracking (3 failures in 10min = auto-disable), and adaptive depth (quality-based follow-up rounds with configurable budget)
 - Langfuse tracing per `research_entity` call when `LANGFUSE_PUBLIC_KEY` is set
-- Env: `RABBIT_HOLE_ROOT`, `ANTHROPIC_API_KEY`, `TAVILY_API_KEY`, `GROQ_API_KEY`, `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_BASE_URL`
+- Env: `RABBIT_HOLE_ROOT`, `ANTHROPIC_API_KEY`, `TAVILY_API_KEY`, `GROQ_API_KEY`, `MCP_AUTH_TOKEN`, `MCP_PORT`, `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_BASE_URL`

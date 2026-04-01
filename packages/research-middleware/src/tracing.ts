@@ -11,6 +11,8 @@
  *   await tracing.flush(); // call after chain completes (non-blocking)
  */
 
+import { Langfuse, type LangfuseTraceClient } from "langfuse";
+
 // ---------------------------------------------------------------------------
 // Public types
 // ---------------------------------------------------------------------------
@@ -105,13 +107,10 @@ class NullTracingContext implements TracingContext {
 // ---------------------------------------------------------------------------
 
 class LangfuseTracingContext implements TracingContext {
-  private readonly _langfuse: import("langfuse").Langfuse;
-  private readonly _trace: import("langfuse").LangfuseTraceClient;
+  private readonly _langfuse: Langfuse;
+  private readonly _trace: LangfuseTraceClient;
 
-  constructor(
-    langfuse: import("langfuse").Langfuse,
-    trace: import("langfuse").LangfuseTraceClient
-  ) {
+  constructor(langfuse: Langfuse, trace: LangfuseTraceClient) {
     this._langfuse = langfuse;
     this._trace = trace;
   }
@@ -162,9 +161,9 @@ class LangfuseTracingContext implements TracingContext {
 // ---------------------------------------------------------------------------
 
 /** Singleton Langfuse instance — created lazily on first use. */
-let _langfuseInstance: import("langfuse").Langfuse | null = null;
+let _langfuseInstance: Langfuse | null = null;
 
-function getLangfuse(): import("langfuse").Langfuse | null {
+function getLangfuse(): Langfuse | null {
   const publicKey = process.env["LANGFUSE_PUBLIC_KEY"];
   const secretKey = process.env["LANGFUSE_SECRET_KEY"];
 
@@ -173,25 +172,13 @@ function getLangfuse(): import("langfuse").Langfuse | null {
   }
 
   if (!_langfuseInstance) {
-    // Dynamic import isn't used here; we rely on the optional peer dep being
-    // present if the key is set. The package.json lists langfuse as a regular
-    // dependency, so this import is always safe when the dep is installed.
-    // We use a lazy require-style pattern to avoid top-level side effects.
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { Langfuse } = require("langfuse") as typeof import("langfuse");
-      _langfuseInstance = new Langfuse({
-        publicKey,
-        secretKey,
-        baseUrl: process.env["LANGFUSE_BASE_URL"] || undefined,
-        // Disable automatic flushing on shutdown — we call flushAsync ourselves.
-        flushAt: 100,
-        flushInterval: 10_000,
-      });
-    } catch {
-      // langfuse package not available — fall back to no-op
-      return null;
-    }
+    _langfuseInstance = new Langfuse({
+      publicKey,
+      secretKey,
+      baseUrl: process.env["LANGFUSE_BASE_URL"] || undefined,
+      flushAt: 100,
+      flushInterval: 10_000,
+    });
   }
 
   return _langfuseInstance;

@@ -27,9 +27,7 @@ export function buildEvidenceGathererGraph(
     name: "evidence-gatherer",
     prompt: EVIDENCE_GATHERER_PROMPT,
     tools: [
-      tools["wikipedia_fetch"],
-      tools["tavily_search"],
-      tools["duckduckgo_search"],
+      tools["searxng_search"],
       getSubmitOutputTool("evidence-gatherer"),
     ].filter(Boolean) as StructuredTool[],
     model,
