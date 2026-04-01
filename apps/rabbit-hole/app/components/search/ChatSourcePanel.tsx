@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { Icon } from "@proto/icon-system";
 
@@ -93,7 +93,10 @@ function PanelContent({
           </div>
           <div className="space-y-1.5">
             {communities.map((community) => (
-              <CommunityCard key={community.communityId} community={community} />
+              <CommunityCard
+                key={community.communityId}
+                community={community}
+              />
             ))}
           </div>
         </div>
@@ -146,8 +149,14 @@ export function ChatSourcePanel({
   onMobileClose,
 }: ChatSourcePanelProps) {
   const [collapsed, setCollapsed] = useState(false);
+  const hadContent = useRef(false);
 
-  if (sources.length === 0 && entities.length === 0 && communities.length === 0 && !isStreaming) return null;
+  const hasContent =
+    sources.length > 0 || entities.length > 0 || communities.length > 0;
+  if (hasContent) hadContent.current = true;
+
+  // Don't render if we never had content and aren't streaming
+  if (!hadContent.current && !isStreaming) return null;
 
   const totalCount = sources.length + entities.length + communities.length;
 
