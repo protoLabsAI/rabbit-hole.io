@@ -7,7 +7,12 @@
 
 import { getGlobalNeo4jClient } from "@proto/database";
 import { createNeo4jClientWithIntegerConversion } from "@proto/utils";
-import { searchKgVector, reciprocalRankFusion } from "@proto/vector";
+import {
+  searchKgVector,
+  reciprocalRankFusion,
+  searchCommunitySummaries,
+  type CommunitySearchResult,
+} from "@proto/vector";
 
 // ── Types ────────────────────────────────────────────────────────────
 
@@ -176,6 +181,21 @@ export async function searchGraph(
   return fused
     .map((r) => entityMap.get(r.uid))
     .filter((r): r is GraphSearchResult => r !== undefined);
+}
+
+// ── Community Search (GraphRAG global search) ───────────────────────
+
+export async function searchCommunities(
+  query: string,
+  limit = 5
+): Promise<CommunitySearchResult[]> {
+  if (!QDRANT_ENABLED) return [];
+
+  try {
+    return await searchCommunitySummaries(query, limit);
+  } catch {
+    return [];
+  }
 }
 
 // ── Web Search (SearXNG) ─────────────────────────────────────────────

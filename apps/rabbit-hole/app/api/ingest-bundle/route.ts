@@ -621,6 +621,38 @@ const handleBundleIngest = async (
       timestamp: new Date().toISOString(),
     } satisfies GraphBundleCompleteEvent);
 
+    // Track entities for community recomputation trigger
+    if (summary.entitiesCreated > 0) {
+      const counter =
+        ((globalThis as any).__entitiesSinceLastCommunityRecompute as number) ??
+        0;
+      const newCount = counter + summary.entitiesCreated;
+      (globalThis as any).__entitiesSinceLastCommunityRecompute = newCount;
+
+      if (newCount >= 25) {
+        (globalThis as any).__entitiesSinceLastCommunityRecompute = 0;
+        // Fire-and-forget: enqueue community recomputation via job processor
+        const jobProcessorUrl =
+          process.env.JOB_PROCESSOR_URL || "http://localhost:8680";
+        fetch(`${jobProcessorUrl}/api/jobs/enqueue`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            jobClass: "CommunityRecomputationJob",
+            queue: "community-recomputation",
+            data: { triggeredBy: "threshold", entitiesSinceLastRun: newCount },
+          }),
+        }).catch((err) =>
+          console.warn(
+            `[community-recompute] Failed to enqueue job: ${err.message}`
+          )
+        );
+        console.log(
+          `[community-recompute] Threshold reached (${newCount} entities) — recomputation enqueued`
+        );
+      }
+    }
+
     console.log(`🎉 Bundle ingest completed in ${totalMs}ms`);
     console.log(`📈 Phase timings:`, phaseTimings);
 

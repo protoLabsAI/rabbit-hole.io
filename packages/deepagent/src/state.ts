@@ -75,6 +75,13 @@ export interface EntityResearchAgentState {
   maxHops: number;
   /** Session ID used to scope this research run's vector memory */
   sessionId?: string;
+  /** Result of auto-ingesting the research bundle into the KG */
+  autoIngestResult?: {
+    ingested: boolean;
+    entitiesIngested: number;
+    relationshipsIngested: number;
+    error?: string;
+  };
 }
 
 export function partialBundleReducer(
@@ -159,6 +166,19 @@ export const EntityResearchAgentStateAnnotation = Annotation.Root({
   }),
 
   sessionId: Annotation<string | undefined>({
+    reducer: (left, right) => right ?? left,
+    default: () => undefined,
+  }),
+
+  autoIngestResult: Annotation<
+    | {
+        ingested: boolean;
+        entitiesIngested: number;
+        relationshipsIngested: number;
+        error?: string;
+      }
+    | undefined
+  >({
     reducer: (left, right) => right ?? left,
     default: () => undefined,
   }),

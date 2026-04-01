@@ -7,6 +7,7 @@ import {
   EMBED_DIMS,
   KG_COLLECTION,
   RESEARCH_COLLECTION,
+  COMMUNITY_COLLECTION,
 } from "./qdrant";
 
 export async function ensureKgCollection(): Promise<void> {
@@ -32,5 +33,20 @@ export async function ensureResearchCollection(): Promise<void> {
   await client.createPayloadIndex(RESEARCH_COLLECTION, {
     field_name: "sessionId",
     field_schema: "keyword",
+  });
+}
+
+export async function ensureCommunityCollection(): Promise<void> {
+  const client = getQdrantClient();
+  const { collections } = await client.getCollections();
+  if (collections.some((c) => c.name === COMMUNITY_COLLECTION)) return;
+
+  await client.createCollection(COMMUNITY_COLLECTION, {
+    vectors: { size: EMBED_DIMS, distance: "Cosine" },
+  });
+
+  await client.createPayloadIndex(COMMUNITY_COLLECTION, {
+    field_name: "communityId",
+    field_schema: "integer",
   });
 }

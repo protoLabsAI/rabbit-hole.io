@@ -33,6 +33,7 @@ import {
 } from "../tools";
 import { log } from "../utils/logger";
 
+import { createAutoIngestNode } from "./auto-ingest";
 import { resetCoordinatorModel } from "./nodes";
 import { createResearchLoopNode } from "./research-loop";
 import { buildScopingGraph } from "./scoping";
@@ -299,12 +300,14 @@ export function buildDeepAgentGraph(options?: {
         cachedSubgraphs["bundle-assembler"]
       )
     )
+    .addNode("auto-ingest", createAutoIngestNode())
     .addEdge(START, "scoping")
     .addEdge("scoping", "research-loop")
     .addEdge("research-loop", "entity-creator")
     .addEdge("entity-creator", "relationship-mapper")
     .addEdge("relationship-mapper", "bundle-assembler")
-    .addEdge("bundle-assembler", END);
+    .addEdge("bundle-assembler", "auto-ingest")
+    .addEdge("auto-ingest", END);
 
   return graph;
 }
