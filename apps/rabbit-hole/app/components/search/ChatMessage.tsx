@@ -9,6 +9,7 @@ import { Badge } from "@proto/ui/atoms";
 
 import { ChatMarkdown } from "./ChatMarkdown";
 import { ChatSourcePanel } from "./ChatSourcePanel";
+import type { GraphEntity } from "./EntityCard";
 import { ReasoningBlock } from "./ReasoningBlock";
 import type { ResearchSource } from "./SourceCard";
 
