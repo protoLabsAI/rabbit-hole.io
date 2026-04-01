@@ -216,7 +216,7 @@ export function buildDeepAgentGraph(options?: {
   let model = options?.model;
   if (!model) {
     if (!cachedModel)
-      cachedModel = getModel("smart", undefined, { maxTokens: 4096 });
+      cachedModel = getModel("smart", undefined, { maxTokens: 32768 });
     model = cachedModel;
   }
 
