@@ -3,16 +3,10 @@
 /**
  * Research POC — Minimal viable research page
  *
- * Canvas (React Flow) + Chat (CopilotKit) + Agent bridge.
- * No Yjs, no workspace management, no collaboration, no utility panels.
+ * Canvas (React Flow) + Chat stub. CopilotKit removed (M4 milestone).
+ * Chat will be re-wired to native deep research API in a follow-up milestone.
  */
 
-import {
-  CopilotKit,
-  useCopilotChatHeadless_c,
-  useCoAgent,
-  useCopilotAction,
-} from "@copilotkit/react-core";
 import {
   ReactFlow,
   Background,
@@ -65,50 +59,11 @@ function ResearchChat({
   onEntitiesReceived: (nodes: Node[], edges: Edge[]) => void;
 }) {
   const [input, setInput] = useState("");
-  const { messages, sendMessage, isLoading } = useCopilotChatHeadless_c();
-  const { state: agentState } = useCoAgent({ name: "research_agent" });
-
-  // Register the push_entities_to_canvas action
-  useCopilotAction({
-    name: "push_entities_to_canvas",
-    description: "Push research entities to the canvas for visualization",
-    parameters: [
-      {
-        name: "entities",
-        type: "object[]",
-        description: "Entity objects",
-        required: true,
-      },
-      {
-        name: "relationships",
-        type: "object[]",
-        description: "Relationship objects",
-        required: false,
-      },
-    ],
-    handler: async ({ entities, relationships }) => {
-      const newNodes: Node[] = (entities ?? []).map(
-        (entity: any, i: number) => ({
-          id: entity.uid || `entity-${i}`,
-          type: "default",
-          position: { x: 200 * (i % 5), y: 200 * Math.floor(i / 5) },
-          data: { label: entity.name || entity.uid || `Entity ${i}` },
-        })
-      );
-
-      const newEdges: Edge[] = (relationships ?? []).map(
-        (rel: any, i: number) => ({
-          id: rel.uid || `rel-${i}`,
-          source: rel.source,
-          target: rel.target,
-          label: rel.type,
-        })
-      );
-
-      onEntitiesReceived(newNodes, newEdges);
-      return `Added ${newNodes.length} entities and ${newEdges.length} relationships to canvas.`;
-    },
-  });
+  // CopilotKit removed (M4) — stubs until native API wired in
+  const messages: any[] = [];
+  const sendMessage = (_msg: any) => {};
+  const isLoading = false;
+  const agentState: any = null;
 
   const handleSend = () => {
     if (input.trim() && !isLoading) {
@@ -225,16 +180,8 @@ function ResearchWorkspace() {
   );
 }
 
-// ─── Entry with CopilotKit Provider ─────────────────────────────────────────
+// ─── Entry ───────────────────────────────────────────────────────────────────
 
 export default function ResearchPOC() {
-  return (
-    <CopilotKit
-      runtimeUrl="/api/copilotkit"
-      agent="research_agent"
-      publicLicenseKey="ck_pub_5d425f60d199031698f99a979d267a19"
-    >
-      <ResearchWorkspace />
-    </CopilotKit>
-  );
+  return <ResearchWorkspace />;
 }
