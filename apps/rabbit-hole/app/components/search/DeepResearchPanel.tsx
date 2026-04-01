@@ -5,6 +5,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Icon } from "@proto/icon-system";
 
 import { ChatMarkdown } from "./ChatMarkdown";
+import { SourceCard, type ResearchSource } from "./SourceCard";
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -12,13 +13,6 @@ interface ResearchEvent {
   type: string;
   data: any;
   timestamp: number;
-}
-
-interface ResearchSource {
-  title: string;
-  url: string;
-  type: "web" | "wikipedia" | "graph";
-  snippet?: string;
 }
 
 // ─── Constants ──────────────────────────────────────────────────────
@@ -241,83 +235,6 @@ function PhaseProgress({ currentPhase }: { currentPhase: string }) {
           </div>
         );
       })}
-    </div>
-  );
-}
-
-// ─── Source Card ─────────────────────────────────────────────────────
-
-function SourceCard({
-  source,
-  index,
-}: {
-  source: ResearchSource;
-  index: number;
-}) {
-  const domain = source.url.startsWith("#")
-    ? "Knowledge Graph"
-    : (() => {
-        try {
-          return new URL(source.url).hostname.replace("www.", "");
-        } catch {
-          return source.url;
-        }
-      })();
-
-  const isExternal = !source.url.startsWith("#");
-  const typeIcon =
-    source.type === "graph"
-      ? "Database"
-      : source.type === "wikipedia"
-        ? "BookOpen"
-        : "Globe";
-  const typeColor =
-    source.type === "graph"
-      ? "text-purple-500"
-      : source.type === "wikipedia"
-        ? "text-blue-500"
-        : "text-green-500";
-
-  return (
-    <div
-      className={`group rounded-lg border border-border/50 p-3 text-xs transition-colors ${
-        isExternal
-          ? "hover:border-border hover:bg-muted/30 cursor-pointer"
-          : "bg-muted/20"
-      }`}
-      onClick={() =>
-        isExternal && window.open(source.url, "_blank", "noopener")
-      }
-    >
-      <div className="flex items-start gap-2">
-        <span className="flex items-center justify-center w-5 h-5 rounded bg-primary/10 text-[9px] font-semibold text-primary flex-shrink-0 mt-0.5">
-          {index + 1}
-        </span>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 mb-1">
-            <Icon name={typeIcon as any} className={`h-3 w-3 ${typeColor}`} />
-            {isExternal && (
-              <img
-                src={`https://www.google.com/s2/favicons?domain=${domain}&sz=16`}
-                className="w-3.5 h-3.5"
-                alt=""
-              />
-            )}
-            <span className="text-[10px] text-muted-foreground truncate">
-              {domain}
-            </span>
-          </div>
-          <p className="font-medium text-foreground leading-snug line-clamp-2">
-            {source.title}
-          </p>
-          {source.snippet && (
-            <p className="text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
-              {source.snippet.slice(0, 120)}
-              {(source.snippet?.length ?? 0) > 120 ? "..." : ""}
-            </p>
-          )}
-        </div>
-      </div>
     </div>
   );
 }
