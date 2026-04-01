@@ -23,6 +23,9 @@ export const KG_COLLECTION = "kg-entities";
 /** Single collection for all research session memory, filtered by sessionId */
 export const RESEARCH_COLLECTION = "research-memory";
 
+/** Community summaries for GraphRAG global search */
+export const COMMUNITY_COLLECTION = "community-summaries";
+
 /**
  * Deterministic point ID from an entity UID string.
  * Uses FNV-1a 32-bit hash — collision probability negligible at KG scale.

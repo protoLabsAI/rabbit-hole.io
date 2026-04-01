@@ -36,7 +36,12 @@ import {
 import { generateSecureId } from "@proto/utils";
 
 import { getMiddlewareRegistry } from "../../lib/middleware-config";
-import { searchGraph, searchWeb, searchWikipedia } from "../../lib/search";
+import {
+  searchGraph,
+  searchWeb,
+  searchWikipedia,
+  searchCommunities,
+} from "../../lib/search";
 
 // ─── Tool Definitions ───────────────────────────────────────────────
 
@@ -83,6 +88,26 @@ const searchTools = {
     },
   }),
 
+  searchCommunities: tool({
+    description:
+      "Search community summaries for broad thematic questions about the knowledge graph. Use this for questions like 'what are the main themes?', 'what topics are covered?', or 'how do these areas connect?' Returns community-level summaries rather than individual entities.",
+    inputSchema: z.object({
+      query: z.string().describe("Thematic or holistic search query"),
+    }),
+    execute: async (input: { query: string }) => {
+      const results = await searchCommunities(input.query);
+      if (results.length === 0) return { results: [] };
+      return {
+        results: results.map((r) => ({
+          communityId: r.communityId,
+          summary: r.summary,
+          topEntities: r.topEntities,
+          entityCount: r.entityCount,
+        })),
+      };
+    },
+  }),
+
   askClarification: tool({
     description:
       "Ask the user a clarifying question when their query has multiple valid interpretations, references ambiguous entities (e.g. 'Mercury' — planet or element?), or when intent is unclear. Use at most once per turn.",
@@ -124,8 +149,9 @@ const SYSTEM_PROMPT = `You are Rabbit Hole, an AI search engine powered by a liv
 ## Workflow
 1. ALWAYS call searchGraph first to check existing knowledge
 2. If the graph has good results (3+ entities), use them to answer
-3. ${SEARXNG_ENABLED ? "If the graph is thin, call searchWeb for more context" : "If the graph is thin, rely on your training knowledge and say so — web search is not available"}
-4. Synthesize all findings into a clear, well-cited answer
+3. For broad or thematic questions ("what are the main themes?", "how do these connect?"), call searchCommunities
+4. ${SEARXNG_ENABLED ? "If the graph is thin, call searchWeb for more context" : "If the graph is thin, rely on your training knowledge and say so — web search is not available"}
+5. Synthesize all findings into a clear, well-cited answer
 
 ## Answer Format
 - Answer directly and concisely
@@ -274,6 +300,16 @@ export async function POST(request: Request) {
           "searchWikipedia",
           input as Record<string, unknown>,
           searchTools.searchWikipedia.execute as unknown as ToolExecutor
+        ),
+    },
+    searchCommunities: {
+      ...searchTools.searchCommunities,
+      execute: async (input: { query: string }) =>
+        chain.wrapToolCall(
+          ctx,
+          "searchCommunities",
+          input as Record<string, unknown>,
+          searchTools.searchCommunities.execute as unknown as ToolExecutor
         ),
     },
     askClarification: {

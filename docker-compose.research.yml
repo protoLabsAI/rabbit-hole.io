@@ -204,6 +204,9 @@ services:
       - NEO4J_PASSWORD=evidencegraph2024
       - QDRANT_URL=http://host.docker.internal:6333
       - OLLAMA_ENDPOINT=http://host.docker.internal:11434
+      - LANGFUSE_SECRET_KEY=${LANGFUSE_SECRET_KEY:-}
+      - LANGFUSE_PUBLIC_KEY=${LANGFUSE_PUBLIC_KEY:-}
+      - LANGFUSE_BASE_URL=${LANGFUSE_BASE_URL:-https://langfuse.proto-labs.ai}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:

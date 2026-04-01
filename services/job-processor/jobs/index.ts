@@ -6,6 +6,7 @@
 
 import { Sidequest } from "sidequest";
 
+import { CommunityRecomputationJob } from "./CommunityRecomputationJob.js";
 import { LangExtractJob } from "./LangExtractJob.js";
 import { TextExtractionJob } from "./TextExtractionJob.js";
 import { YouTubeProcessingJob } from "./YouTubeProcessingJob.js";
@@ -20,9 +21,15 @@ export function registerJobs() {
   console.log("  - TextExtractionJob (queue: file-processing)");
   console.log("  - YouTubeProcessingJob (queue: youtube-processing)");
   console.log("  - LangExtractJob (queue: langextract-processing)");
+  console.log("  - CommunityRecomputationJob (queue: community-recomputation)");
 }
 
-export { TextExtractionJob, YouTubeProcessingJob, LangExtractJob };
+export {
+  TextExtractionJob,
+  YouTubeProcessingJob,
+  LangExtractJob,
+  CommunityRecomputationJob,
+};
 
 // Job enqueue helpers
 export async function enqueueTextExtraction(data: {
@@ -76,4 +83,18 @@ export async function enqueueLangExtract(data: {
     .queue("langextract-processing")
     .maxAttempts(3)
     .enqueue(data);
+}
+
+export async function enqueueCommunityRecomputation(
+  triggeredBy: "threshold" | "cron" | "manual",
+  entitiesSinceLastRun?: number
+) {
+  console.log(
+    `📤 Enqueueing community recomputation (trigger: ${triggeredBy})`
+  );
+
+  return await Sidequest.build(CommunityRecomputationJob)
+    .queue("community-recomputation")
+    .maxAttempts(2)
+    .enqueue({ triggeredBy, entitiesSinceLastRun });
 }

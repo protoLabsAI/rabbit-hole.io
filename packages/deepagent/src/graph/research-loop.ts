@@ -22,6 +22,7 @@ import type { StructuredTool } from "@langchain/core/tools";
 import { upsertResearchChunks } from "@proto/vector";
 
 import type { EntityResearchAgentStateType } from "../state";
+import { communitySearchTool } from "../tools/community-search";
 import { graphSearchTool } from "../tools/graph-search";
 import { vectorMemoryTool } from "../tools/vector-memory";
 import type { SearxngInfobox } from "../types";
@@ -38,6 +39,7 @@ Your goal: gather comprehensive evidence for the research brief by strategically
 Available tools:
 - search_memory(query) — semantic search over prior findings from this session
 - search_graph(query) — hybrid BM25 + vector search over the knowledge graph (existing known entities)
+- search_communities(query) — search community summaries for broad thematic context
 - searxng_search(query, category?, time_range?, pageno?) — search web/news/science/it categories
 - langextract_wrapper — extract structured entities from accumulated evidence files
 - read_file / write_file — read/write evidence files
@@ -45,7 +47,8 @@ Available tools:
 Research strategy:
 1. Call search_memory FIRST for any topic before searching externally — avoid redundant searches
 2. Call search_graph to check what is already known in the knowledge base before searching the web
-3. Only call searxng_search if memory and graph don't have sufficient coverage
+3. Call search_communities for broad thematic context — understand how topics cluster
+4. Only call searxng_search if memory, graph, and communities don't have sufficient coverage
 4. Use searxng_search with appropriate categories:
    - general: broad web research
    - news: current events, recent developments (combine with time_range)
@@ -131,6 +134,7 @@ export function createResearchLoopNode(
   const tools: StructuredTool[] = [
     vectorMemoryTool as unknown as StructuredTool,
     graphSearchTool as unknown as StructuredTool,
+    communitySearchTool as unknown as StructuredTool,
     searxngTool,
     langextractTool,
     readFileTool,
