@@ -13,7 +13,11 @@
       "@proto/observability": ["../observability/src"],
       "@proto/types": ["../types/src"],
       "@proto/vector": ["../vector/src"],
-      "@proto/vector/*": ["../vector/src/*"]
+      "@proto/vector/*": ["../vector/src/*"],
+      "@proto/database": ["../database/src"],
+      "@proto/database/*": ["../database/src/*"],
+      "@proto/utils": ["../utils/src"],
+      "@proto/utils/*": ["../utils/src/*"]
     },
     "composite": true,
     "incremental": true
@@ -24,6 +28,8 @@
     { "path": "../types" },
     { "path": "../llm-providers" },
     { "path": "../observability" },
-    { "path": "../vector" }
+    { "path": "../vector" },
+    { "path": "../database" },
+    { "path": "../utils" }
   ]
 }
