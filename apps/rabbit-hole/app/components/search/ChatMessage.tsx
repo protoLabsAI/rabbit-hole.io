@@ -8,7 +8,9 @@ import { Icon } from "@proto/icon-system";
 import { Badge } from "@proto/ui/atoms";
 
 import { ChatMarkdown } from "./ChatMarkdown";
+import { ChatSourcePanel } from "./ChatSourcePanel";
 import { ReasoningBlock } from "./ReasoningBlock";
+import type { ResearchSource } from "./SourceCard";
 
 // ─── Entity type → dot color (mirrors atlas-schema ENTITY_VISUALS) ──
 
@@ -535,78 +537,6 @@ function stripRelatedSearches(text: string): string {
   return cleaned.trimEnd();
 }
 
-// ─── Sources Summary ────────────────────────────────────────────────
-
-function SourcesSummary({
-  sources,
-}: {
-  sources: Array<{
-    title: string;
-    url: string;
-    type: string;
-    snippet?: string;
-  }>;
-}) {
-  const [expanded, setExpanded] = useState(false);
-
-  return (
-    <div className="pt-1">
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground/70 hover:text-foreground transition-colors"
-      >
-        <Icon name="BookOpen" className="h-3 w-3" />
-        <span>
-          Used {sources.length} source{sources.length !== 1 ? "s" : ""}
-        </span>
-        <Icon
-          name="ChevronDown"
-          className={`h-3 w-3 transition-transform ${expanded ? "rotate-180" : ""}`}
-        />
-      </button>
-      {expanded && (
-        <div className="mt-2 space-y-1.5">
-          {sources.map((s, i) => {
-            let domain = "";
-            try {
-              domain = new URL(s.url).hostname.replace(/^www\./, "");
-            } catch {
-              /* ignore */
-            }
-            return (
-              <a
-                key={i}
-                href={s.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted/50 transition-colors group"
-              >
-                {domain && (
-                  <img
-                    src={`https://www.google.com/s2/favicons?domain=${domain}&sz=16`}
-                    className="w-4 h-4 flex-shrink-0 rounded-sm"
-                    alt=""
-                  />
-                )}
-                <div className="min-w-0 flex-1">
-                  <span className="text-xs text-foreground group-hover:text-primary truncate block">
-                    {s.title}
-                  </span>
-                  {domain && (
-                    <span className="text-[10px] text-muted-foreground/50">
-                      {domain}
-                    </span>
-                  )}
-                </div>
-              </a>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-}
-
 // ─── Suggestion Pills ───────────────────────────────────────────────
 
 function SuggestionPills({
@@ -731,14 +661,9 @@ export function ChatMessage({
       (p.type.startsWith("tool-") && "toolName" in p)
   );
 
-  // Extract sources from tool results for citation badges
+  // Extract sources from tool results for citation badges and source panel
   const sources = useMemo(() => {
-    const result: Array<{
-      title: string;
-      url: string;
-      type: "web" | "wikipedia" | "graph";
-      snippet?: string;
-    }> = [];
+    const result: ResearchSource[] = [];
     for (const t of allTools) {
       const output = t.output ?? t.result;
       if (!output) continue;
@@ -796,7 +721,9 @@ export function ChatMessage({
   const isComplete = !isStreaming || !isLast;
 
   return (
-    <div className="space-y-3 pb-2">
+    <div className="flex items-start gap-4">
+      {/* Main content */}
+      <div className="flex-1 min-w-0 space-y-3 pb-2">
       {/* Reasoning — collapsible thinking indicator */}
       {reasoningAnnotation && (
         <ReasoningBlock
@@ -834,9 +761,6 @@ export function ChatMessage({
           )}
         </div>
       )}
-
-      {/* Sources summary — collapsible list */}
-      {isComplete && sources.length > 0 && <SourcesSummary sources={sources} />}
 
       {/* Actions */}
       {isComplete && textContent && (
@@ -966,6 +890,13 @@ export function ChatMessage({
           <span>Thinking...</span>
         </div>
       )}
+      </div>
+
+      {/* Source panel — collapsible right-side panel populated from tool results */}
+      <ChatSourcePanel
+        sources={sources}
+        isStreaming={isStreaming && isLast}
+      />
     </div>
   );
 }

@@ -1,0 +1,86 @@
+"use client";
+
+import { useState } from "react";
+
+import { Icon } from "@proto/icon-system";
+
+import { SourceCard } from "./SourceCard";
+import type { ResearchSource } from "./SourceCard";
+
+// ─── Chat Source Panel ───────────────────────────────────────────────
+
+interface ChatSourcePanelProps {
+  sources: ResearchSource[];
+  isStreaming?: boolean;
+}
+
+/**
+ * Collapsible right-side source panel for chat messages.
+ * Populates from tool invocation results as they stream in.
+ * Sources are numbered to match [N] citation references in the answer text.
+ */
+export function ChatSourcePanel({
+  sources,
+  isStreaming = false,
+}: ChatSourcePanelProps) {
+  const [collapsed, setCollapsed] = useState(false);
+
+  if (sources.length === 0 && !isStreaming) return null;
+
+  if (collapsed) {
+    return (
+      <button
+        onClick={() => setCollapsed(false)}
+        className="flex flex-col items-center gap-1 p-2 rounded-lg border border-border/50 hover:border-border hover:bg-muted/30 transition-colors flex-shrink-0"
+        title={`${sources.length} source${sources.length !== 1 ? "s" : ""}`}
+      >
+        <Icon name="BookOpen" className="h-4 w-4 text-muted-foreground" />
+        <span className="flex items-center justify-center min-w-[18px] h-[18px] rounded-full bg-primary/10 text-[9px] font-bold text-primary px-1">
+          {sources.length}
+        </span>
+      </button>
+    );
+  }
+
+  return (
+    <div className="w-52 flex-shrink-0 space-y-2 transition-all duration-200">
+      {/* Header */}
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5 text-xs font-medium text-foreground/70">
+          <Icon name="BookOpen" className="h-3.5 w-3.5" />
+          <span>Sources</span>
+          {sources.length > 0 && (
+            <span className="px-1.5 py-0.5 rounded-full bg-muted text-[10px] text-muted-foreground font-normal">
+              {sources.length}
+            </span>
+          )}
+          {isStreaming && (
+            <Icon
+              name="Loader2"
+              className="h-3 w-3 animate-spin text-primary/60"
+            />
+          )}
+        </div>
+        <button
+          onClick={() => setCollapsed(true)}
+          className="p-0.5 text-muted-foreground/50 hover:text-foreground transition-colors rounded"
+          title="Collapse sources"
+        >
+          <Icon name="ChevronRight" className="h-3.5 w-3.5" />
+        </button>
+      </div>
+
+      {/* Source list */}
+      <div className="space-y-1.5">
+        {sources.map((source, i) => (
+          <SourceCard key={`${source.url}-${i}`} source={source} index={i} />
+        ))}
+        {isStreaming && sources.length === 0 && (
+          <div className="text-xs text-muted-foreground/60 py-2 text-center">
+            Gathering sources...
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
