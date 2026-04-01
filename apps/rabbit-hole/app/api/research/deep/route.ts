@@ -17,10 +17,12 @@ import { getAIModel } from "@proto/llm-providers/server";
 import { safeValidate } from "@proto/types";
 
 import {
+  searchCommunities,
   searchGraph,
   searchWeb,
   searchWikipedia,
   withRetry,
+  type CommunitySearchResult,
   type GraphSearchResult,
   type WebSearchResult,
   type WikiSearchResult,
@@ -178,6 +180,39 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
           emit("search.completed", {
             query,
             source: "graph",
+            resultCount: 0,
+          });
+        }
+
+        // Search community summaries for thematic context
+        checkAbort(researchId);
+        emit("search.started", { query, source: "communities" });
+        let communityResults: CommunitySearchResult[] = [];
+        try {
+          communityResults = await withRetry(() => searchCommunities(query, 5));
+          trackSearch();
+          emit("search.completed", {
+            query,
+            source: "communities",
+            resultCount: communityResults.length,
+          });
+          if (communityResults.length > 0) {
+            const communityNote = `Community themes: ${communityResults
+              .map(
+                (c) =>
+                  `Community ${c.communityId} (${c.entityCount} entities — ${c.topEntities.slice(0, 3).join(", ")}): ${c.summary}`
+              )
+              .join("\n")}`;
+            allNotes.push(communityNote);
+            const finding = `Found ${communityResults.length} relevant community clusters with thematic context`;
+            allFindings.push(finding);
+            updateResearch(researchId, { findings: allFindings });
+            emit("research.finding", { text: finding });
+          }
+        } catch {
+          emit("search.completed", {
+            query,
+            source: "communities",
             resultCount: 0,
           });
         }

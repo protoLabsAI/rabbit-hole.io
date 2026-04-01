@@ -4,6 +4,8 @@
  * Single source of truth for graph, web, and Wikipedia search.
  */
 
+import { searchCommunitySummaries } from "@proto/vector";
+
 import { getGlobalNeo4jClient } from "@proto/database";
 import { createNeo4jClientWithIntegerConversion } from "@proto/utils";
 
@@ -36,6 +38,14 @@ export interface WikiSearchResult {
   text: string;
   url: string;
   snippet: string;
+}
+
+export interface CommunitySearchResult {
+  communityId: number;
+  summary: string;
+  topEntities: string[];
+  entityCount: number;
+  score: number;
 }
 
 // ── Lucene Query Builder ─────────────────────────────────────────────
@@ -169,6 +179,15 @@ export async function searchWikipedia(
     url,
     snippet: text.slice(0, 300),
   };
+}
+
+// ── Community Search ─────────────────────────────────────────────────
+
+export async function searchCommunities(
+  query: string,
+  limit = 5
+): Promise<CommunitySearchResult[]> {
+  return searchCommunitySummaries(query, limit);
 }
 
 // ── Retry Wrapper ────────────────────────────────────────────────────
