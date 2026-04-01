@@ -14,6 +14,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 import { getAIModel } from "@proto/llm-providers/server";
+import {
+  createTracingContext,
+  type TracingContext,
+} from "@proto/research-middleware";
 import { safeValidate } from "@proto/types";
 
 import {
@@ -55,6 +59,24 @@ function checkAbort(researchId: string) {
   }
 }
 
+// ─── Token usage helper ───────────────────────────────────────────────
+
+function toGenerationUsage(usage: {
+  inputTokens?: number;
+  outputTokens?: number;
+} | undefined) {
+  if (!usage) return undefined;
+  const { inputTokens, outputTokens } = usage;
+  return {
+    promptTokens: inputTokens,
+    completionTokens: outputTokens,
+    totalTokens:
+      inputTokens !== undefined && outputTokens !== undefined
+        ? inputTokens + outputTokens
+        : undefined,
+  };
+}
+
 // ─── Research Pipeline ───────────────────────────────────────────────
 
 async function runResearch(
@@ -62,6 +84,13 @@ async function runResearch(
   query: string,
   mode: "deep-research" | "due-diligence" = "deep-research"
 ) {
+  const tracing = createTracingContext({
+    agentId: researchId,
+    query,
+    sessionId: researchId,
+    metadata: { mode },
+  });
+
   const emit = (type: string, data: unknown) =>
     addEvent(researchId, type, data);
 
@@ -89,6 +118,29 @@ async function runResearch(
 
     checkAbort(researchId);
 
+    const scopePrompt =
+      mode === "due-diligence"
+        ? `You are planning a due diligence investigation on: "${query}"
+
+Write a brief and identify 3-6 evaluation dimensions. Focus on:
+- Performance and scalability evidence
+- Compatibility and integration risks
+- Community support and maintenance trajectory
+- Alternatives and trade-offs
+- Real-world case studies and production usage`
+        : `You are planning a deep research investigation on: "${query}"
+
+Write a research brief and identify 3-6 specific research dimensions to investigate.
+Each dimension should be a focused sub-topic that, combined, gives comprehensive coverage.`;
+
+    const scopeSpan = tracing.createSpan("scope", { mode, query });
+    const scopeGeneration = tracing.createGeneration(
+      "scope:plan",
+      "fast",
+      scopePrompt,
+      { mode }
+    );
+
     const scopeModel = getAIModel("fast");
     const scopeResult = await generateObject({
       model: scopeModel,
@@ -100,27 +152,17 @@ async function runResearch(
           .array(z.string())
           .describe("3-6 specific research dimensions to investigate"),
       }),
-      prompt:
-        mode === "due-diligence"
-          ? `You are planning a due diligence investigation on: "${query}"
-
-Write a brief and identify 3-6 evaluation dimensions. Focus on:
-- Performance and scalability evidence
-- Compatibility and integration risks
-- Community support and maintenance trajectory
-- Alternatives and trade-offs
-- Real-world case studies and production usage`
-          : `You are planning a deep research investigation on: "${query}"
-
-Write a research brief and identify 3-6 specific research dimensions to investigate.
-Each dimension should be a focused sub-topic that, combined, gives comprehensive coverage.`,
+      prompt: scopePrompt,
     });
+
+    scopeGeneration.end(scopeResult.object, toGenerationUsage(scopeResult.usage));
 
     const { dimensions, brief } = scopeResult.object;
 
     updateResearch(researchId, { dimensions, brief });
     emit("scope.completed", { dimensions, brief });
     emit("phase.completed", { phase: "scope" });
+    scopeSpan.end({ dimensionsCount: dimensions.length });
 
     // ── Phase 2: PLAN REVIEW — Show plan, continue automatically ─
     emit("phase.started", {
@@ -153,13 +195,20 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
         phaseDetail: `Iteration ${iteration}: ${dimensionsToResearch.length} dimensions`,
       });
 
+      const researchIterationSpan = tracing.createSpan("research:iteration", {
+        iteration,
+        dimensionCount: dimensionsToResearch.length,
+      });
+
       // Search knowledge graph first (only on first iteration)
       if (iteration === 1) {
         checkAbort(researchId);
         emit("search.started", { query, source: "graph" });
+        const graphSearchSpan = tracing.createSpan("search:graph", { query, source: "initial" });
         try {
           const graphResults = await withRetry(() => searchGraph(query, 15));
           trackSearch();
+          graphSearchSpan.end({ resultCount: graphResults.length });
           emit("search.completed", {
             query,
             source: "graph",
@@ -182,6 +231,7 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
             emit("research.finding", { text: finding });
           }
         } catch {
+          graphSearchSpan.end({ resultCount: 0, error: true });
           emit("search.completed", {
             query,
             source: "graph",
@@ -192,10 +242,12 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
         // Search community summaries for thematic context
         checkAbort(researchId);
         emit("search.started", { query, source: "communities" });
+        const communitySearchSpan = tracing.createSpan("search:communities", { query });
         let communityResults: CommunitySearchResult[] = [];
         try {
           communityResults = await withRetry(() => searchCommunities(query, 5));
           trackSearch();
+          communitySearchSpan.end({ resultCount: communityResults.length });
           emit("search.completed", {
             query,
             source: "communities",
@@ -215,6 +267,7 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
             emit("research.finding", { text: finding });
           }
         } catch {
+          communitySearchSpan.end({ resultCount: 0, error: true });
           emit("search.completed", {
             query,
             source: "communities",
@@ -239,6 +292,12 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
           iteration,
         });
 
+        const dimensionSpan = tracing.createSpan("research:dimension", {
+          dimension,
+          iteration,
+          index: i,
+        });
+
         // Check vector memory for prior findings from this session
         let memoryNote = "";
         try {
@@ -255,10 +314,12 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
         // Graph search per dimension (all iterations — hybrid BM25+vector via shared searchGraph)
         checkAbort(researchId);
         emit("search.started", { query: dimension, source: "graph" });
+        const dimGraphSpan = tracing.createSpan("search:graph", { query: dimension, iteration });
         let dimGraphResults: GraphSearchResult[] = [];
         try {
           dimGraphResults = await withRetry(() => searchGraph(dimension, 5));
           trackSearch();
+          dimGraphSpan.end({ resultCount: dimGraphResults.length });
           emit("search.completed", {
             query: dimension,
             source: "graph",
@@ -276,6 +337,7 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
             }
           }
         } catch {
+          dimGraphSpan.end({ resultCount: 0, error: true });
           emit("search.completed", {
             query: dimension,
             source: "graph",
@@ -287,6 +349,7 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
         // Web search with retry
         checkAbort(researchId);
         emit("search.started", { query: dimension, source: "web" });
+        const webSearchSpan = tracing.createSpan("search:web", { query: dimension, iteration });
         let webResults: WebSearchResult[] = [];
         try {
           webResults = await withRetry(() => searchWeb(dimension, 5));
@@ -294,6 +357,7 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
           /* continue without web results */
         }
         trackSearch();
+        webSearchSpan.end({ resultCount: webResults.length });
         emit("search.completed", {
           query: dimension,
           source: "web",
@@ -312,6 +376,7 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
         // Wikipedia with retry
         checkAbort(researchId);
         emit("search.started", { query: dimension, source: "wikipedia" });
+        const wikiSearchSpan = tracing.createSpan("search:wikipedia", { query: dimension, iteration });
         let wiki: WikiSearchResult | null = null;
         try {
           wiki = await withRetry(() => searchWikipedia(dimension));
@@ -319,6 +384,7 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
           /* continue without wiki */
         }
         trackSearch();
+        wikiSearchSpan.end({ resultCount: wiki ? 1 : 0 });
         emit("search.completed", {
           query: dimension,
           source: "wikipedia",
@@ -360,6 +426,19 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
         if (corpus) {
           checkAbort(researchId);
           emit("research.compressing", { dimension });
+          const compressPrompt = `Summarize the key findings about "${dimension}" from the following research.
+Be concise but include all important facts, names, dates, and relationships.
+Also provide the single most important finding in one sentence.
+
+${corpus.slice(0, 8000)}`;
+
+          const compressGeneration = tracing.createGeneration(
+            "research:compress",
+            "fast",
+            compressPrompt,
+            { dimension, iteration, corpusLength: corpus.length }
+          );
+
           try {
             const compressModel = getAIModel("fast");
             const compressed = await generateObject({
@@ -370,12 +449,13 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
                   .string()
                   .describe("Single most important finding in one sentence"),
               }),
-              prompt: `Summarize the key findings about "${dimension}" from the following research.
-Be concise but include all important facts, names, dates, and relationships.
-Also provide the single most important finding in one sentence.
-
-${corpus.slice(0, 8000)}`,
+              prompt: compressPrompt,
             });
+
+            compressGeneration.end(
+              compressed.object,
+              toGenerationUsage(compressed.usage)
+            );
 
             allNotes.push(`## ${dimension}\n\n${compressed.object.summary}`);
 
@@ -401,10 +481,13 @@ ${corpus.slice(0, 8000)}`,
               noteLength: compressed.object.summary.length,
             });
           } catch {
+            compressGeneration.end(undefined);
             // Fallback: store raw corpus excerpt
             allNotes.push(`## ${dimension}\n\n${corpus.slice(0, 2000)}`);
           }
         }
+
+        dimensionSpan.end({ notesCount: allNotes.length });
 
         updateResearch(researchId, {
           notes: allNotes,
@@ -413,6 +496,7 @@ ${corpus.slice(0, 8000)}`,
       }
 
       emit("phase.completed", { phase: "research" });
+      researchIterationSpan.end({ sourcesCount: allSources.length, notesCount: allNotes.length });
 
       // ── EVALUATE — Should we research more? ────────────────────
       checkAbort(researchId);
@@ -427,7 +511,31 @@ ${corpus.slice(0, 8000)}`,
           phaseDetail: "Checking for gaps...",
         });
 
+        const evaluateSpan = tracing.createSpan("evaluate", { iteration });
+
         try {
+          const evalPrompt = `You are evaluating research coverage on: "${query}"
+
+Research brief: ${brief}
+
+Planned dimensions: ${dimensions.join(", ")}
+
+Research notes so far:
+${allNotes.map((n) => n.slice(0, 500)).join("\n---\n")}
+
+Sources found: ${allSources.length}
+
+Is this research comprehensive enough for a quality, well-cited report?
+If not, identify 1-3 specific gaps that should be investigated.
+Be conservative — only flag genuine gaps, not minor tangents.`;
+
+          const evalGeneration = tracing.createGeneration(
+            "evaluate:gaps",
+            "fast",
+            evalPrompt,
+            { iteration, sourcesCount: allSources.length }
+          );
+
           const evalModel = getAIModel("fast");
           const evalResult = await generateObject({
             model: evalModel,
@@ -443,23 +551,19 @@ ${corpus.slice(0, 8000)}`,
                   "Specific topics or angles not yet covered, empty if complete"
                 ),
             }),
-            prompt: `You are evaluating research coverage on: "${query}"
-
-Research brief: ${brief}
-
-Planned dimensions: ${dimensions.join(", ")}
-
-Research notes so far:
-${allNotes.map((n) => n.slice(0, 500)).join("\n---\n")}
-
-Sources found: ${allSources.length}
-
-Is this research comprehensive enough for a quality, well-cited report?
-If not, identify 1-3 specific gaps that should be investigated.
-Be conservative — only flag genuine gaps, not minor tangents.`,
+            prompt: evalPrompt,
           });
 
+          evalGeneration.end(
+            evalResult.object,
+            toGenerationUsage(evalResult.usage)
+          );
+
           emit("phase.completed", { phase: "evaluating" });
+          evaluateSpan.end({
+            complete: evalResult.object.complete,
+            gapsCount: evalResult.object.gaps.length,
+          });
 
           if (
             evalResult.object.complete ||
@@ -487,6 +591,7 @@ Be conservative — only flag genuine gaps, not minor tangents.`,
         } catch {
           // If evaluation fails, just proceed to synthesis
           emit("phase.completed", { phase: "evaluating" });
+          evaluateSpan.end({ error: true });
           break;
         }
       }
@@ -542,9 +647,7 @@ Write a well-structured, comprehensive research report with these sections:
 - Be thorough but readable (aim for 1500-3000 words)
 - End with 3-5 "Related Topics" as short search phrases (not questions)`;
 
-    const reportStream = streamText({
-      model: reportModel,
-      prompt: `You are writing a ${mode === "due-diligence" ? "due diligence report" : "comprehensive research report"} on: "${query}"
+    const synthesisPrompt = `You are writing a ${mode === "due-diligence" ? "due diligence report" : "comprehensive research report"} on: "${query}"
 
 Research brief: ${brief}
 
@@ -560,7 +663,23 @@ ${synthesisInstructions}
 - Use inline citations like [1], [2], etc. referring to the numbered sources above
 - Cite specific claims — don't just cite generally
 - Every major fact should have at least one citation
-- Use multiple citations where evidence converges: [1][3]`,
+- Use multiple citations where evidence converges: [1][3]`;
+
+    const synthesisSpan = tracing.createSpan("synthesis", {
+      sourcesCount: uniqueSources.length,
+      notesCount: allNotes.length,
+      mode,
+    });
+    const synthesisGeneration = tracing.createGeneration(
+      "synthesis:report",
+      "smart",
+      synthesisPrompt,
+      { mode, sourcesCount: uniqueSources.length, notesCount: allNotes.length }
+    );
+
+    const reportStream = streamText({
+      model: reportModel,
+      prompt: synthesisPrompt,
     });
 
     // Stream report chunks as events
@@ -575,11 +694,16 @@ ${synthesisInstructions}
       emit("report.chunk", { text: chunk });
     }
 
+    // Capture token usage after stream completes (AI SDK v6: inputTokens/outputTokens)
+    const synthesisUsage = await reportStream.usage;
+    synthesisGeneration.end(fullReport, toGenerationUsage(synthesisUsage));
+    synthesisSpan.end({ reportLength: fullReport.length });
+
     emit("report.completed", { length: fullReport.length });
     emit("phase.completed", { phase: "synthesis" });
 
     // ── Auto-Ingest: fire-and-forget entity extraction ────────────
-    autoIngestEntities(researchId, query, fullReport, emit).catch(() => {
+    autoIngestEntities(researchId, query, fullReport, emit, tracing).catch(() => {
       // Swallow — ingest failure must never block research completion
     });
 
@@ -616,6 +740,9 @@ ${synthesisInstructions}
       phaseDetail: `Error: ${msg}`,
     });
     emit("research.error", { message: msg });
+  } finally {
+    // Flush Langfuse events — never blocks or throws
+    tracing.flush().catch(() => undefined);
   }
 }
 
@@ -640,14 +767,14 @@ async function autoIngestEntities(
   researchId: string,
   query: string,
   report: string,
-  emit: (type: string, data: unknown) => void
+  emit: (type: string, data: unknown) => void,
+  tracing: TracingContext
 ) {
   emit("ingest.started", { researchId });
 
-  const model = getAIModel("fast");
-  const result = await generateText({
-    model,
-    prompt: `Extract entities and relationships from this research report about "${query}".
+  const ingestSpan = tracing.createSpan("auto-ingest", { researchId, query });
+
+  const extractPrompt = `Extract entities and relationships from this research report about "${query}".
 
 Return ONLY valid JSON:
 {
@@ -660,7 +787,29 @@ Rules:
 - Extract 5-20 entities and their relationships
 - Only include entities clearly mentioned in the text
 
-Text:\n${report.slice(0, 8000)}`,
+Text:\n${report.slice(0, 8000)}`;
+
+  const extractGeneration = tracing.createGeneration(
+    "auto-ingest:extract",
+    "fast",
+    extractPrompt,
+    { reportLength: report.length }
+  );
+
+  const model = getAIModel("fast");
+  const result = await generateText({
+    model,
+    prompt: extractPrompt,
+  });
+
+  extractGeneration.end(result.text, {
+    promptTokens: result.usage?.inputTokens,
+    completionTokens: result.usage?.outputTokens,
+    totalTokens:
+      result.usage?.inputTokens !== undefined &&
+      result.usage?.outputTokens !== undefined
+        ? result.usage.inputTokens + result.usage.outputTokens
+        : undefined,
   });
 
   const raw = result.text?.trim() ?? "";
@@ -669,6 +818,7 @@ Text:\n${report.slice(0, 8000)}`,
   const parsed = JSON.parse(jsonStr);
 
   if (!parsed?.entities?.length) {
+    ingestSpan.end({ error: "No entities extracted" });
     emit("ingest.failed", { researchId, reason: "No entities extracted" });
     return;
   }
@@ -701,11 +851,16 @@ Text:\n${report.slice(0, 8000)}`,
 
   if (!ingestRes.ok) {
     const err = await ingestRes.text();
+    ingestSpan.end({ error: err });
     emit("ingest.failed", { researchId, reason: err });
     return;
   }
 
   const ingestData = await ingestRes.json();
+  ingestSpan.end({
+    entitiesCount: parsed.entities.length,
+    relationshipsCount: (parsed.relationships ?? []).length,
+  });
   emit("ingest.completed", {
     researchId,
     entitiesCount: parsed.entities.length,
