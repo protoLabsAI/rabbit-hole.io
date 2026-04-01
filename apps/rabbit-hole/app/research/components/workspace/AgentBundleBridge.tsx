@@ -1,15 +1,11 @@
 "use client";
 
 /**
- * AgentBundleBridge
+ * AgentBundleBridge — CopilotKit removed (M4 milestone)
  *
- * Bridge component that reads the research agent's partialBundle from
- * CopilotKit's coagent state and passes it to children via render prop.
- *
- * Must be rendered inside a CopilotKit provider.
+ * Previously read partialBundle from CopilotKit's coagent state.
+ * Now passes null until re-wired to native deep research API.
  */
-
-import { useCoAgent } from "@copilotkit/react-core";
 
 import type { PartialBundle } from "@proto/types";
 
@@ -18,11 +14,5 @@ interface AgentBundleBridgeProps {
 }
 
 export function AgentBundleBridge({ children }: AgentBundleBridgeProps) {
-  const { state: agentState } = useCoAgent({
-    name: "research_agent",
-  });
-
-  const partialBundle = (agentState?.partialBundle as PartialBundle) ?? null;
-
-  return <>{children(partialBundle)}</>;
+  return <>{children(null)}</>;
 }

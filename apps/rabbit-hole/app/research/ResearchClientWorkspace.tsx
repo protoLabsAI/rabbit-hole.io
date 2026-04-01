@@ -18,7 +18,6 @@ import { ResizableChatLayout } from "@proto/ui/templates";
 import type { CanvasType } from "@proto/workspace";
 
 import { ConfirmDialogProvider } from "./components/ConfirmDialog";
-import { LazyCopilotKitWrapper } from "./components/LazyCopilotKitWrapper";
 import { ResearchChatInterface } from "./components/ResearchChatInterface";
 import { WorkspaceContainer } from "./components/workspace/WorkspaceContainer";
 import { useFeaturePreloader } from "./hooks/useFeaturePreloader";
@@ -225,19 +224,7 @@ export default function ResearchClientWorkspace() {
 
   return (
     <ConfirmDialogProvider>
-      <QueryProvider>
-        {canUseAIChat ? (
-          <LazyCopilotKitWrapper
-            runtimeUrl="/api/copilotkit"
-            agent="research_agent"
-            publicLicenseKey="ck_pub_5d425f60d199031698f99a979d267a19"
-          >
-            {content}
-          </LazyCopilotKitWrapper>
-        ) : (
-          content
-        )}
-      </QueryProvider>
+      <QueryProvider>{content}</QueryProvider>
     </ConfirmDialogProvider>
   );
 }
