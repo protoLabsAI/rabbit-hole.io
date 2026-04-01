@@ -71,7 +71,15 @@ function preprocessCitations(text: string): string {
 
 // ── Citation Badge ───────────────────────────────────────────────────
 
-function CitationBadge({ index, source }: { index: number; source?: Source }) {
+function CitationBadge({
+  index,
+  source,
+  onCitationClick,
+}: {
+  index: number;
+  source?: Source;
+  onCitationClick?: (index: number) => void;
+}) {
   const [showTooltip, setShowTooltip] = useState(false);
   const domain = source?.url
     ? (() => {
@@ -90,9 +98,7 @@ function CitationBadge({ index, source }: { index: number; source?: Source }) {
         onMouseLeave={() => setShowTooltip(false)}
         onClick={(e) => {
           e.preventDefault();
-          if (source?.url && !source.url.startsWith("#")) {
-            window.open(source.url, "_blank");
-          }
+          onCitationClick?.(index);
         }}
         className="inline-flex items-center justify-center min-w-[1.1rem] h-[1.1rem] px-0.5 text-[9px] font-semibold bg-primary/10 text-primary rounded-full align-super cursor-pointer hover:bg-primary/20 transition-colors"
       >
@@ -134,6 +140,7 @@ interface ChatMarkdownProps {
   isStreaming?: boolean;
   className?: string;
   sources?: Source[];
+  onCitationClick?: (index: number) => void;
 }
 
 export function ChatMarkdown({
@@ -141,6 +148,7 @@ export function ChatMarkdown({
   isStreaming,
   className,
   sources,
+  onCitationClick,
 }: ChatMarkdownProps) {
   // Pre-process citations if sources are provided
   const processedContent = useMemo(
@@ -164,7 +172,13 @@ export function ChatMarkdown({
         if (href?.startsWith("#cite-")) {
           const index = parseInt(href.replace("#cite-", ""), 10);
           const source = sources?.[index - 1];
-          return <CitationBadge index={index} source={source} />;
+          return (
+            <CitationBadge
+              index={index}
+              source={source}
+              onCitationClick={onCitationClick}
+            />
+          );
         }
 
         // Regular link
@@ -305,7 +319,7 @@ export function ChatMarkdown({
       ),
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [sources, isStreaming]
+    [sources, isStreaming, onCitationClick]
   );
 
   return (

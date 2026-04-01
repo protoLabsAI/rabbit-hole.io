@@ -2,13 +2,17 @@
 
 import type { UIMessage } from "ai";
 import Link from "next/link";
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useRef } from "react";
 
 import { Icon } from "@proto/icon-system";
 import { Badge } from "@proto/ui/atoms";
 
 import { ChatMarkdown } from "./ChatMarkdown";
+import { ChatSourcePanel } from "./ChatSourcePanel";
+import type { CommunitySummary } from "./CommunityCard";
+import type { GraphEntity } from "./EntityCard";
 import { ReasoningBlock } from "./ReasoningBlock";
+import type { ResearchSource } from "./SourceCard";
 
 // ─── Entity type → dot color (mirrors atlas-schema ENTITY_VISUALS) ──
 
@@ -535,78 +539,6 @@ function stripRelatedSearches(text: string): string {
   return cleaned.trimEnd();
 }
 
-// ─── Sources Summary ────────────────────────────────────────────────
-
-function SourcesSummary({
-  sources,
-}: {
-  sources: Array<{
-    title: string;
-    url: string;
-    type: string;
-    snippet?: string;
-  }>;
-}) {
-  const [expanded, setExpanded] = useState(false);
-
-  return (
-    <div className="pt-1">
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground/70 hover:text-foreground transition-colors"
-      >
-        <Icon name="BookOpen" className="h-3 w-3" />
-        <span>
-          Used {sources.length} source{sources.length !== 1 ? "s" : ""}
-        </span>
-        <Icon
-          name="ChevronDown"
-          className={`h-3 w-3 transition-transform ${expanded ? "rotate-180" : ""}`}
-        />
-      </button>
-      {expanded && (
-        <div className="mt-2 space-y-1.5">
-          {sources.map((s, i) => {
-            let domain = "";
-            try {
-              domain = new URL(s.url).hostname.replace(/^www\./, "");
-            } catch {
-              /* ignore */
-            }
-            return (
-              <a
-                key={i}
-                href={s.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted/50 transition-colors group"
-              >
-                {domain && (
-                  <img
-                    src={`https://www.google.com/s2/favicons?domain=${domain}&sz=16`}
-                    className="w-4 h-4 flex-shrink-0 rounded-sm"
-                    alt=""
-                  />
-                )}
-                <div className="min-w-0 flex-1">
-                  <span className="text-xs text-foreground group-hover:text-primary truncate block">
-                    {s.title}
-                  </span>
-                  {domain && (
-                    <span className="text-[10px] text-muted-foreground/50">
-                      {domain}
-                    </span>
-                  )}
-                </div>
-              </a>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-}
-
 // ─── Suggestion Pills ───────────────────────────────────────────────
 
 function SuggestionPills({
@@ -658,6 +590,15 @@ export function ChatMessage({
   const [ingesting, setIngesting] = useState(false);
   const [copied, setCopied] = useState(false);
   const [feedback, setFeedback] = useState<"up" | "down" | null>(null);
+  const [highlightedSourceIndex, setHighlightedSourceIndex] = useState<number | null>(null);
+  const [mobileSourceOpen, setMobileSourceOpen] = useState(false);
+  const highlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleCitationClick = useCallback((index: number) => {
+    if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current);
+    setHighlightedSourceIndex(index);
+    highlightTimerRef.current = setTimeout(() => setHighlightedSourceIndex(null), 2000);
+  }, []);
 
   const handleIngest = useCallback(async () => {
     if (!onIngest) return;
@@ -731,14 +672,9 @@ export function ChatMessage({
       (p.type.startsWith("tool-") && "toolName" in p)
   );
 
-  // Extract sources from tool results for citation badges
+  // Extract sources from tool results for citation badges and source panel
   const sources = useMemo(() => {
-    const result: Array<{
-      title: string;
-      url: string;
-      type: "web" | "wikipedia" | "graph";
-      snippet?: string;
-    }> = [];
+    const result: ResearchSource[] = [];
     for (const t of allTools) {
       const output = t.output ?? t.result;
       if (!output) continue;
@@ -769,10 +705,10 @@ export function ChatMessage({
     return result;
   }, [allTools]);
 
-  // Extract graph entities from searchGraph results for "View in Atlas" CTA
+  // Extract graph entities from searchGraph results for "View in Atlas" CTA and source panel
   const graphEntities = useMemo(() => {
     const seen = new Set<string>();
-    const entities: Array<{ uid: string; name: string; type: string }> = [];
+    const entities: GraphEntity[] = [];
     for (const t of allTools) {
       if (t.toolName === "searchGraph") {
         const output = t.output ?? t.result;
@@ -784,6 +720,10 @@ export function ChatMessage({
                 uid: entity.uid,
                 name: entity.name ?? entity.uid,
                 type: entity.type ?? "",
+                tags: Array.isArray(entity.tags) ? entity.tags : [],
+                connectedEntities: Array.isArray(entity.connectedEntities)
+                  ? entity.connectedEntities
+                  : [],
               });
             }
           }
@@ -793,10 +733,35 @@ export function ChatMessage({
     return entities;
   }, [allTools]);
 
+  // Extract community summaries from searchCommunities results for the Themes section
+  const communities = useMemo(() => {
+    const result: CommunitySummary[] = [];
+    for (const t of allTools) {
+      if (t.toolName === "searchCommunities") {
+        const output = t.output ?? t.result;
+        if (output && Array.isArray(output.results)) {
+          for (const r of output.results) {
+            if (r.communityId != null) {
+              result.push({
+                communityId: r.communityId,
+                summary: r.summary ?? "",
+                topEntities: Array.isArray(r.topEntities) ? r.topEntities : [],
+                entityCount: r.entityCount ?? 0,
+              });
+            }
+          }
+        }
+      }
+    }
+    return result;
+  }, [allTools]);
+
   const isComplete = !isStreaming || !isLast;
 
   return (
-    <div className="space-y-3 pb-2">
+    <div className="flex items-start gap-4">
+      {/* Main content */}
+      <div className="flex-1 min-w-0 space-y-3 pb-2">
       {/* Reasoning — collapsible thinking indicator */}
       {reasoningAnnotation && (
         <ReasoningBlock
@@ -828,15 +793,13 @@ export function ChatMessage({
             content={stripRelatedSearches(textContent)}
             isStreaming={isStreaming && isLast}
             sources={sources.length > 0 ? sources : undefined}
+            onCitationClick={handleCitationClick}
           />
           {isStreaming && isLast && (
             <span className="inline-block w-1.5 h-4 bg-primary/70 animate-pulse ml-0.5 align-text-bottom rounded-sm" />
           )}
         </div>
       )}
-
-      {/* Sources summary — collapsible list */}
-      {isComplete && sources.length > 0 && <SourcesSummary sources={sources} />}
 
       {/* Actions */}
       {isComplete && textContent && (
@@ -951,6 +914,22 @@ export function ChatMessage({
         />
       )}
 
+      {/* Mobile: source count badge — tap to open bottom sheet */}
+      {(() => {
+        const mobileCount = sources.length + graphEntities.length + communities.length;
+        return mobileCount > 0 ? (
+          <button
+            className="md:hidden flex items-center gap-1.5 text-xs text-muted-foreground/70 hover:text-foreground transition-colors px-2.5 py-1.5 rounded-full border border-border/50 hover:border-border hover:bg-muted/30 self-start"
+            onClick={() => setMobileSourceOpen(true)}
+          >
+            <Icon name="BookOpen" className="h-3.5 w-3.5" />
+            <span>
+              {mobileCount} source{mobileCount !== 1 ? "s" : ""}
+            </span>
+          </button>
+        ) : null;
+      })()}
+
       {/* Follow-up suggestions */}
       {isComplete && isLast && onFollowUp && (
         <SuggestionPills
@@ -966,6 +945,18 @@ export function ChatMessage({
           <span>Thinking...</span>
         </div>
       )}
+      </div>
+
+      {/* Source panel — collapsible right-side panel (desktop) / bottom sheet (mobile) */}
+      <ChatSourcePanel
+        sources={sources}
+        entities={graphEntities}
+        communities={communities}
+        isStreaming={isStreaming && isLast}
+        highlightedIndex={highlightedSourceIndex}
+        mobileOpen={mobileSourceOpen}
+        onMobileClose={() => setMobileSourceOpen(false)}
+      />
     </div>
   );
 }

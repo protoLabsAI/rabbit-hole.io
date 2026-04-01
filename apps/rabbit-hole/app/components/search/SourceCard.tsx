@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+
 import { Icon } from "@proto/icon-system";
 
 // ─── Types ──────────────────────────────────────────────────────────
@@ -16,10 +18,35 @@ export interface ResearchSource {
 export function SourceCard({
   source,
   index,
+  isHighlighted,
 }: {
   source: ResearchSource;
   index: number;
+  isHighlighted?: boolean;
 }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [isPulsing, setIsPulsing] = useState(false);
+  const wasHighlighted = useRef(false);
+
+  useEffect(() => {
+    if (isHighlighted && ref.current) {
+      ref.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }, [isHighlighted]);
+
+  // Trigger a brief pulse animation when the card becomes highlighted
+  useEffect(() => {
+    if (isHighlighted && !wasHighlighted.current) {
+      wasHighlighted.current = true;
+      setIsPulsing(true);
+      const t = setTimeout(() => setIsPulsing(false), 900);
+      return () => clearTimeout(t);
+    }
+    if (!isHighlighted) {
+      wasHighlighted.current = false;
+    }
+  }, [isHighlighted]);
+
   const domain = source.url.startsWith("#")
     ? "Knowledge Graph"
     : (() => {
@@ -50,10 +77,18 @@ export function SourceCard({
 
   return (
     <div
-      className={`group rounded-lg border border-border/50 p-3 text-xs transition-colors ${
-        isExternal
-          ? "hover:border-border hover:bg-muted/30 cursor-pointer"
-          : "bg-muted/20"
+      ref={ref}
+      style={{ animationDelay: `${index * 60}ms` }}
+      className={`group rounded-lg border p-3 text-xs transition-colors duration-300 animate-in fade-in-0 slide-in-from-bottom-1 fill-mode-both ${
+        isPulsing
+          ? "animate-pulse"
+          : ""
+      } ${
+        isHighlighted
+          ? "border-primary/60 bg-primary/10 shadow-sm"
+          : isExternal
+            ? "border-border/50 hover:border-border hover:bg-muted/30 cursor-pointer"
+            : "border-border/50 bg-muted/20"
       }`}
       onClick={() =>
         isExternal && window.open(source.url, "_blank", "noopener")

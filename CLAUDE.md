@@ -6,7 +6,10 @@ The active surface is the **Search Engine** at `/`. Everything else (Atlas, Rese
 
 ## Git Workflow
 
-- **Ship to main**: Feature branches from `main`, squash-merge PRs
+- **Two-branch strategy**: `dev` (integration) and `main` (production)
+- Feature branches from `dev`, squash-merge PRs into `dev`
+- Periodic `dev → main` merge PRs to promote to production
+- No staging branch
 - **Never commit unresolved merge conflicts** — pre-commit hook blocks `<<<<<<` markers
 
 ## Code Conventions
@@ -26,9 +29,10 @@ The active surface is the **Search Engine** at `/`. Everything else (Atlas, Rese
 
 **Frontend**: `useChat` from `@ai-sdk/react` + `DefaultChatTransport` → `POST /api/chat`
 
-**Backend**: AI SDK v6 `streamText` with 4 tools:
-- `searchGraph` — Neo4j full-text search via Lucene index
-- `searchWeb` — Tavily advanced search
+**Backend**: AI SDK v6 `streamText` with 5 tools:
+- `searchGraph` — Hybrid BM25 (Neo4j fulltext) + vector (Qdrant) search with RRF fusion
+- `searchCommunities` — GraphRAG community summary search for thematic/holistic questions
+- `searchWeb` — SearXNG self-hosted web search
 - `searchWikipedia` — Wikipedia article fetch
 - `askClarification` — Ask user a clarifying question (intercepted by middleware)
 
@@ -64,6 +68,8 @@ The agent decides tool order and iteration. `stopWhen: stepCountIs(5)`.
 - `app/hooks/useSearchSessions.ts` — Session persistence (localStorage)
 - `app/components/search/ChatMessage.tsx` — UIMessage parts renderer
 - `app/components/search/ChatMarkdown.tsx` — Markdown renderer with inline citation support
+- `app/components/search/ChatSourcePanel.tsx` — Collapsible source panel shown alongside chat responses; citation badges click-scroll to matching card
+- `app/components/search/SourceCard.tsx` — Individual source card (title, URL, snippet, highlight state)
 - `app/components/search/SearchInput.tsx` — Input with file attach
 - `app/components/search/SearchSidebar.tsx` — Session history + nav
 - `packages/research-middleware/` — Middleware runtime, chain, registry, tracing, all middleware

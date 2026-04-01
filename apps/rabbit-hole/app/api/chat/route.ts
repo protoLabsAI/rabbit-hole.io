@@ -153,10 +153,15 @@ const SYSTEM_PROMPT = `You are Rabbit Hole, an AI search engine powered by a liv
 4. ${SEARXNG_ENABLED ? "If the graph is thin, call searchWeb for more context" : "If the graph is thin, rely on your training knowledge and say so — web search is not available"}
 5. Synthesize all findings into a clear, well-cited answer
 
+## Citations (REQUIRED)
+- Every factual claim MUST include an inline [N] citation where N matches the source's citationNumber
+- Knowledge graph entities (from searchGraph) each have a citationNumber field — use it when referencing that entity
+- Community summaries (from searchCommunities) each have a citationNumber field — use it when referencing that community
+- Web sources and Wikipedia: assign the next available number sequentially and cite as [N] inline
+- Do NOT omit citations. Every claim that can be traced to a source must have one
+
 ## Answer Format
 - Answer directly and concisely
-- Cite web sources as [Source Title](url) when referencing them
-- Mention knowledge graph entities by name when relevant
 - Use markdown for readability
 - If information is uncertain, say so
 - Do NOT use emojis in responses — the only exceptions are ✓ and ✗ when used to denote true/false or present/absent data in tables or lists
@@ -250,6 +255,11 @@ export async function POST(request: Request) {
   const tracing = createTracingContext({ agentId, query });
   const ctx: MiddlewareContext = { agentId, state: {}, tracing };
 
+  // Sequential citation counter — incremented each time a source is returned.
+  // Assigned to each graph entity and community summary so the LLM can cite
+  // them with matching [N] inline references.
+  let citationCounter = 0;
+
   const registry = getMiddlewareRegistry();
 
   // Register deferred tool loading middleware.
@@ -270,13 +280,22 @@ export async function POST(request: Request) {
   const wrappedTools = {
     searchGraph: {
       ...searchTools.searchGraph,
-      execute: async (input: { query: string }) =>
-        chain.wrapToolCall(
+      execute: async (input: { query: string }) => {
+        const result = await chain.wrapToolCall(
           ctx,
           "searchGraph",
           input as Record<string, unknown>,
           searchTools.searchGraph.execute as unknown as ToolExecutor
-        ),
+        );
+        // Assign sequential citation numbers to each graph entity
+        if (Array.isArray(result)) {
+          return result.map((entity) => ({
+            ...(entity as Record<string, unknown>),
+            citationNumber: ++citationCounter,
+          }));
+        }
+        return result;
+      },
     },
     ...(SEARXNG_ENABLED
       ? {
@@ -304,13 +323,26 @@ export async function POST(request: Request) {
     },
     searchCommunities: {
       ...searchTools.searchCommunities,
-      execute: async (input: { query: string }) =>
-        chain.wrapToolCall(
+      execute: async (input: { query: string }) => {
+        const result = await chain.wrapToolCall(
           ctx,
           "searchCommunities",
           input as Record<string, unknown>,
           searchTools.searchCommunities.execute as unknown as ToolExecutor
-        ),
+        );
+        // Assign sequential citation numbers to each community summary
+        const r = result as { results?: Record<string, unknown>[] } | null;
+        if (r && Array.isArray(r.results)) {
+          return {
+            ...r,
+            results: r.results.map((community) => ({
+              ...community,
+              citationNumber: ++citationCounter,
+            })),
+          };
+        }
+        return result;
+      },
     },
     askClarification: {
       ...searchTools.askClarification,
