@@ -6,7 +6,10 @@ The active surface is the **Search Engine** at `/`. Everything else (Atlas, Rese
 
 ## Git Workflow
 
-- **Ship to main**: Feature branches from `main`, squash-merge PRs
+- **Two-branch strategy**: `dev` (integration) and `main` (production)
+- Feature branches from `dev`, squash-merge PRs into `dev`
+- Periodic `dev → main` merge PRs to promote to production
+- No staging branch
 - **Never commit unresolved merge conflicts** — pre-commit hook blocks `<<<<<<` markers
 
 ## Code Conventions
@@ -26,9 +29,10 @@ The active surface is the **Search Engine** at `/`. Everything else (Atlas, Rese
 
 **Frontend**: `useChat` from `@ai-sdk/react` + `DefaultChatTransport` → `POST /api/chat`
 
-**Backend**: AI SDK v6 `streamText` with 4 tools:
-- `searchGraph` — Neo4j full-text search via Lucene index
-- `searchWeb` — Tavily advanced search
+**Backend**: AI SDK v6 `streamText` with 5 tools:
+- `searchGraph` — Hybrid BM25 (Neo4j fulltext) + vector (Qdrant) search with RRF fusion
+- `searchCommunities` — GraphRAG community summary search for thematic/holistic questions
+- `searchWeb` — SearXNG self-hosted web search
 - `searchWikipedia` — Wikipedia article fetch
 - `askClarification` — Ask user a clarifying question (intercepted by middleware)
 
