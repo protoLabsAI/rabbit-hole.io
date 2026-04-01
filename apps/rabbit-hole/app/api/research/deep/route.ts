@@ -9,11 +9,17 @@
  * Stream progress via GET /api/research/deep/:id (SSE)
  */
 
-import { generateObject, streamText } from "ai";
+import { generateObject, generateText, streamText } from "ai";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 import { getAIModel } from "@proto/llm-providers/server";
+import {
+  buildExtractionContext,
+  buildExtractionPrompt,
+  parseExtractionResult,
+  type ToolCallRecord,
+} from "@proto/research-middleware";
 import { safeValidate } from "@proto/types";
 
 import {
@@ -577,6 +583,51 @@ ${synthesisInstructions}
 
     emit("report.completed", { length: fullReport.length });
     emit("phase.completed", { phase: "synthesis" });
+
+    // ── Phase 5: EXTRACT — Entity extraction from research notes ─
+    checkAbort(researchId);
+    emit("phase.started", {
+      phase: "extraction",
+      label: "Extracting entities",
+    });
+    updateResearch(researchId, {
+      phase: "extraction",
+      phaseDetail: "Extracting entities and relationships...",
+    });
+
+    try {
+      // Build extraction context: treat each research note as a tool result
+      const notesAsToolResults: ToolCallRecord[] = allNotes.map((note, i) => ({
+        toolName: "researchNote",
+        args: { query: dimensions[i] ?? `note_${i}` },
+        result: note,
+      }));
+      const extractionContext = buildExtractionContext(
+        fullReport,
+        notesAsToolResults
+      );
+      const extractionPrompt = buildExtractionPrompt(extractionContext);
+
+      const extractionModel = getAIModel("fast");
+      const extractionResult = await generateText({
+        model: extractionModel,
+        prompt: extractionPrompt,
+      });
+
+      const extraction = parseExtractionResult(extractionResult.text);
+      if (extraction) {
+        updateResearch(researchId, { extraction });
+        emit("extraction.completed", {
+          entityCount: extraction.entities.length,
+          relationshipCount: extraction.relationships.length,
+          confidence: extraction.confidence,
+        });
+      }
+    } catch {
+      // Extraction failures must not affect the completed research
+    }
+
+    emit("phase.completed", { phase: "extraction" });
 
     // ── Complete ──────────────────────────────────────────────────
     updateResearch(researchId, {

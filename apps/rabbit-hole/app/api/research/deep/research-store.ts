@@ -3,6 +3,8 @@
  * Keyed by researchId. Persists across SSE reconnections.
  */
 
+import type { ExtractionPreview } from "@proto/research-middleware";
+
 export interface ResearchSource {
   title: string;
   url: string;
@@ -27,6 +29,7 @@ export interface ResearchState {
     | "research"
     | "evaluating"
     | "synthesis"
+    | "extraction"
     | "complete";
   phaseDetail: string;
   supervisorIteration: number;
@@ -44,6 +47,8 @@ export interface ResearchState {
   startedAt: number;
   completedAt: number | null;
   abortController: AbortController | null;
+  /** Extracted entities and relationships from the research report. */
+  extraction?: ExtractionPreview;
 }
 
 // Use globalThis to survive Turbopack module isolation
