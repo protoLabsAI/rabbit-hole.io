@@ -117,7 +117,7 @@ export function generateOpenAPISpec(tools: Tool[], port: number): OpenAPISpec {
                   server: { type: "string", example: "rabbit-hole-mcp" },
                   version: { type: "string", example: "0.1.0" },
                   transport: { type: "string", example: "streamable-http" },
-                  tools: { type: "integer", example: 11 },
+                  tools: { type: "integer", example: 12 },
                   activeSessions: { type: "integer" },
                   uptime: { type: "string", example: "3600s" },
                   auth: { type: "string", enum: ["bearer", "none"] },
