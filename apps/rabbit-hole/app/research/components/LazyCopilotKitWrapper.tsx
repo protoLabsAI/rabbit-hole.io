@@ -1,24 +1,14 @@
 "use client";
 
 /**
- * Lazy CopilotKit Wrapper
+ * LazyCopilotKitWrapper — CopilotKit removed (M4 milestone)
  *
- * Dynamically loads CopilotKit only for users with AI chat access.
- * Reduces bundle size for free tier users.
+ * Previously wrapped children in a CopilotKit provider. Now renders
+ * children directly. Research AI chat will be re-wired to the native
+ * deep research API in a follow-up milestone.
  */
 
-import React, { Suspense } from "react";
-
-import {
-  LazyFeatureErrorBoundary,
-  CopilotKitLoadingSkeleton,
-} from "@proto/utils/react/lazy-loading";
-
-const CopilotKitProvider = React.lazy(() =>
-  import("@copilotkit/react-core").then((module) => ({
-    default: module.CopilotKit,
-  }))
-);
+import React from "react";
 
 interface LazyCopilotKitWrapperProps {
   children: React.ReactNode;
@@ -29,21 +19,6 @@ interface LazyCopilotKitWrapperProps {
 
 export function LazyCopilotKitWrapper({
   children,
-  runtimeUrl,
-  agent,
-  publicLicenseKey,
 }: LazyCopilotKitWrapperProps) {
-  return (
-    <LazyFeatureErrorBoundary featureName="AI Chat">
-      <Suspense fallback={<CopilotKitLoadingSkeleton />}>
-        <CopilotKitProvider
-          runtimeUrl={runtimeUrl}
-          agent={agent}
-          publicLicenseKey={publicLicenseKey}
-        >
-          {children}
-        </CopilotKitProvider>
-      </Suspense>
-    </LazyFeatureErrorBoundary>
-  );
+  return <>{children}</>;
 }

@@ -15,18 +15,8 @@ interface PreloadConfig {
   priority?: number;
 }
 
-const PRELOAD_CONFIG: PreloadConfig[] = [
-  {
-    featureFlag: "hasAIChatAccess",
-    importFn: () => import("@copilotkit/react-core"),
-    priority: 1,
-  },
-  {
-    featureFlag: "hasAIChatAccess",
-    importFn: () => import("@copilotkit/react-ui"),
-    priority: 2,
-  },
-];
+// CopilotKit preloads removed (M4 milestone). Add native deep research preloads here.
+const PRELOAD_CONFIG: PreloadConfig[] = [];
 
 export function useFeaturePreloader() {
   const user = {

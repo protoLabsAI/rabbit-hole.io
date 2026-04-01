@@ -11,7 +11,6 @@ import {
   searchKgVector,
   reciprocalRankFusion,
   searchCommunitySummaries,
-  type CommunitySearchResult,
 } from "@proto/vector";
 
 // ── Types ────────────────────────────────────────────────────────────
@@ -43,6 +42,14 @@ export interface WikiSearchResult {
   text: string;
   url: string;
   snippet: string;
+}
+
+export interface CommunitySearchResult {
+  communityId: number;
+  summary: string;
+  topEntities: string[];
+  entityCount: number;
+  score: number;
 }
 
 // ── Lucene Query Builder ─────────────────────────────────────────────

@@ -7,10 +7,6 @@
 // Navigation and Layout
 // Note: SiteMap and AppNavBar components removed - were not in use
 
-// CopilotKit Integration
-export { default as CopilotChatInterface } from "./CopilotChatInterface";
-export { CopilotKitActions } from "./CopilotKitActions";
-
 // Performance Monitoring
 export { WebVitalsMonitor } from "./WebVitalsMonitor";
 
