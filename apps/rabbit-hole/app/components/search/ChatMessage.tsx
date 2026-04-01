@@ -9,6 +9,7 @@ import { Badge } from "@proto/ui/atoms";
 
 import { ChatMarkdown } from "./ChatMarkdown";
 import { ChatSourcePanel } from "./ChatSourcePanel";
+import type { CommunitySummary } from "./CommunityCard";
 import type { GraphEntity } from "./EntityCard";
 import { ReasoningBlock } from "./ReasoningBlock";
 import type { ResearchSource } from "./SourceCard";
@@ -731,6 +732,29 @@ export function ChatMessage({
     return entities;
   }, [allTools]);
 
+  // Extract community summaries from searchCommunities results for the Themes section
+  const communities = useMemo(() => {
+    const result: CommunitySummary[] = [];
+    for (const t of allTools) {
+      if (t.toolName === "searchCommunities") {
+        const output = t.output ?? t.result;
+        if (output && Array.isArray(output.results)) {
+          for (const r of output.results) {
+            if (r.communityId != null) {
+              result.push({
+                communityId: r.communityId,
+                summary: r.summary ?? "",
+                topEntities: Array.isArray(r.topEntities) ? r.topEntities : [],
+                entityCount: r.entityCount ?? 0,
+              });
+            }
+          }
+        }
+      }
+    }
+    return result;
+  }, [allTools]);
+
   const isComplete = !isStreaming || !isLast;
 
   return (
@@ -910,6 +934,7 @@ export function ChatMessage({
       <ChatSourcePanel
         sources={sources}
         entities={graphEntities}
+        communities={communities}
         isStreaming={isStreaming && isLast}
         highlightedIndex={highlightedSourceIndex}
       />
