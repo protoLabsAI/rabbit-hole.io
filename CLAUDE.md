@@ -68,6 +68,8 @@ The agent decides tool order and iteration. `stopWhen: stepCountIs(5)`.
 - `app/hooks/useSearchSessions.ts` — Session persistence (localStorage)
 - `app/components/search/ChatMessage.tsx` — UIMessage parts renderer
 - `app/components/search/ChatMarkdown.tsx` — Markdown renderer with inline citation support
+- `app/components/search/ChatSourcePanel.tsx` — Collapsible source panel shown alongside chat responses; citation badges click-scroll to matching card
+- `app/components/search/SourceCard.tsx` — Individual source card (title, URL, snippet, highlight state)
 - `app/components/search/SearchInput.tsx` — Input with file attach
 - `app/components/search/SearchSidebar.tsx` — Session history + nav
 - `packages/research-middleware/` — Middleware runtime, chain, registry, tracing, all middleware
