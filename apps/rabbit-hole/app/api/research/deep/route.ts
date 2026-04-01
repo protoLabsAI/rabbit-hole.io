@@ -17,6 +17,11 @@ import { getAIModel } from "@proto/llm-providers/server";
 import { safeValidate } from "@proto/types";
 
 import {
+  upsertResearchChunks,
+  searchResearchMemory,
+} from "@proto/vector";
+
+import {
   searchCommunities,
   searchGraph,
   searchWeb,
@@ -234,6 +239,19 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
           iteration,
         });
 
+        // Check vector memory for prior findings from this session
+        let memoryNote = "";
+        try {
+          const memoryResults = await searchResearchMemory(dimension, researchId, 5);
+          if (memoryResults.length > 0) {
+            memoryNote = `Prior session findings for "${dimension}":\n${memoryResults
+              .map((r) => `- ${r.content} (${r.source})`)
+              .join("\n")}`;
+          }
+        } catch {
+          // Vector memory unavailable — continue without it
+        }
+
         // Graph search per dimension (all iterations — hybrid BM25+vector via shared searchGraph)
         checkAbort(researchId);
         emit("search.started", { query: dimension, source: "graph" });
@@ -331,6 +349,7 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
             : "";
 
         const corpus = [
+          memoryNote,
           graphNote,
           wiki?.text ?? "",
           ...webResults.map((r) => `${r.title}: ${r.snippet ?? ""}`),
@@ -359,6 +378,18 @@ ${corpus.slice(0, 8000)}`,
             });
 
             allNotes.push(`## ${dimension}\n\n${compressed.object.summary}`);
+
+            // Upsert findings to vector memory for subsequent dimension lookups
+            upsertResearchChunks([
+              {
+                sessionId: researchId,
+                content: compressed.object.summary,
+                source: `dimension:${dimension}`,
+                hopIndex: iteration,
+              },
+            ]).catch(() => {
+              // Vector memory upsert is best-effort — don't fail the pipeline
+            });
 
             // Surface key finding
             allFindings.push(compressed.object.keyFinding);
