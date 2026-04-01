@@ -4,6 +4,8 @@ import { useState } from "react";
 
 import { Icon } from "@proto/icon-system";
 
+import { CommunityCard } from "./CommunityCard";
+import type { CommunitySummary } from "./CommunityCard";
 import { EntityCard } from "./EntityCard";
 import type { GraphEntity } from "./EntityCard";
 import { SourceCard } from "./SourceCard";
@@ -14,6 +16,7 @@ import type { ResearchSource } from "./SourceCard";
 interface ChatSourcePanelProps {
   sources: ResearchSource[];
   entities?: GraphEntity[];
+  communities?: CommunitySummary[];
   isStreaming?: boolean;
   highlightedIndex?: number | null;
 }
@@ -26,14 +29,15 @@ interface ChatSourcePanelProps {
 export function ChatSourcePanel({
   sources,
   entities = [],
+  communities = [],
   isStreaming = false,
   highlightedIndex,
 }: ChatSourcePanelProps) {
   const [collapsed, setCollapsed] = useState(false);
 
-  if (sources.length === 0 && entities.length === 0 && !isStreaming) return null;
+  if (sources.length === 0 && entities.length === 0 && communities.length === 0 && !isStreaming) return null;
 
-  const totalCount = sources.length + entities.length;
+  const totalCount = sources.length + entities.length + communities.length;
 
   if (collapsed) {
     return (
@@ -91,6 +95,24 @@ export function ChatSourcePanel({
           <div className="space-y-1.5">
             {entities.map((entity) => (
               <EntityCard key={entity.uid} entity={entity} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Themes section (community summaries) */}
+      {communities.length > 0 && (
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-1.5 text-[10px] font-medium text-amber-400/80 px-0.5">
+            <Icon name="Layers" className="h-3 w-3" />
+            <span>Themes</span>
+            <span className="px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400/70 font-normal">
+              {communities.length}
+            </span>
+          </div>
+          <div className="space-y-1.5">
+            {communities.map((community) => (
+              <CommunityCard key={community.communityId} community={community} />
             ))}
           </div>
         </div>
