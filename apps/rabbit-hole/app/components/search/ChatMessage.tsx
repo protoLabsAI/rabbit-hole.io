@@ -2,7 +2,7 @@
 
 import type { UIMessage } from "ai";
 import Link from "next/link";
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useRef } from "react";
 
 import { Icon } from "@proto/icon-system";
 import { Badge } from "@proto/ui/atoms";
@@ -588,6 +588,14 @@ export function ChatMessage({
   const [ingesting, setIngesting] = useState(false);
   const [copied, setCopied] = useState(false);
   const [feedback, setFeedback] = useState<"up" | "down" | null>(null);
+  const [highlightedSourceIndex, setHighlightedSourceIndex] = useState<number | null>(null);
+  const highlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleCitationClick = useCallback((index: number) => {
+    if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current);
+    setHighlightedSourceIndex(index);
+    highlightTimerRef.current = setTimeout(() => setHighlightedSourceIndex(null), 2000);
+  }, []);
 
   const handleIngest = useCallback(async () => {
     if (!onIngest) return;
@@ -755,6 +763,7 @@ export function ChatMessage({
             content={stripRelatedSearches(textContent)}
             isStreaming={isStreaming && isLast}
             sources={sources.length > 0 ? sources : undefined}
+            onCitationClick={handleCitationClick}
           />
           {isStreaming && isLast && (
             <span className="inline-block w-1.5 h-4 bg-primary/70 animate-pulse ml-0.5 align-text-bottom rounded-sm" />
@@ -896,6 +905,7 @@ export function ChatMessage({
       <ChatSourcePanel
         sources={sources}
         isStreaming={isStreaming && isLast}
+        highlightedIndex={highlightedSourceIndex}
       />
     </div>
   );
