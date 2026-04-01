@@ -21,6 +21,7 @@ import {
   searchWeb,
   searchWikipedia,
   withRetry,
+  type GraphSearchResult,
   type WebSearchResult,
   type WikiSearchResult,
 } from "../../../lib/search";
@@ -198,7 +199,40 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
           iteration,
         });
 
+        // Graph search per dimension (all iterations — hybrid BM25+vector via shared searchGraph)
+        checkAbort(researchId);
+        emit("search.started", { query: dimension, source: "graph" });
+        let dimGraphResults: GraphSearchResult[] = [];
+        try {
+          dimGraphResults = await withRetry(() => searchGraph(dimension, 5));
+          trackSearch();
+          emit("search.completed", {
+            query: dimension,
+            source: "graph",
+            resultCount: dimGraphResults.length,
+          });
+          if (dimGraphResults.length > 0) {
+            for (const e of dimGraphResults) {
+              if (!allSources.find((s) => s.url === `#entity:${e.uid}`)) {
+                allSources.push({
+                  title: e.name,
+                  url: `#entity:${e.uid}`,
+                  type: "graph",
+                });
+              }
+            }
+          }
+        } catch {
+          emit("search.completed", {
+            query: dimension,
+            source: "graph",
+            resultCount: 0,
+          });
+          /* continue without graph results */
+        }
+
         // Web search with retry
+        checkAbort(researchId);
         emit("search.started", { query: dimension, source: "web" });
         let webResults: WebSearchResult[] = [];
         try {
@@ -246,38 +280,23 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
           });
         }
 
-        // Graph search per dimension (beyond first iteration)
-        if (iteration > 1) {
-          checkAbort(researchId);
-          emit("search.started", { query: dimension, source: "graph" });
-          try {
-            const dimGraphResults = await withRetry(() =>
-              searchGraph(dimension, 5)
-            );
-            trackSearch();
-            emit("search.completed", {
-              query: dimension,
-              source: "graph",
-              resultCount: dimGraphResults.length,
-            });
-            if (dimGraphResults.length > 0) {
-              for (const e of dimGraphResults) {
-                if (!allSources.find((s) => s.url === `#entity:${e.uid}`)) {
-                  allSources.push({
-                    title: e.name,
-                    url: `#entity:${e.uid}`,
-                    type: "graph",
-                  });
-                }
-              }
-            }
-          } catch {
-            /* continue */
-          }
-        }
-
         // Compress dimension findings
+        const graphNote =
+          dimGraphResults.length > 0
+            ? `Knowledge graph entities for "${dimension}": ${dimGraphResults
+                .map(
+                  (e) =>
+                    `${e.name} (${e.type})${
+                      e.connectedEntities.length > 0
+                        ? ` — related: ${e.connectedEntities.map((c) => c.name).join(", ")}`
+                        : ""
+                    }`
+                )
+                .join("; ")}`
+            : "";
+
         const corpus = [
+          graphNote,
           wiki?.text ?? "",
           ...webResults.map((r) => `${r.title}: ${r.snippet ?? ""}`),
         ]
