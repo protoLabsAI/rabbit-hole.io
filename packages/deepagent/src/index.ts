@@ -1,14 +1,12 @@
 /**
  * @proto/deepagent
  *
- * Deep agent entity researcher for knowledge graph construction.
- * Uses LangGraph multi-agent pattern with supervisor-worker coordination.
+ * Research prompts and schemas for knowledge graph construction.
+ * LangGraph graph code removed in M4 — this package is now a pure library.
  */
 
-// State
+// State (pure reducers and types, no LangGraph annotations)
 export {
-  EntityResearchAgentStateAnnotation,
-  type EntityResearchAgentStateType,
   type EntityResearchAgentState,
   TodoSchema,
   fileReducer,
@@ -26,27 +24,6 @@ export type {
   ResearchDepth,
 } from "./types";
 
-// Graph
-export {
-  buildDeepAgentGraph,
-  getDeepAgentGraph,
-  resetDeepAgentGraph,
-  coordinatorNode,
-  resetCoordinatorModel,
-  routeFromCoordinator,
-  buildSubagentGraph,
-} from "./graph";
-
-// Subgraphs
-export {
-  buildEvidenceGathererGraph,
-  buildEntityExtractorGraph,
-  buildFieldAnalyzerGraph,
-  buildEntityCreatorGraph,
-  buildRelationshipMapperGraph,
-  buildBundleAssemblerGraph,
-} from "./subagents";
-
 // Prompts
 export {
   COORDINATOR_PROMPT,
@@ -58,20 +35,8 @@ export {
   BUNDLE_ASSEMBLER_PROMPT,
 } from "./prompts";
 
-// Tools
-export {
-  writeTodos,
-  readFile,
-  writeFile,
-  ls,
-  wikipediaFetchTool,
-  langextractWrapperTool,
-  batchFieldMappingLookupTool,
-  validateBundleTool,
-} from "./tools";
-
 // Utils
-export { log, getSubmitOutputTool, getAllSubmitOutputTools } from "./utils";
+export { log } from "./utils/logger";
 
 // Schemas
 export {
