@@ -12,6 +12,7 @@ import type { ResearchSource } from "./SourceCard";
 interface ChatSourcePanelProps {
   sources: ResearchSource[];
   isStreaming?: boolean;
+  highlightedIndex?: number | null;
 }
 
 /**
@@ -22,6 +23,7 @@ interface ChatSourcePanelProps {
 export function ChatSourcePanel({
   sources,
   isStreaming = false,
+  highlightedIndex,
 }: ChatSourcePanelProps) {
   const [collapsed, setCollapsed] = useState(false);
 
@@ -73,7 +75,12 @@ export function ChatSourcePanel({
       {/* Source list */}
       <div className="space-y-1.5">
         {sources.map((source, i) => (
-          <SourceCard key={`${source.url}-${i}`} source={source} index={i} />
+          <SourceCard
+            key={`${source.url}-${i}`}
+            source={source}
+            index={i}
+            isHighlighted={highlightedIndex === i + 1}
+          />
         ))}
         {isStreaming && sources.length === 0 && (
           <div className="text-xs text-muted-foreground/60 py-2 text-center">
