@@ -150,10 +150,10 @@ export function ChatMarkdown({
   sources,
   onCitationClick,
 }: ChatMarkdownProps) {
-  // Pre-process citations if sources are provided
+  // Pre-process citations — always convert [N] to citation links
   const processedContent = useMemo(
-    () => (sources?.length ? preprocessCitations(content) : content),
-    [content, sources?.length]
+    () => preprocessCitations(content),
+    [content]
   );
 
   // Stable components object — prevent re-creation during streaming
@@ -259,10 +259,7 @@ export function ChatMarkdown({
         node: _node,
         ...rest
       }: React.HTMLAttributes<HTMLTableElement> & { node?: unknown }) => (
-        <table
-          {...rest}
-          className="my-2 w-full border-collapse text-xs"
-        >
+        <table {...rest} className="my-2 w-full border-collapse text-xs">
           {children}
         </table>
       ),
@@ -294,16 +291,16 @@ export function ChatMarkdown({
         node: _node,
         ...rest
       }: React.HTMLAttributes<HTMLTableCellElement> & { node?: unknown }) => (
-        <td
-          {...rest}
-          className="border-t border-border/30 px-2 py-1 text-xs"
-        >
+        <td {...rest} className="border-t border-border/30 px-2 py-1 text-xs">
           {children}
         </td>
       ),
 
       // HR
-      hr: ({ node: _node, ...rest }: { node?: unknown } & React.HTMLAttributes<HTMLHRElement>) => (
+      hr: ({
+        node: _node,
+        ...rest
+      }: { node?: unknown } & React.HTMLAttributes<HTMLHRElement>) => (
         <hr {...rest} className="my-4 border-border/40" />
       ),
 
@@ -318,7 +315,7 @@ export function ChatMarkdown({
         </del>
       ),
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     [sources, isStreaming, onCitationClick]
   );
 
