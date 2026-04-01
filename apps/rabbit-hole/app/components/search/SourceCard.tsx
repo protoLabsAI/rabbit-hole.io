@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Icon } from "@proto/icon-system";
 
@@ -25,12 +25,28 @@ export function SourceCard({
   isHighlighted?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const [isPulsing, setIsPulsing] = useState(false);
+  const wasHighlighted = useRef(false);
 
   useEffect(() => {
     if (isHighlighted && ref.current) {
       ref.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
   }, [isHighlighted]);
+
+  // Trigger a brief pulse animation when the card becomes highlighted
+  useEffect(() => {
+    if (isHighlighted && !wasHighlighted.current) {
+      wasHighlighted.current = true;
+      setIsPulsing(true);
+      const t = setTimeout(() => setIsPulsing(false), 900);
+      return () => clearTimeout(t);
+    }
+    if (!isHighlighted) {
+      wasHighlighted.current = false;
+    }
+  }, [isHighlighted]);
+
   const domain = source.url.startsWith("#")
     ? "Knowledge Graph"
     : (() => {
@@ -62,7 +78,12 @@ export function SourceCard({
   return (
     <div
       ref={ref}
-      className={`group rounded-lg border p-3 text-xs transition-colors duration-300 ${
+      style={{ animationDelay: `${index * 60}ms` }}
+      className={`group rounded-lg border p-3 text-xs transition-colors duration-300 animate-in fade-in-0 slide-in-from-bottom-1 fill-mode-both ${
+        isPulsing
+          ? "animate-pulse"
+          : ""
+      } ${
         isHighlighted
           ? "border-primary/60 bg-primary/10 shadow-sm"
           : isExternal

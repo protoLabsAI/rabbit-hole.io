@@ -23,6 +23,29 @@ interface ChatSourcePanelProps {
   onMobileClose?: () => void;
 }
 
+// ─── Loading skeleton for pending sources ────────────────────────────
+
+function SourceSkeleton({ index }: { index: number }) {
+  return (
+    <div
+      style={{ animationDelay: `${index * 80}ms` }}
+      className="rounded-lg border border-border/30 p-3 animate-in fade-in-0 fill-mode-both"
+    >
+      <div className="flex items-start gap-2">
+        <div className="w-5 h-5 rounded bg-muted/50 animate-pulse flex-shrink-0 mt-0.5" />
+        <div className="flex-1 min-w-0 space-y-1.5">
+          <div className="flex items-center gap-1.5">
+            <div className="w-3 h-3 rounded bg-muted/50 animate-pulse" />
+            <div className="h-2.5 w-20 rounded bg-muted/40 animate-pulse" />
+          </div>
+          <div className="h-3 w-full rounded bg-muted/50 animate-pulse" />
+          <div className="h-3 w-3/4 rounded bg-muted/40 animate-pulse" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Shared panel content (used by both desktop and mobile) ──────────
 
 function PanelContent({
@@ -93,9 +116,12 @@ function PanelContent({
               isHighlighted={highlightedIndex === i + 1}
             />
           ))}
+          {/* Loading skeleton while streaming and no sources yet */}
           {isStreaming && sources.length === 0 && entities.length === 0 && (
-            <div className="text-xs text-muted-foreground/60 py-2 text-center">
-              Gathering sources...
+            <div className="space-y-1.5">
+              <SourceSkeleton index={0} />
+              <SourceSkeleton index={1} />
+              <SourceSkeleton index={2} />
             </div>
           )}
         </div>
@@ -131,7 +157,7 @@ export function ChatSourcePanel({
       {collapsed && (
         <button
           onClick={() => setCollapsed(false)}
-          className="hidden md:flex flex-col items-center gap-1 p-2 rounded-lg border border-border/50 hover:border-border hover:bg-muted/30 transition-colors flex-shrink-0"
+          className="hidden md:flex flex-col items-center gap-1 p-2 rounded-lg border border-border/50 hover:border-border hover:bg-muted/30 transition-colors flex-shrink-0 animate-in fade-in-0 zoom-in-95 duration-200"
           title={`${totalCount} item${totalCount !== 1 ? "s" : ""}`}
         >
           <Icon name="BookOpen" className="h-4 w-4 text-muted-foreground" />
@@ -143,7 +169,7 @@ export function ChatSourcePanel({
 
       {/* ── Desktop: expanded panel ─────────────────────────────────── */}
       {!collapsed && (
-        <div className="hidden md:block w-52 flex-shrink-0 space-y-2 transition-all duration-200">
+        <div className="hidden md:block w-52 flex-shrink-0 space-y-2 animate-in fade-in-0 slide-in-from-right-2 duration-200">
           {/* Header */}
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-1.5 text-xs font-medium text-foreground/70">
