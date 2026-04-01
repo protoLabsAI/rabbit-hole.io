@@ -591,6 +591,7 @@ export function ChatMessage({
   const [copied, setCopied] = useState(false);
   const [feedback, setFeedback] = useState<"up" | "down" | null>(null);
   const [highlightedSourceIndex, setHighlightedSourceIndex] = useState<number | null>(null);
+  const [mobileSourceOpen, setMobileSourceOpen] = useState(false);
   const highlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleCitationClick = useCallback((index: number) => {
@@ -913,6 +914,22 @@ export function ChatMessage({
         />
       )}
 
+      {/* Mobile: source count badge — tap to open bottom sheet */}
+      {(() => {
+        const mobileCount = sources.length + graphEntities.length + communities.length;
+        return mobileCount > 0 ? (
+          <button
+            className="md:hidden flex items-center gap-1.5 text-xs text-muted-foreground/70 hover:text-foreground transition-colors px-2.5 py-1.5 rounded-full border border-border/50 hover:border-border hover:bg-muted/30 self-start"
+            onClick={() => setMobileSourceOpen(true)}
+          >
+            <Icon name="BookOpen" className="h-3.5 w-3.5" />
+            <span>
+              {mobileCount} source{mobileCount !== 1 ? "s" : ""}
+            </span>
+          </button>
+        ) : null;
+      })()}
+
       {/* Follow-up suggestions */}
       {isComplete && isLast && onFollowUp && (
         <SuggestionPills
@@ -930,13 +947,15 @@ export function ChatMessage({
       )}
       </div>
 
-      {/* Source panel — collapsible right-side panel populated from tool results */}
+      {/* Source panel — collapsible right-side panel (desktop) / bottom sheet (mobile) */}
       <ChatSourcePanel
         sources={sources}
         entities={graphEntities}
         communities={communities}
         isStreaming={isStreaming && isLast}
         highlightedIndex={highlightedSourceIndex}
+        mobileOpen={mobileSourceOpen}
+        onMobileClose={() => setMobileSourceOpen(false)}
       />
     </div>
   );

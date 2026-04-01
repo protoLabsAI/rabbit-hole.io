@@ -19,69 +19,27 @@ interface ChatSourcePanelProps {
   communities?: CommunitySummary[];
   isStreaming?: boolean;
   highlightedIndex?: number | null;
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
 }
 
-/**
- * Collapsible right-side source panel for chat messages.
- * Populates from tool invocation results as they stream in.
- * Sources are numbered to match [N] citation references in the answer text.
- */
-export function ChatSourcePanel({
+// ─── Shared panel content (used by both desktop and mobile) ──────────
+
+function PanelContent({
   sources,
-  entities = [],
-  communities = [],
-  isStreaming = false,
+  entities,
+  communities,
+  isStreaming,
   highlightedIndex,
-}: ChatSourcePanelProps) {
-  const [collapsed, setCollapsed] = useState(false);
-
-  if (sources.length === 0 && entities.length === 0 && communities.length === 0 && !isStreaming) return null;
-
-  const totalCount = sources.length + entities.length + communities.length;
-
-  if (collapsed) {
-    return (
-      <button
-        onClick={() => setCollapsed(false)}
-        className="flex flex-col items-center gap-1 p-2 rounded-lg border border-border/50 hover:border-border hover:bg-muted/30 transition-colors flex-shrink-0"
-        title={`${totalCount} item${totalCount !== 1 ? "s" : ""}`}
-      >
-        <Icon name="BookOpen" className="h-4 w-4 text-muted-foreground" />
-        <span className="flex items-center justify-center min-w-[18px] h-[18px] rounded-full bg-primary/10 text-[9px] font-bold text-primary px-1">
-          {totalCount}
-        </span>
-      </button>
-    );
-  }
-
+}: {
+  sources: ResearchSource[];
+  entities: GraphEntity[];
+  communities: CommunitySummary[];
+  isStreaming: boolean;
+  highlightedIndex?: number | null;
+}) {
   return (
-    <div className="w-52 flex-shrink-0 space-y-2 transition-all duration-200">
-      {/* Header */}
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-1.5 text-xs font-medium text-foreground/70">
-          <Icon name="BookOpen" className="h-3.5 w-3.5" />
-          <span>Sources</span>
-          {totalCount > 0 && (
-            <span className="px-1.5 py-0.5 rounded-full bg-muted text-[10px] text-muted-foreground font-normal">
-              {totalCount}
-            </span>
-          )}
-          {isStreaming && (
-            <Icon
-              name="Loader2"
-              className="h-3 w-3 animate-spin text-primary/60"
-            />
-          )}
-        </div>
-        <button
-          onClick={() => setCollapsed(true)}
-          className="p-0.5 text-muted-foreground/50 hover:text-foreground transition-colors rounded"
-          title="Collapse sources"
-        >
-          <Icon name="ChevronRight" className="h-3.5 w-3.5" />
-        </button>
-      </div>
-
+    <div className="space-y-2">
       {/* Knowledge Graph section */}
       {entities.length > 0 && (
         <div className="space-y-1.5">
@@ -143,5 +101,145 @@ export function ChatSourcePanel({
         </div>
       )}
     </div>
+  );
+}
+
+/**
+ * Collapsible right-side source panel for chat messages (desktop).
+ * On mobile (<768px) the panel is hidden; instead it renders as a bottom
+ * sheet controlled by the `mobileOpen` / `onMobileClose` props.
+ * Sources are numbered to match [N] citation references in the answer text.
+ */
+export function ChatSourcePanel({
+  sources,
+  entities = [],
+  communities = [],
+  isStreaming = false,
+  highlightedIndex,
+  mobileOpen = false,
+  onMobileClose,
+}: ChatSourcePanelProps) {
+  const [collapsed, setCollapsed] = useState(false);
+
+  if (sources.length === 0 && entities.length === 0 && communities.length === 0 && !isStreaming) return null;
+
+  const totalCount = sources.length + entities.length + communities.length;
+
+  return (
+    <>
+      {/* ── Desktop: collapsed icon button ─────────────────────────── */}
+      {collapsed && (
+        <button
+          onClick={() => setCollapsed(false)}
+          className="hidden md:flex flex-col items-center gap-1 p-2 rounded-lg border border-border/50 hover:border-border hover:bg-muted/30 transition-colors flex-shrink-0"
+          title={`${totalCount} item${totalCount !== 1 ? "s" : ""}`}
+        >
+          <Icon name="BookOpen" className="h-4 w-4 text-muted-foreground" />
+          <span className="flex items-center justify-center min-w-[18px] h-[18px] rounded-full bg-primary/10 text-[9px] font-bold text-primary px-1">
+            {totalCount}
+          </span>
+        </button>
+      )}
+
+      {/* ── Desktop: expanded panel ─────────────────────────────────── */}
+      {!collapsed && (
+        <div className="hidden md:block w-52 flex-shrink-0 space-y-2 transition-all duration-200">
+          {/* Header */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 text-xs font-medium text-foreground/70">
+              <Icon name="BookOpen" className="h-3.5 w-3.5" />
+              <span>Sources</span>
+              {totalCount > 0 && (
+                <span className="px-1.5 py-0.5 rounded-full bg-muted text-[10px] text-muted-foreground font-normal">
+                  {totalCount}
+                </span>
+              )}
+              {isStreaming && (
+                <Icon
+                  name="Loader2"
+                  className="h-3 w-3 animate-spin text-primary/60"
+                />
+              )}
+            </div>
+            <button
+              onClick={() => setCollapsed(true)}
+              className="p-0.5 text-muted-foreground/50 hover:text-foreground transition-colors rounded"
+              title="Collapse sources"
+            >
+              <Icon name="ChevronRight" className="h-3.5 w-3.5" />
+            </button>
+          </div>
+
+          <PanelContent
+            sources={sources}
+            entities={entities}
+            communities={communities}
+            isStreaming={isStreaming}
+            highlightedIndex={highlightedIndex}
+          />
+        </div>
+      )}
+
+      {/* ── Mobile: backdrop ────────────────────────────────────────── */}
+      <div
+        className={`md:hidden fixed inset-0 z-40 bg-background/60 backdrop-blur-sm transition-opacity duration-300 ${
+          mobileOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
+        }`}
+        onClick={onMobileClose}
+      />
+
+      {/* ── Mobile: bottom sheet ────────────────────────────────────── */}
+      <div
+        className={`md:hidden fixed inset-x-0 bottom-0 z-50 transition-transform duration-300 ease-out ${
+          mobileOpen ? "translate-y-0" : "translate-y-full"
+        }`}
+      >
+        <div className="bg-background border-t border-border rounded-t-2xl max-h-[70vh] flex flex-col shadow-2xl">
+          {/* Drag handle */}
+          <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
+            <div className="w-8 h-1 rounded-full bg-border" />
+          </div>
+
+          {/* Sheet header */}
+          <div className="flex items-center justify-between px-4 py-2 flex-shrink-0 border-b border-border/50">
+            <div className="flex items-center gap-1.5 text-sm font-medium text-foreground/70">
+              <Icon name="BookOpen" className="h-4 w-4" />
+              <span>Sources</span>
+              {totalCount > 0 && (
+                <span className="px-1.5 py-0.5 rounded-full bg-muted text-[10px] text-muted-foreground font-normal">
+                  {totalCount}
+                </span>
+              )}
+              {isStreaming && (
+                <Icon
+                  name="Loader2"
+                  className="h-3.5 w-3.5 animate-spin text-primary/60"
+                />
+              )}
+            </div>
+            <button
+              onClick={onMobileClose}
+              className="p-1.5 text-muted-foreground/50 hover:text-foreground transition-colors rounded-md hover:bg-muted/50"
+              title="Close"
+            >
+              <Icon name="X" className="h-4 w-4" />
+            </button>
+          </div>
+
+          {/* Scrollable content */}
+          <div className="overflow-y-auto flex-1 px-4 py-3">
+            <PanelContent
+              sources={sources}
+              entities={entities}
+              communities={communities}
+              isStreaming={isStreaming}
+              highlightedIndex={highlightedIndex}
+            />
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
