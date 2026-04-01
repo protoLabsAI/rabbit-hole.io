@@ -9,7 +9,7 @@
  * Stream progress via GET /api/research/deep/:id (SSE)
  */
 
-import { generateObject, streamText } from "ai";
+import { generateObject, generateText, streamText } from "ai";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -578,6 +578,11 @@ ${synthesisInstructions}
     emit("report.completed", { length: fullReport.length });
     emit("phase.completed", { phase: "synthesis" });
 
+    // ── Auto-Ingest: fire-and-forget entity extraction ────────────
+    autoIngestEntities(researchId, query, fullReport, emit).catch(() => {
+      // Swallow — ingest failure must never block research completion
+    });
+
     // ── Complete ──────────────────────────────────────────────────
     updateResearch(researchId, {
       status: "completed",
@@ -626,6 +631,86 @@ function deduplicateSources(sources: ResearchSource[]): ResearchSource[] {
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
+  });
+}
+
+// ─── Auto-Ingest ─────────────────────────────────────────────────────
+
+async function autoIngestEntities(
+  researchId: string,
+  query: string,
+  report: string,
+  emit: (type: string, data: unknown) => void
+) {
+  emit("ingest.started", { researchId });
+
+  const model = getAIModel("fast");
+  const result = await generateText({
+    model,
+    prompt: `Extract entities and relationships from this research report about "${query}".
+
+Return ONLY valid JSON:
+{
+  "entities": [{"uid": "{type}:{snake_name}", "name": "...", "type": "Person|Organization|Technology|Concept|Event|Publication", "properties": {}, "tags": [], "aliases": []}],
+  "relationships": [{"uid": "rel:{src}_{type}_{tgt}", "type": "RELATED_TO|AUTHORED|FOUNDED|WORKS_AT|PART_OF", "source": "entity_uid", "target": "entity_uid", "properties": {}}]
+}
+
+Rules:
+- Entity UIDs: {type_prefix}:{snake_case_name}
+- Extract 5-20 entities and their relationships
+- Only include entities clearly mentioned in the text
+
+Text:\n${report.slice(0, 8000)}`,
+  });
+
+  const raw = result.text?.trim() ?? "";
+  const fence = raw.match(/```(?:json)?\s*([\s\S]*?)```/);
+  const jsonStr = fence ? fence[1].trim() : raw;
+  const parsed = JSON.parse(jsonStr);
+
+  if (!parsed?.entities?.length) {
+    emit("ingest.failed", { researchId, reason: "No entities extracted" });
+    return;
+  }
+
+  const bundle = {
+    entities: parsed.entities,
+    relationships: parsed.relationships ?? [],
+    evidence: [
+      {
+        uid: `evidence:deep_research_${Date.now()}`,
+        kind: "research",
+        title: `Deep Research: ${query}`,
+        publisher: "Rabbit Hole Deep Research",
+        date: new Date().toISOString().slice(0, 10),
+        reliability: 0.8,
+        notes: `Auto-extracted from deep research for "${query}"`,
+      },
+    ],
+  };
+
+  const rabbitHoleUrl = process.env.RABBIT_HOLE_URL || "http://localhost:3000";
+  const ingestRes = await fetch(`${rabbitHoleUrl}/api/ingest-bundle`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      data: bundle,
+      mergeOptions: { strategy: "merge_smart" },
+    }),
+  });
+
+  if (!ingestRes.ok) {
+    const err = await ingestRes.text();
+    emit("ingest.failed", { researchId, reason: err });
+    return;
+  }
+
+  const ingestData = await ingestRes.json();
+  emit("ingest.completed", {
+    researchId,
+    entitiesCount: parsed.entities.length,
+    relationshipsCount: (parsed.relationships ?? []).length,
+    summary: ingestData.data?.summary,
   });
 }
 
