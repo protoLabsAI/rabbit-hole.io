@@ -19,11 +19,7 @@ import {
   type TracingContext,
 } from "@proto/research-middleware";
 import { safeValidate } from "@proto/types";
-
-import {
-  upsertResearchChunks,
-  searchResearchMemory,
-} from "@proto/vector";
+import { upsertResearchChunks, searchResearchMemory } from "@proto/vector";
 
 import {
   searchCommunities,
@@ -61,10 +57,14 @@ function checkAbort(researchId: string) {
 
 // ─── Token usage helper ───────────────────────────────────────────────
 
-function toGenerationUsage(usage: {
-  inputTokens?: number;
-  outputTokens?: number;
-} | undefined) {
+function toGenerationUsage(
+  usage:
+    | {
+        inputTokens?: number;
+        outputTokens?: number;
+      }
+    | undefined
+) {
   if (!usage) return undefined;
   const { inputTokens, outputTokens } = usage;
   return {
@@ -155,7 +155,10 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
       prompt: scopePrompt,
     });
 
-    scopeGeneration.end(scopeResult.object, toGenerationUsage(scopeResult.usage));
+    scopeGeneration.end(
+      scopeResult.object,
+      toGenerationUsage(scopeResult.usage)
+    );
 
     const { dimensions, brief } = scopeResult.object;
 
@@ -204,7 +207,10 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
       if (iteration === 1) {
         checkAbort(researchId);
         emit("search.started", { query, source: "graph" });
-        const graphSearchSpan = tracing.createSpan("search:graph", { query, source: "initial" });
+        const graphSearchSpan = tracing.createSpan("search:graph", {
+          query,
+          source: "initial",
+        });
         try {
           const graphResults = await withRetry(() => searchGraph(query, 15));
           trackSearch();
@@ -242,7 +248,9 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
         // Search community summaries for thematic context
         checkAbort(researchId);
         emit("search.started", { query, source: "communities" });
-        const communitySearchSpan = tracing.createSpan("search:communities", { query });
+        const communitySearchSpan = tracing.createSpan("search:communities", {
+          query,
+        });
         let communityResults: CommunitySearchResult[] = [];
         try {
           communityResults = await withRetry(() => searchCommunities(query, 5));
@@ -301,7 +309,11 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
         // Check vector memory for prior findings from this session
         let memoryNote = "";
         try {
-          const memoryResults = await searchResearchMemory(dimension, researchId, 5);
+          const memoryResults = await searchResearchMemory(
+            dimension,
+            researchId,
+            5
+          );
           if (memoryResults.length > 0) {
             memoryNote = `Prior session findings for "${dimension}":\n${memoryResults
               .map((r) => `- ${r.content} (${r.source})`)
@@ -314,7 +326,10 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
         // Graph search per dimension (all iterations — hybrid BM25+vector via shared searchGraph)
         checkAbort(researchId);
         emit("search.started", { query: dimension, source: "graph" });
-        const dimGraphSpan = tracing.createSpan("search:graph", { query: dimension, iteration });
+        const dimGraphSpan = tracing.createSpan("search:graph", {
+          query: dimension,
+          iteration,
+        });
         let dimGraphResults: GraphSearchResult[] = [];
         try {
           dimGraphResults = await withRetry(() => searchGraph(dimension, 5));
@@ -349,7 +364,10 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
         // Web search with retry
         checkAbort(researchId);
         emit("search.started", { query: dimension, source: "web" });
-        const webSearchSpan = tracing.createSpan("search:web", { query: dimension, iteration });
+        const webSearchSpan = tracing.createSpan("search:web", {
+          query: dimension,
+          iteration,
+        });
         let webResults: WebSearchResult[] = [];
         try {
           webResults = await withRetry(() => searchWeb(dimension, 5));
@@ -376,7 +394,10 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
         // Wikipedia with retry
         checkAbort(researchId);
         emit("search.started", { query: dimension, source: "wikipedia" });
-        const wikiSearchSpan = tracing.createSpan("search:wikipedia", { query: dimension, iteration });
+        const wikiSearchSpan = tracing.createSpan("search:wikipedia", {
+          query: dimension,
+          iteration,
+        });
         let wiki: WikiSearchResult | null = null;
         try {
           wiki = await withRetry(() => searchWikipedia(dimension));
@@ -496,7 +517,10 @@ ${corpus.slice(0, 8000)}`;
       }
 
       emit("phase.completed", { phase: "research" });
-      researchIterationSpan.end({ sourcesCount: allSources.length, notesCount: allNotes.length });
+      researchIterationSpan.end({
+        sourcesCount: allSources.length,
+        notesCount: allNotes.length,
+      });
 
       // ── EVALUATE — Should we research more? ────────────────────
       checkAbort(researchId);
@@ -703,9 +727,11 @@ ${synthesisInstructions}
     emit("phase.completed", { phase: "synthesis" });
 
     // ── Auto-Ingest: fire-and-forget entity extraction ────────────
-    autoIngestEntities(researchId, query, fullReport, emit, tracing).catch(() => {
-      // Swallow — ingest failure must never block research completion
-    });
+    autoIngestEntities(researchId, query, fullReport, emit, tracing).catch(
+      () => {
+        // Swallow — ingest failure must never block research completion
+      }
+    );
 
     // ── Complete ──────────────────────────────────────────────────
     updateResearch(researchId, {
