@@ -169,20 +169,21 @@ export async function GET(
       // Query 1: Get all nodes (don't filter by :Entity label - use uid instead)
       const nodesQuery = `
         MATCH (n)
-        WHERE n.uid IS NOT NULL 
+        WHERE n.uid IS NOT NULL
           AND n.name IS NOT NULL
           AND NOT n:Evidence
           AND NOT n:File
           AND NOT n:Content
-        RETURN 
+        RETURN
           n.uid as uid,
           n.name as name,
           labels(n) as nodeLabels,
           coalesce(n.type, labels(n)[0]) as type,
           coalesce(n.x, rand() * 1000) as x,
           coalesce(n.y, rand() * 1000) as y,
-          n.communityId as communityId
-        ORDER BY n.name
+          n.communityId as communityId,
+          coalesce(n.degree_total, 0) as degree_total
+        ORDER BY coalesce(n.degree_total, 0) DESC
         LIMIT $limit
       `;
 
@@ -193,6 +194,7 @@ export async function GET(
       nodes = nodesResult.records.map((record: any) => {
         const labels = record.get("nodeLabels") || [];
         const typeValue = record.get("type");
+        const degreeRaw = record.get("degree_total");
         return {
           uid: record.get("uid"),
           name: record.get("name"),
@@ -201,6 +203,10 @@ export async function GET(
           x: record.get("x"),
           y: record.get("y"),
           communityId: record.get("communityId"),
+          degree_total:
+            typeof degreeRaw === "number"
+              ? degreeRaw
+              : (degreeRaw?.toInt?.() ?? 0),
         };
       });
 
