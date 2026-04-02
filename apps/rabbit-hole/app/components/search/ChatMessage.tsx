@@ -393,8 +393,27 @@ function ToolCallCard({
   const isError = state === "error";
   const isActive = isStreaming || isRunning;
 
-  // Done results are shown in the right panel — suppress inline cards
-  if (isDone && !isError) return null;
+  // Done: show as a faded completed step (results are in the right panel)
+  if (isDone && !isError) {
+    let doneSummary = "";
+    if (output) {
+      if (toolName === "searchGraph" && Array.isArray(output))
+        doneSummary = `${output.length} entities`;
+      else if (toolName === "searchWeb" && output?.results)
+        doneSummary = `${output.results.length} sources`;
+      else if (toolName === "searchWikipedia" && output?.title)
+        doneSummary = output.title;
+    }
+    return (
+      <div className="flex items-center gap-1.5 text-xs text-muted-foreground/40 py-0.5">
+        <Icon name={config.icon as any} className="h-3 w-3 flex-shrink-0" />
+        <span>{config.label}</span>
+        {doneSummary && (
+          <span className="text-muted-foreground/30">— {doneSummary}</span>
+        )}
+      </div>
+    );
+  }
 
   // Status badge
   const statusBadge = isStreaming
