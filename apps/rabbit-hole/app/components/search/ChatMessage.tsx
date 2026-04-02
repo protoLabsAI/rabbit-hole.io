@@ -967,7 +967,7 @@ export function ChatMessage({
         )}
       </div>
 
-      {/* Source panel — collapsible right-side panel (desktop) / bottom sheet (mobile) */}
+      {/* Mobile bottom sheet only — desktop sources are in the page-level right panel */}
       <ChatSourcePanel
         sources={sources}
         entities={graphEntities}
@@ -976,6 +976,7 @@ export function ChatMessage({
         highlightedIndex={highlightedSourceIndex}
         mobileOpen={mobileSourceOpen}
         onMobileClose={() => setMobileSourceOpen(false)}
+        hideDesktop
       />
     </div>
   );

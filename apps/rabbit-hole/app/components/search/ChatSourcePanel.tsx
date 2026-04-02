@@ -21,6 +21,8 @@ interface ChatSourcePanelProps {
   highlightedIndex?: number | null;
   mobileOpen?: boolean;
   onMobileClose?: () => void;
+  /** Suppress desktop panel — render mobile bottom sheet only */
+  hideDesktop?: boolean;
 }
 
 // ─── Loading skeleton for pending sources ────────────────────────────
@@ -147,6 +149,7 @@ export function ChatSourcePanel({
   highlightedIndex,
   mobileOpen = false,
   onMobileClose,
+  hideDesktop = false,
 }: ChatSourcePanelProps) {
   const [collapsed, setCollapsed] = useState(false);
   const hadContent = useRef(false);
@@ -163,7 +166,7 @@ export function ChatSourcePanel({
   return (
     <>
       {/* ── Desktop: collapsed icon button ─────────────────────────── */}
-      {collapsed && (
+      {!hideDesktop && collapsed && (
         <button
           onClick={() => setCollapsed(false)}
           className="hidden md:flex flex-col items-center gap-1 p-2 rounded-lg border border-border/50 hover:border-border hover:bg-muted/30 transition-colors flex-shrink-0 animate-in fade-in-0 zoom-in-95 duration-200"
@@ -177,7 +180,7 @@ export function ChatSourcePanel({
       )}
 
       {/* ── Desktop: expanded panel ─────────────────────────────────── */}
-      {!collapsed && (
+      {!hideDesktop && !collapsed && (
         <div className="hidden md:block w-52 flex-shrink-0 space-y-2 animate-in fade-in-0 slide-in-from-right-2 duration-200">
           {/* Header */}
           <div className="flex items-center justify-between gap-2">
