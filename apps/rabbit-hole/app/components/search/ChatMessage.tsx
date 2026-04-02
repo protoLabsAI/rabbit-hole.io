@@ -427,46 +427,29 @@ function ToolCallCard({
     return null;
   };
 
-  return (
-    <div className="rounded-lg border border-border/60 bg-muted/20 overflow-hidden">
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-      >
-        {isActive ? (
-          <Icon name="Loader2" className="h-3 w-3 animate-spin text-primary" />
-        ) : isError ? (
-          <Icon name="AlertCircle" className="h-3 w-3 text-destructive" />
-        ) : (
-          <Icon
-            name={config.icon as any}
-            className="h-3 w-3 text-muted-foreground/70"
-          />
-        )}
-        <span className="font-medium">
-          {isActive ? config.activeLabel : config.label}
-        </span>
-        {statusBadge && (
-          <span
-            className={`text-[9px] font-medium px-1.5 py-0.5 rounded-full ${statusBadge.color}`}
-          >
-            {statusBadge.label}
-          </span>
-        )}
-        {summary && !isActive && (
-          <span className="text-muted-foreground/50">— {summary}</span>
-        )}
-        {input?.query && isActive && (
-          <span className="text-primary/60 italic truncate max-w-[200px]">
+  // Active tools: compact pill indicator — no card chrome needed
+  if (isActive) {
+    return (
+      <div className="flex items-center gap-1.5 text-xs text-muted-foreground py-0.5">
+        <Icon
+          name="Loader2"
+          className="h-3 w-3 animate-spin text-primary flex-shrink-0"
+        />
+        <span className="text-primary/80">{config.activeLabel}</span>
+        {input?.query && (
+          <span className="text-muted-foreground/50 italic truncate max-w-[240px]">
             &quot;{input.query}&quot;
           </span>
         )}
-        <Icon
-          name={expanded ? "ChevronUp" : "ChevronDown"}
-          className="h-3 w-3 ml-auto opacity-40"
-        />
-      </button>
-      {expanded && renderOutput()}
+      </div>
+    );
+  }
+
+  // Error state: keep minimal card
+  return (
+    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-destructive/30 bg-destructive/5 text-xs text-destructive">
+      <Icon name="AlertCircle" className="h-3 w-3 flex-shrink-0" />
+      <span>{config.label} failed</span>
     </div>
   );
 }
