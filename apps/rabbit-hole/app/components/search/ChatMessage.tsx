@@ -8,11 +8,12 @@ import { Icon } from "@proto/icon-system";
 import { Badge } from "@proto/ui/atoms";
 
 import { ChatMarkdown } from "./ChatMarkdown";
-import { ChatSourcePanel } from "./ChatSourcePanel";
 import type { CommunitySummary } from "./CommunityCard";
 import type { GraphEntity } from "./EntityCard";
 import { ReasoningBlock } from "./ReasoningBlock";
+import { ResearchLayout } from "./ResearchLayout";
 import type { ResearchSource } from "./SourceCard";
+import { toolPartsToActivityEvents } from "./toolEventAdapter";
 
 // ─── Entity type → dot color (mirrors atlas-schema ENTITY_VISUALS) ──
 
@@ -756,12 +757,27 @@ export function ChatMessage({
     return result;
   }, [allTools]);
 
+  const activityEvents = useMemo(
+    () => toolPartsToActivityEvents(allTools),
+    [allTools]
+  );
+
   const isComplete = !isStreaming || !isLast;
 
+  const mobileCount =
+    sources.length + graphEntities.length + communities.length;
+
   return (
-    <div className="flex items-start gap-4">
-      {/* Main content */}
-      <div className="flex-1 min-w-0 space-y-3 pb-2">
+    <ResearchLayout mode="chat"
+      activityEvents={activityEvents}
+      sources={sources}
+      entities={graphEntities}
+      communities={communities}
+      isStreaming={isStreaming && isLast}
+      highlightedSourceIndex={highlightedSourceIndex}
+      mobileOpen={mobileSourceOpen}
+      onMobileClose={() => setMobileSourceOpen(false)}
+    >
       {/* Reasoning — collapsible thinking indicator */}
       {reasoningAnnotation && (
         <ReasoningBlock
@@ -885,7 +901,9 @@ export function ChatMessage({
                     <span
                       className="w-1.5 h-1.5 rounded-full flex-shrink-0"
                       style={{
-                        backgroundColor: ENTITY_TYPE_COLORS[entity.type?.toLowerCase()] ?? "#6B7280",
+                        backgroundColor:
+                          ENTITY_TYPE_COLORS[entity.type?.toLowerCase()] ??
+                          "#6B7280",
                       }}
                     />
                     {entity.name}
@@ -906,7 +924,7 @@ export function ChatMessage({
         </div>
       )}
 
-      {/* Extraction Preview — "Add to Graph" card (pre-computed from full research context) */}
+      {/* Extraction Preview — "Add to Graph" card */}
       {isComplete && extractionPreview && onIngestBundle && (
         <ExtractionPreviewCard
           preview={extractionPreview}
@@ -915,20 +933,17 @@ export function ChatMessage({
       )}
 
       {/* Mobile: source count badge — tap to open bottom sheet */}
-      {(() => {
-        const mobileCount = sources.length + graphEntities.length + communities.length;
-        return mobileCount > 0 ? (
-          <button
-            className="md:hidden flex items-center gap-1.5 text-xs text-muted-foreground/70 hover:text-foreground transition-colors px-2.5 py-1.5 rounded-full border border-border/50 hover:border-border hover:bg-muted/30 self-start"
-            onClick={() => setMobileSourceOpen(true)}
-          >
-            <Icon name="BookOpen" className="h-3.5 w-3.5" />
-            <span>
-              {mobileCount} source{mobileCount !== 1 ? "s" : ""}
-            </span>
-          </button>
-        ) : null;
-      })()}
+      {mobileCount > 0 && (
+        <button
+          className="md:hidden flex items-center gap-1.5 text-xs text-muted-foreground/70 hover:text-foreground transition-colors px-2.5 py-1.5 rounded-full border border-border/50 hover:border-border hover:bg-muted/30 self-start"
+          onClick={() => setMobileSourceOpen(true)}
+        >
+          <Icon name="BookOpen" className="h-3.5 w-3.5" />
+          <span>
+            {mobileCount} source{mobileCount !== 1 ? "s" : ""}
+          </span>
+        </button>
+      )}
 
       {/* Follow-up suggestions */}
       {isComplete && isLast && onFollowUp && (
@@ -945,18 +960,6 @@ export function ChatMessage({
           <span>Thinking...</span>
         </div>
       )}
-      </div>
-
-      {/* Source panel — collapsible right-side panel (desktop) / bottom sheet (mobile) */}
-      <ChatSourcePanel
-        sources={sources}
-        entities={graphEntities}
-        communities={communities}
-        isStreaming={isStreaming && isLast}
-        highlightedIndex={highlightedSourceIndex}
-        mobileOpen={mobileSourceOpen}
-        onMobileClose={() => setMobileSourceOpen(false)}
-      />
-    </div>
+    </ResearchLayout>
   );
 }
