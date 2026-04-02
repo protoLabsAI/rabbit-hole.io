@@ -393,6 +393,9 @@ function ToolCallCard({
   const isError = state === "error";
   const isActive = isStreaming || isRunning;
 
+  // Done results are shown in the right panel — suppress inline cards
+  if (isDone && !isError) return null;
+
   // Status badge
   const statusBadge = isStreaming
     ? { label: "streaming", color: "text-blue-400 bg-blue-400/10" }
