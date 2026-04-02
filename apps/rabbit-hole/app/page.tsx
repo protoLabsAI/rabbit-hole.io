@@ -272,7 +272,7 @@ export default function SearchPage() {
       <div className="flex-1 flex flex-col min-w-0 min-h-0">
         {/* Top bar */}
         <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border">
-          <div className="max-w-3xl mx-auto px-4 py-3 flex items-center gap-3">
+          <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="p-1.5 text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-muted/50"
@@ -329,7 +329,7 @@ export default function SearchPage() {
         ) : (
           <>
             {/* Messages */}
-            <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-6">
+            <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-6">
               <div className="space-y-2">
                 {messages.map((msg, i) => (
                   <ChatMessage
@@ -354,7 +354,7 @@ export default function SearchPage() {
 
             {/* Bottom input bar */}
             <footer className="sticky bottom-0 z-30 bg-background/80 backdrop-blur-md border-t border-border">
-              <div className="max-w-3xl mx-auto px-4 py-3">
+              <div className="max-w-5xl mx-auto px-4 py-3">
                 <SearchInput onSearch={handleSearch} autoFocus={!isStreaming} />
               </div>
             </footer>
