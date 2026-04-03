@@ -25,7 +25,7 @@ export class TestDataService {
     this.neo4jService = new Neo4jService({
       uri: process.env.NEO4J_URI || "bolt://localhost:7687",
       username: process.env.NEO4J_USERNAME || "neo4j",
-      password: process.env.NEO4J_PASSWORD || "evidencegraph2024",
+      password: process.env.NEO4J_PASSWORD || "",
       database: process.env.NEO4J_DATABASE || "neo4j",
     });
   }

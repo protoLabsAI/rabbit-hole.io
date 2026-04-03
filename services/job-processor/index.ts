@@ -18,8 +18,7 @@ const config = {
   backend: {
     driver: "@sidequest/postgres-backend",
     config:
-      process.env.DATABASE_URL ||
-      "postgres://jobqueue:jobs2024@localhost:5432/sidequest",
+      process.env.DATABASE_URL || process.env.JOB_QUEUE_DATABASE_URL || "",
   },
   dashboard: {
     enabled: true,

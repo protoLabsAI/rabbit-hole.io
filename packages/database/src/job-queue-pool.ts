@@ -22,7 +22,8 @@ export function getJobQueuePool(): Pool {
       connectionString:
         process.env.JOB_QUEUE_DATABASE_URL ||
         process.env.DATABASE_URL || // Fallback to main DB in dev
-        "postgresql://jobqueue:jobs2024@localhost:5433/sidequest",
+        process.env.JOB_QUEUE_DATABASE_URL ||
+        "",
       max: 20,
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 2000,

@@ -13,8 +13,7 @@ export function getGlobalPostgresPool(): Pool {
   if (!globalPool) {
     globalPool = new Pool({
       connectionString:
-        process.env.APP_DATABASE_URL ||
-        "postgresql://app_user:rabbit2024@localhost:5432/rabbit_hole_app",
+        process.env.APP_DATABASE_URL || process.env.APP_DATABASE_URL || "",
       max: 20, // Maximum pool size
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 2000,

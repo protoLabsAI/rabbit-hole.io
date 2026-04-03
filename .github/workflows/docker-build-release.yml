@@ -1,6 +1,6 @@
 # Docker Build - Production Release
 # Single-platform (AMD64) builds triggered by version tags
-# Runs on self-hosted runner at 100.71.25.102
+# Runs on self-hosted runner
 #
 # ⚠️ Cache Management Strategy
 # ─────────────────────────────
@@ -134,7 +134,7 @@ jobs:
           cache-to: type=registry,ref=${{ env.REGISTRY }}/proto-labs-ai/proto-starter/cache:${{ matrix.service.name }}-release,mode=max
           build-args: |
             ${{ matrix.service.name == 'rabbit-hole' && format('NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY={0}', secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) || '' }}
-            ${{ matrix.service.name == 'rabbit-hole' && format('NEXT_PUBLIC_YJS_WS_URL={0}', vars.NEXT_PUBLIC_YJS_WS_URL || 'wss://collab.proto-labs.ai') || '' }}
+            ${{ matrix.service.name == 'rabbit-hole' && format('NEXT_PUBLIC_YJS_WS_URL={0}', vars.NEXT_PUBLIC_YJS_WS_URL || '') || '' }}
           provenance: true
           sbom: true
           # Add network configuration for better reliability
@@ -298,6 +298,6 @@ jobs:
           echo "- **Version:** ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Images:** Using \`latest\` tag (pulled fresh with \`pull_policy: always\`)" >> $GITHUB_STEP_SUMMARY
           echo "- **Deployment:** Triggered via Coolify API" >> $GITHUB_STEP_SUMMARY
-          echo "- **Environment:** https://sandbox.proto-labs.ai" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment:** your-deployment-url" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Check [Coolify dashboard](https://coolify.proto-labs.ai) for deployment status." >> $GITHUB_STEP_SUMMARY
+          echo "Check [Coolify dashboard](your-coolify-dashboard) for deployment status." >> $GITHUB_STEP_SUMMARY

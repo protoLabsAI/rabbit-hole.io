@@ -489,7 +489,7 @@ import { enqueueYouTubeJob } from "@proto/sidequest-utils/server";
 JOB_PROCESSOR_URL=http://localhost:8680
 
 # Job Queue Database for status queries (default: localhost:5433)
-JOB_QUEUE_DATABASE_URL=postgresql://jobqueue:jobs2024@localhost:5433/sidequest
+JOB_QUEUE_DATABASE_URL=postgresql://jobqueue:changeme@localhost:5433/sidequest
 ```
 
 ## Architecture Details

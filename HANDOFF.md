@@ -176,14 +176,14 @@ docker compose -f docker-compose.research.yml --env-file .env.research up -d
 pnpm install
 
 # Create .env.local with:
-#   APP_DATABASE_URL=postgresql://app_user:rabbit2024@localhost:5432/rabbit_hole_app
+#   APP_DATABASE_URL=postgresql://app_user:changeme@localhost:5432/rabbit_hole_app
 #   NEO4J_URI=bolt://localhost:7687
 #   NEO4J_USER=neo4j
-#   NEO4J_PASSWORD=evidencegraph2024
+#   NEO4J_PASSWORD=changeme
 #   JOB_PROCESSOR_URL=http://localhost:8680
 #   MINIO_ENDPOINT=localhost:9000
 #   MINIO_ACCESS_KEY=minio
-#   MINIO_SECRET_KEY=minio123
+#   MINIO_SECRET_KEY=changeme
 #   MINIO_USE_SSL=false
 #   COPILOTKIT_REMOTE_URL=http://localhost:8123
 #   ANTHROPIC_API_KEY=<your key>

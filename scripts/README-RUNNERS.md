@@ -20,8 +20,8 @@ Copy the registration token (expires in 1 hour).
 ./scripts/setup-github-runners.sh 8
 
 # On remote machine
-scp scripts/setup-github-runners.sh user@100.71.25.102:~
-ssh user@100.71.25.102
+scp scripts/setup-github-runners.sh user@<runner-host>:~
+ssh user@<runner-host>
 ./setup-github-runners.sh 4
 ```
 

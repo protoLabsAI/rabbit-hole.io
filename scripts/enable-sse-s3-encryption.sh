@@ -16,7 +16,7 @@ fi
 
 # Configure alias
 echo "🔧 Configuring MinIO client..."
-docker exec $CONTAINER mc alias set $ALIAS http://localhost:9000 minio minio123 > /dev/null
+docker exec $CONTAINER mc alias set $ALIAS http://localhost:9000 minio changeme > /dev/null
 
 # Enable SSE-S3 on all buckets
 for bucket in evidence-temp evidence-raw evidence-derived; do

@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
         uri: process.env.NEO4J_URI || "bolt://localhost:7687",
         username:
           process.env.NEO4J_USERNAME || process.env.NEO4J_USER || "neo4j",
-        password: process.env.NEO4J_PASSWORD || "evidencegraph2024",
+        password: process.env.NEO4J_PASSWORD || "",
         database: process.env.NEO4J_DATABASE || "neo4j",
       });
 
