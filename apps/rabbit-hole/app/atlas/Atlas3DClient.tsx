@@ -283,17 +283,12 @@ export default function Atlas3DClient() {
             const busiest = data.nodes.reduce((max, n) =>
               (n.degree ?? 0) > (max.degree ?? 0) ? n : max
             );
+            const bx = (busiest as any).x ?? 0;
+            const by = (busiest as any).y ?? 0;
+            const bz = (busiest as any).z ?? 0;
             graphRef.current.cameraPosition(
-              {
-                x: (busiest as any).x ?? 0,
-                y: (busiest as any).y ?? 0,
-                z: 300,
-              },
-              {
-                x: (busiest as any).x ?? 0,
-                y: (busiest as any).y ?? 0,
-                z: 0,
-              },
+              { x: bx, y: by, z: bz + 200 },
+              { x: bx, y: by, z: bz },
               1200
             );
           }, 2500);
@@ -382,15 +377,6 @@ export default function Atlas3DClient() {
     },
     [settings.showLabels]
   );
-
-  // Lazy frustum culling: hide nodes that have drifted far behind the camera
-  // to reduce per-frame geometry submissions on large graphs.
-  const nodeVisibility = useCallback((node: any): boolean => {
-    const cam = cameraPositionRef.current;
-    // Cull nodes more than 3× LOD_LABEL_DISTANCE behind the camera along z.
-    const nz = node.z ?? 0;
-    return nz > cam.z - LOD_LABEL_DISTANCE * 3;
-  }, []);
 
   // Settings updater — persists to localStorage
   const updateSettings = useCallback((patch: Partial<AtlasSettings>) => {
@@ -499,7 +485,6 @@ export default function Atlas3DClient() {
                 : (node.val ?? 1);
             }}
             nodeLabel={nodeLabelFn}
-            nodeVisibility={nodeVisibility}
             nodeOpacity={0.9}
             nodeResolution={isLargeGraph ? 6 : 12}
             nodeRelSize={isLargeGraph ? 3 : 4}
