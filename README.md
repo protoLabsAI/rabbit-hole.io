@@ -11,7 +11,7 @@ Rabbit Hole is an AI search engine backed by a living knowledge graph. When you 
 | Phase | Product | Status |
 |-------|---------|--------|
 | **1** | **Search Engine** (`/`) — Perplexity-style AI search. Self-growing knowledge graph. | Active |
-| **2** | **3D Atlas** — GPU-accelerated 3D graph visualization (Cosmograph) for millions of nodes. | In Progress |
+| **2** | **3D Atlas** — 3D graph visualization for millions of nodes and communities. | In Progress |
 | **3** | **Research App** — Downloadable self-hostable app (Tauri/Electron) with full research workspace. | Planned |
 
 ### Current Surfaces
@@ -19,7 +19,7 @@ Rabbit Hole is an AI search engine backed by a living knowledge graph. When you 
 | Surface | Description |
 |---------|-------------|
 | **Search** (`/`) | AI search engine. Graph search + web research + streaming answers + user-triggered KG ingest + deep research mode. |
-| **Atlas** (`/atlas`) | 3D knowledge graph visualization (react-force-graph-3d, migrating to Cosmograph GPU renderer) |
+| **Atlas** (`/atlas`) | 3D knowledge graph visualization (react-force-graph-3d) |
 | **Research** (`/research`) | Research workspace (React Flow canvas, entity cards, enrichment wizards). Dev-only — gated by `ENABLE_RESEARCH=true`. |
 
 ## Quick Start
