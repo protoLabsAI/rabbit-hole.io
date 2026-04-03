@@ -11,16 +11,16 @@ Rabbit Hole is an AI search engine backed by a living knowledge graph. When you 
 | Phase | Product | Status |
 |-------|---------|--------|
 | **1** | **Search Engine** (`/`) — Perplexity-style AI search. Self-growing knowledge graph. | Active |
-| **2** | **3D Atlas** — Modern 3D graph visualization for millions of nodes and communities. | Planned |
-| **3** | **Research App** — Downloadable self-hostable search engine (Tauri/Electron) with full research workspace. | Planned |
+| **2** | **3D Atlas** — GPU-accelerated 3D graph visualization (Cosmograph) for millions of nodes. | In Progress |
+| **3** | **Research App** — Downloadable self-hostable app (Tauri/Electron) with full research workspace. | Planned |
 
 ### Current Surfaces
 
 | Surface | Description |
 |---------|-------------|
 | **Search** (`/`) | AI search engine. Graph search + web research + streaming answers + user-triggered KG ingest + deep research mode. |
-| **Atlas** (`/atlas`) | Knowledge graph visualization (Cytoscape.js — will be replaced with 3D) |
-| **Research** (`/research`) | Research workspace (React Flow canvas, entity cards, enrichment wizards, media upload) |
+| **Atlas** (`/atlas`) | 3D knowledge graph visualization (react-force-graph-3d, migrating to Cosmograph GPU renderer) |
+| **Research** (`/research`) | Research workspace (React Flow canvas, entity cards, enrichment wizards). Dev-only — gated by `ENABLE_RESEARCH=true`. |
 
 ## Quick Start
 
@@ -36,14 +36,14 @@ docker compose -f docker-compose.research.yml up -d
 pnpm dev
 
 # Open search engine
-open http://localhost:3000
+open http://localhost:3399
 ```
 
 ### Services
 
 | Service | Port | Purpose |
 |---------|------|---------|
-| Next.js | 3000 | Web application + search engine |
+| Next.js | 3399 | Web application + search engine |
 | Neo4j Browser | 7474 | Graph database UI |
 | Neo4j Bolt | 7687 | Graph database protocol |
 | MinIO Console | 9001 | Object storage UI |
@@ -91,8 +91,8 @@ Sessions are stored locally and accessible via URL (`?s=<id>`). Conversation his
 rabbit-hole.io/
 ├── apps/rabbit-hole/          # Next.js application
 │   ├── app/                   # Search engine landing page
-│   ├── app/atlas/             # Knowledge graph visualization
-│   ├── app/research/          # Research workspace
+│   ├── app/atlas/             # 3D knowledge graph visualization
+│   ├── app/research/          # Research workspace (dev-only, gated by ENABLE_RESEARCH)
 │   ├── app/evidence/          # Evidence management
 │   ├── app/lib/search.ts      # Shared search utilities (graph, web, wiki)
 │   ├── app/api/chat/          # AI SDK v6 agentic search + ingest
@@ -100,12 +100,13 @@ rabbit-hole.io/
 │   ├── app/api/entity-search/ # Full-text entity lookup
 │   └── app/api/ingest-bundle/ # Bundle ingestion
 ├── packages/
-│   ├── @proto/types           # Zod schemas, bundle format, entity types
-│   ├── @proto/database        # Neo4j + PostgreSQL clients
-│   ├── @proto/mcp-server      # MCP tools for Claude Code
-│   ├── @proto/llm-providers   # LLM abstraction (Claude, GPT, Gemini)
-│   ├── @proto/ui              # Component library (atoms/molecules/organisms)
-│   └── @proto/utils           # Graph algorithms, atlas config
+│   ├── @proto/types               # Zod schemas, bundle format, entity types
+│   ├── @proto/database            # Neo4j + PostgreSQL clients
+│   ├── @proto/mcp-server          # MCP tools (stdio + HTTP, port 3398)
+│   ├── @proto/research-middleware # AI SDK middleware chain (EntityMemory, Reflection, etc.)
+│   ├── @proto/llm-providers       # LLM abstraction (Claude, GPT, Gemini)
+│   ├── @proto/ui                  # Component library (atoms/molecules/organisms)
+│   └── @proto/utils               # Graph algorithms, atlas config
 ├── services/job-processor/    # Media ingestion + job queue (Sidequest)
 ├── agent/                     # LangGraph agent server
 ├── migrations/                # Neo4j schema migrations
@@ -126,7 +127,11 @@ The `@proto/mcp-server` provides tools for Claude Code and other MCP clients:
 | `validate_bundle` | Validate bundle structure |
 | `wikipedia_search` | Fetch Wikipedia articles |
 | `tavily_search` | Premium web search |
-| `web_search` | DuckDuckGo search |
+| `web_search` | SearXNG self-hosted web search |
+| `ingest_url` | Fetch and ingest a URL into the knowledge graph |
+| `ingest_file` | Upload and ingest a local file |
+| `transcribe_audio` | Transcribe audio and ingest as evidence |
+| `extract_pdf` | Extract text from a PDF and ingest |
 
 ## Tech Stack
 
