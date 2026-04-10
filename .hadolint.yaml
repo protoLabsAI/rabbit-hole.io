@@ -1,0 +1,12 @@
+# hadolint configuration — https://github.com/hadolint/hadolint#configure
+failure-threshold: warning
+
+ignored:
+  # Version pinning exceptions — enforce in a separate hardening pass
+  - DL3007 # Using latest tag
+  - DL3008 # Pin versions in apt-get install
+  - DL3013 # Pin versions in pip install
+  - DL3018 # Pin versions in apk add
+  # Style-only warnings that don't affect image correctness
+  - DL3003 # Use WORKDIR to switch directories
+  - DL3059 # Multiple consecutive RUN instructions

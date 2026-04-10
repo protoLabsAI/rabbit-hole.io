@@ -34,39 +34,14 @@ vi.mock("next/cache", () => ({
 }));
 
 describe("mergeResearchToNeo4j", () => {
-  let mockAuth: any;
   let mockDatabase: any;
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    mockAuth = {} as any; // Clerk removed
     mockDatabase = await import("@proto/database");
   });
 
-  it("should reject unauthorized users", async () => {
-    mockAuth.auth.mockResolvedValue({ userId: null, orgId: null });
-
-    const bundle: ResearchBundle = {
-      entities: [],
-      relationships: [],
-      metadata: {
-        version: "1.0.0",
-        createdAt: new Date().toISOString(),
-      },
-    };
-
-    const result = await mergeResearchToNeo4j(bundle);
-
-    expect(result.status).toBe(401);
-    expect(result.error).toBe("Unauthorized");
-  });
-
   it("should validate bundle format", async () => {
-    mockAuth.auth.mockResolvedValue({
-      userId: "user-123",
-      orgId: null,
-    });
-
     const invalidBundle = {
       // Missing required fields
     } as any;
@@ -78,11 +53,6 @@ describe("mergeResearchToNeo4j", () => {
   });
 
   it("should reject bundle without entities or relationships", async () => {
-    mockAuth.auth.mockResolvedValue({
-      userId: "user-123",
-      orgId: null,
-    });
-
     const bundle = {
       metadata: {
         version: "1.0.0",
@@ -97,11 +67,6 @@ describe("mergeResearchToNeo4j", () => {
   });
 
   it("should merge entities and relationships successfully", async () => {
-    mockAuth.auth.mockResolvedValue({
-      userId: "user-123",
-      orgId: null,
-    });
-
     const mockClient = {
       executeWrite: vi
         .fn()
@@ -162,11 +127,6 @@ describe("mergeResearchToNeo4j", () => {
   });
 
   it("should map temporary IDs to real IDs", async () => {
-    mockAuth.auth.mockResolvedValue({
-      userId: "user-123",
-      orgId: null,
-    });
-
     const mockClient = {
       executeWrite: vi.fn().mockResolvedValue({
         records: [
@@ -208,11 +168,6 @@ describe("mergeResearchToNeo4j", () => {
   });
 
   it("should handle Neo4j errors gracefully", async () => {
-    mockAuth.auth.mockResolvedValue({
-      userId: "user-123",
-      orgId: null,
-    });
-
     const mockClient = {
       executeWrite: vi
         .fn()
