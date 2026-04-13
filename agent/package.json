@@ -36,7 +36,7 @@
     "@langchain/google-genai": "^1.0.0",
     "@langchain/langgraph": "^1.0.0",
     "@langchain/langgraph-checkpoint": "~0.0.18",
-    "@langchain/openai": "^1.0.0",
+    "@langchain/openai": "^1.4.4",
     "@langfuse/langchain": "^4.4.2",
     "@langfuse/otel": "^4.4.2",
     "@opentelemetry/resources": "^2.2.0",
