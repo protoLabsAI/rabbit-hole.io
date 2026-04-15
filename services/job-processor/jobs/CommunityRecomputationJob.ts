@@ -60,7 +60,7 @@ export class CommunityRecomputationJob extends Job {
         const result = await generateText({
           model,
           prompt,
-          maxTokens: 300,
+          maxOutputTokens: 300,
         });
         return result.text;
       };
