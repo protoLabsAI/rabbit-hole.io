@@ -218,7 +218,7 @@ export class DomainRegistry {
   /**
    * Get schema for entity type
    */
-  getSchema(entityType: string): z.ZodSchema | undefined {
+  getSchema(entityType: string): z.ZodTypeAny | undefined {
     const domainName = this.entityToDomain.get(entityType);
     if (!domainName) return undefined;
 

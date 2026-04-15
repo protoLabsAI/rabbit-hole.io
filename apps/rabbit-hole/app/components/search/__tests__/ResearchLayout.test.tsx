@@ -7,7 +7,9 @@ import type { ActivityEvent } from "../types";
 // ─── Minimal test doubles ────────────────────────────────────────────
 
 vi.mock("../EntityCard", () => ({
-  EntityCard: ({ entity }: any) => <div data-testid="entity-card">{entity.name}</div>,
+  EntityCard: ({ entity }: any) => (
+    <div data-testid="entity-card">{entity.name}</div>
+  ),
 }));
 vi.mock("../CommunityCard", () => ({
   CommunityCard: ({ community }: any) => (
@@ -15,7 +17,9 @@ vi.mock("../CommunityCard", () => ({
   ),
 }));
 vi.mock("../SourceCard", () => ({
-  SourceCard: ({ source }: any) => <div data-testid="source-card">{source.title}</div>,
+  SourceCard: ({ source }: any) => (
+    <div data-testid="source-card">{source.title}</div>
+  ),
 }));
 
 // ─── Chat mode tests ─────────────────────────────────────────────────
@@ -31,13 +35,19 @@ describe("ResearchLayout — chat mode", () => {
   });
 
   test("shows sources in right panel when sources present", () => {
-    const sources = [{ title: "Test Source", url: "https://example.com", type: "web" as const }];
+    const sources = [
+      {
+        title: "Test Source",
+        url: "https://example.com",
+        type: "web" as const,
+      },
+    ];
     render(
       <ResearchLayout mode="chat" sources={sources} isStreaming={false}>
         <p>Answer</p>
       </ResearchLayout>
     );
-    expect(screen.getByTestId("source-card")).toBeTruthy();
+    expect(screen.getAllByTestId("source-card").length).toBeGreaterThan(0);
   });
 
   test("shows activity events in right panel", () => {
@@ -48,7 +58,9 @@ describe("ResearchLayout — chat mode", () => {
         timestamp: Date.now(),
       },
     ];
-    const sources = [{ title: "A Source", url: "https://example.com", type: "web" as const }];
+    const sources = [
+      { title: "A Source", url: "https://example.com", type: "web" as const },
+    ];
     render(
       <ResearchLayout mode="chat" activityEvents={events} sources={sources}>
         <p>Answer</p>
@@ -58,7 +70,9 @@ describe("ResearchLayout — chat mode", () => {
   });
 
   test("toggles drawer collapse/expand on button click", () => {
-    const sources = [{ title: "Source", url: "https://example.com", type: "web" as const }];
+    const sources = [
+      { title: "Source", url: "https://example.com", type: "web" as const },
+    ];
     render(
       <ResearchLayout mode="chat" sources={sources}>
         <p>Answer</p>
@@ -73,9 +87,20 @@ describe("ResearchLayout — chat mode", () => {
   });
 
   test("renders mobile bottom sheet when mobileOpen=true", () => {
-    const sources = [{ title: "Mobile Source", url: "https://example.com", type: "web" as const }];
+    const sources = [
+      {
+        title: "Mobile Source",
+        url: "https://example.com",
+        type: "web" as const,
+      },
+    ];
     render(
-      <ResearchLayout mode="chat" sources={sources} mobileOpen={true} onMobileClose={vi.fn()}>
+      <ResearchLayout
+        mode="chat"
+        sources={sources}
+        mobileOpen={true}
+        onMobileClose={vi.fn()}
+      >
         <p>Answer</p>
       </ResearchLayout>
     );
@@ -126,7 +151,11 @@ describe("ResearchLayout — deep-research mode", () => {
   test("renders key findings section when findings provided", () => {
     const findings = ["Finding 1", "Finding 2"];
     render(
-      <ResearchLayout mode="deep-research" findings={findings} isStreaming={true}>
+      <ResearchLayout
+        mode="deep-research"
+        findings={findings}
+        isStreaming={true}
+      >
         <p>Report</p>
       </ResearchLayout>
     );

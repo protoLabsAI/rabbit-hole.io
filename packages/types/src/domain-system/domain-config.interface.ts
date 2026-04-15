@@ -86,7 +86,7 @@ export interface DomainConfig {
 
   // ==================== Schema System ====================
   /** Entity type → Zod schema mapping */
-  entities: Record<string, z.ZodSchema>;
+  entities: Record<string, z.ZodTypeAny>;
 
   /** Entity type → UID prefix mapping */
   uidPrefixes: Record<string, string>;

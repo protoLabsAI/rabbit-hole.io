@@ -23,8 +23,8 @@
   },
   "dependencies": {
     "@copilotkit/sdk-js": "^1.9.1",
-    "@langchain/langgraph": "^1.0.0",
-    "zod": "^4.1.12"
+    "@langchain/langgraph": "^1.2.8",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "tsup": "^8.0.1",

@@ -5,7 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { ZodSchema, ZodError } from "zod";
+import { ZodType, ZodError } from "zod";
 
 import {
   withAuth,
@@ -47,7 +47,7 @@ function formatZodError(error: ZodError): string[] {
  * Validates request body against Zod schema
  */
 export function withValidation<TInput>(
-  schema: ZodSchema<TInput>,
+  schema: ZodType<TInput, any, any>,
   handler: ValidatedHandler<TInput>,
   options: ValidationOptions = {}
 ) {
@@ -119,7 +119,7 @@ export function withValidation<TInput>(
  * Combines authentication + validation + logging
  */
 export function withAuthValidation<TInput>(
-  schema: ZodSchema<TInput>,
+  schema: ZodType<TInput, any, any>,
   handler: ValidatedAuthHandler<TInput>,
   options: ValidationOptions = {}
 ) {
@@ -197,7 +197,7 @@ export function withAuthValidation<TInput>(
  */
 export function withAuthValidationLogging<TInput>(
   actionName: string,
-  schema: ZodSchema<TInput>,
+  schema: ZodType<TInput, any, any>,
   handler: ValidatedAuthHandler<TInput>
 ) {
   return withAuthAndLogging(actionName)(

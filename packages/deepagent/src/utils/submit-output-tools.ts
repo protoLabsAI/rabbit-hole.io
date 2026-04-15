@@ -23,7 +23,7 @@ import {
 
 import { log } from "./logger";
 
-const SCHEMA_MAP: Record<string, z.ZodSchema> = {
+const SCHEMA_MAP: Record<string, z.ZodTypeAny> = {
   "evidence-gatherer": EvidenceGathererOutputSchema,
   "entity-extractor": EntityExtractorOutputSchema,
   "field-analyzer": FieldAnalyzerOutputSchema,

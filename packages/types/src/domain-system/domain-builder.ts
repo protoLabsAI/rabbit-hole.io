@@ -49,7 +49,7 @@ export class DomainBuilder<_TName extends string = string> {
     return this;
   }
 
-  withEntities<T extends Record<string, z.ZodSchema>>(entities: T): this {
+  withEntities<T extends Record<string, z.ZodTypeAny>>(entities: T): this {
     this.config.entities = entities;
 
     // Auto-generate UID prefixes from entity names if not provided
