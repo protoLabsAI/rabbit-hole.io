@@ -176,7 +176,8 @@ export const ${domain.sanitizedName}DomainConfig: DomainConfig = {
   entities: {
 ${Object.keys(jsonDomain.entities)
   .map(
-    (type) => `    ${JSON.stringify(type)}: ${sanitizeDomainName(type)}Schema`
+    (type) =>
+      `    ${JSON.stringify(type)}: ${sanitizeDomainName(type)}Schema as z.ZodTypeAny`
   )
   .join(",\n")}
   },

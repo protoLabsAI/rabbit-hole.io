@@ -338,11 +338,11 @@ export function entityToZodSchema(
  * Convert entire JSON domain to runtime Zod schemas
  */
 export function convertJSONDomainToZod(jsonDomain: JSONDomainConfig): {
-  entities: Record<string, z.ZodSchema>;
+  entities: Record<string, z.ZodTypeAny>;
   uidPrefixes: Record<string, string>;
   validators: Record<string, (uid: string) => boolean>;
 } {
-  const entities: Record<string, z.ZodSchema> = {};
+  const entities: Record<string, z.ZodTypeAny> = {};
   const uidPrefixes: Record<string, string> = {};
   const validators: Record<string, (uid: string) => boolean> = {};
 

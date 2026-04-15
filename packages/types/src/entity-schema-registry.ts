@@ -428,7 +428,7 @@ export function getEntityTypeAliases(entityType: EntityType): string[] {
 
 export class EntitySchemaRegistry {
   private static instance: EntitySchemaRegistry;
-  private schemas = new Map<string, z.ZodSchema>();
+  private schemas = new Map<string, z.ZodTypeAny>();
   private uidValidators = new Map<string, (uid: string) => boolean>();
 
   static getInstance(): EntitySchemaRegistry {
@@ -516,7 +516,7 @@ export class EntitySchemaRegistry {
 
   registerDomain(
     name: string,
-    schemas: Record<string, z.ZodSchema>,
+    schemas: Record<string, z.ZodTypeAny>,
     validators: Record<string, (uid: string) => boolean>
   ): void {
     Object.entries(schemas).forEach(([type, schema]) => {
@@ -527,7 +527,7 @@ export class EntitySchemaRegistry {
     });
   }
 
-  getSchema(entityType: string): z.ZodSchema | undefined {
+  getSchema(entityType: string): z.ZodTypeAny | undefined {
     return this.schemas.get(entityType);
   }
 

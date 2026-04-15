@@ -296,7 +296,7 @@ export function validateProcessingStateUpdate(
  * Safe validation with error handling
  */
 export function safeValidate<T>(
-  schema: z.ZodSchema<T>,
+  schema: z.ZodType<T>,
   data: unknown
 ):
   | {

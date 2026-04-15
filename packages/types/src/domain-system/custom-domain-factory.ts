@@ -37,7 +37,7 @@ import { DomainConfigSchema } from "./validation-schemas";
  */
 export function createCustomDomain<
   TName extends string,
-  TEntities extends Record<string, z.ZodSchema>,
+  TEntities extends Record<string, z.ZodTypeAny>,
 >(spec: {
   name: TName;
   displayName: string;
@@ -83,7 +83,7 @@ export function createCustomDomain<
     description: spec.description,
     category: "custom",
 
-    entities: spec.entities as Record<string, z.ZodSchema>,
+    entities: spec.entities as Record<string, z.ZodTypeAny>,
     uidPrefixes: spec.uidPrefixes as Record<string, string>,
     validators,
 
@@ -115,7 +115,7 @@ export function createCustomDomain<
 /**
  * Helper to validate schema extends EntitySchema
  */
-function isValidEntitySchema(schema: z.ZodSchema): boolean {
+function isValidEntitySchema(schema: z.ZodTypeAny): boolean {
   // Check if schema is a ZodObject with the required base fields
   // We can't easily test at runtime with specific type literals,
   // so we just check if it looks like a ZodObject (extends will create one)
