@@ -11,7 +11,7 @@ import neo4j from "neo4j-driver";
 
 const driver = neo4j.driver(
   "bolt://localhost:7687",
-  neo4j.auth.basic("neo4j", "evidencegraph2024"),
+  neo4j.auth.basic("neo4j", process.env.NEO4J_PASSWORD || ""),
   { disableLosslessIntegers: true }
 );
 
@@ -63,7 +63,7 @@ async function resetDevDatabase() {
     // Reinitialize driver for schema creation
     const newDriver = neo4j.driver(
       "bolt://localhost:7687",
-      neo4j.auth.basic("neo4j", "evidencegraph2024"),
+      neo4j.auth.basic("neo4j", process.env.NEO4J_PASSWORD || ""),
       { disableLosslessIntegers: true }
     );
     const newSession = newDriver.session();

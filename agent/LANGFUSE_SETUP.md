@@ -18,7 +18,7 @@ Create or update `agent/.env`:
 ```bash
 LANGFUSE_SECRET_KEY=sk-lf-...
 LANGFUSE_PUBLIC_KEY=pk-lf-...
-LANGFUSE_BASE_URL=https://langfuse-web-production-857b.up.railway.app
+LANGFUSE_BASE_URL=https://your-langfuse-instance.com
 ```
 
 ### 2. Get API Keys
@@ -27,7 +27,7 @@ LANGFUSE_BASE_URL=https://langfuse-web-production-857b.up.railway.app
 
 **Self-Hosted (Railway)**:
 
-1. Open your Railway deployment: https://langfuse-web-production-857b.up.railway.app
+1. Open your Railway deployment: https://your-langfuse-instance.com
 2. Log in to admin panel
 3. Go to Settings → API Keys
 4. Copy secret and public keys
@@ -80,7 +80,7 @@ If Langfuse is not configured or unavailable:
 
 **For Self-Hosted (Railway)**:
 
-1. Log in to your instance: https://langfuse-web-production-857b.up.railway.app
+1. Log in to your instance: https://your-langfuse-instance.com
 2. Select your project
 3. Navigate to **Traces** tab
 4. Filter by:

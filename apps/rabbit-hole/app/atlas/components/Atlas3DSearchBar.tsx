@@ -20,6 +20,8 @@ interface SearchResult {
 interface Atlas3DSearchBarProps {
   /** Called when the user selects an entity. Returns the uid. */
   onSelect: (uid: string, name: string) => void;
+  /** Called on every keystroke — drives the graph filter overlay. */
+  onFilter?: (term: string) => void;
   /** Set of node IDs currently in the graph */
   graphNodeIds: Set<string>;
 }
@@ -28,6 +30,7 @@ interface Atlas3DSearchBarProps {
 
 export default function Atlas3DSearchBar({
   onSelect,
+  onFilter,
   graphNodeIds,
 }: Atlas3DSearchBarProps) {
   const [query, setQuery] = useState("");
@@ -107,14 +110,10 @@ export default function Atlas3DSearchBar({
 
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        setActiveIndex((prev) =>
-          prev < results.length - 1 ? prev + 1 : 0
-        );
+        setActiveIndex((prev) => (prev < results.length - 1 ? prev + 1 : 0));
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        setActiveIndex((prev) =>
-          prev > 0 ? prev - 1 : results.length - 1
-        );
+        setActiveIndex((prev) => (prev > 0 ? prev - 1 : results.length - 1));
       } else if (e.key === "Enter" && activeIndex >= 0) {
         e.preventDefault();
         handleSelect(results[activeIndex]);
@@ -127,10 +126,7 @@ export default function Atlas3DSearchBar({
   );
 
   return (
-    <div
-      ref={containerRef}
-      className="absolute top-3 left-3 z-20 w-[280px]"
-    >
+    <div ref={containerRef} className="absolute top-3 left-3 z-20 w-[280px]">
       {/* Input */}
       <div className="relative">
         <Icon
@@ -142,8 +138,10 @@ export default function Atlas3DSearchBar({
           type="text"
           value={query}
           onChange={(e) => {
-            setQuery(e.target.value);
-            search(e.target.value);
+            const v = e.target.value;
+            setQuery(v);
+            search(v);
+            onFilter?.(v);
           }}
           onFocus={() => {
             if (results.length > 0) setOpen(true);
@@ -167,6 +165,7 @@ export default function Atlas3DSearchBar({
               setQuery("");
               setResults([]);
               setOpen(false);
+              onFilter?.("");
             }}
             className="absolute right-2.5 top-1/2 -translate-y-1/2"
           >

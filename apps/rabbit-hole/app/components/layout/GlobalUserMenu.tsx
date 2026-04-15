@@ -155,15 +155,17 @@ export function GlobalUserMenu({ className = "" }: GlobalUserMenuProps) {
             </Link>
           </DropdownMenuItem>
 
-          <DropdownMenuItem asChild>
-            <Link href="/research" className="cursor-pointer">
-              <Icon name="edit" size={14} className="mr-2" />
-              Research
-              {pathname === "/research" && (
-                <span className="ml-auto text-xs text-primary">•</span>
-              )}
-            </Link>
-          </DropdownMenuItem>
+          {process.env.NEXT_PUBLIC_ENABLE_RESEARCH === "true" && (
+            <DropdownMenuItem asChild>
+              <Link href="/research" className="cursor-pointer">
+                <Icon name="edit" size={14} className="mr-2" />
+                Research
+                {pathname === "/research" && (
+                  <span className="ml-auto text-xs text-primary">•</span>
+                )}
+              </Link>
+            </DropdownMenuItem>
+          )}
 
           <DropdownMenuItem asChild>
             <Link href="/playground" className="cursor-pointer">

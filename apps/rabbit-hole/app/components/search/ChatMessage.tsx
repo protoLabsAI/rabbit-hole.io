@@ -8,12 +8,11 @@ import { Icon } from "@proto/icon-system";
 import { Badge } from "@proto/ui/atoms";
 
 import { ChatMarkdown } from "./ChatMarkdown";
+import { ChatSourcePanel } from "./ChatSourcePanel";
 import type { CommunitySummary } from "./CommunityCard";
 import type { GraphEntity } from "./EntityCard";
 import { ReasoningBlock } from "./ReasoningBlock";
-import { ResearchLayout } from "./ResearchLayout";
 import type { ResearchSource } from "./SourceCard";
-import { toolPartsToActivityEvents } from "./toolEventAdapter";
 
 // ─── Entity type → dot color (mirrors atlas-schema ENTITY_VISUALS) ──
 
@@ -146,9 +145,7 @@ function ExtractionPreviewCard({
             }`}
           >
             <Icon
-              name={
-                confirmed ? "Check" : ingesting ? "Loader2" : "DatabaseZap"
-              }
+              name={confirmed ? "Check" : ingesting ? "Loader2" : "DatabaseZap"}
               className={`h-3.5 w-3.5 ${ingesting ? "animate-spin" : ""}`}
             />
             {confirmed
@@ -396,6 +393,28 @@ function ToolCallCard({
   const isError = state === "error";
   const isActive = isStreaming || isRunning;
 
+  // Done: show as a faded completed step (results are in the right panel)
+  if (isDone && !isError) {
+    let doneSummary = "";
+    if (output) {
+      if (toolName === "searchGraph" && Array.isArray(output))
+        doneSummary = `${output.length} entities`;
+      else if (toolName === "searchWeb" && output?.results)
+        doneSummary = `${output.results.length} sources`;
+      else if (toolName === "searchWikipedia" && output?.title)
+        doneSummary = output.title;
+    }
+    return (
+      <div className="flex items-center gap-1.5 text-xs text-muted-foreground/40 py-0.5">
+        <Icon name={config.icon as any} className="h-3 w-3 flex-shrink-0" />
+        <span>{config.label}</span>
+        {doneSummary && (
+          <span className="text-muted-foreground/30">— {doneSummary}</span>
+        )}
+      </div>
+    );
+  }
+
   // Status badge
   const statusBadge = isStreaming
     ? { label: "streaming", color: "text-blue-400 bg-blue-400/10" }
@@ -427,46 +446,29 @@ function ToolCallCard({
     return null;
   };
 
-  return (
-    <div className="rounded-lg border border-border/60 bg-muted/20 overflow-hidden">
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-      >
-        {isActive ? (
-          <Icon name="Loader2" className="h-3 w-3 animate-spin text-primary" />
-        ) : isError ? (
-          <Icon name="AlertCircle" className="h-3 w-3 text-destructive" />
-        ) : (
-          <Icon
-            name={config.icon as any}
-            className="h-3 w-3 text-muted-foreground/70"
-          />
-        )}
-        <span className="font-medium">
-          {isActive ? config.activeLabel : config.label}
-        </span>
-        {statusBadge && (
-          <span
-            className={`text-[9px] font-medium px-1.5 py-0.5 rounded-full ${statusBadge.color}`}
-          >
-            {statusBadge.label}
-          </span>
-        )}
-        {summary && !isActive && (
-          <span className="text-muted-foreground/50">— {summary}</span>
-        )}
-        {input?.query && isActive && (
-          <span className="text-primary/60 italic truncate max-w-[200px]">
+  // Active tools: compact pill indicator — no card chrome needed
+  if (isActive) {
+    return (
+      <div className="flex items-center gap-1.5 text-xs text-muted-foreground py-0.5">
+        <Icon
+          name="Loader2"
+          className="h-3 w-3 animate-spin text-primary flex-shrink-0"
+        />
+        <span className="text-primary/80">{config.activeLabel}</span>
+        {input?.query && (
+          <span className="text-muted-foreground/50 italic truncate max-w-[240px]">
             &quot;{input.query}&quot;
           </span>
         )}
-        <Icon
-          name={expanded ? "ChevronUp" : "ChevronDown"}
-          className="h-3 w-3 ml-auto opacity-40"
-        />
-      </button>
-      {expanded && renderOutput()}
+      </div>
+    );
+  }
+
+  // Error state: keep minimal card
+  return (
+    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-destructive/30 bg-destructive/5 text-xs text-destructive">
+      <Icon name="AlertCircle" className="h-3 w-3 flex-shrink-0" />
+      <span>{config.label} failed</span>
     </div>
   );
 }
@@ -591,14 +593,19 @@ export function ChatMessage({
   const [ingesting, setIngesting] = useState(false);
   const [copied, setCopied] = useState(false);
   const [feedback, setFeedback] = useState<"up" | "down" | null>(null);
-  const [highlightedSourceIndex, setHighlightedSourceIndex] = useState<number | null>(null);
+  const [highlightedSourceIndex, setHighlightedSourceIndex] = useState<
+    number | null
+  >(null);
   const [mobileSourceOpen, setMobileSourceOpen] = useState(false);
   const highlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleCitationClick = useCallback((index: number) => {
     if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current);
     setHighlightedSourceIndex(index);
-    highlightTimerRef.current = setTimeout(() => setHighlightedSourceIndex(null), 2000);
+    highlightTimerRef.current = setTimeout(
+      () => setHighlightedSourceIndex(null),
+      2000
+    );
   }, []);
 
   const handleIngest = useCallback(async () => {
@@ -667,11 +674,22 @@ export function ChatMessage({
   )?.reasoning;
 
   // Collect all tool-related parts
-  const allTools = parts.filter(
-    (p): p is any =>
-      p.type === "tool-invocation" ||
-      (p.type.startsWith("tool-") && "toolName" in p)
-  );
+  // AI SDK v6 uses "tool-{toolName}" as part type (e.g. "tool-searchGraph")
+  const allTools = parts
+    .filter(
+      (p): p is any =>
+        p.type === "tool-invocation" ||
+        (typeof p.type === "string" &&
+          p.type.startsWith("tool-") &&
+          p.type !== "tool-input")
+    )
+    .map((p: any) => ({
+      ...p,
+      // Normalize: extract toolName from type if not present as a property
+      toolName: p.toolName ?? p.type?.replace("tool-", ""),
+      // Normalize: output may be in different properties
+      output: p.output ?? p.result ?? p.toolResult,
+    }));
 
   // Extract sources from tool results for citation badges and source panel
   const sources = useMemo(() => {
@@ -757,209 +775,214 @@ export function ChatMessage({
     return result;
   }, [allTools]);
 
-  const activityEvents = useMemo(
-    () => toolPartsToActivityEvents(allTools),
-    [allTools]
-  );
-
   const isComplete = !isStreaming || !isLast;
 
-  const mobileCount =
-    sources.length + graphEntities.length + communities.length;
-
   return (
-    <ResearchLayout mode="chat"
-      activityEvents={activityEvents}
-      sources={sources}
-      entities={graphEntities}
-      communities={communities}
-      isStreaming={isStreaming && isLast}
-      highlightedSourceIndex={highlightedSourceIndex}
-      mobileOpen={mobileSourceOpen}
-      onMobileClose={() => setMobileSourceOpen(false)}
-    >
-      {/* Reasoning — collapsible thinking indicator */}
-      {reasoningAnnotation && (
-        <ReasoningBlock
-          content={reasoningAnnotation.content}
-          isStreaming={isStreaming && isLast}
-          duration={reasoningAnnotation.duration}
-        />
-      )}
-
-      {/* Tool calls — compact cards */}
-      {allTools.length > 0 && (
-        <div className="space-y-1">
-          {allTools.map((t: any, i: number) => (
-            <ToolCallCard
-              key={t.toolCallId || i}
-              toolName={t.toolName}
-              input={t.input ?? t.args}
-              output={t.output ?? t.result}
-              state={t.state ?? "result"}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Answer */}
-      {textContent && (
-        <div>
-          <ChatMarkdown
-            content={stripRelatedSearches(textContent)}
+    <div className="flex items-start gap-4">
+      {/* Main content */}
+      <div className="flex-1 min-w-0 space-y-3 pb-2">
+        {/* Reasoning — collapsible thinking indicator */}
+        {reasoningAnnotation && (
+          <ReasoningBlock
+            content={reasoningAnnotation.content}
             isStreaming={isStreaming && isLast}
-            sources={sources.length > 0 ? sources : undefined}
-            onCitationClick={handleCitationClick}
+            duration={reasoningAnnotation.duration}
           />
-          {isStreaming && isLast && (
-            <span className="inline-block w-1.5 h-4 bg-primary/70 animate-pulse ml-0.5 align-text-bottom rounded-sm" />
-          )}
-        </div>
-      )}
+        )}
 
-      {/* Actions */}
-      {isComplete && textContent && (
-        <div className="flex items-center gap-0.5 pt-1">
-          {/* Copy */}
-          <button
-            onClick={handleCopy}
-            className="p-1.5 text-muted-foreground/60 hover:text-foreground transition-colors rounded-md hover:bg-muted/50"
-            title="Copy"
-          >
-            <Icon
-              name={copied ? "Check" : "Copy"}
-              className={`h-3.5 w-3.5 ${copied ? "text-green-500" : ""}`}
+        {/* Tool calls — compact cards */}
+        {allTools.length > 0 && (
+          <div className="space-y-1">
+            {allTools.map((t: any, i: number) => (
+              <ToolCallCard
+                key={t.toolCallId || i}
+                toolName={t.toolName}
+                input={t.input ?? t.args}
+                output={t.output ?? t.result}
+                state={t.state ?? "result"}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Answer */}
+        {textContent && (
+          <div>
+            <ChatMarkdown
+              content={stripRelatedSearches(textContent)}
+              isStreaming={isStreaming && isLast}
+              sources={sources.length > 0 ? sources : undefined}
+              onCitationClick={handleCitationClick}
             />
-          </button>
+            {isStreaming && isLast && (
+              <span className="inline-block w-1.5 h-4 bg-primary/70 animate-pulse ml-0.5 align-text-bottom rounded-sm" />
+            )}
+          </div>
+        )}
 
-          {/* Regenerate */}
-          {onRegenerate && isLast && (
+        {/* Actions */}
+        {isComplete && textContent && (
+          <div className="flex items-center gap-0.5 pt-1">
+            {/* Copy */}
             <button
-              onClick={onRegenerate}
+              onClick={handleCopy}
               className="p-1.5 text-muted-foreground/60 hover:text-foreground transition-colors rounded-md hover:bg-muted/50"
-              title="Regenerate"
-            >
-              <Icon name="RotateCcw" className="h-3.5 w-3.5" />
-            </button>
-          )}
-
-          {/* Thumbs up */}
-          <button
-            onClick={() => setFeedback(feedback === "up" ? null : "up")}
-            className={`p-1.5 transition-colors rounded-md hover:bg-muted/50 ${
-              feedback === "up"
-                ? "text-green-500"
-                : "text-muted-foreground/60 hover:text-foreground"
-            }`}
-            title="Good response"
-          >
-            <Icon name="ThumbsUp" className="h-3.5 w-3.5" />
-          </button>
-
-          {/* Thumbs down */}
-          <button
-            onClick={() => setFeedback(feedback === "down" ? null : "down")}
-            className={`p-1.5 transition-colors rounded-md hover:bg-muted/50 ${
-              feedback === "down"
-                ? "text-red-500"
-                : "text-muted-foreground/60 hover:text-foreground"
-            }`}
-            title="Poor response"
-          >
-            <Icon name="ThumbsDown" className="h-3.5 w-3.5" />
-          </button>
-
-          {/* Divider */}
-          <div className="w-px h-4 bg-border/40 mx-1" />
-
-          {/* Add to Knowledge Graph */}
-          {onIngest && (
-            <button
-              onClick={handleIngest}
-              disabled={ingesting}
-              className="flex items-center gap-1 text-[11px] text-muted-foreground/60 hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-muted/50 disabled:opacity-50"
+              title="Copy"
             >
               <Icon
-                name={ingesting ? "Loader2" : "DatabaseZap"}
-                className={`h-3.5 w-3.5 ${ingesting ? "animate-spin" : ""}`}
+                name={copied ? "Check" : "Copy"}
+                className={`h-3.5 w-3.5 ${copied ? "text-green-500" : ""}`}
               />
-              {ingesting ? "Adding..." : "Add to Knowledge Graph"}
             </button>
-          )}
 
-          {/* View in Atlas — entity chips + view-all button */}
-          {graphEntities.length > 0 && (
-            <>
-              <div className="w-px h-4 bg-border/40 mx-1" />
-              <div className="flex items-center gap-1 flex-wrap">
-                {graphEntities.slice(0, 5).map((entity) => (
-                  <Link
-                    key={entity.uid}
-                    href={`/atlas?centerEntity=${entity.uid}`}
-                    className="inline-flex items-center gap-1 text-[11px] text-muted-foreground/70 hover:text-foreground transition-colors px-2 py-0.5 rounded-md hover:bg-muted/50 border border-border/40 hover:border-primary/30"
-                  >
-                    <span
-                      className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                      style={{
-                        backgroundColor:
-                          ENTITY_TYPE_COLORS[entity.type?.toLowerCase()] ??
-                          "#6B7280",
-                      }}
-                    />
-                    {entity.name}
-                  </Link>
-                ))}
-                {graphEntities.length > 1 && (
-                  <Link
-                    href={`/atlas?entities=${graphEntities.map((e) => e.uid).join(",")}`}
-                    className="inline-flex items-center gap-1 text-[11px] text-primary/70 hover:text-primary transition-colors px-2 py-0.5 rounded-md hover:bg-primary/5 border border-primary/20 hover:border-primary/40"
-                  >
-                    <Icon name="Globe" className="h-3 w-3" />
-                    View all in Atlas
-                  </Link>
-                )}
-              </div>
-            </>
-          )}
-        </div>
-      )}
+            {/* Regenerate */}
+            {onRegenerate && isLast && (
+              <button
+                onClick={onRegenerate}
+                className="p-1.5 text-muted-foreground/60 hover:text-foreground transition-colors rounded-md hover:bg-muted/50"
+                title="Regenerate"
+              >
+                <Icon name="RotateCcw" className="h-3.5 w-3.5" />
+              </button>
+            )}
 
-      {/* Extraction Preview — "Add to Graph" card */}
-      {isComplete && extractionPreview && onIngestBundle && (
-        <ExtractionPreviewCard
-          preview={extractionPreview}
-          onConfirm={() => onIngestBundle(extractionPreview)}
-        />
-      )}
+            {/* Thumbs up */}
+            <button
+              onClick={() => setFeedback(feedback === "up" ? null : "up")}
+              className={`p-1.5 transition-colors rounded-md hover:bg-muted/50 ${
+                feedback === "up"
+                  ? "text-green-500"
+                  : "text-muted-foreground/60 hover:text-foreground"
+              }`}
+              title="Good response"
+            >
+              <Icon name="ThumbsUp" className="h-3.5 w-3.5" />
+            </button>
 
-      {/* Mobile: source count badge — tap to open bottom sheet */}
-      {mobileCount > 0 && (
-        <button
-          className="md:hidden flex items-center gap-1.5 text-xs text-muted-foreground/70 hover:text-foreground transition-colors px-2.5 py-1.5 rounded-full border border-border/50 hover:border-border hover:bg-muted/30 self-start"
-          onClick={() => setMobileSourceOpen(true)}
-        >
-          <Icon name="BookOpen" className="h-3.5 w-3.5" />
-          <span>
-            {mobileCount} source{mobileCount !== 1 ? "s" : ""}
-          </span>
-        </button>
-      )}
+            {/* Thumbs down */}
+            <button
+              onClick={() => setFeedback(feedback === "down" ? null : "down")}
+              className={`p-1.5 transition-colors rounded-md hover:bg-muted/50 ${
+                feedback === "down"
+                  ? "text-red-500"
+                  : "text-muted-foreground/60 hover:text-foreground"
+              }`}
+              title="Poor response"
+            >
+              <Icon name="ThumbsDown" className="h-3.5 w-3.5" />
+            </button>
 
-      {/* Follow-up suggestions */}
-      {isComplete && isLast && onFollowUp && (
-        <SuggestionPills
-          suggestions={extractSuggestions(textContent)}
-          onSelect={onFollowUp}
-        />
-      )}
+            {/* Divider */}
+            <div className="w-px h-4 bg-border/40 mx-1" />
 
-      {/* Loading state — waiting for first content */}
-      {isStreaming && isLast && !textContent && allTools.length === 0 && (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground py-4">
-          <Icon name="Loader2" className="h-4 w-4 animate-spin text-primary" />
-          <span>Thinking...</span>
-        </div>
-      )}
-    </ResearchLayout>
+            {/* Add to Knowledge Graph */}
+            {onIngest && (
+              <button
+                onClick={handleIngest}
+                disabled={ingesting}
+                className="flex items-center gap-1 text-[11px] text-muted-foreground/60 hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-muted/50 disabled:opacity-50"
+              >
+                <Icon
+                  name={ingesting ? "Loader2" : "DatabaseZap"}
+                  className={`h-3.5 w-3.5 ${ingesting ? "animate-spin" : ""}`}
+                />
+                {ingesting ? "Adding..." : "Add to Knowledge Graph"}
+              </button>
+            )}
+
+            {/* View in Atlas — entity chips + view-all button */}
+            {graphEntities.length > 0 && (
+              <>
+                <div className="w-px h-4 bg-border/40 mx-1" />
+                <div className="flex items-center gap-1 flex-wrap">
+                  {graphEntities.slice(0, 5).map((entity) => (
+                    <Link
+                      key={entity.uid}
+                      href={`/atlas?centerEntity=${entity.uid}`}
+                      className="inline-flex items-center gap-1 text-[11px] text-muted-foreground/70 hover:text-foreground transition-colors px-2 py-0.5 rounded-md hover:bg-muted/50 border border-border/40 hover:border-primary/30"
+                    >
+                      <span
+                        className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                        style={{
+                          backgroundColor:
+                            ENTITY_TYPE_COLORS[entity.type?.toLowerCase()] ??
+                            "#6B7280",
+                        }}
+                      />
+                      {entity.name}
+                    </Link>
+                  ))}
+                  {graphEntities.length > 1 && (
+                    <Link
+                      href={`/atlas?entities=${graphEntities.map((e) => e.uid).join(",")}`}
+                      className="inline-flex items-center gap-1 text-[11px] text-primary/70 hover:text-primary transition-colors px-2 py-0.5 rounded-md hover:bg-primary/5 border border-primary/20 hover:border-primary/40"
+                    >
+                      <Icon name="Globe" className="h-3 w-3" />
+                      View all in Atlas
+                    </Link>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Extraction Preview — "Add to Graph" card (pre-computed from full research context) */}
+        {isComplete && extractionPreview && onIngestBundle && (
+          <ExtractionPreviewCard
+            preview={extractionPreview}
+            onConfirm={() => onIngestBundle(extractionPreview)}
+          />
+        )}
+
+        {/* Mobile: source count badge — tap to open bottom sheet */}
+        {(() => {
+          const mobileCount =
+            sources.length + graphEntities.length + communities.length;
+          return mobileCount > 0 ? (
+            <button
+              className="md:hidden flex items-center gap-1.5 text-xs text-muted-foreground/70 hover:text-foreground transition-colors px-2.5 py-1.5 rounded-full border border-border/50 hover:border-border hover:bg-muted/30 self-start"
+              onClick={() => setMobileSourceOpen(true)}
+            >
+              <Icon name="BookOpen" className="h-3.5 w-3.5" />
+              <span>
+                {mobileCount} source{mobileCount !== 1 ? "s" : ""}
+              </span>
+            </button>
+          ) : null;
+        })()}
+
+        {/* Follow-up suggestions */}
+        {isComplete && isLast && onFollowUp && (
+          <SuggestionPills
+            suggestions={extractSuggestions(textContent)}
+            onSelect={onFollowUp}
+          />
+        )}
+
+        {/* Loading state — waiting for first content */}
+        {isStreaming && isLast && !textContent && allTools.length === 0 && (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground py-4">
+            <Icon
+              name="Loader2"
+              className="h-4 w-4 animate-spin text-primary"
+            />
+            <span>Thinking...</span>
+          </div>
+        )}
+      </div>
+
+      {/* Mobile bottom sheet only — desktop sources are in the page-level right panel */}
+      <ChatSourcePanel
+        sources={sources}
+        entities={graphEntities}
+        communities={communities}
+        isStreaming={isStreaming && isLast}
+        highlightedIndex={highlightedSourceIndex}
+        mobileOpen={mobileSourceOpen}
+        onMobileClose={() => setMobileSourceOpen(false)}
+        hideDesktop
+      />
+    </div>
   );
 }

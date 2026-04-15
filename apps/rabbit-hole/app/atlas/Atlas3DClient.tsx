@@ -20,6 +20,7 @@ import type { ForceGraphMethods } from "react-force-graph-3d";
 import { Icon } from "@proto/icon-system";
 
 import Atlas3DDetailPanel from "./components/Atlas3DDetailPanel";
+import Atlas3DSearchBar from "./components/Atlas3DSearchBar";
 import { useGraphUpdates } from "./hooks/useGraphUpdates";
 import {
   getEntityVisual,
@@ -83,6 +84,7 @@ interface AtlasNode {
   type: string;
   color: string;
   val: number;
+  degree?: number;
   // Injected by react-force-graph-3d at simulation time
   x?: number;
   y?: number;
@@ -120,14 +122,17 @@ async function fetchGraphData(
   const { nodes: rawNodes, edges: rawEdges } = json.data;
 
   const nodes: AtlasNode[] = (rawNodes ?? []).map(
-    (n: { uid: string; name: string; type: string }) => {
+    (n: { uid: string; name: string; type: string; degree_total?: number }) => {
       const visual = getEntityVisual(n.type);
+      const degree = n.degree_total ?? 0;
       return {
         id: n.uid,
         name: n.name,
         type: n.type,
         color: visual.color,
-        val: visual.size,
+        // Scale node size with degree so hubs are visually prominent
+        val: visual.size * (1 + Math.log1p(degree) * 0.3),
+        degree: degree,
       };
     }
   );
@@ -173,6 +178,7 @@ export default function Atlas3DClient() {
   const [selectedNode, setSelectedNode] = useState<AtlasNode | null>(null);
   const [detailPanelOpen, setDetailPanelOpen] = useState(false);
   const [settings, setSettings] = useState<AtlasSettings>(DEFAULT_SETTINGS);
+  const [filterTerm, setFilterTerm] = useState("");
   // Mutable ref tracking camera position — updated per-frame via onRenderFramePre
   // to drive LOD label and nodeVisibility callbacks without React re-renders.
   const cameraPositionRef = useRef({ x: 0, y: 0, z: 0 });
@@ -230,18 +236,17 @@ export default function Atlas3DClient() {
     const viewMode = centerEntity ? "ego" : "full-atlas";
 
     setLoading(true);
-    fetchGraphData(viewMode, 5000, centerEntity)
+    fetchGraphData(viewMode, 2000, centerEntity)
       .then((data) => {
         setGraphData(data);
         if (isMultiHighlight) {
-          // For multi-entity mode: fit camera to contain all highlighted nodes
+          // Multi-entity: fit camera to bounding box of highlighted nodes
           setTimeout(() => {
             if (!graphRef.current) return;
             const highlighted = data.nodes.filter((n) =>
               highlightedUids.has(n.id)
             );
             if (highlighted.length === 0) return;
-            // Compute bounding box centroid
             const xs = highlighted.map((n) => (n as any).x ?? 0);
             const ys = highlighted.map((n) => (n as any).y ?? 0);
             const zs = highlighted.map((n) => (n as any).z ?? 0);
@@ -271,6 +276,22 @@ export default function Atlas3DClient() {
               );
             }
           }, 2000);
+        } else {
+          // Full atlas: fly to the busiest (highest-degree) node
+          setTimeout(() => {
+            if (!graphRef.current || data.nodes.length === 0) return;
+            const busiest = data.nodes.reduce((max, n) =>
+              (n.degree ?? 0) > (max.degree ?? 0) ? n : max
+            );
+            const bx = (busiest as any).x ?? 0;
+            const by = (busiest as any).y ?? 0;
+            const bz = (busiest as any).z ?? 0;
+            graphRef.current.cameraPosition(
+              { x: bx, y: by, z: bz + 200 },
+              { x: bx, y: by, z: bz },
+              1200
+            );
+          }, 2500);
         }
       })
       .catch((err) => setError(err.message))
@@ -357,15 +378,6 @@ export default function Atlas3DClient() {
     [settings.showLabels]
   );
 
-  // Lazy frustum culling: hide nodes that have drifted far behind the camera
-  // to reduce per-frame geometry submissions on large graphs.
-  const nodeVisibility = useCallback((node: any): boolean => {
-    const cam = cameraPositionRef.current;
-    // Cull nodes more than 3× LOD_LABEL_DISTANCE behind the camera along z.
-    const nz = node.z ?? 0;
-    return nz > cam.z - LOD_LABEL_DISTANCE * 3;
-  }, []);
-
   // Settings updater — persists to localStorage
   const updateSettings = useCallback((patch: Partial<AtlasSettings>) => {
     setSettings((prev) => {
@@ -378,6 +390,23 @@ export default function Atlas3DClient() {
   // Derived performance settings based on current graph size.
   const nodeCount = graphData?.nodes.length ?? 0;
   const isLargeGraph = nodeCount > LARGE_GRAPH_THRESHOLD;
+
+  // Set of all node IDs in the graph — passed to search bar for "in graph" indicator
+  const graphNodeIds = useMemo<Set<string>>(
+    () => new Set(graphData?.nodes.map((n) => n.id) ?? []),
+    [graphData]
+  );
+
+  // Filter: IDs of nodes matching the current filter term (empty = no filter)
+  const filteredNodeIds = useMemo<Set<string> | null>(() => {
+    if (!filterTerm.trim() || !graphData) return null;
+    const term = filterTerm.toLowerCase();
+    return new Set(
+      graphData.nodes
+        .filter((n) => n.name.toLowerCase().includes(term))
+        .map((n) => n.id)
+    );
+  }, [filterTerm, graphData]);
 
   if (loading) {
     return (
@@ -436,8 +465,14 @@ export default function Atlas3DClient() {
             graphData={graphData}
             backgroundColor="#0a0a12"
             showNavInfo={false}
-            // Node rendering — highlight matching nodes when ?entities= is set
+            // Node rendering — filter dims non-matching nodes; highlight dims unselected entities
             nodeColor={(node: any) => {
+              // Filter mode takes priority
+              if (filteredNodeIds !== null) {
+                return filteredNodeIds.has(node.id)
+                  ? (node.color ?? "#6B7280")
+                  : "#1a1a2a";
+              }
               if (highlightedUids.size === 0) return node.color ?? "#6B7280";
               return highlightedUids.has(node.id)
                 ? (node.color ?? "#6B7280")
@@ -450,7 +485,6 @@ export default function Atlas3DClient() {
                 : (node.val ?? 1);
             }}
             nodeLabel={nodeLabelFn}
-            nodeVisibility={nodeVisibility}
             nodeOpacity={0.9}
             nodeResolution={isLargeGraph ? 6 : 12}
             nodeRelSize={isLargeGraph ? 3 : 4}
@@ -479,6 +513,32 @@ export default function Atlas3DClient() {
             onNodeClick={handleNodeClick}
           />
         )}
+
+        {/* Search / filter bar — top-left overlay */}
+        <Atlas3DSearchBar
+          onSelect={(uid, _name) => {
+            const node = graphData?.nodes.find((n) => n.id === uid);
+            if (node && graphRef.current) {
+              setSelectedNode(node);
+              setDetailPanelOpen(true);
+              graphRef.current.cameraPosition(
+                {
+                  x: (node as any).x ?? 0,
+                  y: (node as any).y ?? 0,
+                  z: ((node as any).z ?? 0) + 150,
+                },
+                {
+                  x: (node as any).x ?? 0,
+                  y: (node as any).y ?? 0,
+                  z: (node as any).z ?? 0,
+                },
+                1000
+              );
+            }
+          }}
+          onFilter={setFilterTerm}
+          graphNodeIds={graphNodeIds}
+        />
 
         {/* Full-detail slide-out panel — opens on node click */}
         <Atlas3DDetailPanel

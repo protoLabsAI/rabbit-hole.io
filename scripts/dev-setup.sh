@@ -135,13 +135,13 @@ LOG_LEVEL=debug
 # === DATABASE SETTINGS ===
 NEO4J_URI=bolt://localhost:7687
 NEO4J_USER=neo4j
-NEO4J_PASSWORD=evidencegraph2024
+NEO4J_PASSWORD=changeme
 
 REDIS_URL=redis://localhost:6379
 
 MINIO_ENDPOINT=localhost:9000
 MINIO_ACCESS_KEY=minio
-MINIO_SECRET_KEY=minio123
+MINIO_SECRET_KEY=changeme
 
 # === SERVICE URLS ===
 NEXT_PUBLIC_API_URL=http://localhost:3000/api
@@ -336,7 +336,7 @@ seed_test_data() {
     done
     
     # Check if test data already exists
-    local node_count=$(docker compose -f "$DEV_COMPOSE_FILE" exec -T neo4j-dev cypher-shell -u neo4j -p evidencegraph2024 "MATCH (n) RETURN count(n) as count" 2>/dev/null | tail -n 1 | cut -d'|' -f2 | tr -d ' ' | tr -d '"')
+    local node_count=$(docker compose -f "$DEV_COMPOSE_FILE" exec -T neo4j-dev cypher-shell -u neo4j -p changeme "MATCH (n) RETURN count(n) as count" 2>/dev/null | tail -n 1 | cut -d'|' -f2 | tr -d ' ' | tr -d '"')
     
     if [ "$node_count" = "0" ] || [ -z "$node_count" ]; then
         log_info "Loading comprehensive test data from 15+ entity bundles..."
@@ -373,7 +373,7 @@ seed_test_data() {
         
         # Verify data was loaded
         sleep 2
-        local final_count=$(docker compose -f "$DEV_COMPOSE_FILE" exec -T neo4j-dev cypher-shell -u neo4j -p evidencegraph2024 "MATCH (n) RETURN count(n) as count" 2>/dev/null | tail -n 1 | cut -d'|' -f2 | tr -d ' ' | tr -d '"')
+        local final_count=$(docker compose -f "$DEV_COMPOSE_FILE" exec -T neo4j-dev cypher-shell -u neo4j -p changeme "MATCH (n) RETURN count(n) as count" 2>/dev/null | tail -n 1 | cut -d'|' -f2 | tr -d ' ' | tr -d '"')
         
         if [ "$final_count" -gt "0" ]; then
             log_success "Database now contains $final_count entities"
@@ -413,7 +413,7 @@ verify_services() {
     done
     
     # Check Neo4j
-    if docker compose -f "$DEV_COMPOSE_FILE" exec -T neo4j-dev cypher-shell -u neo4j -p evidencegraph2024 "RETURN 1" > /dev/null 2>&1; then
+    if docker compose -f "$DEV_COMPOSE_FILE" exec -T neo4j-dev cypher-shell -u neo4j -p changeme "RETURN 1" > /dev/null 2>&1; then
         log_success "✓ Neo4j Database: http://localhost:7474"
     else
         failed_services+=("Neo4j")
@@ -430,7 +430,7 @@ verify_services() {
     
     # Check MinIO
     if curl -f -s http://localhost:9000/minio/health/live > /dev/null 2>&1; then
-        log_success "✓ MinIO Storage: http://localhost:9001 (minio/minio123)"
+        log_success "✓ MinIO Storage: http://localhost:9001 (minio/changeme)"
     else
         failed_services+=("MinIO")
         log_error "✗ MinIO Storage: http://localhost:9001"
@@ -479,9 +479,9 @@ show_development_info() {
     echo -e "${GREEN}🚀 Core Services:${NC}"
     echo "   • Next.js UI:        http://localhost:3000"
     echo "   • Atlas Interface:   http://localhost:3000/atlas"
-    echo "   • Neo4j Browser:     http://localhost:7474 (neo4j/evidencegraph2024)" 
+    echo "   • Neo4j Browser:     http://localhost:7474 (neo4j/changeme)" 
     echo "   • LangExtract API:   http://localhost:8000/docs"
-    echo "   • MinIO Console:     http://localhost:9001 (minio/minio123)"
+    echo "   • MinIO Console:     http://localhost:9001 (minio/changeme)"
     echo ""
     echo -e "${BLUE}📊 Monitoring Tools:${NC}"
     echo "   • Prometheus:        http://localhost:9090"

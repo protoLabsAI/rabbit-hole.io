@@ -189,10 +189,10 @@ docker exec -i postgres-jobs psql -U jobqueue -d sidequest < migrations/postgres
 JOB_PROCESSOR_URL=http://localhost:8680
 
 # Job queue database for status queries (separate instance!)
-JOB_QUEUE_DATABASE_URL=postgresql://jobqueue:jobs2024@localhost:5433/sidequest
+JOB_QUEUE_DATABASE_URL=postgresql://jobqueue:changeme@localhost:5433/sidequest
 
 # App database
-APP_DATABASE_URL=postgresql://app_user:rabbit2024@localhost:5432/rabbit_hole_app
+APP_DATABASE_URL=postgresql://app_user:changeme@localhost:5432/rabbit_hole_app
 ```
 
 **4. Enqueue a test job:**
@@ -226,20 +226,20 @@ curl -X POST http://localhost:3000/api/jobs/enqueue-youtube \
 
 ```bash
 # Job queue database (Sidequest tables)
-DATABASE_URL=postgresql://jobqueue:jobs2024@postgres-jobs:5432/sidequest
+DATABASE_URL=postgresql://jobqueue:changeme@postgres-jobs:5432/sidequest
 
 # Application database (user data, share tokens, etc.)
-APP_DATABASE_URL=postgresql://app_user:rabbit2024@host.docker.internal:5432/rabbit_hole_app
+APP_DATABASE_URL=postgresql://app_user:changeme@host.docker.internal:5432/rabbit_hole_app
 
 # Neo4j (for entity creation)
 NEO4J_URI=bolt://host.docker.internal:7687
 NEO4J_USER=neo4j
-NEO4J_PASSWORD=evidencegraph2024
+NEO4J_PASSWORD=changeme
 
 # MinIO (file storage)
 MINIO_ENDPOINT=host.docker.internal:9000
 MINIO_ACCESS_KEY=minio
-MINIO_SECRET_KEY=minio123
+MINIO_SECRET_KEY=changeme
 MINIO_SECURE=false
 
 # Job processor config
@@ -253,10 +253,10 @@ HEALTH_PORT=8679
 
 ```bash
 # Main app database
-APP_DATABASE_URL=postgresql://app_user:rabbit2024@localhost:5432/rabbit_hole_app
+APP_DATABASE_URL=postgresql://app_user:changeme@localhost:5432/rabbit_hole_app
 
 # Job queue database (separate, isolated)
-JOB_QUEUE_DATABASE_URL=postgresql://jobqueue:jobs2024@localhost:5433/sidequest
+JOB_QUEUE_DATABASE_URL=postgresql://jobqueue:changeme@localhost:5433/sidequest
 ```
 
 ## Database Schema

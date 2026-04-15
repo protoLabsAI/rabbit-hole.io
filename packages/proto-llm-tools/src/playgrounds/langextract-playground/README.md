@@ -178,7 +178,7 @@ NEXT_PUBLIC_LANGEXTRACT_URL=http://localhost:8000
 JOB_PROCESSOR_URL=http://localhost:8680
 
 # Job queue database
-DATABASE_URL=postgresql://jobqueue:jobs2024@localhost:5433/sidequest
+DATABASE_URL=postgresql://jobqueue:changeme@localhost:5433/sidequest
 ```
 
 ## Schema Control

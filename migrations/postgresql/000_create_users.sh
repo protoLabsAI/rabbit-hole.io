@@ -8,7 +8,7 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
     DO \$\$
     BEGIN
         IF NOT EXISTS (SELECT FROM pg_user WHERE usename = '${POSTGRES_APP_USER:-app_user}') THEN
-            CREATE USER ${POSTGRES_APP_USER:-app_user} WITH PASSWORD '${POSTGRES_APP_PASSWORD:-rabbit2024}';
+            CREATE USER ${POSTGRES_APP_USER:-app_user} WITH PASSWORD '${POSTGRES_APP_PASSWORD:-changeme}';
         END IF;
     END
     \$\$;
@@ -27,7 +27,7 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
     DO \$\$
     BEGIN
         IF NOT EXISTS (SELECT FROM pg_user WHERE usename = '${POSTGRES_JOB_USER:-jobqueue}') THEN
-            CREATE USER ${POSTGRES_JOB_USER:-jobqueue} WITH PASSWORD '${POSTGRES_JOB_PASSWORD:-jobs2024}';
+            CREATE USER ${POSTGRES_JOB_USER:-jobqueue} WITH PASSWORD '${POSTGRES_JOB_PASSWORD:-changeme}';
         END IF;
     END
     \$\$;

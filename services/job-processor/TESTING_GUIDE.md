@@ -31,14 +31,14 @@ This guide covers how to test the Sidequest.js job processor for YouTube video p
    # Neo4j
    NEO4J_URI=bolt://localhost:7687
    NEO4J_USER=neo4j
-   NEO4J_PASSWORD=evidencegraph2024
+   NEO4J_PASSWORD=changeme
 
    # MinIO
    MINIO_ENDPOINT=http://localhost:9000
    MINIO_PORT=9000
    MINIO_USE_SSL=false
    MINIO_ACCESS_KEY=minio
-   MINIO_SECRET_KEY=minio123
+   MINIO_SECRET_KEY=changeme
 
    # API URL (for job status updates)
    NEXT_PUBLIC_API_URL=http://localhost:3000
@@ -162,7 +162,7 @@ docker exec postgres-jobs psql -U jobqueue -d sidequest -c \
 **Note:** Completed jobs are cleaned up by Sidequest immediately. Status API may return 404. Verify result in Neo4j instead:
 
 ```bash
-docker exec evidencegraph-neo4j cypher-shell -u neo4j -p evidencegraph2024 \
+docker exec evidencegraph-neo4j cypher-shell -u neo4j -p changeme \
   "MATCH (v:Video) RETURN v.videoId, v.title ORDER BY v.createdAt DESC LIMIT 3;"
 ```
 

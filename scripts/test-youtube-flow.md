@@ -32,7 +32,7 @@ Test the complete YouTube → Transcription → Summarization pipeline.
    GROQ_API_KEY=your_groq_api_key_here
    MINIO_ENDPOINT=http://localhost:9000
    MINIO_ACCESS_KEY=minio
-   MINIO_SECRET_KEY=minio123
+   MINIO_SECRET_KEY=changeme
    NEXT_PUBLIC_URL=http://localhost:3000
    ```
 

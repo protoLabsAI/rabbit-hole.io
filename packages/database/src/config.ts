@@ -31,7 +31,7 @@ export const getDefaultConfig = (): DatabaseConfig => ({
   neo4j: {
     uri: process.env.NEO4J_URI || "bolt://localhost:7687",
     username: process.env.NEO4J_USERNAME || "neo4j",
-    password: process.env.NEO4J_PASSWORD || "evidencegraph2024",
+    password: process.env.NEO4J_PASSWORD || "",
     database: process.env.NEO4J_DATABASE || "neo4j",
     maxConnectionPoolSize: parseInt(process.env.NEO4J_POOL_SIZE || "50"),
     connectionTimeout: parseInt(process.env.NEO4J_TIMEOUT || "20000"),

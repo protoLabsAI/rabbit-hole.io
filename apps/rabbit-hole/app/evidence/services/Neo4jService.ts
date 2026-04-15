@@ -52,8 +52,7 @@ export class Neo4jService {
     this.config = {
       uri: config?.uri || process.env.NEO4J_URI || "bolt://localhost:7687",
       username: config?.username || process.env.NEO4J_USERNAME || "neo4j",
-      password:
-        config?.password || process.env.NEO4J_PASSWORD || "evidencegraph2024",
+      password: config?.password || process.env.NEO4J_PASSWORD || "",
       database: config?.database || process.env.NEO4J_DATABASE || "neo4j",
     };
   }

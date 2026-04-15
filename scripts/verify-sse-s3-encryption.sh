@@ -18,7 +18,7 @@ if ! docker ps | grep -q "$CONTAINER"; then
 fi
 
 # Setup alias
-docker exec $CONTAINER mc alias set $ALIAS http://localhost:9000 minio minio123 > /dev/null 2>&1
+docker exec $CONTAINER mc alias set $ALIAS http://localhost:9000 minio changeme > /dev/null 2>&1
 
 # Test 1: Check encryption is enabled on buckets
 echo "📋 Test 1: Bucket Encryption Status"

@@ -36,6 +36,7 @@
     "prebuild": "pnpm run codegen",
     "build": "tsup",
     "dev": "tsup --watch",
+    "pretype-check": "pnpm run codegen",
     "type-check": "tsc --noEmit",
     "validate-models": "tsx scripts/validate-models.ts"
   },

@@ -32,7 +32,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         process.env.NEO4J_URI || "bolt://localhost:7687",
         neo4j.auth.basic(
           process.env.NEO4J_USERNAME || process.env.NEO4J_USER || "neo4j",
-          process.env.NEO4J_PASSWORD || "evidencegraph2024"
+          process.env.NEO4J_PASSWORD || ""
         ),
         { disableLosslessIntegers: false }
       );

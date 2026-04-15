@@ -3,7 +3,11 @@ import { Inter } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 import { Toaster } from "@proto/ui/atoms";
-import { getValidatedThemeName, getTheme } from "@proto/ui/theme";
+import {
+  getValidatedThemeName,
+  getTheme,
+  ThemeGenerator,
+} from "@proto/ui/theme";
 
 import { DebugUtilsInitializer } from "./components/DebugUtilsInitializer";
 import { DomainRegistryInitializer } from "./components/DomainRegistryInitializer";
@@ -70,8 +74,18 @@ export default function RootLayout({
     "default"
   );
 
+  // Generate theme CSS server-side so it lands in the initial HTML —
+  // prevents the flash of unstyled content before client JS hydrates.
+  const themeCSS = ThemeGenerator.generateCSSVariables(getTheme(defaultTheme));
+
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <style
+          id="dynamic-theme"
+          dangerouslySetInnerHTML={{ __html: themeCSS }}
+        />
+      </head>
       <body className={inter.className}>
         <ThemeProvider defaultThemeName={defaultTheme}>
           <DebugUtilsInitializer />

@@ -62,7 +62,7 @@ jobs:
 
   build-packages:
     name: Build Packages
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: validate
 
@@ -103,7 +103,7 @@ jobs:
       - name: Type check app (strict)
         run: cd apps/rabbit-hole && pnpm exec tsc --noEmit --skipLibCheck
         env:
-          NODE_OPTIONS: "--max_old_space_size=8192"
+          NODE_OPTIONS: "--max_old_space_size=4096"
 
       - name: Cache build artifacts
         uses: actions/cache@v4
@@ -116,7 +116,7 @@ jobs:
 
   build-app:
     name: Build Next.js App
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: build-packages
     env:
@@ -234,7 +234,7 @@ jobs:
       - name: Build Next.js app
         run: cd apps/rabbit-hole && pnpm run build
         env:
-          NODE_OPTIONS: "--max_old_space_size=8192"
+          NODE_OPTIONS: "--max_old_space_size=4096"
 
       - name: Check build output
         run: |
@@ -243,7 +243,7 @@ jobs:
 
   test:
     name: Run Tests
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: build-packages
 

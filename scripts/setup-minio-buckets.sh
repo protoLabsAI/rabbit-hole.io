@@ -6,7 +6,7 @@ set -e
 
 MINIO_HOST="${MINIO_HOST:-http://minio:9000}"
 MINIO_ACCESS_KEY="${MINIO_ACCESS_KEY:-minio}"
-MINIO_SECRET_KEY="${MINIO_SECRET_KEY:-minio123}"
+MINIO_SECRET_KEY="${MINIO_SECRET_KEY:-changeme}"
 MINIO_ALIAS="${MINIO_ALIAS:-local}"
 
 echo "Waiting for MinIO to be ready..."

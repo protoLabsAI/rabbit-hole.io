@@ -3,13 +3,17 @@
   "globalDependencies": ["tsconfig.json", "tsconfig.base.json"],
   "globalEnv": ["WORKSPACE_EXTRACTION_ENABLED"],
   "tasks": {
+    "codegen": {
+      "outputs": ["src/generated/**"],
+      "cache": true
+    },
     "build": {
-      "dependsOn": ["^build", "scan:domains"],
+      "dependsOn": ["^build", "scan:domains", "codegen"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**", ".generated/**"],
       "env": ["NEXT_PUBLIC_*", "NODE_ENV"]
     },
     "type-check": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "codegen"],
       "outputs": [],
       "cache": true
     },

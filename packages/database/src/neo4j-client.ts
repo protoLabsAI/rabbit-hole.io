@@ -354,7 +354,7 @@ export function createNeo4jClient(config?: Partial<Neo4jConfig>): Neo4jClient {
   const defaultConfig: Neo4jConfig = {
     uri: process.env.NEO4J_URI || "bolt://localhost:7687",
     username: process.env.NEO4J_USERNAME || process.env.NEO4J_USER || "neo4j",
-    password: process.env.NEO4J_PASSWORD || "evidencegraph2024",
+    password: process.env.NEO4J_PASSWORD || "",
     database: process.env.NEO4J_DATABASE || "neo4j",
   };
 
@@ -376,7 +376,9 @@ async function ensureSchemaConstraints(client: Neo4jClient): Promise<void> {
     await session.run(
       "CREATE CONSTRAINT rel_uid_unique IF NOT EXISTS FOR ()-[r:RELATED_TO]-() REQUIRE r.uid IS UNIQUE"
     );
-    console.log("✅ Neo4j schema constraints ensured (entity_uid_unique, rel_uid_unique)");
+    console.log(
+      "✅ Neo4j schema constraints ensured (entity_uid_unique, rel_uid_unique)"
+    );
   } catch (error) {
     console.warn("⚠️ Failed to ensure Neo4j schema constraints:", error);
   } finally {
