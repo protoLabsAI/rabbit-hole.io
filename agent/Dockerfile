@@ -1,11 +1,10 @@
-# Multi-stage build for LangGraph Agent Services
-# Using "copy everything" pattern for proper ESM workspace resolution
-# This maintains the full workspace structure with all dependencies and symlinks.
-# ESM requires access to monorepo workspace (node_modules/.pnpm) for module resolution.
-# Trade-off: Larger image (~2.8GB) but guaranteed correct dependency resolution.
+# Multi-stage build for the rabbit-hole.io researcher A2A agent.
 #
-# Future optimization: Publish @proto/* packages to private registry, then use
-# pnpm deploy with published packages for smaller, self-contained images (~200-400MB).
+# The production entrypoint is the A2A server (agent/src/a2a-main.ts). The
+# langgraphjs dev server is retained for local debugging only — run it via
+# `pnpm --filter @proto/agent dev` on a dev machine. In production, research
+# agent graphs are imported directly by the A2A skill producers, so no dev
+# server is needed in the container.
 
 # ============================================
 # BASE
@@ -21,26 +20,22 @@ RUN corepack enable && corepack prepare pnpm@10.14.0 --activate
 WORKDIR /app
 
 # ============================================
-# DEPS - Install everything
+# DEPS
 # ============================================
 FROM base AS deps
 
-# Copy entire monorepo
 COPY . .
 
-# Install all dependencies with cache
 RUN --mount=type=cache,id=pnpm-agent,target=/pnpm/store \
     pnpm install --filter=@proto/agent...
 
 # ============================================
-# BUILDER - Build
+# BUILDER
 # ============================================
 FROM base AS builder
 
-# Copy everything from deps
 COPY --from=deps /app .
 
-# Build workspace packages and agent (Turbo handles dependency order automatically)
 # SKIP_DTS=1 prevents @proto/llm-tools from generating .d.ts files (saves ~4GB RAM)
 ENV NODE_ENV=production
 ENV SKIP_DTS=1
@@ -62,23 +57,40 @@ RUN addgroup --system --gid 1001 agent && \
     adduser --system --uid 1001 agent
 
 # Copy everything from builder (maintains workspace structure)
-# This preserves symlinks and ensures all dependencies resolve correctly.
-# Includes: node_modules with pnpm store, all workspace packages, built artifacts.
-# Note: Selective copying breaks ESM resolution in pnpm workspaces.
-# Image size: ~2.8GB (workspace + node_modules + built packages).
+# Selective copying breaks ESM resolution in pnpm workspaces.
 COPY --from=builder --chown=agent:agent /app .
 
 USER agent
 
 WORKDIR /app/agent
 
-EXPOSE 8123
+# ── A2A contract ────────────────────────────────────────────────────
+#
+# AGENT_VERSION flows from the release workflow (build-arg → ENV → card)
+# so the agent card advertises the image's actual tag.
+ARG AGENT_VERSION=dev
+ENV AGENT_VERSION=${AGENT_VERSION}
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=5 \
-    CMD curl -f http://localhost:8123/ok || exit 1
+# A2A port — workstacean resolves us as http://researcher:7870 on the
+# ai_default Docker network. The runtime can override via A2A_PORT env.
+ENV A2A_PORT=7870
+ENV A2A_ADVERTISE_URL=http://researcher:7870
+EXPOSE 7870
 
-# langgraphjs dev requires .env file (referenced in langgraph.json)
-# Actual env vars are injected via docker-compose environment
-RUN touch .env
+# protoWorkstacean discovery labels — the SkillBrokerPlugin enumerates
+# containers that advertise these labels to build its service registry.
+LABEL a2a.protoworkstacean/agent=true \
+      a2a.protoworkstacean/name=researcher \
+      a2a.protoworkstacean/version=${AGENT_VERSION} \
+      org.opencontainers.image.title="rabbit-hole researcher" \
+      org.opencontainers.image.description="A2A research agent backed by rabbit-hole.io" \
+      org.opencontainers.image.source="https://github.com/protoLabsAI/rabbit-hole.io" \
+      org.opencontainers.image.vendor="protoLabsAI"
 
-CMD ["npx", "langgraphjs", "dev", "--port", "8123", "--host", "0.0.0.0", "--no-browser"]
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=5 \
+    CMD curl -fsS http://localhost:${A2A_PORT}/ok || exit 1
+
+# Production entrypoint: the A2A server. Producers import research-agent
+# graphs directly, so langgraphjs dev is not part of the runtime. Devs
+# who need LangSmith introspection can run `pnpm dev` outside the image.
+CMD ["node", "--import", "tsx", "src/a2a-main.ts"]
