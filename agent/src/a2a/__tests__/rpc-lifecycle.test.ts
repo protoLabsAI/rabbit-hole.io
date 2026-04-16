@@ -1,6 +1,56 @@
+// @vitest-environment node
+import { request as httpRequest } from "node:http";
+
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { startA2AServer } from "../index.js";
+
+// The root vitest.setup.ts installs `global.fetch = vi.fn()` for the
+// jsdom-majority test suite, which returns undefined and breaks these
+// tests. Instead of relying on the global, we go straight to node:http —
+// it's always available, zero new deps, and these tests only talk to
+// our local server on 127.0.0.1.
+interface SimpleResponse {
+  status: number;
+  json(): Promise<unknown>;
+}
+
+function httpJson(
+  url: string,
+  init: {
+    method?: string;
+    headers?: Record<string, string>;
+    body?: string;
+  } = {}
+): Promise<SimpleResponse> {
+  const parsed = new URL(url);
+  return new Promise((resolve, reject) => {
+    const req = httpRequest(
+      {
+        hostname: parsed.hostname,
+        port: parsed.port,
+        path: parsed.pathname + parsed.search,
+        method: init.method ?? "GET",
+        headers: init.headers ?? {},
+      },
+      (res) => {
+        const chunks: Buffer[] = [];
+        res.on("data", (c: Buffer) => chunks.push(c));
+        res.on("end", () => {
+          const body = Buffer.concat(chunks).toString("utf8");
+          resolve({
+            status: res.statusCode ?? 0,
+            json: async () => (body.length === 0 ? null : JSON.parse(body)),
+          });
+        });
+        res.on("error", reject);
+      }
+    );
+    req.on("error", reject);
+    if (init.body) req.write(init.body);
+    req.end();
+  });
+}
 
 describe("A2A RPC lifecycle", () => {
   let server: Awaited<ReturnType<typeof startA2AServer>>;
@@ -30,7 +80,7 @@ describe("A2A RPC lifecycle", () => {
   async function rpc(
     body: unknown
   ): Promise<{ result?: unknown; error?: { code: number; message: string } }> {
-    const res = await fetch(`${base}/a2a`, {
+    const res = await httpJson(`${base}/a2a`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(body),
@@ -80,10 +130,10 @@ describe("A2A RPC lifecycle", () => {
   });
 
   it("agent card served at both well-known paths", async () => {
-    const canonical = await fetch(`${base}/.well-known/agent-card.json`).then(
-      (r) => r.json()
-    );
-    const legacy = await fetch(`${base}/.well-known/agent.json`).then((r) =>
+    const canonical = await httpJson(
+      `${base}/.well-known/agent-card.json`
+    ).then((r) => r.json());
+    const legacy = await httpJson(`${base}/.well-known/agent.json`).then((r) =>
       r.json()
     );
     expect(canonical).toEqual(legacy);
@@ -119,7 +169,7 @@ describe("A2A RPC lifecycle", () => {
     // Minimum params by method to keep the router on the "registered" path;
     // -32602 (invalid params) is also an acceptable outcome for registered methods.
     for (const method of methods) {
-      const res = await fetch(`${base}/a2a`, {
+      const res = await httpJson(`${base}/a2a`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params: {} }),
