@@ -24,6 +24,11 @@ export class RpcRouter {
     return this.handlers.has(method);
   }
 
+  /** Returns the currently-registered handler (if any) so callers can wrap it. */
+  unwrap(method: string): RpcHandler | undefined {
+    return this.handlers.get(method);
+  }
+
   async dispatch(
     request: unknown,
     ctx: RpcContext
