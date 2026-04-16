@@ -14,7 +14,8 @@
     "dev:enhanced": "./scripts/dev-agent.sh",
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "test": "echo 'Agent tests placeholder'",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "test:person-research": "curl -X POST http://localhost:8123/person_research_agent/invoke -H 'Content-Type: application/json' -d '{\"input\":{\"targetPersonName\":\"Test Person\",\"existingPersonEntities\":[],\"existingRelationships\":[]}}'",
     "health": "curl http://localhost:8123/docs",
     "clean": "rm -rf dist node_modules",
@@ -28,7 +29,9 @@
     "@types/html-to-text": "^9.0.4",
     "@types/node": "^25.6.0",
     "nodemon": "^3.1.10",
-    "typescript": "^5.9.3"
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.3",
+    "vitest": "^1.6.1"
   },
   "dependencies": {
     "@copilotkit/sdk-js": "^1.9.1",

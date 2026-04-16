@@ -60,7 +60,9 @@ export class SsrfValidator {
       throw new SsrfError(`Scheme not allowed: ${url.protocol}`, rawUrl);
     }
 
-    const host = url.hostname.toLowerCase();
+    // WHATWG URL leaves IPv6 brackets in hostname (e.g. "[::1]"); strip
+    // them so the range tests below can compare literal addresses.
+    const host = stripBrackets(url.hostname.toLowerCase());
 
     // Allowlist bypass — hostname matches an explicitly trusted internal
     // service. This is the intended escape for in-cluster webhooks like
@@ -130,6 +132,13 @@ function isMulticast(host: string): boolean {
   }
   // IPv6 multicast ff00::/8
   return /^ff[0-9a-f]{2}:/i.test(host);
+}
+
+function stripBrackets(host: string): string {
+  if (host.startsWith("[") && host.endsWith("]")) {
+    return host.slice(1, -1);
+  }
+  return host;
 }
 
 function isIpv4Literal(host: string): boolean {

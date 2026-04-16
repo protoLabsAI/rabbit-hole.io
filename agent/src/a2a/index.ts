@@ -114,8 +114,14 @@ export async function startA2AServer(cfg: StartConfig = {}): Promise<{
     });
   });
 
+  // When port=0, the OS assigns an ephemeral port — read the actual bound
+  // port off the server rather than returning the requested 0.
+  const addr = server.address();
+  const boundPort =
+    typeof addr === "object" && addr && "port" in addr ? addr.port : port;
+
   return {
-    port,
+    port: boundPort,
     taskStore,
     pushStore,
     close: () =>
