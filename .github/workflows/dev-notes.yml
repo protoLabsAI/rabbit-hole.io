@@ -20,6 +20,9 @@ jobs:
   post-dev-commit:
     runs-on: ubuntu-latest
     timeout-minutes: 3
+    # Skip cleanly when no dev webhook is configured — the dev channel is
+    # optional and should never block a main push.
+    if: vars.DEV_NOTES_ENABLED == 'true'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -31,6 +34,6 @@ jobs:
 
       - name: Post commit to Discord dev channel
         env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_RABBIT_HOLE_DEV }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_DEV_WEBHOOK }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: node scripts/post-dev-commit.mjs
