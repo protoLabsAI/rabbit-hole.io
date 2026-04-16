@@ -1,5 +1,5 @@
 {
-  "name": "@proto/config-next",
+  "name": "@protolabsai/config-next",
   "version": "0.1.0",
   "private": true,
   "type": "module",

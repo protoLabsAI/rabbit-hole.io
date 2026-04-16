@@ -11,7 +11,7 @@ import {
   CreateShareRequest,
   ShareType,
   ShareTokenParameters,
-} from "@proto/types";
+} from "@protolabsai/types";
 
 import { generateShareToken } from "./uuid";
 

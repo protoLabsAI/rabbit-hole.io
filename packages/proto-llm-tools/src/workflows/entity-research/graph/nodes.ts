@@ -10,7 +10,7 @@ import {
   type Evidence,
   type EntityResearchOutput,
   type ResearchableEntityType,
-} from "@proto/types";
+} from "@protolabsai/types";
 
 import { wikipediaConfig } from "../../../config/wikipedia-config";
 import { EntityResearchState, EntityTypeDetectionResult } from "../state";
@@ -19,7 +19,7 @@ import { EntityResearchState, EntityTypeDetectionResult } from "../state";
 async function getToolForEntityType(_entityType: EntityType) {
   // NOTE: Entity-specific research tools have been deprecated
   // Use deep agent entity researcher for all entity types
-  const { getDeepAgentGraph } = await import("@proto/deepagent/graph");
+  const { getDeepAgentGraph } = await import("@protolabsai/deepagent/graph");
   return getDeepAgentGraph();
 }
 

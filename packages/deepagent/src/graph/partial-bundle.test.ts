@@ -10,7 +10,7 @@ import { describe, it, expect } from "vitest";
 import {
   createEmptyPartialBundle,
   mergePartialBundle,
-} from "@proto/types";
+} from "@protolabsai/types";
 
 import { partialBundleReducer } from "../state";
 
@@ -52,12 +52,21 @@ describe("mergePartialBundle", () => {
 
   it("accumulates entities across merges", () => {
     const first = mergePartialBundle(createEmptyPartialBundle(), {
-      entities: [{ uid: "ent1", label: "Entity 1", entityType: "person", properties: {} }] as any,
+      entities: [
+        {
+          uid: "ent1",
+          label: "Entity 1",
+          entityType: "person",
+          properties: {},
+        },
+      ] as any,
       phase: "entity-creation",
     });
 
     const second = mergePartialBundle(first, {
-      entities: [{ uid: "ent2", label: "Entity 2", entityType: "org", properties: {} }] as any,
+      entities: [
+        { uid: "ent2", label: "Entity 2", entityType: "org", properties: {} },
+      ] as any,
       phase: "entity-creation",
     });
 
@@ -67,13 +76,20 @@ describe("mergePartialBundle", () => {
 
   it("adds relationships while preserving existing data", () => {
     const withEntities = mergePartialBundle(createEmptyPartialBundle(), {
-      entities: [{ uid: "e1", label: "E1", entityType: "person", properties: {} }] as any,
+      entities: [
+        { uid: "e1", label: "E1", entityType: "person", properties: {} },
+      ] as any,
       phase: "entity-creation",
     });
 
     const withRelationships = mergePartialBundle(withEntities, {
       relationships: [
-        { source: "e1", target: "e2", relationshipType: "knows", properties: {} },
+        {
+          source: "e1",
+          target: "e2",
+          relationshipType: "knows",
+          properties: {},
+        },
       ] as any,
       phase: "relationship-mapping",
     });
@@ -85,7 +101,9 @@ describe("mergePartialBundle", () => {
 
   it("marks complete on final merge", () => {
     const partial = mergePartialBundle(createEmptyPartialBundle(), {
-      entities: [{ uid: "e1", label: "E1", entityType: "person", properties: {} }] as any,
+      entities: [
+        { uid: "e1", label: "E1", entityType: "person", properties: {} },
+      ] as any,
       phase: "entity-creation",
     });
 
@@ -101,9 +119,14 @@ describe("mergePartialBundle", () => {
   });
 
   it("preserves phase when update.phase is undefined", () => {
-    const bundle = mergePartialBundle(createEmptyPartialBundle("evidence-gathering"), {
-      evidence: [{ uid: "ev1", label: "Ev", entityType: "evidence", properties: {} }] as any,
-    });
+    const bundle = mergePartialBundle(
+      createEmptyPartialBundle("evidence-gathering"),
+      {
+        evidence: [
+          { uid: "ev1", label: "Ev", entityType: "evidence", properties: {} },
+        ] as any,
+      }
+    );
     expect(bundle.phase).toBe("evidence-gathering");
   });
 });
@@ -113,7 +136,9 @@ describe("partialBundleReducer", () => {
     const left = createEmptyPartialBundle("scoping");
     const right = mergePartialBundle(createEmptyPartialBundle(), {
       phase: "evidence-gathering",
-      evidence: [{ uid: "e1", label: "E", entityType: "evidence", properties: {} }] as any,
+      evidence: [
+        { uid: "e1", label: "E", entityType: "evidence", properties: {} },
+      ] as any,
     });
 
     const result = partialBundleReducer(left, right);
@@ -143,11 +168,16 @@ describe("extractPartialBundleUpdate (via subgraph wrapper integration)", () => 
   it("evidence-gatherer files produce evidence entries", () => {
     const evidenceFile = JSON.stringify({
       evidence: [
-        { uid: "ev1", label: "Wikipedia Source", entityType: "evidence", properties: { url: "https://en.wikipedia.org/wiki/Test" } },
+        {
+          uid: "ev1",
+          label: "Wikipedia Source",
+          entityType: "evidence",
+          properties: { url: "https://en.wikipedia.org/wiki/Test" },
+        },
       ],
     });
 
-    const files = { "q0_evidence_0": evidenceFile };
+    const files = { q0_evidence_0: evidenceFile };
     const gatheredEvidence: unknown[] = [];
     for (const value of Object.values(files)) {
       try {
@@ -165,7 +195,7 @@ describe("extractPartialBundleUpdate (via subgraph wrapper integration)", () => 
   });
 
   it("non-JSON files are skipped gracefully", () => {
-    const files = { "q0_raw": "not json content" };
+    const files = { q0_raw: "not json content" };
     const gathered: unknown[] = [];
     for (const value of Object.values(files)) {
       try {
@@ -196,7 +226,12 @@ describe("extractPartialBundleUpdate (via subgraph wrapper integration)", () => 
   it("relationship-mapper produces relationship entries", () => {
     const result = {
       relationships: [
-        { source: "ent1", target: "ent2", relationshipType: "knows", properties: {} },
+        {
+          source: "ent1",
+          target: "ent2",
+          relationshipType: "knows",
+          properties: {},
+        },
       ],
     };
 
@@ -206,7 +241,9 @@ describe("extractPartialBundleUpdate (via subgraph wrapper integration)", () => 
   it("bundle-assembler marks isComplete", () => {
     const result = {
       bundle: {
-        entities: [{ uid: "e1", label: "E1", entityType: "person", properties: {} }],
+        entities: [
+          { uid: "e1", label: "E1", entityType: "person", properties: {} },
+        ],
         relationships: [],
         evidence: [],
       },

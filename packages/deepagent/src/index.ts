@@ -1,5 +1,5 @@
 /**
- * @proto/deepagent
+ * @protolabsai/deepagent
  *
  * Deep agent entity researcher for knowledge graph construction.
  * Uses LangGraph multi-agent pattern with supervisor-worker coordination.

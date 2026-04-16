@@ -4,7 +4,7 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useState } from "react";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@proto/ui";
+import { Card, CardContent, CardHeader, CardTitle } from "@protolabsai/ui";
 
 import {
   useExtractionWorkflow,

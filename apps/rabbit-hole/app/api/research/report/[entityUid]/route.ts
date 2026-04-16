@@ -7,9 +7,9 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { withAuthAndLogging } from "@proto/auth";
-import { AnalysisResponse } from "@proto/types";
-import { getMissingDatesForEntity } from "@proto/utils/atlas";
+import { withAuthAndLogging } from "@protolabsai/auth";
+import { AnalysisResponse } from "@protolabsai/types";
+import { getMissingDatesForEntity } from "@protolabsai/utils/atlas";
 
 interface ResearchReportData {
   entityUid: string;

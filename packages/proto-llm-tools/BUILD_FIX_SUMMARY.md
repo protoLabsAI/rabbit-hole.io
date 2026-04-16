@@ -137,17 +137,17 @@ All types still resolve correctly via workspace references.
 
 ```typescript
 // Main entry
-import { entityExtractionBasicTool } from "@proto/llm-tools";
+import { entityExtractionBasicTool } from "@protolabsai/llm-tools";
 
 // Client hooks
-import { useLangExtract } from "@proto/llm-tools/client";
+import { useLangExtract } from "@protolabsai/llm-tools/client";
 
 // Playgrounds
-import { LangExtractPlayground } from "@proto/llm-tools/playgrounds";
-import { EntityResearchPlayground } from "@proto/llm-tools/playgrounds/entity-research-playground";
+import { LangExtractPlayground } from "@protolabsai/llm-tools/playgrounds";
+import { EntityResearchPlayground } from "@protolabsai/llm-tools/playgrounds/entity-research-playground";
 
 // Deep agent
-import { deepAgentEntityResearcherTool } from "@proto/llm-tools";
+import { deepAgentEntityResearcherTool } from "@protolabsai/llm-tools";
 ```
 
 ---
@@ -230,7 +230,7 @@ Watch for:
 
 If builds become slow again:
 
-1. **Split Package** - Create `@proto/llm-playgrounds`
+1. **Split Package** - Create `@protolabsai/llm-playgrounds`
 2. **Reduce Entry Points** - Consolidate deep-agent exports
 3. **Lazy Compilation** - Only build changed files in dev
 4. **External Heavy Deps** - Already done for React, langchain, etc.
@@ -252,7 +252,7 @@ Before merging:
 - [x] Local build succeeds
 - [ ] CI build succeeds
 - [ ] Type checking passes
-- [ ] Apps using @proto/llm-tools build successfully
+- [ ] Apps using @protolabsai/llm-tools build successfully
 - [ ] No import errors in consuming code
 - [ ] Playgrounds load correctly
 

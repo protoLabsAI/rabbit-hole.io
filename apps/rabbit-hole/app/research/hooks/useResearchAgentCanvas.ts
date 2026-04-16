@@ -14,7 +14,7 @@
 import type Graph from "graphology";
 import { useCallback, useEffect, useRef } from "react";
 
-import type { PartialBundle, RabbitHoleBundleData } from "@proto/types";
+import type { PartialBundle, RabbitHoleBundleData } from "@protolabsai/types";
 
 import type {
   GraphNodeAttributes,

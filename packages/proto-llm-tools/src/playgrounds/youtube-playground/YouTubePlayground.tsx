@@ -9,9 +9,9 @@
 
 import { useState, useRef } from "react";
 
-import { Icon } from "@proto/icon-system";
-import { useEnqueueYouTube } from "@proto/sidequest-utils/client";
-import { JobStatusTracker } from "@proto/sidequest-utils/components";
+import { Icon } from "@protolabsai/icon-system";
+import { useEnqueueYouTube } from "@protolabsai/sidequest-utils/client";
+import { JobStatusTracker } from "@protolabsai/sidequest-utils/components";
 import {
   Badge,
   Button,
@@ -32,8 +32,8 @@ import {
   TabsList,
   TabsTrigger,
   Textarea,
-} from "@proto/ui/atoms";
-import { useToast } from "@proto/ui/hooks";
+} from "@protolabsai/ui/atoms";
+import { useToast } from "@protolabsai/ui/hooks";
 
 import {
   useYouTubeProcess,

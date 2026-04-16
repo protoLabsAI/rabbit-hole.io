@@ -2,4 +2,4 @@
  * Deep Agent Prompts
  */
 
-export { COORDINATOR_PROMPT } from "@proto/deepagent/prompts";
+export { COORDINATOR_PROMPT } from "@protolabsai/deepagent/prompts";

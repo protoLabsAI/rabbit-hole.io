@@ -10,7 +10,7 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 
-import { generateEntityUID } from "@proto/types";
+import { generateEntityUID } from "@protolabsai/types";
 import {
   Badge,
   Button,
@@ -20,7 +20,7 @@ import {
   CardHeader,
   CardTitle,
   Form,
-} from "@proto/ui/atoms";
+} from "@protolabsai/ui/atoms";
 
 import {
   EntityType,

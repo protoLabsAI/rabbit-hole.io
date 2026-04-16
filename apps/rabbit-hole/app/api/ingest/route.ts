@@ -7,7 +7,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { generateSecureId } from "@proto/utils";
+import { generateSecureId } from "@protolabsai/utils";
 
 const JOB_PROCESSOR_URL =
   process.env.JOB_PROCESSOR_URL || "http://localhost:8680";

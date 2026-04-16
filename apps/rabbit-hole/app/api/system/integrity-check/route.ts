@@ -14,8 +14,8 @@ import {
   withAuthAndLogging,
   checkAdminRole,
   type AuthenticatedUser,
-} from "@proto/auth";
-import { getGlobalNeo4jClient } from "@proto/database";
+} from "@protolabsai/auth";
+import { getGlobalNeo4jClient } from "@protolabsai/database";
 
 interface IntegrityIssue {
   type:

@@ -9,13 +9,13 @@
 
 import React, { useState, useCallback } from "react";
 
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 import {
   Button,
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@proto/ui/atoms";
+} from "@protolabsai/ui/atoms";
 
 import { RelationshipTypeSelector } from "../nodes/RelationshipTypeSelector";
 

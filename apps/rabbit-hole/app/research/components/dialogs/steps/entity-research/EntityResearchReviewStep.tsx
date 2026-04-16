@@ -3,8 +3,8 @@
 import type Graph from "graphology";
 import { useState, useCallback } from "react";
 
-import { Icon } from "@proto/icon-system";
-import { Button, Badge } from "@proto/ui/atoms";
+import { Icon } from "@protolabsai/icon-system";
+import { Button, Badge } from "@protolabsai/ui/atoms";
 
 import type {
   GraphNodeAttributes,

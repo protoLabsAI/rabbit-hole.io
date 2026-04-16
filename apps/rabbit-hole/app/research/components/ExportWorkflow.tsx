@@ -16,7 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from "@proto/ui/atoms";
+} from "@protolabsai/ui/atoms";
 
 import type {
   GraphNodeAttributes,

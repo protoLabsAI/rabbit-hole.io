@@ -5,7 +5,7 @@
  */
 
 import "../instrumentation.js"; // MUST BE FIRST - Initializes OpenTelemetry
-import { buildWritingAgentGraph } from "@proto/llm-tools/tools/writing-agent-tools/graph";
+import { buildWritingAgentGraph } from "@protolabsai/llm-tools/tools/writing-agent-tools/graph";
 
 import { coordinatorNode } from "./graph/nodes.js";
 import { WritingAgentStateAnnotation } from "./state.js";

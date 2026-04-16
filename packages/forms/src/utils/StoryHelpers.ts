@@ -5,7 +5,7 @@
  * Promotes consistency and reduces duplication across story files.
  */
 
-import { ALL_ENTITY_TYPES } from "@proto/types";
+import { ALL_ENTITY_TYPES } from "@protolabsai/types";
 
 import { getEntityTypesByDomain } from "../registry/DomainFormRegistry";
 

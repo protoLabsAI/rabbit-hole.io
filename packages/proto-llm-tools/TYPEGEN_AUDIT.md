@@ -1,4 +1,4 @@
-# Type Generation Memory Audit - @proto/llm-tools
+# Type Generation Memory Audit - @protolabsai/llm-tools
 
 **Date**: October 27, 2025  
 **Issue**: `dts.resolve: true` violates workspace guidelines for type generation  
@@ -8,7 +8,7 @@
 
 ### Type Surface Area
 
-The `@proto/llm-tools` package has exceptionally high type complexity:
+The `@protolabsai/llm-tools` package has exceptionally high type complexity:
 
 1. **LangChain Dependencies** (highest impact)
    - `@langchain/core` - Extensive type definitions for runnable chains
@@ -24,9 +24,9 @@ The `@proto/llm-tools` package has exceptionally high type complexity:
    - **Issue**: Deep type unions for editor state
 
 3. **Monorepo Internal Types**
-   - `@proto/types` - Workspace-wide type definitions (213 files)
-   - `@proto/ui` - React component prop types
-   - `@proto/llm-providers` - Provider configuration types
+   - `@protolabsai/types` - Workspace-wide type definitions (213 files)
+   - `@protolabsai/ui` - React component prop types
+   - `@protolabsai/llm-providers` - Provider configuration types
    - **Issue**: Circular type references across packages
 
 4. **Multiple Entry Points** (11 separate builds)
@@ -39,7 +39,7 @@ The `@proto/llm-tools` package has exceptionally high type complexity:
 
 ## Root Cause: `dts.resolve`
 
-The `dts.resolve` option instructs TypeScript to trace and resolve ALL external type dependencies during declaration generation. For `@proto/llm-tools`:
+The `dts.resolve` option instructs TypeScript to trace and resolve ALL external type dependencies during declaration generation. For `@protolabsai/llm-tools`:
 
 ```
 dts.resolve: true behavior:
@@ -53,7 +53,7 @@ dts.resolve: true behavior:
 │  └─ Trace through all possible node outputs
 ├─ Resolve Tiptap type definitions
 │  └─ Expand extension union types for each plugin
-├─ Resolve @proto/* monorepo packages
+├─ Resolve @protolabsai/* monorepo packages
 │  └─ Follow circular type references
 └─ Repeat for EACH of 11 entry points × 2 formats (CJS/ESM)
 
@@ -99,8 +99,8 @@ Already implemented:
 | `@langchain/community` | Very High       | No       | Multiple adapters   |
 | `langchain`            | High            | No       | Message types       |
 | `@tiptap/core`         | High            | No       | Extension unions    |
-| `@proto/types`         | High            | No       | 213-file monorepo   |
-| `@proto/ui`            | Medium          | No       | React components    |
+| `@protolabsai/types`         | High            | No       | 213-file monorepo   |
+| `@protolabsai/ui`            | Medium          | No       | React components    |
 | `@copilotkit/sdk-js`   | Medium          | No       | Agent state types   |
 | Rest                   | Low             | No       | Utilities           |
 
@@ -122,10 +122,10 @@ Create separate packages to reduce entry point combinations:
 
 ```
 Proposed structure:
-├─ @proto/llm-tools (client-safe only)
-├─ @proto/llm-workflows (server workflows)
-├─ @proto/llm-playgrounds (isolated playgrounds)
-└─ @proto/entity-researcher (deep-agent system)
+├─ @protolabsai/llm-tools (client-safe only)
+├─ @protolabsai/llm-workflows (server workflows)
+├─ @protolabsai/llm-playgrounds (isolated playgrounds)
+└─ @protolabsai/entity-researcher (deep-agent system)
 
 Result: 4 packages × 3 entry points vs 1 package × 11 entry points
 Savings: Type resolution complexity O(n²) → O(n)
@@ -136,7 +136,7 @@ Savings: Type resolution complexity O(n²) → O(n)
 Create thin wrapper to delay type imports:
 
 ```typescript
-// @proto/llm-workflows/lazy-types.ts
+// @protolabsai/llm-workflows/lazy-types.ts
 export type { StateGraph } from "@langchain/langgraph";
 // Import deferred until runtime
 ```
@@ -197,8 +197,8 @@ env:
 ### Phase 3 (Optimization - Dec 2025)
 
 - Review monorepo type architecture
-- Consolidate @proto/types circular dependencies
-- Consider breaking @proto/llm-tools into 3-4 packages
+- Consolidate @protolabsai/types circular dependencies
+- Consider breaking @protolabsai/llm-tools into 3-4 packages
 
 ## Related Files
 

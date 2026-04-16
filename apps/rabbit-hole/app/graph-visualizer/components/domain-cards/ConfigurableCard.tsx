@@ -7,13 +7,13 @@
 
 import React from "react";
 
-import { domainRegistry } from "@proto/types";
+import { domainRegistry } from "@protolabsai/types";
 import type {
   DomainCardConfig,
   DomainCardFieldConfig,
   DomainCardProps,
   DomainNodeData,
-} from "@proto/types";
+} from "@protolabsai/types";
 
 import { BaseDomainCard, CardSection, PropertyRow } from "./BaseDomainCard";
 

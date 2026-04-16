@@ -2,13 +2,13 @@
  * Neo4j Sync Layer
  *
  * Handles persistence of graph data to Neo4j database
- * Uses centralized neo4j.int() utilities from @proto/utils
+ * Uses centralized neo4j.int() utilities from @protolabsai/utils
  */
 
 import type Graph from "graphology";
 
-import type { Neo4jClient } from "@proto/database";
-import { toNeo4jInt, convertAllNeo4jParams } from "@proto/utils";
+import type { Neo4jClient } from "@protolabsai/database";
+import { toNeo4jInt, convertAllNeo4jParams } from "@protolabsai/utils";
 
 import type { GraphNodeAttributes, GraphEdgeAttributes } from "../model/graph";
 

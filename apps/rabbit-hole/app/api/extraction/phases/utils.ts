@@ -5,7 +5,7 @@
  * Uses LangExtract for all entity detection - no hardcoded logic.
  */
 
-import { langextractConfig } from "@proto/llm-tools";
+import { langextractConfig } from "@protolabsai/llm-tools";
 
 /**
  * Auto-detect focus entities from text using LangExtract
@@ -22,7 +22,7 @@ export async function detectFocusEntities(
     const serviceUrl = langextractConfig.getServiceUrl();
 
     // Generate domain-specific discovery example
-    const { generateDiscoveryExample } = await import("@proto/types");
+    const { generateDiscoveryExample } = await import("@protolabsai/types");
     const discoveryExample = generateDiscoveryExample(domains as any);
 
     // Use LangExtract to identify most important entities by type

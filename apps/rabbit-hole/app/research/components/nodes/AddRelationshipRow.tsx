@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 
-import { Icon } from "@proto/icon-system";
-import { Button } from "@proto/ui/atoms";
+import { Icon } from "@protolabsai/icon-system";
+import { Button } from "@protolabsai/ui/atoms";
 
 import { EntitySelector } from "./EntitySelector";
 import { RelationshipTypeSelector } from "./RelationshipTypeSelector";

@@ -15,11 +15,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@proto/ui/atoms";
-import { ProcessingStateInfo } from "@proto/ui/molecules";
-import { EntitySearch, type SearchableEntity } from "@proto/ui/organisms";
-import { getAllowedFileExtensions } from "@proto/utils";
-import type { FileProcessingResult } from "@proto/utils";
+} from "@protolabsai/ui/atoms";
+import { ProcessingStateInfo } from "@protolabsai/ui/molecules";
+import { EntitySearch, type SearchableEntity } from "@protolabsai/ui/organisms";
+import { getAllowedFileExtensions } from "@protolabsai/utils";
+import type { FileProcessingResult } from "@protolabsai/utils";
 
 interface FileUploadDialogProps {
   isOpen: boolean;

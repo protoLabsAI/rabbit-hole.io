@@ -7,8 +7,12 @@ import {
   EVENT_TYPES,
   SIGNIFICANCE_LEVELS,
   MEDIA_COVERAGE_LEVELS,
-} from "@proto/types";
-import { generateEventUID, isValidDate, isDateInRange } from "@proto/utils";
+} from "@protolabsai/types";
+import {
+  generateEventUID,
+  isValidDate,
+  isDateInRange,
+} from "@protolabsai/utils";
 
 import { langextractConfig } from "../../../config/langextract-config";
 import { enqueueLangExtract } from "../../../utils/enqueueLangExtract";

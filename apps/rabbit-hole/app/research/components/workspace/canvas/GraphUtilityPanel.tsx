@@ -10,10 +10,10 @@
 
 import React, { useMemo, useState } from "react";
 
-import { getEntityTypesByDomain } from "@proto/forms";
-import { Icon } from "@proto/icon-system";
-import type { UtilityTab, SideNavTab } from "@proto/ui/templates";
-import { SideNavigationPanel } from "@proto/ui/templates";
+import { getEntityTypesByDomain } from "@protolabsai/forms";
+import { Icon } from "@protolabsai/icon-system";
+import type { UtilityTab, SideNavTab } from "@protolabsai/ui/templates";
+import { SideNavigationPanel } from "@protolabsai/ui/templates";
 
 import { EntityDomainGrid, type CardSize } from "../../EntityDomainGrid";
 

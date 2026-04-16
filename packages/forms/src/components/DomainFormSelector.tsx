@@ -11,7 +11,7 @@
 
 import React, { useState, useMemo } from "react";
 
-import { domainRegistry } from "@proto/types";
+import { domainRegistry } from "@protolabsai/types";
 import {
   Card,
   CardContent,
@@ -23,7 +23,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@proto/ui/atoms";
+} from "@protolabsai/ui/atoms";
 
 import {
   EntityType,

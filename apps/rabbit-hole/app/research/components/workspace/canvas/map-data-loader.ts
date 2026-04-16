@@ -8,9 +8,9 @@
 import Graph from "graphology";
 import type { Record as Neo4jRecord } from "neo4j-driver";
 
-import { getGlobalNeo4jClient } from "@proto/database";
-import type { EntityType } from "@proto/types";
-import { getEntityColor } from "@proto/utils/atlas";
+import { getGlobalNeo4jClient } from "@protolabsai/database";
+import type { EntityType } from "@protolabsai/types";
+import { getEntityColor } from "@protolabsai/utils/atlas";
 
 export interface GeographicEntity {
   uid: string;

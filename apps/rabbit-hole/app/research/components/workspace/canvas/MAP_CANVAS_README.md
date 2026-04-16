@@ -35,7 +35,7 @@ function createMockGraphData(): Graph {
 4. **Click Handlers**:
    - Click node → Show entity details
    - Click map → Create marker at coordinates
-5. **Entity Styling** - Uses `getEntityColor()` from `@proto/utils/atlas`
+5. **Entity Styling** - Uses `getEntityColor()` from `@protolabsai/utils/atlas`
 
 ## Connecting to Neo4j
 
@@ -177,7 +177,7 @@ async function fetchEntities() {
 
 ## Geographic Data Schema
 
-All entities support universal geospatial properties (defined in `@proto/types`):
+All entities support universal geospatial properties (defined in `@protolabsai/types`):
 
 ```typescript
 interface GeographicEntity {
@@ -206,7 +206,7 @@ interface GeographicEntity {
 
 ## Supported Entity Types
 
-All entity types from `@proto/types` can have geographic coordinates:
+All entity types from `@protolabsai/types` can have geographic coordinates:
 
 - **Person** - Home location, birth place, current residence
 - **Organization** - Headquarters, offices, facilities

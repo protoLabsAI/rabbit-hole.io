@@ -6,8 +6,8 @@
 
 import Link from "next/link";
 
-import { getUserTierClient, getTierLabel } from "@proto/auth/client";
-import { Badge, Button } from "@proto/ui/atoms";
+import { getUserTierClient, getTierLabel } from "@protolabsai/auth/client";
+import { Badge, Button } from "@protolabsai/ui/atoms";
 
 interface WorkspaceHeaderProps {
   workspaceId: string;

@@ -4,7 +4,7 @@ import { useDraggable } from "@dnd-kit/core";
 import type { FC, ReactNode } from "react";
 import { useEffect } from "react";
 
-import { Card } from "@proto/ui/atoms";
+import { Card } from "@protolabsai/ui/atoms";
 
 import { useGanttDragging } from "../../hooks";
 import { cn } from "../../lib/utils";

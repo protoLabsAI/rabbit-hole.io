@@ -4,7 +4,7 @@
  * Shared interfaces and types for domain-specific node cards.
  */
 
-import type { EntityType } from "@proto/types";
+import type { EntityType } from "@protolabsai/types";
 
 /**
  * Domain names from the type system - all 12 domains

@@ -1,10 +1,10 @@
-# @proto/utils
+# @protolabsai/utils
 
 Professional design token utilities and color manipulation tools for the Proto project. Built with modern color science and accessibility-first principles.
 
 ## Overview
 
-`@proto/utils` provides a comprehensive suite of utilities for working with design tokens, with a focus on color manipulation, palette generation, and accessibility compliance. The package is built on top of [chroma.js](https://gka.github.io/chroma.js/) and uses perceptually uniform color spaces for professional-grade color operations.
+`@protolabsai/utils` provides a comprehensive suite of utilities for working with design tokens, with a focus on color manipulation, palette generation, and accessibility compliance. The package is built on top of [chroma.js](https://gka.github.io/chroma.js/) and uses perceptually uniform color spaces for professional-grade color operations.
 
 ## Features
 
@@ -33,19 +33,19 @@ Professional design token utilities and color manipulation tools for the Proto p
 
 ```bash
 # npm
-npm install @proto/utils
+npm install @protolabsai/utils
 
 # pnpm
-pnpm add @proto/utils
+pnpm add @protolabsai/utils
 
 # yarn
-yarn add @proto/utils
+yarn add @protolabsai/utils
 ```
 
 ## Quick Start
 
 ```typescript
-import { generateColorScale, generateColorHarmony } from "@proto/utils/tokens";
+import { generateColorScale, generateColorHarmony } from "@protolabsai/utils/tokens";
 
 // Generate a perceptually uniform color scale
 const blueScale = generateColorScale("#3b82f6");
@@ -73,7 +73,7 @@ console.log(harmony.colors);
 Creates a perceptually uniform 11-step color scale from a base color.
 
 ```typescript
-import { generateColorScale } from "@proto/utils/tokens";
+import { generateColorScale } from "@protolabsai/utils/tokens";
 
 const scale = generateColorScale("#3b82f6", {
   steps: 11, // Number of color steps (5-15)
@@ -108,7 +108,7 @@ console.log(namedScale.metadata.accessibilityInfo.wcagAA);
 Creates color harmonies based on color theory principles.
 
 ```typescript
-import { generateColorHarmony } from "@proto/utils/tokens";
+import { generateColorHarmony } from "@protolabsai/utils/tokens";
 
 // Complementary harmony
 const complementary = generateColorHarmony("#3b82f6", {
@@ -262,7 +262,7 @@ import type {
   HarmonyGenerationOptions,
   ColorPalette,
   AccessibilityInfo,
-} from "@proto/utils/tokens";
+} from "@protolabsai/utils/tokens";
 ```
 
 ### Key Interfaces
@@ -293,7 +293,7 @@ interface AccessibilityInfo {
 ### Design System Color Palette
 
 ```typescript
-import { generateColorScale, generateColorHarmony } from "@proto/utils/tokens";
+import { generateColorScale, generateColorHarmony } from "@protolabsai/utils/tokens";
 
 // Primary color scale
 const primary = generateColorScale("#3b82f6");
@@ -318,7 +318,7 @@ const cssVariables = Object.entries(primary)
 import {
   generateColorScale,
   generateAccessibilityInfo,
-} from "@proto/utils/tokens";
+} from "@protolabsai/utils/tokens";
 
 const scale = generateColorScale("#8b5cf6");
 const accessibilityInfo = generateAccessibilityInfo(scale);
@@ -337,7 +337,7 @@ console.log(`Use shades ${textColors.join(", ")} for accessible text`);
 import {
   generateAllHarmonies,
   getSuggestedHarmonies,
-} from "@proto/utils/tokens";
+} from "@protolabsai/utils/tokens";
 
 const baseColor = "#ff6b35";
 
@@ -362,7 +362,7 @@ import {
   generateColorScale,
   generateColorHarmony,
   validateColorScale,
-} from "@proto/utils/tokens";
+} from "@protolabsai/utils/tokens";
 
 // Analyze existing brand color
 const brandColor = "#1a73e8";
@@ -392,7 +392,7 @@ import {
   generateColorHarmony,
   generateRandomDesignSystemPalette,
   generateColorScale,
-} from "@proto/utils/tokens";
+} from "@protolabsai/utils/tokens";
 
 // Step 1: Generate random colors for inspiration
 const inspirationColors = generateRandomColors(20);
@@ -434,9 +434,9 @@ The utilities are designed to work seamlessly with the Proto Color Agent:
 
 ```typescript
 // The agent uses these utilities internally
-import { colorAgent } from "@proto/agent";
+import { colorAgent } from "@protolabsai/agent";
 
-// Tools like generateColorPalette use @proto/utils under the hood
+// Tools like generateColorPalette use @protolabsai/utils under the hood
 ```
 
 ### With Design System
@@ -562,7 +562,7 @@ import {
   withTierAwareLazy,
   LazyFeatureErrorBoundary,
   CopilotKitLoadingSkeleton 
-} from "@proto/utils/react/lazy-loading";
+} from "@protolabsai/utils/react/lazy-loading";
 
 // Tier-aware lazy loading
 const LazyComponent = withTierAwareLazy(

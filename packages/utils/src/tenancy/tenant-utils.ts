@@ -144,11 +144,11 @@ export function suggestTenantSlug(orgName: string): string {
 
 /**
  * Get PostgreSQL connection pool for app database
- * @deprecated This function creates a new pool - use getGlobalPostgresPool() from @proto/database instead
+ * @deprecated This function creates a new pool - use getGlobalPostgresPool() from @protolabsai/database instead
  */
 async function getAppDbPool(): Promise<Pool> {
   // Dynamic import to avoid circular dependency
-  const { getGlobalPostgresPool } = await import("@proto/database");
+  const { getGlobalPostgresPool } = await import("@protolabsai/database");
   return getGlobalPostgresPool();
 }
 

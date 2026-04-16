@@ -13,8 +13,8 @@ import {
   enrichNode,
   relateNode,
   annotationNode,
-} from "@proto/llm-tools";
-import { createLogger } from "@proto/logger";
+} from "@protolabsai/llm-tools";
+import { createLogger } from "@protolabsai/logger";
 
 const logger = createLogger({ operation: "extraction-workflow-interactive" });
 

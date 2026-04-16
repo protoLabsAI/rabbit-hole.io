@@ -1,5 +1,5 @@
 {
-  "name": "@proto/config-tailwind",
+  "name": "@protolabsai/config-tailwind",
   "version": "0.1.0",
   "private": true,
   "type": "module",

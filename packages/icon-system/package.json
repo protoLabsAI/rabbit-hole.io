@@ -1,5 +1,5 @@
 {
-  "name": "@proto/icon-system",
+  "name": "@protolabsai/icon-system",
   "version": "0.1.0",
   "private": true,
   "main": "dist/index.js",

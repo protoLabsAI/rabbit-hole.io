@@ -24,7 +24,7 @@ const packages = fs
     const pkgPath = path.join(packagesDir, name);
     return fs.statSync(pkgPath).isDirectory();
   })
-  .map((name) => `@proto/${name}`);
+  .map((name) => `@protolabsai/${name}`);
 
 console.log("📦 Analyzing packages:", packages.join(", "));
 
@@ -64,7 +64,7 @@ function findTsFiles(dir) {
 
 // Scan each package for @proto imports
 packages.forEach((pkgName) => {
-  const simpleName = pkgName.replace("@proto/", "");
+  const simpleName = pkgName.replace("@protolabsai/", "");
   const srcDir = path.join(packagesDir, simpleName, "src");
 
   if (!fs.existsSync(srcDir)) {
@@ -81,7 +81,7 @@ packages.forEach((pkgName) => {
     let match;
 
     while ((match = importRegex.exec(content)) !== null) {
-      const importedPkg = `@proto/${match[1]}`;
+      const importedPkg = `@protolabsai/${match[1]}`;
       if (packages.includes(importedPkg) && importedPkg !== pkgName) {
         imports.add(importedPkg);
       }
@@ -94,10 +94,10 @@ packages.forEach((pkgName) => {
 // Display dependency graph
 console.log("\n📊 Dependency Graph:");
 deps.forEach((imports, pkgName) => {
-  const simpleName = pkgName.replace("@proto/", "");
+  const simpleName = pkgName.replace("@protolabsai/", "");
   if (imports.length > 0) {
     console.log(
-      `  ${simpleName} → ${imports.map((i) => i.replace("@proto/", "")).join(", ")}`
+      `  ${simpleName} → ${imports.map((i) => i.replace("@protolabsai/", "")).join(", ")}`
     );
   } else {
     console.log(`  ${simpleName} (no deps)`);
@@ -139,7 +139,7 @@ for (const pkg of packages) {
       foundCycle = true;
       console.error(
         "\n❌ CIRCULAR DEPENDENCY DETECTED:\n",
-        cycle.map((p) => p.replace("@proto/", "")).join(" → ")
+        cycle.map((p) => p.replace("@protolabsai/", "")).join(" → ")
       );
     }
   }
@@ -152,23 +152,23 @@ if (!foundCycle) {
   const buildOrder = topologicalSort(packages, deps);
   console.log(
     "\n📋 Recommended build order:\n ",
-    buildOrder.map((p) => p.replace("@proto/", "")).join(" → ")
+    buildOrder.map((p) => p.replace("@protolabsai/", "")).join(" → ")
   );
 
   // Check against current build order
   const currentOrder = [
-    "@proto/types",
-    "@proto/icon-system",
-    "@proto/database",
-    "@proto/utils",
-    "@proto/auth",
-    "@proto/assets",
-    "@proto/llm-tools",
-    "@proto/api-utils",
+    "@protolabsai/types",
+    "@protolabsai/icon-system",
+    "@protolabsai/database",
+    "@protolabsai/utils",
+    "@protolabsai/auth",
+    "@protolabsai/assets",
+    "@protolabsai/llm-tools",
+    "@protolabsai/api-utils",
   ];
 
-  const currentSimple = currentOrder.map((p) => p.replace("@proto/", ""));
-  const optimalSimple = buildOrder.map((p) => p.replace("@proto/", ""));
+  const currentSimple = currentOrder.map((p) => p.replace("@protolabsai/", ""));
+  const optimalSimple = buildOrder.map((p) => p.replace("@protolabsai/", ""));
 
   if (JSON.stringify(currentSimple) !== JSON.stringify(optimalSimple)) {
     console.log("\n⚠️  Current build order may not be optimal");

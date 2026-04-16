@@ -2,7 +2,7 @@
  * ConfirmDialog Component
  *
  * A modern replacement for window.confirm() that provides better UX.
- * Integrates with the dialog system from @proto/ui.
+ * Integrates with the dialog system from @protolabsai/ui.
  *
  * Usage in a provider context:
  * <ConfirmDialogProvider>
@@ -28,7 +28,7 @@ import {
   DialogDescription,
   DialogFooter,
   Button,
-} from "@proto/ui/atoms";
+} from "@protolabsai/ui/atoms";
 
 export interface ConfirmDialogConfig {
   title: string;

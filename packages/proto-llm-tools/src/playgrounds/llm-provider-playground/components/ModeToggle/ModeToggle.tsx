@@ -1,4 +1,4 @@
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 import {
   Badge,
   Card,
@@ -9,7 +9,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@proto/ui/atoms";
+} from "@protolabsai/ui/atoms";
 
 import type { ModeToggleProps } from "../../types";
 

@@ -7,7 +7,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import type { FileSource } from "@proto/types";
+import type { FileSource } from "@protolabsai/types";
 
 import { DocxAdapter } from "../../src/adapters/docx-adapter.js";
 import {

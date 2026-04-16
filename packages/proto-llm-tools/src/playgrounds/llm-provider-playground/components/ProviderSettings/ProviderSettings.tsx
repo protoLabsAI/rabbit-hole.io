@@ -1,4 +1,4 @@
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 import {
   Button,
   Card,
@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
   Separator,
-} from "@proto/ui/atoms";
+} from "@protolabsai/ui/atoms";
 
 import { PROVIDER_LABELS, CATEGORY_LABELS } from "../../constants";
 import type { ProviderSettingsProps } from "../../types";

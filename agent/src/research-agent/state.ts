@@ -8,7 +8,7 @@
 import { CopilotKitStateAnnotation } from "@copilotkit/sdk-js/langgraph";
 import { Annotation } from "@langchain/langgraph";
 
-import type { ResearchSessionConfig } from "@proto/types";
+import type { ResearchSessionConfig } from "@protolabsai/types";
 
 /**
  * CopilotKit Shared Graph State

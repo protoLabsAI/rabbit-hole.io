@@ -1,4 +1,4 @@
-import { domainRegistry, ALL_RELATIONSHIP_TYPES } from "@proto/types";
+import { domainRegistry, ALL_RELATIONSHIP_TYPES } from "@protolabsai/types";
 
 /**
  * Get valid relationship types for an entity's domain

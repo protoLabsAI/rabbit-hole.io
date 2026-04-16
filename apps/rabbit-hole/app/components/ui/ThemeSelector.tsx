@@ -2,7 +2,10 @@
 
 import React from "react";
 
-import { themeDisplayInfo, type AvailableThemeName } from "@proto/ui/theme";
+import {
+  themeDisplayInfo,
+  type AvailableThemeName,
+} from "@protolabsai/ui/theme";
 
 import { useTheme } from "../../context/ThemeProvider";
 import { cn } from "../../lib/utils";

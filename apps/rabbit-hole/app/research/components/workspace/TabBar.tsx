@@ -8,10 +8,13 @@
 
 import React, { useState, useRef } from "react";
 
-import { getUserTierClient, getTierLimitsClient } from "@proto/auth/client";
-import { Icon } from "@proto/icon-system";
-import { useToast } from "@proto/ui/hooks";
-import type { WorkspaceTab, CanvasType } from "@proto/workspace";
+import {
+  getUserTierClient,
+  getTierLimitsClient,
+} from "@protolabsai/auth/client";
+import { Icon } from "@protolabsai/icon-system";
+import { useToast } from "@protolabsai/ui/hooks";
+import type { WorkspaceTab, CanvasType } from "@protolabsai/workspace";
 
 import "@/context-menu/registry/workspaceTabMenus.direct";
 import { useContextMenu } from "@/context-menu";

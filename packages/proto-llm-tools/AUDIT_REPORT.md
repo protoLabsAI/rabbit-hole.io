@@ -1,4 +1,4 @@
-# @proto/llm-tools Package Audit Report
+# @protolabsai/llm-tools Package Audit Report
 
 **Date:** October 27, 2025  
 **Issue:** Build failure due to memory exhaustion during DTS generation  
@@ -258,8 +258,8 @@ export default defineConfig([
 **Implementation:**
 Create separate packages:
 
-- `@proto/llm-tools` - Core tools and workflows
-- `@proto/llm-playgrounds` - Playground components
+- `@protolabsai/llm-tools` - Core tools and workflows
+- `@protolabsai/llm-playgrounds` - Playground components
 
 **Pros:**
 
@@ -331,7 +331,7 @@ Create separate packages:
 
 ### Phase 3: Long-term (Future consideration)
 
-1. Consider splitting into `@proto/llm-playgrounds` package
+1. Consider splitting into `@protolabsai/llm-playgrounds` package
 2. Evaluate if `LLMProviderPlayground` should be deleted or moved to apps layer
 3. Audit other workspace packages for similar issues
 
@@ -361,11 +361,11 @@ After implementing fixes:
 - [ ] `pnpm run build` succeeds locally
 - [ ] `pnpm run type-check` passes
 - [ ] All exports still accessible:
-  - [ ] `@proto/llm-tools` (main)
-  - [ ] `@proto/llm-tools/client`
-  - [ ] `@proto/llm-tools/playgrounds`
-  - [ ] `@proto/llm-tools/playgrounds/entity-research-playground`
-  - [ ] `@proto/llm-tools/deep-agent-entity-researcher/*`
+  - [ ] `@protolabsai/llm-tools` (main)
+  - [ ] `@protolabsai/llm-tools/client`
+  - [ ] `@protolabsai/llm-tools/playgrounds`
+  - [ ] `@protolabsai/llm-tools/playgrounds/entity-research-playground`
+  - [ ] `@protolabsai/llm-tools/deep-agent-entity-researcher/*`
 - [ ] CI build passes
 - [ ] Apps using the package build successfully
 

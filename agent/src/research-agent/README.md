@@ -8,7 +8,7 @@ Autonomous entity research with CopilotKit real-time streaming.
 ## Architecture
 
 **Consolidated Pattern (November 2025):**
-All graph building logic lives in `@proto/llm-tools`. Agent only customizes coordinator for CopilotKit streaming.
+All graph building logic lives in `@protolabsai/llm-tools`. Agent only customizes coordinator for CopilotKit streaming.
 
 ```
 agent/src/research-agent/
@@ -17,11 +17,11 @@ agent/src/research-agent/
 ├── graph/
 │   └── nodes.ts          # Custom coordinator with copilotkitEmitState
 ├── tools/
-│   └── index.ts          # Re-exports from @proto/llm-tools
+│   └── index.ts          # Re-exports from @protolabsai/llm-tools
 ├── subagents/
-│   └── index.ts          # Re-exports from @proto/llm-tools
+│   └── index.ts          # Re-exports from @protolabsai/llm-tools
 └── prompts/
-    └── index.ts          # Re-exports from @proto/llm-tools
+    └── index.ts          # Re-exports from @protolabsai/llm-tools
 
 packages/proto-llm-tools/tools/deep-agent-entity-researcher/
 └── graph/

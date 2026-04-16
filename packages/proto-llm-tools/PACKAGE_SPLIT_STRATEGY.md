@@ -1,4 +1,4 @@
-# Package Split Strategy - @proto/llm-tools
+# Package Split Strategy - @protolabsai/llm-tools
 
 **Authored**: October 27, 2025  
 **Context**: Type generation memory issue requiring architectural solutions  
@@ -49,7 +49,7 @@ tools/entity-extraction-basic/*               → 1 sub-entry point
 
 ### Phase 1: Extract High-Type-Complexity Workflows (Q1 2026)
 
-**New Package**: `@proto/llm-workflows`
+**New Package**: `@protolabsai/llm-workflows`
 
 - Move server-only LangGraph workflows
 - Move job queue patterns
@@ -58,7 +58,7 @@ tools/entity-extraction-basic/*               → 1 sub-entry point
 **Benefits**:
 
 - Isolates LangGraph type resolution (StateGraph, StateAnnotation, etc.)
-- Reduces entry points from 11 to 5 in @proto/llm-tools
+- Reduces entry points from 11 to 5 in @protolabsai/llm-tools
 - Reduces type surface by 40% in main package
 
 **Contents to Move**:
@@ -75,12 +75,12 @@ src/tools/
 └─ entity-extraction-basic/
 ```
 
-**Remaining in @proto/llm-tools**:
+**Remaining in @protolabsai/llm-tools**:
 
 ```
 src/
 ├─ client.ts (unchanged)
-├─ index.ts (re-exports from @proto/llm-workflows)
+├─ index.ts (re-exports from @protolabsai/llm-workflows)
 ├─ hooks/ (React Query, Transcription, YouTube)
 ├─ config/ (Wikipedia, LangExtract, YouTube, Transcription)
 ├─ playgrounds/ (moved to separate package in Phase 2)
@@ -89,11 +89,11 @@ src/
 
 ### Phase 2: Extract Playgrounds (Q1 2026)
 
-**New Package**: `@proto/llm-playgrounds`
+**New Package**: `@protolabsai/llm-playgrounds`
 
 - Move all playground components
 - Include playground-specific state and utilities
-- Maintain dependency on both @proto/llm-tools and @proto/llm-workflows
+- Maintain dependency on both @protolabsai/llm-tools and @protolabsai/llm-workflows
 
 **Benefits**:
 
@@ -119,19 +119,19 @@ Related docs:
 **Result Structure**:
 
 ```
-@proto/llm-playgrounds/
+@protolabsai/llm-playgrounds/
 ├─ src/
 │  ├─ components/ (Playgrounds)
 │  ├─ hooks/ (Playground-specific)
 │  ├─ state/ (Playground state)
 │  └─ index.ts
-├─ package.json (dependencies: @proto/llm-tools, @proto/llm-workflows)
+├─ package.json (dependencies: @protolabsai/llm-tools, @protolabsai/llm-workflows)
 └─ tsup.config.ts
 ```
 
 ### Phase 3: Deep Agent Researcher Package (Q2 2026)
 
-**New Package**: `@proto/entity-researcher`
+**New Package**: `@protolabsai/entity-researcher`
 
 - Specialized multi-agent system for entity research
 - Complete autonomy from other tools
@@ -140,7 +140,7 @@ Related docs:
 **Benefits**:
 
 - Isolates complex multi-agent orchestration
-- Reduces entry points in @proto/llm-workflows
+- Reduces entry points in @protolabsai/llm-workflows
 - Enables independent versioning and updates
 
 **Contents to Move**:
@@ -159,7 +159,7 @@ src/tools/deep-agent-entity-researcher/
 **Result Structure**:
 
 ```
-@proto/entity-researcher/
+@protolabsai/entity-researcher/
 ├─ src/
 │  ├─ graph/
 │  ├─ prompts/
@@ -181,7 +181,7 @@ Build command: NODE_OPTIONS='--max-old-space-size=4096' tsup
 Type resolution per entry point:
 ├─ 11 entry points
 ├─ 2 formats (CJS/ESM)
-├─ Each resolves: @langchain/*, @tiptap/*, @proto/types
+├─ Each resolves: @langchain/*, @tiptap/*, @protolabsai/types
 └─ Total combinations: 22 type generation passes
 
 Peak memory: ~3.5GB during type generation
@@ -191,25 +191,25 @@ Estimated build time: 45-60 seconds
 ### After Complete Split
 
 ```
-@proto/llm-tools:
+@protolabsai/llm-tools:
 ├─ 3 entry points (index, client, utils)
 ├─ 2 formats
 ├─ Type surface: 30% of current
 └─ Peak memory: ~1.2GB
 
-@proto/llm-workflows:
+@protolabsai/llm-workflows:
 ├─ 2 entry points (index, state-types)
 ├─ 2 formats
 ├─ Type surface: 40% (high complexity)
 └─ Peak memory: ~1.5GB (parallel)
 
-@proto/llm-playgrounds:
+@protolabsai/llm-playgrounds:
 ├─ 1 entry point (index)
 ├─ 2 formats
 ├─ Type surface: 20%
 └─ Peak memory: ~0.8GB (parallel)
 
-@proto/entity-researcher:
+@protolabsai/entity-researcher:
 ├─ 1 entry point (index)
 ├─ 2 formats
 ├─ Type surface: 15%
@@ -229,16 +229,16 @@ Savings: 58% memory per package, parallelizable
 - ⏳ Monitor build performance
 - ⏳ Verify no hydration/runtime regressions
 
-### Phase 1: Create @proto/llm-workflows (Week 1-2, Nov 2025)
+### Phase 1: Create @protolabsai/llm-workflows (Week 1-2, Nov 2025)
 
 ```bash
 pnpm create-workspace-package llm-workflows
 # Move workflows/ and tools/ to new package
-# Update imports in @proto/llm-tools
+# Update imports in @protolabsai/llm-tools
 # Verify exports and entry points
 ```
 
-### Phase 2: Create @proto/llm-playgrounds (Week 3-4, Nov 2025)
+### Phase 2: Create @protolabsai/llm-playgrounds (Week 3-4, Nov 2025)
 
 ```bash
 pnpm create-workspace-package llm-playgrounds
@@ -247,15 +247,15 @@ pnpm create-workspace-package llm-playgrounds
 # Update app/rabbit-hole imports
 ```
 
-### Phase 3: Create @proto/entity-researcher (Dec 2025)
+### Phase 3: Create @protolabsai/entity-researcher (Dec 2025)
 
 ```bash
 pnpm create-workspace-package entity-researcher
 # Move tools/deep-agent-entity-researcher/ to new package
-# Update references in @proto/llm-workflows
+# Update references in @protolabsai/llm-workflows
 ```
 
-### Phase 4: Consolidate @proto/llm-tools (Dec 2025)
+### Phase 4: Consolidate @protolabsai/llm-tools (Dec 2025)
 
 - Simplify package to client-safe utilities + configs
 - Reduce to 2-3 entry points
@@ -265,32 +265,32 @@ pnpm create-workspace-package entity-researcher
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ @proto/llm-tools (Client-safe utilities & configs)                         │
+│ @protolabsai/llm-tools (Client-safe utilities & configs)                         │
 │ - React hooks (React Query, Transcription, YouTube)                         │
 │ - Config (Wikipedia, LangExtract, YouTube, Transcription)                   │
 │ - Types (browser-safe only)                                                 │
-│ - Dependencies: React, @tanstack/react-query, @proto/types                  │
+│ - Dependencies: React, @tanstack/react-query, @protolabsai/types                  │
 └─────────────────────────────────────────────────────────────────────────────┘
             ↑                                          ↑
             │ imports                                 │ imports
             │                                         │
 ┌───────────────────────────────┐    ┌──────────────────────────────┐
-│ @proto/llm-workflows          │    │ @proto/llm-playgrounds       │
+│ @protolabsai/llm-workflows          │    │ @protolabsai/llm-playgrounds       │
 │ - LangGraph workflows          │    │ - Playground components      │
 │ - Job queue patterns           │    │ - Playground state/hooks     │
 │ - Tool implementations         │    │ - Storybook support         │
-│ - LangChain integrations       │    │ - Dependencies: @proto/llm-* │
+│ - LangChain integrations       │    │ - Dependencies: @protolabsai/llm-* │
 │ - Dependencies: LangChain/*    │    └──────────────────────────────┘
 └───────────────────────────────┘
             ↑
             │ imports
             │
 ┌───────────────────────────────┐
-│ @proto/entity-researcher      │
+│ @protolabsai/entity-researcher      │
 │ - Multi-agent coordinator     │
 │ - 6 specialized subagents     │
 │ - Complex state management    │
-│ - Dependencies: @proto/llm-*  │
+│ - Dependencies: @protolabsai/llm-*  │
 └───────────────────────────────┘
 ```
 

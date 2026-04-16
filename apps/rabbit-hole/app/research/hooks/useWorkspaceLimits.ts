@@ -8,8 +8,11 @@
 import { useEffect, useState } from "react";
 import * as Y from "yjs";
 
-import { getTierLimitsClient, type UserTier } from "@proto/auth/client";
-import { countWorkspaceEntities, type WorkspaceUsage } from "@proto/utils";
+import { getTierLimitsClient, type UserTier } from "@protolabsai/auth/client";
+import {
+  countWorkspaceEntities,
+  type WorkspaceUsage,
+} from "@protolabsai/utils";
 
 export interface WorkspaceLimitsState {
   usage: WorkspaceUsage | null;

@@ -12,8 +12,8 @@ import {
   AtlasCrudFileEntityDataSchema,
   safeValidate,
   type FileProcessingState,
-} from "@proto/types";
-import type { FileProcessingResult } from "@proto/utils/file-processing";
+} from "@protolabsai/types";
+import type { FileProcessingResult } from "@protolabsai/utils/file-processing";
 // Job enqueueing via API call - no direct imports to avoid bundling server-only modules
 
 export interface UploadProgressCallback {

@@ -1,4 +1,4 @@
-# @services/job-processor
+# @protolabsai/job-processor
 
 ## 0.1.6
 
@@ -6,15 +6,15 @@
 
 - c0435ce: Security: Patch Next.js CVE-2025-66478 (RCE)
 - Updated dependencies [c0435ce]
-  - @proto/sidequest-utils@0.1.6
-  - @proto/utils@0.3.0
+  - @protolabsai/sidequest-utils@0.1.6
+  - @protolabsai/utils@0.3.0
 
 ## 0.1.5
 
 ### Patch Changes
 
-- @proto/sidequest-utils@0.1.5
-- @proto/utils@0.3.0
+- @protolabsai/sidequest-utils@0.1.5
+- @protolabsai/utils@0.3.0
 
 ## 0.1.4
 
@@ -25,30 +25,30 @@
   Added manual job resolution configuration to bypass automatic script path detection which was capturing TypeScript source paths (../../src/job/job.ts) instead of compiled JavaScript outputs, causing ERR_MODULE_NOT_FOUND errors in production containers. Job processor now uses explicit job registry (sidequest.jobs.js) that imports from compiled dist/jobs/\*.js files.
 
 - Updated dependencies [f36511a]
-  - @proto/sidequest-utils@0.1.4
+  - @protolabsai/sidequest-utils@0.1.4
 
 ## 0.1.3
 
 ### Patch Changes
 
-- @proto/utils@0.3.0
-- @proto/sidequest-utils@0.1.3
+- @protolabsai/utils@0.3.0
+- @protolabsai/sidequest-utils@0.1.3
 
 ## 0.1.2
 
 ### Patch Changes
 
 - Updated dependencies [f8f13f8]
-  - @proto/utils@0.3.0
-  - @proto/sidequest-utils@0.1.2
+  - @protolabsai/utils@0.3.0
+  - @protolabsai/sidequest-utils@0.1.2
 
 ## 0.1.1
 
 ### Patch Changes
 
 - Updated dependencies [44db068]
-  - @proto/utils@0.2.0
-  - @proto/sidequest-utils@0.1.1
+  - @protolabsai/utils@0.2.0
+  - @protolabsai/sidequest-utils@0.1.1
 
 ## 0.1.0
 
@@ -83,7 +83,7 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @proto/database@0.1.0
-  - @proto/sidequest-utils@1.1.0
-  - @proto/types@0.1.0
-  - @proto/utils@0.1.0
+  - @protolabsai/database@0.1.0
+  - @protolabsai/sidequest-utils@1.1.0
+  - @protolabsai/types@0.1.0
+  - @protolabsai/utils@0.1.0

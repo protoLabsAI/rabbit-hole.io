@@ -12,10 +12,13 @@
 
 import { useState, useCallback, useEffect, useMemo } from "react";
 
-import { getUserTierClient, getTierLimitsClient } from "@proto/auth/client";
-import { logPageView, logWorkspaceOperation } from "@proto/logger";
-import { ResizableChatLayout } from "@proto/ui/templates";
-import type { CanvasType } from "@proto/workspace";
+import {
+  getUserTierClient,
+  getTierLimitsClient,
+} from "@protolabsai/auth/client";
+import { logPageView, logWorkspaceOperation } from "@protolabsai/logger";
+import { ResizableChatLayout } from "@protolabsai/ui/templates";
+import type { CanvasType } from "@protolabsai/workspace";
 
 import { ConfirmDialogProvider } from "./components/ConfirmDialog";
 import { ResearchChatInterface } from "./components/ResearchChatInterface";

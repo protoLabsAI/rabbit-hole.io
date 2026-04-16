@@ -12,8 +12,8 @@
 import { generateText } from "ai";
 import { NextRequest, NextResponse } from "next/server";
 
-import { getGlobalNeo4jClient } from "@proto/database";
-import { getAIModel } from "@proto/llm-providers/server";
+import { getGlobalNeo4jClient } from "@protolabsai/database";
+import { getAIModel } from "@protolabsai/llm-providers/server";
 
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 

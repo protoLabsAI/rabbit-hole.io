@@ -9,8 +9,8 @@
 
 import { useState } from "react";
 
-import { useEnqueueLangExtract } from "@proto/sidequest-utils/client";
-import { JobStatusTracker } from "@proto/sidequest-utils/components";
+import { useEnqueueLangExtract } from "@protolabsai/sidequest-utils/client";
+import { JobStatusTracker } from "@protolabsai/sidequest-utils/components";
 import {
   Badge,
   Button,
@@ -22,8 +22,8 @@ import {
   Label,
   Switch,
   Textarea,
-} from "@proto/ui/atoms";
-import { useToast } from "@proto/ui/hooks";
+} from "@protolabsai/ui/atoms";
+import { useToast } from "@protolabsai/ui/hooks";
 
 import {
   useLangExtract,

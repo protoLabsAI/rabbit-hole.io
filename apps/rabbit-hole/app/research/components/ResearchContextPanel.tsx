@@ -7,8 +7,8 @@
  * Shows file name, type, size, and allows removal.
  */
 
-import { Icon } from "@proto/icon-system";
-import { Badge, Button } from "@proto/ui/atoms";
+import { Icon } from "@protolabsai/icon-system";
+import { Badge, Button } from "@protolabsai/ui/atoms";
 
 import type { ContextFile } from "../hooks/useResearchContext";
 

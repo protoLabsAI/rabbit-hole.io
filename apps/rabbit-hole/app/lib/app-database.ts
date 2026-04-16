@@ -1,11 +1,11 @@
 /**
  * Application Database Connection
  *
- * Delegates to global PostgreSQL pool from @proto/database
+ * Delegates to global PostgreSQL pool from @protolabsai/database
  * Separate from SideQuest.js job processing database (sidequest)
  */
 
-import { getGlobalPostgresPool } from "@proto/database";
+import { getGlobalPostgresPool } from "@protolabsai/database";
 
 export async function testAppDatabaseConnection(): Promise<boolean> {
   const pool = getGlobalPostgresPool();

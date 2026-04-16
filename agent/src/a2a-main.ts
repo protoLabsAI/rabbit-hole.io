@@ -3,7 +3,7 @@
  *
  * Runs as a sibling process to `langgraphjs dev` — the Dockerfile starts
  * both and waits for either to exit. In development, use:
- *   pnpm --filter @proto/agent dev:a2a
+ *   pnpm --filter @protolabsai/agent dev:a2a
  *
  * Env:
  *   A2A_PORT            — listen port (default 7870)

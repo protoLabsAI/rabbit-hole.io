@@ -28,7 +28,7 @@ pnpm dev
 ### 1. Import the Playground
 
 ```tsx
-import { TiptapExtractionPlayground } from "@proto/llm-tools/playgrounds";
+import { TiptapExtractionPlayground } from "@protolabsai/llm-tools/playgrounds";
 
 export default function Page() {
   return <TiptapExtractionPlayground />;
@@ -135,7 +135,7 @@ Expected results:
 If you want to use the extraction workflow without the UI:
 
 ```typescript
-import { extractionGraph } from "@proto/llm-tools";
+import { extractionGraph } from "@protolabsai/llm-tools";
 
 const result = await extractionGraph.invoke({
   inputText: "Your text here...",
@@ -156,7 +156,7 @@ console.log(result.relationships);
 ## React Hook Usage
 
 ```typescript
-import { useExtractionWorkflow } from "@proto/llm-tools";
+import { useExtractionWorkflow } from "@protolabsai/llm-tools";
 
 function MyComponent() {
   const { mutate, isPending, data } = useExtractionWorkflow();

@@ -35,35 +35,39 @@
       ],
       "@rabbit-hole/research": ["./apps/rabbit-hole/app/research"],
       "@rabbit-hole/research/*": ["./apps/rabbit-hole/app/research/*"],
-      "@proto/types": ["./packages/types/src"],
-      "@proto/database": ["./packages/database/src"],
-      "@proto/auth": ["./packages/auth/src"],
-      "@proto/auth/client": ["./packages/auth/src/client"],
-      "@proto/utils": ["./packages/utils/src"],
-      "@proto/utils/atlas": ["./packages/utils/src/atlas"],
-      "@proto/utils/file-processing": ["./packages/utils/src/file-processing"],
-      "@proto/utils/tenancy-edge": ["./packages/utils/src/tenancy-edge"],
-      "@proto/utils/tenancy-server": ["./packages/utils/src/tenancy-server"],
-      "@proto/api-utils": ["./packages/api-utils/src"],
-      "@proto/logger": ["./packages/logger/src"],
-      "@proto/sidequest-utils": ["./packages/sidequest-utils/src"],
-      "@proto/sidequest-utils/client": [
+      "@protolabsai/types": ["./packages/types/src"],
+      "@protolabsai/database": ["./packages/database/src"],
+      "@protolabsai/auth": ["./packages/auth/src"],
+      "@protolabsai/auth/client": ["./packages/auth/src/client"],
+      "@protolabsai/utils": ["./packages/utils/src"],
+      "@protolabsai/utils/atlas": ["./packages/utils/src/atlas"],
+      "@protolabsai/utils/file-processing": [
+        "./packages/utils/src/file-processing"
+      ],
+      "@protolabsai/utils/tenancy-edge": ["./packages/utils/src/tenancy-edge"],
+      "@protolabsai/utils/tenancy-server": [
+        "./packages/utils/src/tenancy-server"
+      ],
+      "@protolabsai/api-utils": ["./packages/api-utils/src"],
+      "@protolabsai/logger": ["./packages/logger/src"],
+      "@protolabsai/sidequest-utils": ["./packages/sidequest-utils/src"],
+      "@protolabsai/sidequest-utils/client": [
         "./packages/sidequest-utils/src/client"
       ],
-      "@proto/sidequest-utils/server": [
+      "@protolabsai/sidequest-utils/server": [
         "./packages/sidequest-utils/src/server"
       ],
-      "@proto/icon-system": ["./packages/icon-system/src"],
-      "@proto/llm-providers": ["./packages/llm-providers/src"],
-      "@proto/ui": ["./packages/ui/src"],
-      "@proto/ui/atoms": ["./packages/ui/src/atoms"],
-      "@proto/ui/molecules": ["./packages/ui/src/molecules"],
-      "@proto/ui/organisms": ["./packages/ui/src/organisms"],
-      "@proto/ui/templates": ["./packages/ui/src/templates"],
-      "@proto/ui/theme": ["./packages/ui/src/theme"],
-      "@proto/charts": ["./packages/charts/src"],
-      "@proto/charts/gantt": ["./packages/charts/src/gantt"],
-      "@proto/yjs-history": ["./packages/yjs-history/src"]
+      "@protolabsai/icon-system": ["./packages/icon-system/src"],
+      "@protolabsai/llm-providers": ["./packages/llm-providers/src"],
+      "@protolabsai/ui": ["./packages/ui/src"],
+      "@protolabsai/ui/atoms": ["./packages/ui/src/atoms"],
+      "@protolabsai/ui/molecules": ["./packages/ui/src/molecules"],
+      "@protolabsai/ui/organisms": ["./packages/ui/src/organisms"],
+      "@protolabsai/ui/templates": ["./packages/ui/src/templates"],
+      "@protolabsai/ui/theme": ["./packages/ui/src/theme"],
+      "@protolabsai/charts": ["./packages/charts/src"],
+      "@protolabsai/charts/gantt": ["./packages/charts/src/gantt"],
+      "@protolabsai/yjs-history": ["./packages/yjs-history/src"]
     }
   },
   "exclude": [

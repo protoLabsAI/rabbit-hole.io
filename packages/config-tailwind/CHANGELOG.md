@@ -1,4 +1,4 @@
-# @proto/config-tailwind
+# @protolabsai/config-tailwind
 
 ## 0.1.0
 

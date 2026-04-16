@@ -1,4 +1,4 @@
-# @proto/yjs-history Implementation Summary
+# @protolabsai/yjs-history Implementation Summary
 
 **Created:** November 1, 2025  
 **Status:** ✅ Complete  
@@ -161,7 +161,7 @@ const { undo, redo, canUndo, canRedo } = useYjsUndo({
 
 **After:**
 ```typescript
-import { useYjsHistory } from "@proto/yjs-history";
+import { useYjsHistory } from "@protolabsai/yjs-history";
 
 const { undo, redo, canUndo, canRedo } = useYjsHistory({
   ydoc,
@@ -173,7 +173,7 @@ const { undo, redo, canUndo, canRedo } = useYjsHistory({
 ### 2. Add Versioning to useWorkspace
 
 ```typescript
-import { useYjsHistory, IndexedDBVersionStorage } from "@proto/yjs-history";
+import { useYjsHistory, IndexedDBVersionStorage } from "@protolabsai/yjs-history";
 
 export function useWorkspace(workspaceId: string) {
   const { ydoc, userId } = useHocuspocusYjs({ roomId });
@@ -218,7 +218,7 @@ export function useWorkspace(workspaceId: string) {
 ### 3. React Flow Integration
 
 ```typescript
-import { useReactFlowYjsHistory } from "@proto/yjs-history";
+import { useReactFlowYjsHistory } from "@protolabsai/yjs-history";
 
 function GraphCanvasIntegrated({ ydoc, userId, onDataChange }) {
   const {
@@ -273,7 +273,7 @@ import {
   formatVersionTime,
   getUniqueTags,
   buildVersionTree,
-} from "@proto/yjs-history";
+} from "@protolabsai/yjs-history";
 
 // Group versions by date
 const groups = groupVersionsByDate(versions);
@@ -449,7 +449,7 @@ dist/
 
 ## Conclusion
 
-The `@proto/yjs-history` package provides a production-ready undo/redo and versioning system that:
+The `@protolabsai/yjs-history` package provides a production-ready undo/redo and versioning system that:
 
 - ✅ Works with existing Yjs infrastructure (HocusPocus + local)
 - ✅ Provides React Flow-compatible history management

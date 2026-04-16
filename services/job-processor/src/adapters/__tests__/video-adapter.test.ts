@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { FileSource, UrlSource } from "@proto/types";
+import type { FileSource, UrlSource } from "@protolabsai/types";
 
 import { VideoAdapter } from "../video-adapter.js";
 

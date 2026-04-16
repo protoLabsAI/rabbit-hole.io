@@ -13,13 +13,16 @@ import { generateObject, generateText, streamText } from "ai";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
-import { getAIModel } from "@proto/llm-providers/server";
+import { getAIModel } from "@protolabsai/llm-providers/server";
 import {
   createTracingContext,
   type TracingContext,
-} from "@proto/research-middleware";
-import { safeValidate } from "@proto/types";
-import { upsertResearchChunks, searchResearchMemory } from "@proto/vector";
+} from "@protolabsai/research-middleware";
+import { safeValidate } from "@protolabsai/types";
+import {
+  upsertResearchChunks,
+  searchResearchMemory,
+} from "@protolabsai/vector";
 
 import {
   searchCommunities,

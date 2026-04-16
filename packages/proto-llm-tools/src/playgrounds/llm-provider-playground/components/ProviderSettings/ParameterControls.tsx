@@ -1,4 +1,4 @@
-import { Label, Slider } from "@proto/ui/atoms";
+import { Label, Slider } from "@protolabsai/ui/atoms";
 
 import type { PlaygroundConfig } from "../../types";
 

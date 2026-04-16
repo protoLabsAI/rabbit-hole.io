@@ -5,7 +5,7 @@
  * to use in langextract prompts. Falls back to default if no examples found.
  */
 
-import type { RelationshipExample } from "@proto/types";
+import type { RelationshipExample } from "@protolabsai/types";
 
 import { getDomainConfig } from "../workflows/multi-phase-extraction-utils";
 

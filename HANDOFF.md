@@ -67,7 +67,7 @@ rabbit-hole.io/
 ├── services/job-processor/       # Media ingestion pipeline
 │   ├── src/adapters/             # 7 format adapters (text, pdf, docx, audio, video, etc.)
 │   └── src/api/                  # REST API (POST /ingest, GET /ingest/:id/stream)
-├── packages/                     # Shared libraries (@proto/*)
+├── packages/                     # Shared libraries (@protolabsai/*)
 │   ├── types/                    # Zod schemas, entity types, bundle types
 │   ├── database/                 # PostgreSQL pool + queries
 │   ├── utils/                    # MinIO storage, file processing, domain helpers
@@ -191,7 +191,7 @@ pnpm install
 #   TAVILY_API_KEY=<your key>
 
 # Start dev server
-pnpm --filter @apps/rabbit-hole dev
+pnpm --filter @protolabsai/rabbit-hole dev
 ```
 
 **Note:** Next.js runs outside Docker. The Docker build OOMs on machines with < 16GB RAM allocated to Docker. Use the dev server locally, Nix build for cloud deployment.
@@ -210,10 +210,10 @@ pnpm --filter @apps/rabbit-hole dev
 
 ## Code Conventions
 
-- **`getModel()`** from `@proto/llm-providers/server` — never import LangChain models directly
-- **`getGlobalPostgresPool()`** from `@proto/database` — never create `Pool` directly
-- **`generateSecureId()`** from `@proto/utils` — never use `crypto.randomUUID()`
-- **Strict import ordering** enforced by ESLint (builtin → external → @proto/* → internal)
+- **`getModel()`** from `@protolabsai/llm-providers/server` — never import LangChain models directly
+- **`getGlobalPostgresPool()`** from `@protolabsai/database` — never create `Pool` directly
+- **`generateSecureId()`** from `@protolabsai/utils` — never use `crypto.randomUUID()`
+- **Strict import ordering** enforced by ESLint (builtin → external → @protolabsai/* → internal)
 - **pnpm workspace + Turborepo** for builds
 - **Vitest** for testing, TDD approach
 
@@ -250,7 +250,7 @@ pnpm --filter @apps/rabbit-hole dev
 
 The rabbit-hole Next.js image requires special handling for memory-constrained environments:
 
-- `SKIP_DTS=1` — Skips TypeScript declaration generation in `@proto/llm-tools` (saves ~4GB RAM)
+- `SKIP_DTS=1` — Skips TypeScript declaration generation in `@protolabsai/llm-tools` (saves ~4GB RAM)
 - `SKIP_STANDALONE=1` — Disables Next.js standalone output tracing (saves ~2GB RAM)
 - `webpackBuildWorker: false` — Disabled in next.config.js (spawns parallel worker that doubles memory)
 - `--max-old-space-size=6144` — Heap limit set to 6GB (needs ~8GB Docker allocation)

@@ -12,7 +12,7 @@ import type {
   ResearchSettings,
   TimeWindow,
   RabbitHoleBundleData,
-} from "@proto/types";
+} from "@protolabsai/types";
 import {
   getBiologicalEntityType,
   getSocialEntityType,
@@ -26,7 +26,7 @@ import {
   getLegalEntityType,
   getAcademicEntityType,
   getCulturalEntityType,
-} from "@proto/types";
+} from "@protolabsai/types";
 
 import type { CanonicalGraphData } from "../../types/canonical-graph";
 import type { Workspace } from "../types/workspace";
@@ -79,7 +79,7 @@ function convertEgoNetworkToBundle(
     return obj;
   };
 
-  // Get entity type from UID using domain helpers from @proto/types
+  // Get entity type from UID using domain helpers from @protolabsai/types
   const getEntityTypeFromUid = (uid: string): string => {
     return (
       getBiologicalEntityType(uid) ||

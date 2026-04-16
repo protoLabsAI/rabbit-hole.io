@@ -1,4 +1,4 @@
-# @proto/yjs-history - Quick Start
+# @protolabsai/yjs-history - Quick Start
 
 **Version:** 1.0.0  
 **Status:** ✅ Production Ready
@@ -10,7 +10,7 @@
 Already installed as workspace package. Import and use:
 
 ```typescript
-import { useYjsHistory, IndexedDBVersionStorage } from "@proto/yjs-history";
+import { useYjsHistory, IndexedDBVersionStorage } from "@protolabsai/yjs-history";
 ```
 
 ---
@@ -21,7 +21,7 @@ import { useYjsHistory, IndexedDBVersionStorage } from "@proto/yjs-history";
 
 ```diff
 - import { useYjsUndo } from "@/hooks/useYjsUndo";
-+ import { useYjsHistory } from "@proto/yjs-history";
++ import { useYjsHistory } from "@protolabsai/yjs-history";
 
 - const { undo, redo, canUndo, canRedo } = useYjsUndo({
 + const { undo, redo, canUndo, canRedo } = useYjsHistory({
@@ -40,7 +40,7 @@ Done! Undo/redo works exactly the same.
 ### 1. Add Storage
 
 ```typescript
-import { useYjsHistory, IndexedDBVersionStorage } from "@proto/yjs-history";
+import { useYjsHistory, IndexedDBVersionStorage } from "@protolabsai/yjs-history";
 
 const {
   undo,
@@ -83,7 +83,7 @@ versions.map(v => (
 ## React Flow Integration
 
 ```typescript
-import { useReactFlowYjsHistory } from "@proto/yjs-history";
+import { useReactFlowYjsHistory } from "@protolabsai/yjs-history";
 
 const { takeSnapshot, undo, redo } = useReactFlowYjsHistory({
   ydoc,
@@ -178,7 +178,7 @@ import {
   filterVersionsByTag,
   searchVersions,
   formatVersionTime,
-} from "@proto/yjs-history";
+} from "@protolabsai/yjs-history";
 
 const groups = groupVersionsByDate(versions);
 const autoSaves = filterVersionsByTag(versions, "auto");

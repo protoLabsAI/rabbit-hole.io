@@ -1,6 +1,6 @@
 "use client";
 
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 import {
   Card,
   CardContent,
@@ -8,7 +8,7 @@ import {
   CardTitle,
   Button,
   Badge,
-} from "@proto/ui";
+} from "@protolabsai/ui";
 
 import type { Entity } from "../../../workflows/multi-phase-extraction";
 

@@ -27,7 +27,7 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@proto/ui/atoms";
+} from "@protolabsai/ui/atoms";
 
 import {
   useWikipediaQuery,

@@ -5,7 +5,7 @@
  * ForceGraph3D component.
  */
 
-import { getEntityColor } from "@proto/utils/atlas";
+import { getEntityColor } from "@protolabsai/utils/atlas";
 
 // ─── Background & Fog ────────────────────────────────────────────────────────
 

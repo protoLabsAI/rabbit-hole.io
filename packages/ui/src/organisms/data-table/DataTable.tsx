@@ -14,7 +14,7 @@ import {
 } from "@tanstack/react-table";
 import * as React from "react";
 
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 
 import { Button } from "../../atoms/button";
 import {

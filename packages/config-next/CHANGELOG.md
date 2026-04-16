@@ -1,4 +1,4 @@
-# @proto/config-next
+# @protolabsai/config-next
 
 ## 0.1.0
 

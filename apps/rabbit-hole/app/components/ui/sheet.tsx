@@ -5,7 +5,7 @@ import { cn } from "app/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 import * as React from "react";
 
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 
 const Sheet = SheetPrimitive.Root;
 

@@ -7,7 +7,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { getGlobalNeo4jClient } from "@proto/database";
+import { getGlobalNeo4jClient } from "@protolabsai/database";
 
 interface BiographicalAnalysis {
   entityId: string;
@@ -359,6 +359,6 @@ export async function GET(
       { status: 500 }
     );
   } finally {
-    // No session cleanup needed - @proto/database handles connection management;
+    // No session cleanup needed - @protolabsai/database handles connection management;
   }
 }

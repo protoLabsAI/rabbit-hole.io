@@ -11,7 +11,7 @@ import {
   RabbitHoleBundleSchema,
   safeValidate,
   type RabbitHoleBundleData,
-} from "@proto/types";
+} from "@protolabsai/types";
 
 export async function POST(request: NextRequest) {
   let body: unknown;

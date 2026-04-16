@@ -10,7 +10,7 @@
 
 import React, { useState, useCallback, useMemo, useEffect } from "react";
 
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 import {
   Badge,
   Button,
@@ -22,7 +22,7 @@ import {
   Checkbox,
   Input,
   Label,
-} from "@proto/ui/atoms";
+} from "@protolabsai/ui/atoms";
 
 import type {
   TimelineFilters,

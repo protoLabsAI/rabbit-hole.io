@@ -9,7 +9,7 @@
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
 
-import { searchCommunitySummaries } from "@proto/vector";
+import { searchCommunitySummaries } from "@protolabsai/vector";
 
 const QDRANT_ENABLED = !!(
   process.env.QDRANT_URL && process.env.OLLAMA_ENDPOINT

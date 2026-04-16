@@ -86,7 +86,7 @@ import {
   useState,
 } from "react";
 
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 
 import { cn } from "../../lib/utils";
 import { Button } from "../button/button";

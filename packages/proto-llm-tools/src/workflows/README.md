@@ -1,6 +1,6 @@
 # Multi-Phase Extraction Workflow
 
-Domain-aware entity extraction using `@proto/types` domain system.
+Domain-aware entity extraction using `@protolabsai/types` domain system.
 
 ## Key Features
 
@@ -17,7 +17,7 @@ Domain-aware entity extraction using `@proto/types` domain system.
 **Dynamic Loading**:
 
 ```typescript
-import { getAllDomainUIMetadata } from "@proto/llm-tools";
+import { getAllDomainUIMetadata } from "@protolabsai/llm-tools";
 
 // Get all available domains
 const domains = getAllDomainUIMetadata();
@@ -26,10 +26,10 @@ const domains = getAllDomainUIMetadata();
 
 ### 2. Automatic UID Generation
 
-Uses domain-specific prefixes from `@proto/types`:
+Uses domain-specific prefixes from `@protolabsai/types`:
 
 ```typescript
-import { generateDomainUID } from "@proto/llm-tools";
+import { generateDomainUID } from "@protolabsai/llm-tools";
 
 // Automatically finds correct prefix from domain registry
 generateDomainUID("Albert Einstein", "Person", "social");
@@ -44,7 +44,7 @@ generateDomainUID("Harvard University", "University", "academic");
 Enrichment fields defined per entity type, easily extensible:
 
 ```typescript
-import { getEnrichmentFieldsForEntity } from "@proto/llm-tools";
+import { getEnrichmentFieldsForEntity } from "@protolabsai/llm-tools";
 
 getEnrichmentFieldsForEntity("Person", "social");
 // → ["birthDate", "deathDate", "nationality", "occupation", "bio", "education"]
@@ -71,7 +71,7 @@ await extractionGraph.invoke({
 ## Architecture
 
 ```
-Domain Registry (@proto/types)
+Domain Registry (@protolabsai/types)
         ↓
 getAllDomainUIMetadata()
         ↓
@@ -88,7 +88,7 @@ getDomainColorForEntity(type) → visualization
 
 ## Adding New Domains
 
-1. **Add to `@proto/types`** domain system:
+1. **Add to `@protolabsai/types`** domain system:
 
 ```typescript
 // packages/types/src/domains/your-domain/domain.config.ts

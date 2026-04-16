@@ -8,8 +8,8 @@
 import Graph from "graphology";
 import type { Attributes } from "graphology-types";
 
-import type { EntityType } from "@proto/types";
-import { getEntityColor, getEntityImage } from "@proto/utils/atlas";
+import type { EntityType } from "@protolabsai/types";
+import { getEntityColor, getEntityImage } from "@protolabsai/utils/atlas";
 
 /**
  * Node attributes stored in Graphology

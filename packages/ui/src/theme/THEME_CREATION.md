@@ -1,6 +1,6 @@
 # Theme Creation Guide
 
-Complete guide to creating custom themes for @proto/ui.
+Complete guide to creating custom themes for @protolabsai/ui.
 
 ## Theme Structure
 
@@ -14,7 +14,7 @@ Every theme requires:
 ## Basic Theme Template
 
 ```tsx
-import { ThemeConfig } from "@proto/ui/theme";
+import { ThemeConfig } from "@protolabsai/ui/theme";
 
 export const myTheme: ThemeConfig = {
   // Metadata
@@ -124,7 +124,7 @@ dark: {
 ## Example: Corporate Theme
 
 ```tsx
-import { ThemeConfig } from "@proto/ui/theme";
+import { ThemeConfig } from "@protolabsai/ui/theme";
 
 export const corporateTheme: ThemeConfig = {
   name: "corporate",
@@ -233,7 +233,7 @@ export const themeDisplayInfo = {
 ## Validation
 
 ```tsx
-import { validateTheme } from "@proto/ui/theme";
+import { validateTheme } from "@protolabsai/ui/theme";
 
 const errors = validateTheme(myTheme);
 if (errors.length > 0) {
@@ -244,7 +244,7 @@ if (errors.length > 0) {
 ## Testing Your Theme
 
 ```tsx
-import { ThemeGenerator } from "@proto/ui/theme";
+import { ThemeGenerator } from "@protolabsai/ui/theme";
 
 // 1. Validate configuration
 const errors = validateTheme(myTheme);
@@ -299,7 +299,7 @@ Study these examples:
 
 ```tsx
 // Check if theme name is valid
-import { isValidThemeName } from "@proto/ui/theme";
+import { isValidThemeName } from "@protolabsai/ui/theme";
 console.log(isValidThemeName("my-theme")); // true/false
 ```
 
@@ -320,7 +320,7 @@ console.log(
 
 ```tsx
 // Ensure all required fields are present
-import type { ThemeConfig } from "@proto/ui/theme";
+import type { ThemeConfig } from "@protolabsai/ui/theme";
 
 const theme: ThemeConfig = {
   // TypeScript will show errors for missing fields

@@ -1,5 +1,5 @@
 /**
- * @proto/database - Database Client Package
+ * @protolabsai/database - Database Client Package
  *
  * Centralized database access for Neo4j operations across the platform.
  */

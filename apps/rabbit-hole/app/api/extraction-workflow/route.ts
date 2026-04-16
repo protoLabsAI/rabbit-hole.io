@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { extractionGraph } from "@proto/llm-tools";
+import { extractionGraph } from "@protolabsai/llm-tools";
 
 export const runtime = "nodejs";
 export const maxDuration = 300; // 5 minutes for long extractions

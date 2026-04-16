@@ -21,9 +21,9 @@ export default defineConfig({
   sourcemap: true,
   minify: false,
   external: [
-    "@proto/types",
-    "@proto/llm-providers",
-    "@proto/vector",
+    "@protolabsai/types",
+    "@protolabsai/llm-providers",
+    "@protolabsai/vector",
     "@langchain/core",
     "@langchain/langgraph",
     "@copilotkit/sdk-js",

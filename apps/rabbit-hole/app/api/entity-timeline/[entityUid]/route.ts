@@ -1,7 +1,7 @@
 /**
  * Entity Timeline API - EventTimelineChart Integration
  *
- * Uses clean utilities from @proto/utils/atlas for EventTimelineChart component
+ * Uses clean utilities from @protolabsai/utils/atlas for EventTimelineChart component
  */
 
 import { NextRequest, NextResponse } from "next/server";

@@ -7,7 +7,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { enqueueTextExtractionJob } from "@proto/sidequest-utils/server";
+import { enqueueTextExtractionJob } from "@protolabsai/sidequest-utils/server";
 
 interface EnqueueJobRequest {
   jobType: "text-extraction";

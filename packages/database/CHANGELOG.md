@@ -1,4 +1,4 @@
-# @proto/database
+# @protolabsai/database
 
 ## 0.1.0
 
@@ -33,4 +33,4 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @proto/types@0.1.0
+  - @protolabsai/types@0.1.0

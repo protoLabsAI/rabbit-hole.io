@@ -1,5 +1,5 @@
 {
-  "name": "@proto/workspace",
+  "name": "@protolabsai/workspace",
   "version": "0.1.0",
   "private": true,
   "description": "Multi-tab collaborative workspace framework with Yjs persistence",
@@ -24,14 +24,14 @@
     "clean": "rm -rf dist .turbo node_modules"
   },
   "dependencies": {
-    "@proto/icon-system": "workspace:*"
+    "@protolabsai/icon-system": "workspace:*"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",
     "yjs": "^13.6.x"
   },
   "devDependencies": {
-    "@proto/config-typescript": "workspace:*",
+    "@protolabsai/config-typescript": "workspace:*",
     "@types/react": "^19.0.0",
     "tsup": "^8.0.1",
     "typescript": "^5.6.3",

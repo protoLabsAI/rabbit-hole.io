@@ -30,10 +30,10 @@ for PKG_DIR in $CHANGED_PKG_DIRS; do
     continue
   fi
   
-  # Find @proto/ imports in staged content only (not working directory)
-  # Updated regex to capture full nested paths like @proto/auth/ui
+  # Find @protolabsai/ imports in staged content only (not working directory)
+  # Updated regex to capture full nested paths like @protolabsai/auth/ui
   IMPORTS=$(echo "$PKG_STAGED_FILES" | while read -r file; do
-    git show ":$file" 2>/dev/null | grep -h "from ['\"]@proto/" || true
+    git show ":$file" 2>/dev/null | grep -h "from ['\"]@protolabsai/" || true
   done | sed -E "s/.*from ['\"](@proto\/[^'\"]+).*/\1/" | sort -u || true)
   
   if [ -z "$IMPORTS" ]; then
@@ -49,7 +49,7 @@ for PKG_DIR in $CHANGED_PKG_DIRS; do
     fi
     
     # Check if in package.json
-    # For subpath imports like @proto/llm-providers/server, check the base package
+    # For subpath imports like @protolabsai/llm-providers/server, check the base package
     HAS_DEP=$(node -p "
       const pkg = require('./$PKG_DIR/package.json');
       const deps = { ...pkg.dependencies, ...pkg.peerDependencies };
@@ -59,7 +59,7 @@ for PKG_DIR in $CHANGED_PKG_DIRS; do
       if (deps[importPath]) {
         'yes';
       } else {
-        // Check if this is a subpath import (e.g., @proto/llm-providers/server)
+        // Check if this is a subpath import (e.g., @protolabsai/llm-providers/server)
         // Extract base package: @scope/package/subpath -> @scope/package
         const match = importPath.match(/^(@[^/]+\/[^/]+)/);
         if (match && deps[match[1]]) {

@@ -9,13 +9,13 @@
  * - Relationship Mapper: Maps relationships between entities
  * - Bundle Assembler: Assembles final research bundle
  *
- * Uses shared graph building from @proto/llm-tools with custom coordinator
+ * Uses shared graph building from @protolabsai/llm-tools with custom coordinator
  */
 
 import "../instrumentation.js"; // MUST BE FIRST - Initializes OpenTelemetry
 import { MemorySaver } from "@langchain/langgraph";
 
-import { buildDeepAgentGraph } from "@proto/deepagent/graph";
+import { buildDeepAgentGraph } from "@protolabsai/deepagent/graph";
 
 import { agentLLMConfig } from "../config/llm-config.js";
 

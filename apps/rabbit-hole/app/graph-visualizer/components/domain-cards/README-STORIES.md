@@ -7,10 +7,10 @@ Interactive Storybook documentation for domain card configuration.
 **Domains must be registered** before they can be used in stories. All story files use idempotent registration:
 
 ```typescript
-import { biologicalDomainConfig } from "@proto/types/domains/biological";
-import { socialDomainConfig } from "@proto/types/domains/social";
+import { biologicalDomainConfig } from "@protolabsai/types/domains/biological";
+import { socialDomainConfig } from "@protolabsai/types/domains/social";
 import { automotiveDomainConfig } from "../../../../custom-domains/automotive";
-import { domainRegistry } from "@proto/types";
+import { domainRegistry } from "@protolabsai/types";
 
 if (typeof window !== "undefined") {
   try {

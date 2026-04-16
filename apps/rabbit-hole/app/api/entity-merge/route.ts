@@ -10,7 +10,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { getGlobalNeo4jClient } from "@proto/database";
+import { getGlobalNeo4jClient } from "@protolabsai/database";
 
 import { requireSuperAdmin, unauthorizedResponse } from "@/lib/auth-guards";
 
@@ -343,7 +343,7 @@ export async function POST(
         },
       });
     } finally {
-      // No session cleanup needed - @proto/database handles connection management
+      // No session cleanup needed - @protolabsai/database handles connection management
     }
   } catch (error) {
     console.error("❌ Entity merge failed:", error);

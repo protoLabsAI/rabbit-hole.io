@@ -12,7 +12,7 @@ import type {
   ExtractionResult,
   IngestSource,
   MediaAdapter,
-} from "@proto/types";
+} from "@protolabsai/types";
 
 type MammothMessage = {
   type: "warning" | "error";

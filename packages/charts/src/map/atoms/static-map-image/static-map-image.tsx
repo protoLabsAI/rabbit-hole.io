@@ -13,7 +13,7 @@
 
 import { useMemo } from "react";
 
-import type { EntityType } from "@proto/types";
+import type { EntityType } from "@protolabsai/types";
 
 export interface StaticMapEntity {
   id: string;

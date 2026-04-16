@@ -15,9 +15,12 @@ import type { RunnableConfig } from "@langchain/core/runnables";
 import type { StructuredTool } from "@langchain/core/tools";
 import { StateGraph, START, END } from "@langchain/langgraph";
 
-import { getModel } from "@proto/llm-providers/server";
-import { mergePartialBundle, createEmptyPartialBundle } from "@proto/types";
-import type { ResearchPhase } from "@proto/types";
+import { getModel } from "@protolabsai/llm-providers/server";
+import {
+  mergePartialBundle,
+  createEmptyPartialBundle,
+} from "@protolabsai/types";
+import type { ResearchPhase } from "@protolabsai/types";
 
 import {
   EntityResearchAgentStateAnnotation,

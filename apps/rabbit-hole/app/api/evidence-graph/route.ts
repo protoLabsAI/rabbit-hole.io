@@ -7,12 +7,12 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { convertAllNeo4jParams } from "@proto/utils";
+import { convertAllNeo4jParams } from "@protolabsai/utils";
 
 // Dynamic import to avoid Turbopack issues with require()
 const resolveTenantFromHeaders = async (request: any) => {
   const { resolveTenantFromHeaders: resolver } = await import(
-    "@proto/utils/tenancy-server"
+    "@protolabsai/utils/tenancy-server"
   );
   return resolver(request);
 };

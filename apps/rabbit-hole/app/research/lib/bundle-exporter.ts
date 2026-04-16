@@ -13,7 +13,7 @@ import type {
   Content,
   Evidence,
   File as FileEntity,
-} from "@proto/types";
+} from "@protolabsai/types";
 
 import type {
   GraphNodeAttributes,

@@ -10,18 +10,18 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "paths": {
-      "@proto/ui": ["../ui/src"],
-      "@proto/ui/atoms": ["../ui/src/atoms"],
-      "@proto/ui/hooks": ["../ui/src/hooks"],
-      "@proto/sidequest-utils/client": ["../sidequest-utils/src/client"],
-      "@proto/sidequest-utils/components": [
+      "@protolabsai/ui": ["../ui/src"],
+      "@protolabsai/ui/atoms": ["../ui/src/atoms"],
+      "@protolabsai/ui/hooks": ["../ui/src/hooks"],
+      "@protolabsai/sidequest-utils/client": ["../sidequest-utils/src/client"],
+      "@protolabsai/sidequest-utils/components": [
         "../sidequest-utils/src/components"
       ],
-      "@proto/icon-system": ["../icon-system/src"],
-      "@proto/llm-providers": ["../llm-providers/src"],
-      "@proto/types": ["../types/src"],
-      "@proto/utils": ["../utils/src"],
-      "@proto/llm-tools/client": ["./src/client"]
+      "@protolabsai/icon-system": ["../icon-system/src"],
+      "@protolabsai/llm-providers": ["../llm-providers/src"],
+      "@protolabsai/types": ["../types/src"],
+      "@protolabsai/utils": ["../utils/src"],
+      "@protolabsai/llm-tools/client": ["./src/client"]
     },
     "composite": true,
     "incremental": true

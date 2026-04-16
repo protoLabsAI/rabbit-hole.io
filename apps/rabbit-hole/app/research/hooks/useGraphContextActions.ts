@@ -15,9 +15,9 @@ import {
   getUserRoleClient,
   hasMinimumRole,
   USER_ROLES,
-} from "@proto/auth/client";
-import { logUserAction } from "@proto/logger";
-import { useToast } from "@proto/ui/hooks";
+} from "@protolabsai/auth/client";
+import { logUserAction } from "@protolabsai/logger";
+import { useToast } from "@protolabsai/ui/hooks";
 
 import type {
   GraphNodeAttributes,

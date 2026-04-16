@@ -11,7 +11,7 @@ import { ResearchPlannerMiddleware } from "./research-planner";
 // ---------------------------------------------------------------------------
 
 vi.mock("ai");
-vi.mock("@proto/llm-providers/server");
+vi.mock("@protolabsai/llm-providers/server");
 
 // ---------------------------------------------------------------------------
 // Helpers

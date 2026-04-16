@@ -11,7 +11,7 @@ export {
   langextractWrapperTool,
   batchFieldMappingLookupTool,
   validateBundleTool,
-} from "@proto/deepagent/tools";
+} from "@protolabsai/deepagent/tools";
 
 import {
   writeTodos,
@@ -22,7 +22,7 @@ import {
   langextractWrapperTool,
   batchFieldMappingLookupTool,
   validateBundleTool,
-} from "@proto/deepagent/tools";
+} from "@protolabsai/deepagent/tools";
 
 export const deepAgentTools = [
   writeTodos,

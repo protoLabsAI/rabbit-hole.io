@@ -3,7 +3,7 @@
 import { useMouse } from "@uidotdev/usehooks";
 import { type FC } from "react";
 
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 
 import { useGanttContext, useGanttScrollX } from "../../hooks";
 import { cn } from "../../lib/utils";

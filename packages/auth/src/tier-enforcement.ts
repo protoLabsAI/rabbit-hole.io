@@ -20,7 +20,7 @@ interface User {
   lastName?: string | null;
 }
 
-import { getEntityCount, getRelationshipCount } from "@proto/database";
+import { getEntityCount, getRelationshipCount } from "@protolabsai/database";
 
 import { getUserTier, getTierLimits } from "./tier-utils";
 
@@ -338,7 +338,7 @@ export async function enforceStorageLimit(
   }
 
   // Import here to avoid circular dependency
-  const { getStorageUsed } = await import("@proto/database");
+  const { getStorageUsed } = await import("@protolabsai/database");
   const currentStorage = await getStorageUsed(clerkOrgId);
 
   if (currentStorage + additionalSize > limits.fileStorage) {

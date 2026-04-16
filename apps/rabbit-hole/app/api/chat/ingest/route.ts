@@ -10,8 +10,8 @@ import { generateText } from "ai";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
-import { getAIModel } from "@proto/llm-providers/server";
-import { safeValidate } from "@proto/types";
+import { getAIModel } from "@protolabsai/llm-providers/server";
+import { safeValidate } from "@protolabsai/types";
 
 const IngestRequestSchema = z.object({
   query: z.string().min(1).max(200),

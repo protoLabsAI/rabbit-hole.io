@@ -4,8 +4,8 @@
  * Helper functions to check domain feature flags.
  */
 
-import { domainRegistry } from "@proto/types";
-import type { DomainFeatureConfig } from "@proto/types";
+import { domainRegistry } from "@protolabsai/types";
+import type { DomainFeatureConfig } from "@protolabsai/types";
 
 // Re-export default config from types
 const DEFAULT_FEATURE_CONFIG: DomainFeatureConfig = {

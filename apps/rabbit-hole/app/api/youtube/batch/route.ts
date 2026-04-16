@@ -31,8 +31,8 @@ export async function GET(): Promise<NextResponse> {
 }
 
 /* DISABLED CODE - PRESERVED FOR RE-ENABLING
-import { withAuthAndLogging } from "@proto/api-utils";
-import { getUserTier } from "@proto/auth";
+import { withAuthAndLogging } from "@protolabsai/api-utils";
+import { getUserTier } from "@protolabsai/auth";
 import { enqueueYouTubeProcessing } from "../../../../services/job-processor/jobs";
 
 interface BatchProcessRequest {

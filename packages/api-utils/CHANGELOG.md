@@ -1,44 +1,44 @@
-# @proto/api-utils
+# @protolabsai/api-utils
 
 ## 0.1.6
 
 ### Patch Changes
 
-- @proto/auth@2.0.4
+- @protolabsai/auth@2.0.4
 
 ## 0.1.5
 
 ### Patch Changes
 
-- @proto/auth@2.0.3
+- @protolabsai/auth@2.0.3
 
 ## 0.1.4
 
 ### Patch Changes
 
 - Updated dependencies [8a48e27]
-  - @proto/auth@2.0.2
+  - @protolabsai/auth@2.0.2
 
 ## 0.1.3
 
 ### Patch Changes
 
 - Updated dependencies [fb1e4be]
-  - @proto/auth@2.0.1
+  - @protolabsai/auth@2.0.1
 
 ## 0.1.2
 
 ### Patch Changes
 
 - Updated dependencies [f8f13f8]
-  - @proto/auth@2.0.0
+  - @protolabsai/auth@2.0.0
 
 ## 0.1.1
 
 ### Patch Changes
 
 - Updated dependencies [44db068]
-  - @proto/auth@1.0.0
+  - @protolabsai/auth@1.0.0
 
 ## 0.1.0
 
@@ -73,5 +73,5 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @proto/auth@0.1.0
-  - @proto/types@0.1.0
+  - @protolabsai/auth@0.1.0
+  - @protolabsai/types@0.1.0

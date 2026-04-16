@@ -12,20 +12,20 @@ import { mergeResearchToNeo4j } from "../research-merge";
 // Mock dependencies
 // Clerk mock removed - auth is now hardcoded to local-user
 
-vi.mock("@proto/database", () => ({
+vi.mock("@protolabsai/database", () => ({
   getGlobalNeo4jClient: vi.fn(() => ({
     executeWrite: vi.fn(),
   })),
 }));
 
-vi.mock("@proto/logger", () => ({
+vi.mock("@protolabsai/logger", () => ({
   logger: {
     info: vi.fn(),
     error: vi.fn(),
   },
 }));
 
-vi.mock("@proto/utils", () => ({
+vi.mock("@protolabsai/utils", () => ({
   convertAllNeo4jParams: vi.fn((params) => params),
 }));
 
@@ -38,7 +38,7 @@ describe("mergeResearchToNeo4j", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    mockDatabase = await import("@proto/database");
+    mockDatabase = await import("@protolabsai/database");
   });
 
   it("should validate bundle format", async () => {

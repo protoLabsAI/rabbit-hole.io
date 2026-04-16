@@ -5,7 +5,7 @@
  * Uses settings JSON object format as required by nuqs.
  */
 
-import type { ResearchSettings, TimeWindow } from "@proto/types";
+import type { ResearchSettings, TimeWindow } from "@protolabsai/types";
 
 export interface ResearchUrlOptions {
   entity: string;

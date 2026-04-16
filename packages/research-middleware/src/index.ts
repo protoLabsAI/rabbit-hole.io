@@ -1,12 +1,12 @@
 /**
- * @proto/research-middleware
+ * @protolabsai/research-middleware
  *
  * DeerFlow-inspired middleware pipeline for wrapping AI SDK streamText
  * tool calls. Provides a typed interface for hooking into each stage of
  * the agent execution loop.
  *
  * @example
- * import { MiddlewareRegistry, PassthroughMiddleware } from "@proto/research-middleware";
+ * import { MiddlewareRegistry, PassthroughMiddleware } from "@protolabsai/research-middleware";
  *
  * const registry = new MiddlewareRegistry({
  *   entries: [

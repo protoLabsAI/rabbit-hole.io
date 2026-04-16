@@ -5,7 +5,7 @@
  * following the Rabbit Hole Bundle format requirements.
  */
 
-import type { Evidence, EvidenceKind } from "@proto/types";
+import type { Evidence, EvidenceKind } from "@protolabsai/types";
 
 interface WikipediaEvidenceParams {
   entityName: string;

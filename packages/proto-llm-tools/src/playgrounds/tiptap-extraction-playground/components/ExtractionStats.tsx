@@ -1,6 +1,6 @@
 "use client";
 
-import { Badge } from "@proto/ui";
+import { Badge } from "@protolabsai/ui";
 
 import type { ExtractionWorkflowResult } from "../../../hooks/useExtractionWorkflow";
 

@@ -8,7 +8,7 @@
 import { NextRequest } from "next/server";
 import type { PoolClient } from "pg";
 
-import { getGlobalPostgresPool } from "@proto/database";
+import { getGlobalPostgresPool } from "@protolabsai/database";
 
 function releaseClient(client: PoolClient | null) {
   if (client) {

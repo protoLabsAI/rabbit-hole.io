@@ -1,4 +1,4 @@
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 import {
   Badge,
   Card,
@@ -8,7 +8,7 @@ import {
   CardTitle,
   Label,
   Switch,
-} from "@proto/ui/atoms";
+} from "@protolabsai/ui/atoms";
 
 import { PROVIDER_LABELS } from "../../constants";
 import type { ApiKeyManagerProps } from "../../types";

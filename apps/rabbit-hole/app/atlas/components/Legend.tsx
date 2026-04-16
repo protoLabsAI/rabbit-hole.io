@@ -7,7 +7,7 @@
 
 import React from "react";
 
-import { generateLegendData } from "@proto/utils/atlas";
+import { generateLegendData } from "@protolabsai/utils/atlas";
 
 import { LegendItem } from "../../evidence/components/atlas/LegendContextMenu";
 import type { CanonicalGraphData } from "../../types/canonical-graph";

@@ -1,5 +1,5 @@
 {
-  "name": "@proto/api-utils",
+  "name": "@protolabsai/api-utils",
   "version": "0.1.6",
   "private": true,
   "description": "Consolidated API utilities and middleware",
@@ -18,8 +18,8 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@proto/auth": "workspace:*",
-    "@proto/types": "workspace:*",
+    "@protolabsai/auth": "workspace:*",
+    "@protolabsai/types": "workspace:*",
     "next": "15.5.3",
     "zod": "^4.1.12"
   },

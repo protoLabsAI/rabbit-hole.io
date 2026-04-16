@@ -5,8 +5,8 @@
  * and implementing intelligent caching to reduce database load.
  */
 
-import type { CompactTimelineData } from "@proto/types";
-import { createCompactTimelineData } from "@proto/utils/atlas";
+import type { CompactTimelineData } from "@protolabsai/types";
+import { createCompactTimelineData } from "@protolabsai/utils/atlas";
 
 interface BatchTimelineRequest {
   entityUid: string;

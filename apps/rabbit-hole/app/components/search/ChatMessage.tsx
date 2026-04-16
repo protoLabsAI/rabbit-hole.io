@@ -4,8 +4,8 @@ import type { UIMessage } from "ai";
 import Link from "next/link";
 import { useState, useCallback, useMemo, useRef } from "react";
 
-import { Icon } from "@proto/icon-system";
-import { Badge } from "@proto/ui/atoms";
+import { Icon } from "@protolabsai/icon-system";
+import { Badge } from "@protolabsai/ui/atoms";
 
 import { ChatMarkdown } from "./ChatMarkdown";
 import { ChatSourcePanel } from "./ChatSourcePanel";
@@ -35,7 +35,7 @@ const ENTITY_TYPE_COLORS: Record<string, string> = {
 
 // ─── Extraction Preview Types ────────────────────────────────────────
 
-/** Matches ExtractionPreview from @proto/research-middleware */
+/** Matches ExtractionPreview from @protolabsai/research-middleware */
 interface ExtractionPreview {
   entities: Array<{ uid: string; type: string; name: string }>;
   relationships: Array<{

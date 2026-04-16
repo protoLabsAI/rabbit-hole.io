@@ -1,5 +1,5 @@
 /**
- * @proto/api-utils - Consolidated API Utilities
+ * @protolabsai/api-utils - Consolidated API Utilities
  *
  * Simple, working utilities without complex generics
  */
@@ -9,7 +9,7 @@ export {
   withAuth,
   withAuthAndLogging,
   type AuthenticatedUser,
-} from "@proto/auth";
+} from "@protolabsai/auth";
 
 // ==================== Response Types ====================
 export {
@@ -60,7 +60,7 @@ export {
   type Entity,
   type Relationship,
   type Evidence,
-} from "@proto/types";
+} from "@protolabsai/types";
 
 // ==================== Response Patterns ====================
 

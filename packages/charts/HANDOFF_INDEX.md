@@ -1,4 +1,4 @@
-# @proto/charts Handoff Documentation Index
+# @protolabsai/charts Handoff Documentation Index
 
 **Current Phase:** 4/9 Complete (Atoms Done)  
 **Next Phase:** 5 (Molecules)  

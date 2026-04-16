@@ -7,18 +7,18 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 
-import { logUserAction } from "@proto/logger";
+import { logUserAction } from "@protolabsai/logger";
 import type {
   Workspace,
   UserPresence,
   CanvasType,
   WorkspaceTab,
-} from "@proto/workspace";
+} from "@protolabsai/workspace";
 import {
   useYjsHistory,
   IndexedDBVersionStorage,
   type VersionMetadata,
-} from "@proto/yjs-history";
+} from "@protolabsai/yjs-history";
 
 import { useLocalYjs } from "@/hooks/useLocalYjs";
 

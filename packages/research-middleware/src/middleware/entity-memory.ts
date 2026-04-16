@@ -15,7 +15,7 @@
  * break the pipeline.
  */
 
-import { getGlobalNeo4jClient } from "@proto/database";
+import { getGlobalNeo4jClient } from "@protolabsai/database";
 
 import type {
   AgentResult,

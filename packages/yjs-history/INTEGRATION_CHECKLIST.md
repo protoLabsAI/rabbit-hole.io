@@ -1,4 +1,4 @@
-# Integration Checklist: @proto/yjs-history
+# Integration Checklist: @protolabsai/yjs-history
 
 **Quick reference for implementing version management in GraphCanvasIntegrated**
 
@@ -18,7 +18,7 @@
 
 **File:** `apps/rabbit-hole/app/research/hooks/useWorkspace.ts`
 
-- [ ] Import `useYjsHistory` and `IndexedDBVersionStorage` from `@proto/yjs-history`
+- [ ] Import `useYjsHistory` and `IndexedDBVersionStorage` from `@protolabsai/yjs-history`
 - [ ] Import `VersionMetadata` type
 - [ ] Replace `useYjsUndo` call with `useYjsHistory` (lines 119-132)
 - [ ] Add `enableVersioning: true` option
@@ -32,7 +32,7 @@
 
 **File:** `apps/rabbit-hole/app/research/components/workspace/canvas/GraphCanvasIntegrated.tsx`
 
-- [ ] Import `VersionMetadata` type from `@proto/yjs-history`
+- [ ] Import `VersionMetadata` type from `@protolabsai/yjs-history`
 - [ ] Add props to interface (lines 59-99):
   - `saveVersion?: (name: string, description?: string, tags?: string[]) => Promise<string>`
   - `loadVersion?: (versionId: string) => Promise<void>`
@@ -62,7 +62,7 @@
 **File:** `apps/rabbit-hole/app/research/components/VersionBrowserDialog.tsx`
 
 - [ ] Create new file with dialog component
-- [ ] Import utilities from `@proto/yjs-history`
+- [ ] Import utilities from `@protolabsai/yjs-history`
 - [ ] Use `groupVersionsByDate` and `formatVersionTime`
 - [ ] Add restore confirmation dialog
 - [ ] Import in GraphCanvasIntegrated
@@ -115,7 +115,7 @@ import {
   useYjsHistory,
   IndexedDBVersionStorage,
   type VersionMetadata,
-} from "@proto/yjs-history";
+} from "@protolabsai/yjs-history";
 ```
 
 ### Hook Usage

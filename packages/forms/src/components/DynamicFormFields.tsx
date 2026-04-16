@@ -10,7 +10,7 @@
 import React, { useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 import {
   Badge,
   Button,
@@ -29,7 +29,7 @@ import {
   SelectValue,
   Separator,
   Textarea,
-} from "@proto/ui/atoms";
+} from "@protolabsai/ui/atoms";
 
 import {
   EntityType,

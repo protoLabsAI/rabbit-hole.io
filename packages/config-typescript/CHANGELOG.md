@@ -1,4 +1,4 @@
-# @proto/config-typescript
+# @protolabsai/config-typescript
 
 ## 0.1.0
 

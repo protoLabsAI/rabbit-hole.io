@@ -21,7 +21,7 @@ import {
   INFRASTRUCTURE_DOMAIN_INFO,
   TRANSPORTATION_DOMAIN_INFO,
   ASTRONOMICAL_DOMAIN_INFO,
-} from "@proto/types";
+} from "@protolabsai/types";
 
 import type { BaseDomainCardProps, DomainName } from "./types";
 

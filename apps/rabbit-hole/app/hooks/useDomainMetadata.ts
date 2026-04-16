@@ -6,7 +6,7 @@
 
 import { useMemo } from "react";
 
-import { domainRegistry, type DomainConfig } from "@proto/types";
+import { domainRegistry, type DomainConfig } from "@protolabsai/types";
 
 import { useTheme } from "../context/ThemeProvider";
 

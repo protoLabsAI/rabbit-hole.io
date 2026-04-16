@@ -4,7 +4,7 @@ export type { MapEntity, MapRelationship, MapCanvasProps } from "./MapCanvas";
 export { StaticMapImage } from "./StaticMapImage";
 export type { StaticMapEntity, StaticMapImageProps } from "./StaticMapImage";
 
-// Re-export tile utilities for convenience (also available from @proto/charts/map/utils)
+// Re-export tile utilities for convenience (also available from @protolabsai/charts/map/utils)
 export {
   latLngToTile,
   latLngToPixel,

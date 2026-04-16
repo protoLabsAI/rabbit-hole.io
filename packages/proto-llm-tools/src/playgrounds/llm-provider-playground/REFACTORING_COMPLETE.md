@@ -26,7 +26,7 @@ Successfully refactored the monolithic 1,194-line LLMProviderPlayground componen
 
 ## Architecture
 
-### Shared Types (`@proto/types/llm-playground/`)
+### Shared Types (`@protolabsai/types/llm-playground/`)
 
 - `Message`, `MessageMetadata` - Chat types
 - `APIKeys`, `APIMode` - API configuration
@@ -62,7 +62,7 @@ Successfully refactored the monolithic 1,194-line LLMProviderPlayground componen
 
 ### Reusability
 
-- ✅ Shared types available across monorepo via `@proto/types`
+- ✅ Shared types available across monorepo via `@protolabsai/types`
 - ✅ Hooks reusable in research agents & other playgrounds
 - ✅ Components can be imported independently
 
@@ -140,7 +140,7 @@ app/components/llm-provider-playground/
 
 ### 1. Shared Types First
 
-Types defined in `@proto/types` for monorepo-wide reuse, not just local component reuse.
+Types defined in `@protolabsai/types` for monorepo-wide reuse, not just local component reuse.
 
 ### 2. Hook Composition
 
@@ -221,7 +221,7 @@ function MyResearchAgent() {
 ### Using Shared Types
 
 ```typescript
-import type { Message, APIKeys } from "@proto/types/llm-playground";
+import type { Message, APIKeys } from "@protolabsai/types/llm-playground";
 
 function processMessages(messages: Message[]) {
   // ...

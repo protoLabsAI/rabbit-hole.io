@@ -1,7 +1,7 @@
 "use client";
 
-import { Icon } from "@proto/icon-system";
-import { Progress } from "@proto/ui/atoms";
+import { Icon } from "@protolabsai/icon-system";
+import { Progress } from "@protolabsai/ui/atoms";
 
 interface EntityResearchProgressStepProps {
   status: string;

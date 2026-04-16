@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -80,9 +80,7 @@ export function SourceCard({
       ref={ref}
       style={{ animationDelay: `${index * 60}ms` }}
       className={`group rounded-lg border p-3 text-xs transition-colors duration-300 animate-in fade-in-0 slide-in-from-bottom-1 fill-mode-both ${
-        isPulsing
-          ? "animate-pulse"
-          : ""
+        isPulsing ? "animate-pulse" : ""
       } ${
         isHighlighted
           ? "border-primary/60 bg-primary/10 shadow-sm"

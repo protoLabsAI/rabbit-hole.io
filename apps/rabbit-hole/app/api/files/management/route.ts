@@ -14,8 +14,8 @@ import {
   withAuthAndLogging,
   checkAdminRole,
   type AuthenticatedUser,
-} from "@proto/auth";
-import { getGlobalNeo4jClient } from "@proto/database";
+} from "@protolabsai/auth";
+import { getGlobalNeo4jClient } from "@protolabsai/database";
 
 interface FileWithRelationships {
   uid: string;
@@ -291,7 +291,7 @@ export const GET = withAuthAndLogging("list files for management")(async (
       { status: 500 }
     );
   }
-  // No finally block needed - @proto/database handles connection management
+  // No finally block needed - @protolabsai/database handles connection management
 });
 
 // DELETE: Remove file with cascade deletion
@@ -493,7 +493,7 @@ export const DELETE = withAuthAndLogging("delete file with cascade")(async (
       { status: 500 }
     );
   }
-  // No finally block needed - @proto/database handles connection management
+  // No finally block needed - @protolabsai/database handles connection management
 });
 
 // Helper function to format file sizes

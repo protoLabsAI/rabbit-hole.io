@@ -11,9 +11,9 @@
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
 
-import { getGlobalNeo4jClient } from "@proto/database";
-import { createNeo4jClientWithIntegerConversion } from "@proto/utils";
-import { searchKgVector, reciprocalRankFusion } from "@proto/vector";
+import { getGlobalNeo4jClient } from "@protolabsai/database";
+import { createNeo4jClientWithIntegerConversion } from "@protolabsai/utils";
+import { searchKgVector, reciprocalRankFusion } from "@protolabsai/vector";
 
 const QDRANT_ENABLED = !!(
   process.env.QDRANT_URL && process.env.OLLAMA_ENDPOINT

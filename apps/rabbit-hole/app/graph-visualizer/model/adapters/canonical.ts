@@ -7,7 +7,7 @@
 
 import type Graph from "graphology";
 
-import { getEntityColor, getEntityImage } from "@proto/utils/atlas";
+import { getEntityColor, getEntityImage } from "@protolabsai/utils/atlas";
 
 import type {
   CanonicalGraphData,

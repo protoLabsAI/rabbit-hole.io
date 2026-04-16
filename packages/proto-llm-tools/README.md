@@ -1,4 +1,4 @@
-# @proto/llm-tools
+# @protolabsai/llm-tools
 
 LLM workflow tools and graph operations for the Proto project.
 
@@ -21,7 +21,7 @@ This package contains LangGraph workflow implementations that can be used across
 ### Universal Entity Research (NEW)
 
 ```typescript
-import { entityResearchTool } from "@proto/llm-tools";
+import { entityResearchTool } from "@protolabsai/llm-tools";
 
 // Research any entity type - auto-detects or specify explicitly
 const result = await entityResearchTool.invoke({
@@ -45,7 +45,7 @@ const result = await entityResearchTool.invoke({
 ### Person Research (Existing)
 
 ```typescript
-import { personResearchGraph } from "@proto/llm-tools/person-research";
+import { personResearchGraph } from "@protolabsai/llm-tools/person-research";
 
 // Specialized person research workflow
 const result = await personResearchGraph.invoke({
@@ -92,7 +92,7 @@ import {
   getLangExtractServiceUrl,
   isLangExtractAvailable,
   getLangExtractModels,
-} from "@proto/llm-tools";
+} from "@protolabsai/llm-tools";
 
 // Get configured service URL
 const serviceUrl = getLangExtractServiceUrl();
@@ -163,14 +163,14 @@ All tools (`langextractClientTool`, research tools, workflows) automatically use
 - Optimistic updates support
 - Built-in loading and error states
 
-**Important:** Import hooks from `@proto/llm-tools/client` to avoid bundling server-side dependencies (LangChain, LangGraph) in your browser bundle.
+**Important:** Import hooks from `@protolabsai/llm-tools/client` to avoid bundling server-side dependencies (LangChain, LangGraph) in your browser bundle.
 
 ```typescript
 // ✅ Correct - Browser-safe import
-import { useLangExtract } from "@proto/llm-tools/client";
+import { useLangExtract } from "@protolabsai/llm-tools/client";
 
 // ❌ Wrong - Pulls in Node.js dependencies
-import { useLangExtract } from "@proto/llm-tools";
+import { useLangExtract } from "@protolabsai/llm-tools";
 ```
 
 ### useLangExtract
@@ -178,7 +178,7 @@ import { useLangExtract } from "@proto/llm-tools";
 React Query mutation hook for calling the LangExtract service from client components.
 
 ```typescript
-import { useLangExtract } from "@proto/llm-tools/client";
+import { useLangExtract } from "@protolabsai/llm-tools/client";
 
 function MyComponent() {
   const { mutate, isPending, error, data, reset } = useLangExtract({
@@ -229,7 +229,7 @@ function MyComponent() {
 React Query hook to check LangExtract service availability.
 
 ```typescript
-import { useLangExtractHealth } from "@proto/llm-tools/client";
+import { useLangExtractHealth } from "@protolabsai/llm-tools/client";
 
 function ServiceStatus() {
   const { data: isAvailable, isLoading, refetch } = useLangExtractHealth();
@@ -256,7 +256,7 @@ function ServiceStatus() {
 React Query hook to fetch available models from LangExtract service.
 
 ```typescript
-import { useLangExtractModels } from "@proto/llm-tools/client";
+import { useLangExtractModels } from "@protolabsai/llm-tools/client";
 
 function ModelSelector() {
   const { data: models, isLoading, error, refetch } = useLangExtractModels({
@@ -291,7 +291,7 @@ function ModelSelector() {
 React Query mutation for querying Wikipedia (search + content).
 
 ```typescript
-import { useWikipediaQuery } from "@proto/llm-tools/client";
+import { useWikipediaQuery } from "@protolabsai/llm-tools/client";
 
 function WikipediaSearch() {
   const { mutate, isPending, data } = useWikipediaQuery({
@@ -330,7 +330,7 @@ function WikipediaSearch() {
 React Query hook for fetching a specific Wikipedia page with automatic caching.
 
 ```typescript
-import { useWikipediaPage } from "@proto/llm-tools/client";
+import { useWikipediaPage } from "@protolabsai/llm-tools/client";
 
 function PageViewer({ pageId }: { pageId: number }) {
   const { data: page, isLoading } = useWikipediaPage(pageId, {
@@ -393,7 +393,7 @@ The YouTube Processor service provides video downloading, processing, and audio 
 Process YouTube videos (extract audio, upload to storage).
 
 ```typescript
-import { useYouTubeProcess } from "@proto/llm-tools/client";
+import { useYouTubeProcess } from "@protolabsai/llm-tools/client";
 
 function ProcessButton({ url, workspaceId }: { url: string, workspaceId: string }) {
   const { mutate, isPending, data, error } = useYouTubeProcess({
@@ -423,7 +423,7 @@ function ProcessButton({ url, workspaceId }: { url: string, workspaceId: string 
 Upload video files directly (no YouTube URL required).
 
 ```typescript
-import { useYouTubeUpload } from "@proto/llm-tools/client";
+import { useYouTubeUpload } from "@protolabsai/llm-tools/client";
 
 function UploadButton({ file, workspaceId }: { file: File, workspaceId: string }) {
   const { mutate, isPending, data } = useYouTubeUpload({
@@ -451,7 +451,7 @@ function UploadButton({ file, workspaceId }: { file: File, workspaceId: string }
 Download videos from generic URLs (mp4, webm, etc).
 
 ```typescript
-import { useYouTubeDownloadURL } from "@proto/llm-tools/client";
+import { useYouTubeDownloadURL } from "@protolabsai/llm-tools/client";
 
 function DownloadButton({ url, workspaceId }: { url: string, workspaceId: string }) {
   const { mutate, isPending, data } = useYouTubeDownloadURL({
@@ -479,7 +479,7 @@ function DownloadButton({ url, workspaceId }: { url: string, workspaceId: string
 Check YouTube processor service availability.
 
 ```typescript
-import { useYouTubeProcessorHealth } from "@proto/llm-tools/client";
+import { useYouTubeProcessorHealth } from "@protolabsai/llm-tools/client";
 
 function ServiceStatus() {
   const { data, isLoading, refetch } = useYouTubeProcessorHealth();
@@ -532,7 +532,7 @@ YOUTUBE_PROCESSOR_URL=http://localhost:8001
 ## Installation
 
 ```bash
-pnpm add @proto/llm-tools
+pnpm add @protolabsai/llm-tools
 ```
 
 The package is automatically included in the workspace via `pnpm-workspace.yaml`.

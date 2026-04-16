@@ -10,7 +10,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import type { FileSource, UrlSource } from "@proto/types";
+import type { FileSource, UrlSource } from "@protolabsai/types";
 
 import { SimpleAdapterRegistry } from "../../jobs/MediaIngestionJob.js";
 import { VideoAdapter } from "../../src/adapters/video-adapter.js";

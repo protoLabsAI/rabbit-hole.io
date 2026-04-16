@@ -5,7 +5,7 @@
  * Replaces all hardcoded color arrays throughout the application.
  */
 
-import { domainRegistry } from "@proto/types";
+import { domainRegistry } from "@protolabsai/types";
 
 /**
  * Get color for entity UID from domain configuration

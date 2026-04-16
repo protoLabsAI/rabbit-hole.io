@@ -17,8 +17,8 @@
 import type * as L from "leaflet";
 import { useEffect, useRef, useState } from "react";
 
-import type { EntityType } from "@proto/types";
-import { getEntityColor } from "@proto/utils/atlas";
+import type { EntityType } from "@protolabsai/types";
+import { getEntityColor } from "@protolabsai/utils/atlas";
 
 export interface MapEntity {
   id: string;

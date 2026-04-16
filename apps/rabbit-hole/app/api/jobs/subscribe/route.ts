@@ -10,7 +10,7 @@
 
 import { NextRequest } from "next/server";
 
-import { getJobQueuePool } from "@proto/database";
+import { getJobQueuePool } from "@protolabsai/database";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

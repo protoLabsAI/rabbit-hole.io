@@ -7,7 +7,7 @@
  * Used internally by extraction tools to replace direct LangExtract calls.
  */
 
-import { pollForJobCompletion } from "@proto/sidequest-utils/server";
+import { pollForJobCompletion } from "@protolabsai/sidequest-utils/server";
 
 interface EnqueueLangExtractParams {
   textContent: string;

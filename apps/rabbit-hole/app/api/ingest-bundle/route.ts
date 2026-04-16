@@ -2,7 +2,7 @@
  * Bundle Ingest API - CONSOLIDATED VERSION
  *
  * Demonstrates DRY principles using shared utilities:
- * - Uses RabbitHoleBundleSchema from @proto/types (eliminates 70+ line inline interface)
+ * - Uses RabbitHoleBundleSchema from @protolabsai/types (eliminates 70+ line inline interface)
  * - Uses consolidated auth+validation middleware
  * - Uses standardized response types
  * - Uses proper error handling patterns
@@ -10,7 +10,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { getGlobalNeo4jClient } from "@proto/database";
+import { getGlobalNeo4jClient } from "@protolabsai/database";
 import {
   RabbitHoleBundleSchema,
   safeValidate,
@@ -20,9 +20,9 @@ import {
   type MergeOptions,
   type ImportSummary,
   type MergeResult,
-} from "@proto/types";
-import { areSimilarStrings } from "@proto/utils";
-import { upsertEntityVector } from "@proto/vector";
+} from "@protolabsai/types";
+import { areSimilarStrings } from "@protolabsai/utils";
+import { upsertEntityVector } from "@protolabsai/vector";
 
 import { initializeDomains } from "../../domain-loader";
 import {
@@ -40,7 +40,7 @@ initializeDomains();
 // Dynamic import to avoid Turbopack issues with require()
 const resolveTenantFromHeaders = async (request: any) => {
   const { resolveTenantFromHeaders: resolver } = await import(
-    "@proto/utils/tenancy-server"
+    "@protolabsai/utils/tenancy-server"
   );
   return resolver(request);
 };
@@ -686,7 +686,7 @@ const handleBundleIngest = async (
       { status: 500 }
     );
   } finally {
-    // Connection cleanup handled by @proto/database
+    // Connection cleanup handled by @protolabsai/database
   }
 };
 

@@ -47,7 +47,7 @@ export default function Page() {
 The playground demonstrates React Query hook patterns:
 
 ```tsx
-import { useWikipediaQuery, useWikipediaPage } from "@proto/llm-tools/client";
+import { useWikipediaQuery, useWikipediaPage } from "@protolabsai/llm-tools/client";
 
 function MyComponent() {
   const { mutate, isPending, data } = useWikipediaQuery();

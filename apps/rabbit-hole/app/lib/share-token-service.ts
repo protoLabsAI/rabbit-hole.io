@@ -5,7 +5,7 @@
  * Uses separate application database (rabbit_hole_app)
  */
 
-import { getGlobalPostgresPool } from "@proto/database";
+import { getGlobalPostgresPool } from "@protolabsai/database";
 import {
   ShareToken,
   ShareTokenRow,
@@ -13,7 +13,7 @@ import {
   ShareTokenNotFoundError,
   ShareTokenExpiredError,
   ShareTokenRevokedError,
-} from "@proto/types";
+} from "@protolabsai/types";
 import {
   calculateExpirationDate,
   validateShareTokenState,
@@ -22,7 +22,7 @@ import {
   generatePreviewUrl,
   validateCreateShareRequest,
   isShareTokenExpired,
-} from "@proto/utils";
+} from "@protolabsai/utils";
 
 export class ShareTokenService {
   /**
@@ -147,7 +147,7 @@ export class ShareTokenService {
       }
 
       // Check if the shared entity is public data
-      const { getGlobalNeo4jClient } = await import("@proto/database");
+      const { getGlobalNeo4jClient } = await import("@protolabsai/database");
       const neo4jClient = getGlobalNeo4jClient();
 
       const entityQuery = `

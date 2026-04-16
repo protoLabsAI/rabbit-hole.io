@@ -12,7 +12,7 @@
 import { Client } from "minio";
 import { Job } from "sidequest";
 
-import { getGlobalPostgresPool } from "@proto/database";
+import { getGlobalPostgresPool } from "@protolabsai/database";
 import type {
   AdapterRegistry,
   ExtractionResult,
@@ -20,7 +20,7 @@ import type {
   IngestSource,
   MediaAdapter,
   SerializedIngestSource,
-} from "@proto/types";
+} from "@protolabsai/types";
 
 // ==================== Simple AdapterRegistry Implementation ====================
 

@@ -1,6 +1,6 @@
 # MCP Tools
 
-The `@proto/mcp-server` package exposes tools via the Model Context Protocol. Any MCP client (Claude Code, Cursor, custom agents) can use these tools.
+The `@protolabsai/mcp-server` package exposes tools via the Model Context Protocol. Any MCP client (Claude Code, Cursor, custom agents) can use these tools.
 
 ## Research Tools
 

@@ -9,7 +9,7 @@
 
 import { useEffect, useState } from "react";
 
-import { getUserTierClient } from "@proto/auth/client";
+import { getUserTierClient } from "@protolabsai/auth/client";
 
 export function OrganizationRequired() {
   const user = {

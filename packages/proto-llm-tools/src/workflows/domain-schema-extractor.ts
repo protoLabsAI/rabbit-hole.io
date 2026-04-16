@@ -2,7 +2,7 @@
  * Domain Schema Field Extractor
  *
  * Server-side utilities for entity enrichment with domain-specific examples.
- * Field extraction now delegated to @proto/types for consistency.
+ * Field extraction now delegated to @protolabsai/types for consistency.
  */
 
 import {
@@ -12,7 +12,7 @@ import {
   geographicDomainConfig,
   economicDomainConfig,
   medicalDomainConfig,
-} from "@proto/types";
+} from "@protolabsai/types";
 
 const DOMAIN_CONFIGS = [
   socialDomainConfig,
@@ -24,7 +24,7 @@ const DOMAIN_CONFIGS = [
 
 /**
  * Get enrichment fields for an entity type
- * Delegates to schema-based extraction from @proto/types
+ * Delegates to schema-based extraction from @protolabsai/types
  */
 export function getEnrichmentFieldsForEntity(
   entityType: string,

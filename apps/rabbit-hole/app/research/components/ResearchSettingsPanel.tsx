@@ -2,22 +2,22 @@
  * Research Settings Panel
  *
  * UI controls for research page settings (hops, nodeLimit, filters).
- * Uses Zod schemas from @proto/types as single source of truth.
+ * Uses Zod schemas from @protolabsai/types as single source of truth.
  */
 
 "use client";
 
 import { useState, useEffect } from "react";
 
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 import {
   ResearchSettings,
   ResearchSettingsSchema,
   SENTIMENT_OPTIONS,
   HOPS_OPTIONS,
   validateResearchSettings,
-} from "@proto/types";
-import { DomainEntityTypeSelector } from "@proto/ui/organisms";
+} from "@protolabsai/types";
+import { DomainEntityTypeSelector } from "@protolabsai/ui/organisms";
 
 interface ResearchSettingsPanelProps {
   currentSettings: ResearchSettings;

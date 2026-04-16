@@ -1,14 +1,19 @@
 /**
  * LLM Provider Playground - Refactored Orchestrator
  *
- * Interactive testing environment for @proto/llm-providers
+ * Interactive testing environment for @protolabsai/llm-providers
  */
 
 "use client";
 
 import { useState, useEffect } from "react";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@proto/ui/atoms";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@protolabsai/ui/atoms";
 
 import { ApiKeyManager } from "./components/ApiKeyManager";
 import { ChatInterface } from "./components/ChatInterface";

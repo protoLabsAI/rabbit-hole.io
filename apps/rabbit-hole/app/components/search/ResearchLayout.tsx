@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 
 import { CommunityCard } from "./CommunityCard";
 import type { CommunitySummary } from "./CommunityCard";
@@ -488,10 +488,7 @@ export function ResearchLayout({
                   <div className="px-3 py-2 border-t border-border/50 flex items-center gap-3 text-[10px] text-muted-foreground flex-shrink-0">
                     {webSourceCount > 0 && (
                       <span className="flex items-center gap-1">
-                        <Icon
-                          name="Globe"
-                          className="h-3 w-3 text-green-500"
-                        />
+                        <Icon name="Globe" className="h-3 w-3 text-green-500" />
                         {webSourceCount}
                       </span>
                     )}

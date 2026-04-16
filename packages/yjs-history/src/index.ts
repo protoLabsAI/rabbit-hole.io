@@ -1,5 +1,5 @@
 /**
- * @proto/yjs-history
+ * @protolabsai/yjs-history
  *
  * Advanced undo/redo and versioning system for Yjs with React Flow integration
  *

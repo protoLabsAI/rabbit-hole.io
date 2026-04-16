@@ -2,8 +2,14 @@
 
 import { useMemo } from "react";
 
-import { Icon } from "@proto/icon-system";
-import { Button, Label, RadioGroup, RadioGroupItem, Slider } from "@proto/ui";
+import { Icon } from "@protolabsai/icon-system";
+import {
+  Button,
+  Label,
+  RadioGroup,
+  RadioGroupItem,
+  Slider,
+} from "@protolabsai/ui";
 
 import type { ExtractionMode } from "../../../workflows/multi-phase-extraction";
 import { getAllDomainUIMetadata } from "../../../workflows/multi-phase-extraction-utils";

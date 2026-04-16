@@ -9,7 +9,7 @@
 
 import { useMemo } from "react";
 
-import type { CanvasType } from "@proto/workspace";
+import type { CanvasType } from "@protolabsai/workspace";
 
 import { useWorkspace } from "../../hooks/useWorkspace";
 

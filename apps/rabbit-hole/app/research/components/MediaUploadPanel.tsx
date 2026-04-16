@@ -9,14 +9,14 @@
 
 import { useCallback, useRef, useState } from "react";
 
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 import {
   Button,
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
   Input,
-} from "@proto/ui/atoms";
+} from "@protolabsai/ui/atoms";
 
 import type { IngestionJob } from "../hooks/useMediaIngestion";
 
@@ -115,7 +115,11 @@ export function MediaUploadPanel({
   const hasJobs = jobs.length > 0;
 
   return (
-    <Collapsible open={open} onOpenChange={setOpen} className="border-t border-border">
+    <Collapsible
+      open={open}
+      onOpenChange={setOpen}
+      className="border-t border-border"
+    >
       <CollapsibleTrigger asChild>
         <Button
           variant="ghost"
@@ -129,7 +133,12 @@ export function MediaUploadPanel({
           <div className="flex items-center gap-2">
             {hasJobs && (
               <span className="text-xs text-muted-foreground">
-                {jobs.filter((j) => j.status === "uploading" || j.status === "processing").length} active
+                {
+                  jobs.filter(
+                    (j) => j.status === "uploading" || j.status === "processing"
+                  ).length
+                }{" "}
+                active
               </span>
             )}
             <Icon

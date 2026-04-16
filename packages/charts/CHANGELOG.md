@@ -1,43 +1,43 @@
-# @proto/charts Changelog
+# @protolabsai/charts Changelog
 
 ## 0.1.5
 
 ### Patch Changes
 
 - Updated dependencies [c0435ce]
-  - @proto/ui@0.3.3
+  - @protolabsai/ui@0.3.3
 
 ## 0.1.4
 
 ### Patch Changes
 
 - Updated dependencies [e8b671f]
-  - @proto/ui@0.3.2
-  - @proto/utils@0.3.0
+  - @protolabsai/ui@0.3.2
+  - @protolabsai/utils@0.3.0
 
 ## 0.1.3
 
 ### Patch Changes
 
 - Updated dependencies [fb1e4be]
-  - @proto/ui@0.3.1
-  - @proto/utils@0.3.0
+  - @protolabsai/ui@0.3.1
+  - @protolabsai/utils@0.3.0
 
 ## 0.1.2
 
 ### Patch Changes
 
 - Updated dependencies [f8f13f8]
-  - @proto/ui@0.3.0
-  - @proto/utils@0.3.0
+  - @protolabsai/ui@0.3.0
+  - @protolabsai/utils@0.3.0
 
 ## 0.1.1
 
 ### Patch Changes
 
 - Updated dependencies [44db068]
-  - @proto/ui@0.2.0
-  - @proto/utils@0.2.0
+  - @protolabsai/ui@0.2.0
+  - @protolabsai/utils@0.2.0
 
 ## 0.1.0
 
@@ -72,16 +72,16 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @proto/icon-system@0.1.0
-  - @proto/types@0.1.0
-  - @proto/ui@2.2.0
-  - @proto/utils@0.1.0
+  - @protolabsai/icon-system@0.1.0
+  - @protolabsai/types@0.1.0
+  - @protolabsai/ui@2.2.0
+  - @protolabsai/utils@0.1.0
 
 ## [0.1.0] - 2025-10-19
 
 ### Added
 
-- Initial release of @proto/charts package
+- Initial release of @protolabsai/charts package
 - Gantt chart components with atomic design architecture
 - Full TypeScript support
 - Drag-and-drop functionality

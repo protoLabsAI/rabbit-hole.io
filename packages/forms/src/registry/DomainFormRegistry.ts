@@ -26,7 +26,7 @@ import {
   ContentSchema,
   FileSchema,
   getEnrichmentFieldsForEntity,
-} from "@proto/types";
+} from "@protolabsai/types";
 
 // Use the existing registry system
 const registry = EntitySchemaRegistry.getInstance();

@@ -40,7 +40,7 @@ import type {
   ExtractionResult,
   IngestSource,
   MediaAdapter,
-} from "@proto/types";
+} from "@protolabsai/types";
 
 import { AudioAdapter } from "./audio-adapter.js";
 

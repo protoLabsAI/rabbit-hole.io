@@ -5,7 +5,7 @@
  * Eliminates 4 competing formats and standardizes field naming.
  */
 
-import { EntityType } from "@proto/types";
+import { EntityType } from "@protolabsai/types";
 
 // Re-export EntityType from central schema (single source of truth)
 export type { EntityType };

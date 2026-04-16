@@ -17,7 +17,7 @@
 import { generateText } from "ai";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { getAIModel } from "@proto/llm-providers/server";
+import { getAIModel } from "@protolabsai/llm-providers/server";
 
 import type { AgentResult, MiddlewareContext } from "../types";
 
@@ -29,7 +29,7 @@ vi.mock("ai", () => ({
   generateText: vi.fn(),
 }));
 
-vi.mock("@proto/llm-providers/server", () => ({
+vi.mock("@protolabsai/llm-providers/server", () => ({
   getAIModel: vi.fn(() => "mock-model"),
 }));
 
@@ -39,8 +39,6 @@ import {
   buildExtractionPrompt,
   parseExtractionResult,
   type ExtractionPreview,
-  type ExtractedEntity,
-  type ExtractedRelationship,
   type ToolCallRecord,
 } from "./structured-extraction";
 
@@ -131,7 +129,9 @@ describe("buildExtractionContext", () => {
       {
         toolName: "searchWeb",
         args: { query: "Nicole Forsgren DORA" },
-        result: { results: [{ title: "DORA Research", url: "https://dora.dev" }] },
+        result: {
+          results: [{ title: "DORA Research", url: "https://dora.dev" }],
+        },
       },
     ];
     const ctx = buildExtractionContext("answer text", toolResults);
@@ -234,7 +234,10 @@ describe("parseExtractionResult", () => {
   });
 
   it("extracts JSON embedded in prose", () => {
-    const prose = "Here is the extraction:\n" + VALID_EXTRACTION_JSON + "\nHope that helps.";
+    const prose =
+      "Here is the extraction:\n" +
+      VALID_EXTRACTION_JSON +
+      "\nHope that helps.";
     const preview = parseExtractionResult(prose);
     expect(preview).not.toBeNull();
     expect(preview!.entities).toHaveLength(3);
@@ -245,7 +248,11 @@ describe("parseExtractionResult", () => {
   });
 
   it("returns null when entities array is empty", () => {
-    const empty = JSON.stringify({ entities: [], relationships: [], confidence: 0.5 });
+    const empty = JSON.stringify({
+      entities: [],
+      relationships: [],
+      confidence: 0.5,
+    });
     expect(parseExtractionResult(empty)).toBeNull();
   });
 
@@ -269,7 +276,13 @@ describe("parseExtractionResult", () => {
     const partial = JSON.stringify({
       entities: [{ uid: "person:a", type: "person", name: "A" }],
       relationships: [
-        { uid: "rel:a__RELATED_TO__b", type: "RELATED_TO", source: "person:a", target: "concept:b", confidence: 0.8 },
+        {
+          uid: "rel:a__RELATED_TO__b",
+          type: "RELATED_TO",
+          source: "person:a",
+          target: "concept:b",
+          confidence: 0.8,
+        },
         { uid: "rel:bad", type: "RELATED_TO" /* no source/target */ },
       ],
       confidence: 0.5,
@@ -341,7 +354,12 @@ describe("StructuredExtractionMiddleware — wrapToolCall", () => {
 
   it("executes the tool and returns its result", async () => {
     const execute = makeExecute({ results: [{ title: "Test" }] });
-    const result = await middleware.wrapToolCall(ctx, "searchWeb", { query: "test" }, execute);
+    const result = await middleware.wrapToolCall(
+      ctx,
+      "searchWeb",
+      { query: "test" },
+      execute
+    );
     expect(execute).toHaveBeenCalledWith({ query: "test" });
     expect(result).toEqual({ results: [{ title: "Test" }] });
   });
@@ -361,7 +379,12 @@ describe("StructuredExtractionMiddleware — wrapToolCall", () => {
 
   it("stores tool name, args, and result in each record", async () => {
     const execute = makeExecute({ title: "Wikipedia Article" });
-    await middleware.wrapToolCall(ctx, "searchWikipedia", { query: "DevOps" }, execute);
+    await middleware.wrapToolCall(
+      ctx,
+      "searchWikipedia",
+      { query: "DevOps" },
+      execute
+    );
 
     const toolResults = ctx.state["toolResults"] as ToolCallRecord[];
     const record = toolResults[0]!;
@@ -392,7 +415,9 @@ describe("StructuredExtractionMiddleware — afterAgent", () => {
 
   it("stores extraction preview in ctx.state.extractionPreview", async () => {
     const result: AgentResult = {
-      text: "DevOps is a set of practices that combines software development (Dev) and IT operations (Ops). ".repeat(5),
+      text: "DevOps is a set of practices that combines software development (Dev) and IT operations (Ops). ".repeat(
+        5
+      ),
     };
     await middleware.afterAgent(ctx, result);
 
@@ -428,10 +453,19 @@ describe("StructuredExtractionMiddleware — afterAgent", () => {
 
   it("passes full context to generateText (final text + tool results)", async () => {
     // Pre-populate tool results via wrapToolCall
-    const execute = makeExecute([{ name: "DORA", uid: "org:dora", type: "organization" }]);
-    await middleware.wrapToolCall(ctx, "searchGraph", { query: "DORA" }, execute);
+    const execute = makeExecute([
+      { name: "DORA", uid: "org:dora", type: "organization" },
+    ]);
+    await middleware.wrapToolCall(
+      ctx,
+      "searchGraph",
+      { query: "DORA" },
+      execute
+    );
 
-    const result: AgentResult = { text: "The DORA research program measures DevOps performance. ".repeat(5) };
+    const result: AgentResult = {
+      text: "The DORA research program measures DevOps performance. ".repeat(5),
+    };
     await middleware.afterAgent(ctx, result);
 
     const callArgs = generateTextMock.mock.calls[0][0];
@@ -461,7 +495,9 @@ describe("StructuredExtractionMiddleware — afterAgent", () => {
     const result: AgentResult = { text: "DevOps research ".repeat(10) };
     await middleware.afterAgent(ctx, result);
 
-    const generationHandle = (ctx.tracing.createGeneration as ReturnType<typeof vi.fn>).mock.results[0]!.value;
+    const generationHandle = (
+      ctx.tracing.createGeneration as ReturnType<typeof vi.fn>
+    ).mock.results[0]!.value;
     expect(generationHandle.end).toHaveBeenCalledWith(
       VALID_EXTRACTION_JSON,
       expect.objectContaining({
@@ -476,7 +512,12 @@ describe("StructuredExtractionMiddleware — afterAgent", () => {
     // Add tool results to state
     const execute = makeExecute([]);
     await middleware.wrapToolCall(ctx, "searchWeb", { query: "q" }, execute);
-    await middleware.wrapToolCall(ctx, "searchWikipedia", { query: "w" }, execute);
+    await middleware.wrapToolCall(
+      ctx,
+      "searchWikipedia",
+      { query: "w" },
+      execute
+    );
 
     const result: AgentResult = { text: "DevOps research ".repeat(10) };
     await middleware.afterAgent(ctx, result);

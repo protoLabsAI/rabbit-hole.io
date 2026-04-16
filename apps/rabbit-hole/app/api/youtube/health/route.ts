@@ -5,7 +5,7 @@
 
 import { NextResponse } from "next/server";
 
-import { youtubeProcessorConfig } from "@proto/llm-tools";
+import { youtubeProcessorConfig } from "@protolabsai/llm-tools";
 
 export const dynamic = "force-dynamic";
 

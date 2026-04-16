@@ -7,8 +7,11 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-import type { PartialBundle } from "@proto/types";
-import { createEmptyPartialBundle, mergePartialBundle } from "@proto/types";
+import type { PartialBundle } from "@protolabsai/types";
+import {
+  createEmptyPartialBundle,
+  mergePartialBundle,
+} from "@protolabsai/types";
 
 // Mock importBundle to track calls
 const mockImportBundle = vi.fn().mockResolvedValue({
@@ -37,13 +40,26 @@ describe("useResearchAgentCanvas logic", () => {
   describe("deduplication", () => {
     it("identifies new entities by UID", () => {
       const importedUids = new Set(["ent-existing"]);
-      const bundle: PartialBundle = mergePartialBundle(createEmptyPartialBundle(), {
-        entities: [
-          { uid: "ent-existing", label: "Old", entityType: "person", properties: {} },
-          { uid: "ent-new", label: "New", entityType: "person", properties: {} },
-        ] as any,
-        phase: "entity-creation",
-      });
+      const bundle: PartialBundle = mergePartialBundle(
+        createEmptyPartialBundle(),
+        {
+          entities: [
+            {
+              uid: "ent-existing",
+              label: "Old",
+              entityType: "person",
+              properties: {},
+            },
+            {
+              uid: "ent-new",
+              label: "New",
+              entityType: "person",
+              properties: {},
+            },
+          ] as any,
+          phase: "entity-creation",
+        }
+      );
 
       const newEntities = bundle.entities.filter(
         (e) => e.uid && !importedUids.has(e.uid)
@@ -55,13 +71,21 @@ describe("useResearchAgentCanvas logic", () => {
 
     it("identifies new relationships by composite key", () => {
       const importedKeys = new Set(["src1-knows-tgt1"]);
-      const bundle: PartialBundle = mergePartialBundle(createEmptyPartialBundle(), {
-        relationships: [
-          { source: "src1", target: "tgt1", type: "knows", properties: {} },
-          { source: "src1", target: "tgt2", type: "works_with", properties: {} },
-        ] as any,
-        phase: "relationship-mapping",
-      });
+      const bundle: PartialBundle = mergePartialBundle(
+        createEmptyPartialBundle(),
+        {
+          relationships: [
+            { source: "src1", target: "tgt1", type: "knows", properties: {} },
+            {
+              source: "src1",
+              target: "tgt2",
+              type: "works_with",
+              properties: {},
+            },
+          ] as any,
+          phase: "relationship-mapping",
+        }
+      );
 
       const newRelationships = bundle.relationships.filter((r) => {
         const key = `${r.source}-${r.type}-${r.target}`;
@@ -75,17 +99,20 @@ describe("useResearchAgentCanvas logic", () => {
     it("skips import when no new entities or relationships", () => {
       const importedUids = new Set(["ent1", "ent2"]);
       const importedKeys = new Set(["ent1-knows-ent2"]);
-      const bundle: PartialBundle = mergePartialBundle(createEmptyPartialBundle(), {
-        entities: [
-          { uid: "ent1", label: "A", entityType: "person", properties: {} },
-          { uid: "ent2", label: "B", entityType: "person", properties: {} },
-        ] as any,
-        relationships: [
-          { source: "ent1", target: "ent2", type: "knows", properties: {} },
-        ] as any,
-        phase: "complete",
-        isComplete: true,
-      });
+      const bundle: PartialBundle = mergePartialBundle(
+        createEmptyPartialBundle(),
+        {
+          entities: [
+            { uid: "ent1", label: "A", entityType: "person", properties: {} },
+            { uid: "ent2", label: "B", entityType: "person", properties: {} },
+          ] as any,
+          relationships: [
+            { source: "ent1", target: "ent2", type: "knows", properties: {} },
+          ] as any,
+          phase: "complete",
+          isComplete: true,
+        }
+      );
 
       const newEntities = bundle.entities.filter(
         (e) => e.uid && !importedUids.has(e.uid)
@@ -103,7 +130,12 @@ describe("useResearchAgentCanvas logic", () => {
   describe("mini-bundle construction", () => {
     it("builds a RabbitHoleBundleData from new items only", () => {
       const newEntities = [
-        { uid: "ent-new", label: "New Entity", entityType: "person", properties: {} },
+        {
+          uid: "ent-new",
+          label: "New Entity",
+          entityType: "person",
+          properties: {},
+        },
       ];
       const newRelationships = [
         { source: "ent-new", target: "ent-old", type: "knows", properties: {} },
@@ -135,7 +167,9 @@ describe("useResearchAgentCanvas logic", () => {
       lastPhase = bundle1.phase;
 
       const bundle2 = mergePartialBundle(bundle1, {
-        entities: [{ uid: "e1", label: "E", entityType: "person", properties: {} }] as any,
+        entities: [
+          { uid: "e1", label: "E", entityType: "person", properties: {} },
+        ] as any,
         phase: "entity-creation",
       });
       const phaseChanged2 = bundle2.phase !== lastPhase;

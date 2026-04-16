@@ -6,13 +6,13 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { enforceEntityLimit, TierLimitError } from "@proto/auth";
-import { getGlobalNeo4jClient } from "@proto/database";
+import { enforceEntityLimit, TierLimitError } from "@protolabsai/auth";
+import { getGlobalNeo4jClient } from "@protolabsai/database";
 import {
   generateSimpleEntityUID,
   getRelationshipType,
   generateSimpleRelationshipUID,
-} from "@proto/types";
+} from "@protolabsai/types";
 
 import { requireAuthenticated, unauthorizedResponse } from "@/lib/auth-guards";
 
@@ -42,7 +42,7 @@ interface CreateRelationshipRequest {
   };
 }
 
-// generateUID function replaced with centralized generateEntityUID from @proto/types
+// generateUID function replaced with centralized generateEntityUID from @protolabsai/types
 
 export async function POST(request: NextRequest) {
   // Check authentication (tier enforcement happens per-action)

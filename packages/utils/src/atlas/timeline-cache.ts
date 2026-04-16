@@ -9,7 +9,7 @@ import type {
   CompactTimelineData,
   TimelineResult,
   TimelineFilters,
-} from "@proto/types";
+} from "@protolabsai/types";
 
 export interface TimelineCacheEntry {
   data: TimelineResult | CompactTimelineData;

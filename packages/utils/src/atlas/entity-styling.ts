@@ -6,8 +6,8 @@
  * Uses domain-based organization with all 77 entity types.
  */
 
-import type { EntityType } from "@proto/types";
-import { domainRegistry, getDomainFromEntityType } from "@proto/types";
+import type { EntityType } from "@protolabsai/types";
+import { domainRegistry, getDomainFromEntityType } from "@protolabsai/types";
 
 /**
  * Returns the appropriate emoji icon for an entity type

@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback } from "react";
 
-import { Badge, Button, Checkbox } from "@proto/ui/atoms";
+import { Badge, Button, Checkbox } from "@protolabsai/ui/atoms";
 
 interface FieldDiff {
   field: string;

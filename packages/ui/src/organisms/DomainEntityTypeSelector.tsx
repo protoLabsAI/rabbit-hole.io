@@ -2,8 +2,8 @@
 
 import { useState, useMemo, useCallback } from "react";
 
-import { Icon } from "@proto/icon-system";
-import { domainRegistry } from "@proto/types";
+import { Icon } from "@protolabsai/icon-system";
+import { domainRegistry } from "@protolabsai/types";
 
 import { Button, Badge } from "../atoms";
 

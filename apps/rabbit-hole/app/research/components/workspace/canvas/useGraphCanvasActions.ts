@@ -12,10 +12,10 @@
 import type Graph from "graphology";
 import { useCallback, useOptimistic } from "react";
 
-import type { UserTier } from "@proto/auth/client";
-import { logUserAction } from "@proto/logger";
-import { useToast } from "@proto/ui/hooks";
-import { getEntityColor, getEntityImage } from "@proto/utils/atlas";
+import type { UserTier } from "@protolabsai/auth/client";
+import { logUserAction } from "@protolabsai/logger";
+import { useToast } from "@protolabsai/ui/hooks";
+import { getEntityColor, getEntityImage } from "@protolabsai/utils/atlas";
 
 import type {
   GraphNodeAttributes,

@@ -1,6 +1,6 @@
 import { StateGraph, END, START, Annotation } from "@langchain/langgraph";
 
-import { mergeLangExtractEntities } from "@proto/utils";
+import { mergeLangExtractEntities } from "@protolabsai/utils";
 
 import { langextractConfig } from "../config/langextract-config";
 import { enqueueLangExtract } from "../utils/enqueueLangExtract";

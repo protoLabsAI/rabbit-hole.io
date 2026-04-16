@@ -16,8 +16,8 @@
 
 import React from "react";
 
-import { Icon } from "@proto/icon-system";
-import { getEntityColor, getEntityImage } from "@proto/utils/atlas";
+import { Icon } from "@protolabsai/icon-system";
+import { getEntityColor, getEntityImage } from "@protolabsai/utils/atlas";
 
 export type CardSize = "small" | "medium" | "large";
 

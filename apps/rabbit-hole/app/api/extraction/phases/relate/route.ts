@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { getUserTier, getTierLimits } from "@proto/auth";
-import { getRelationshipTypesForDomains } from "@proto/types";
+import { getUserTier, getTierLimits } from "@protolabsai/auth";
+import { getRelationshipTypesForDomains } from "@protolabsai/types";
 
 export const maxDuration = 60;
 
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
         );
 
         // Call LangExtract for this batch
-        const { langextractConfig } = await import("@proto/llm-tools");
+        const { langextractConfig } = await import("@protolabsai/llm-tools");
         const serviceUrl = langextractConfig.getServiceUrl();
 
         console.log(

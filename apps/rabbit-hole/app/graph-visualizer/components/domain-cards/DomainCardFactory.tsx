@@ -7,7 +7,7 @@
 
 import React from "react";
 
-import { EntitySchemaRegistry, domainRegistry } from "@proto/types";
+import { EntitySchemaRegistry, domainRegistry } from "@protolabsai/types";
 
 import { BaseDomainCard } from "./BaseDomainCard";
 import { ConfigurableCard } from "./ConfigurableCard";
