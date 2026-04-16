@@ -7,7 +7,9 @@
   "scripts": {
     "dev": "pnpm exec langgraphjs dev --port 8123",
     "dev:nodemon": "nodemon",
+    "dev:a2a": "tsx watch src/a2a-main.ts",
     "start:langgraph": "pnpm exec langgraphjs dev --port 8123",
+    "start:a2a": "node dist/a2a-main.js",
     "dev:proxy-logger": "tsx src/debug-http-logger.ts",
     "dev:enhanced": "./scripts/dev-agent.sh",
     "build": "tsc",
