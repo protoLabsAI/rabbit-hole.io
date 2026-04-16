@@ -1,3 +1,5 @@
+// @vitest-environment node
+// Uses node:http server + global fetch — jsdom's fetch stub breaks both.
 import { describe, expect, it, vi } from "vitest";
 
 import { SsrfValidator } from "../security/ssrf.js";
