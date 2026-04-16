@@ -37,7 +37,7 @@ COPY --from=deps /app .
 # Build workspace packages and job processor (Turbo handles dependency order automatically)
 ENV NODE_ENV=production
 ENV SKIP_DTS=1
-RUN NODE_OPTIONS="--max-old-space-size=4096" pnpm turbo run build --filter=@services/job-processor... --concurrency=1
+RUN NODE_OPTIONS="--max-old-space-size=4096" pnpm turbo run build --filter=@protolabsai/job-processor... --concurrency=1
 
 # ============================================
 # PRODUCTION

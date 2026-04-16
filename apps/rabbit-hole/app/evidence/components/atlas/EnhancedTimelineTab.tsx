@@ -12,11 +12,11 @@ import type {
   CompactTimelineData,
   TimelineEvent,
   Granularity,
-} from "@proto/types";
+} from "@protolabsai/types";
 import {
   createCompactTimelineData,
   useTimelineCache,
-} from "@proto/utils/atlas";
+} from "@protolabsai/utils/atlas";
 
 import { CompactTimeline } from "../../../atlas/components/CompactTimeline";
 import {

@@ -24,7 +24,7 @@ import {
   ReflectionMiddleware,
   ResearchPlannerMiddleware,
   StructuredExtractionMiddleware,
-} from "@proto/research-middleware";
+} from "@protolabsai/research-middleware";
 
 let _registry: MiddlewareRegistry | null = null;
 

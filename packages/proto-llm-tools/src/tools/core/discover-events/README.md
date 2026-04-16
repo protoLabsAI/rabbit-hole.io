@@ -18,7 +18,7 @@ The `discoverEventsTool` extracts and identifies all events associated with a gi
 ### Basic Event Discovery
 
 ```typescript
-import { discoverEventsTool } from "@proto/proto-llm-tools";
+import { discoverEventsTool } from "@protolabsai/proto-llm-tools";
 
 const result = await discoverEventsTool.invoke({
   content: "Trump held a rally in Iowa on January 15, 2024...",

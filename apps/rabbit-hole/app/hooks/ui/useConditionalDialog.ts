@@ -12,7 +12,7 @@ import {
   hasMinimumRole,
   ROLE_METADATA,
   USER_ROLES,
-} from "@proto/auth/client";
+} from "@protolabsai/auth/client";
 
 import type {
   ConditionalDialogConfig,

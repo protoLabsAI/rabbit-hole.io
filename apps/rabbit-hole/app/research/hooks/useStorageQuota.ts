@@ -7,7 +7,7 @@
 
 import { useEffect, useState } from "react";
 
-import { checkStorageAvailable } from "@proto/utils";
+import { checkStorageAvailable } from "@protolabsai/utils";
 
 export interface StorageQuotaState {
   available: number;

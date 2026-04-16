@@ -1,5 +1,5 @@
 {
-  "name": "@services/job-processor",
+  "name": "@protolabsai/job-processor",
   "version": "0.1.6",
   "private": true,
   "type": "module",
@@ -12,12 +12,12 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@proto/database": "workspace:*",
-    "@proto/llm-providers": "workspace:*",
-    "@proto/sidequest-utils": "workspace:*",
-    "@proto/types": "workspace:*",
-    "@proto/utils": "workspace:*",
-    "@proto/vector": "workspace:*",
+    "@protolabsai/database": "workspace:*",
+    "@protolabsai/llm-providers": "workspace:*",
+    "@protolabsai/sidequest-utils": "workspace:*",
+    "@protolabsai/types": "workspace:*",
+    "@protolabsai/utils": "workspace:*",
+    "@protolabsai/vector": "workspace:*",
     "@sidequest/postgres-backend": "1.7.1",
     "busboy": "^1.6.0",
     "mammoth": "^1.11.0",

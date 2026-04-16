@@ -1,4 +1,4 @@
-# @proto/observability
+# @protolabsai/observability
 
 Observability utilities for LLM tracing and monitoring across the monorepo.
 
@@ -12,7 +12,7 @@ Observability utilities for LLM tracing and monitoring across the monorepo.
 
 ```bash
 # Already installed as workspace dependency
-pnpm add @proto/observability
+pnpm add @protolabsai/observability
 ```
 
 ## Usage
@@ -20,7 +20,7 @@ pnpm add @proto/observability
 ### In API Routes
 
 ```typescript
-import { getLangfuse } from "@proto/observability";
+import { getLangfuse } from "@protolabsai/observability";
 
 export async function POST(request: NextRequest) {
   const langfuse = getLangfuse();
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
 ### Check if Enabled
 
 ```typescript
-import { isLangfuseEnabled } from "@proto/observability";
+import { isLangfuseEnabled } from "@protolabsai/observability";
 
 if (isLangfuseEnabled()) {
   console.log("Langfuse tracing active");

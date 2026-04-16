@@ -18,7 +18,7 @@ Interactive entity research workflow with **evidence-first design**, field-level
 ### As Tool (Agent Integration)
 
 ```typescript
-import { entityResearchPlaygroundTool } from "@proto/llm-tools";
+import { entityResearchPlaygroundTool } from "@protolabsai/llm-tools";
 
 const result = await entityResearchPlaygroundTool.invoke({
   entityName: "Tesla Inc.",

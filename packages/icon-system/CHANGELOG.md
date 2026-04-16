@@ -1,4 +1,4 @@
-# @proto/icon-system
+# @protolabsai/icon-system
 
 ## 0.1.0
 

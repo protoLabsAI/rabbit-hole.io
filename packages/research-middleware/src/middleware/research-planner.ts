@@ -14,7 +14,7 @@
 
 import { generateText } from "ai";
 
-import { getAIModel } from "@proto/llm-providers/server";
+import { getAIModel } from "@protolabsai/llm-providers/server";
 
 import type { MiddlewareContext, ResearchMiddleware } from "../types";
 

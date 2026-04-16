@@ -16,7 +16,7 @@ import {
   enforceFileSizeLimit,
   enforceStorageLimit,
   TierLimitError,
-} from "@proto/auth";
+} from "@protolabsai/auth";
 
 import {
   getObjectStoreConfig,

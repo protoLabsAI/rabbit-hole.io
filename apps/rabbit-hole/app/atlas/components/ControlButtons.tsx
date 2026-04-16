@@ -15,8 +15,8 @@ import {
   getUserRoleClient,
   hasMinimumRole,
   USER_ROLES,
-} from "@proto/auth/client";
-import { Button } from "@proto/ui/atoms";
+} from "@protolabsai/auth/client";
+import { Button } from "@protolabsai/ui/atoms";
 
 import { FileUploadButton } from "../../components/ui/FileUploadButton";
 

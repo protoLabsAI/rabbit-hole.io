@@ -1,5 +1,5 @@
 /**
- * @proto/forms - Domain Entity Form System
+ * @protolabsai/forms - Domain Entity Form System
  *
  * Dynamic form generation from Zod schemas for 77 entity types across 12 domains.
  */
@@ -26,8 +26,8 @@ export {
   type FormConfig,
 } from "./registry/DomainFormRegistry";
 
-// UID generation utility (re-exported from @proto/types)
-export { generateEntityUID } from "@proto/types";
+// UID generation utility (re-exported from @protolabsai/types)
+export { generateEntityUID } from "@protolabsai/types";
 
 // Mock data generation
 export {

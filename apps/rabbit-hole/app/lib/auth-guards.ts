@@ -11,7 +11,7 @@ import {
   hasMinimumRole,
   USER_ROLES,
   type UserRole,
-} from "@proto/auth";
+} from "@protolabsai/auth";
 
 export interface AuthResult {
   authorized: boolean;

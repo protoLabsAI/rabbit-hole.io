@@ -10,7 +10,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
-import { getUserTier, getTierLimits } from "@proto/auth";
+import { getUserTier, getTierLimits } from "@protolabsai/auth";
 
 const EnqueueLangExtractSchema = z.object({
   textContent: z.string().min(1, "Text content required"),

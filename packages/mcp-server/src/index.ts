@@ -8,7 +8,7 @@
  * knowledge graphs.
  *
  * Usage:
- *   npx @proto/mcp-server
+ *   npx @protolabsai/mcp-server
  *
  * Environment variables:
  *   JOB_PROCESSOR_URL  - Job processor API URL (default: http://localhost:8680)

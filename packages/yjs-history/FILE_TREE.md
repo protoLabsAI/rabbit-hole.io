@@ -1,4 +1,4 @@
-# @proto/yjs-history - Complete File Tree
+# @protolabsai/yjs-history - Complete File Tree
 
 ```
 packages/yjs-history/
@@ -167,7 +167,7 @@ import {
   useYjsHistory,
   IndexedDBVersionStorage,
   type VersionMetadata,
-} from "@proto/yjs-history";
+} from "@protolabsai/yjs-history";
 ```
 
 ### Basic Usage

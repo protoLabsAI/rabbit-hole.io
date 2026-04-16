@@ -9,13 +9,13 @@
 
 import { NextRequest } from "next/server";
 
-import { getUserTier, getTierLimits } from "@proto/auth";
+import { getUserTier, getTierLimits } from "@protolabsai/auth";
 import {
   discoverNode,
   structureNode,
   summarizeTool,
   entityResearchTool,
-} from "@proto/llm-tools";
+} from "@protolabsai/llm-tools";
 import type {
   Entity,
   Relationship,
@@ -23,9 +23,9 @@ import type {
   RabbitHoleBundleData,
   EntityResearchInput,
   EntityResearchOutput,
-} from "@proto/types";
-import { getRelationshipTypesForDomains } from "@proto/types";
-import { areSimilarStrings } from "@proto/utils";
+} from "@protolabsai/types";
+import { getRelationshipTypesForDomains } from "@protolabsai/types";
+import { areSimilarStrings } from "@protolabsai/utils";
 
 import {
   createEvidenceFromWikipedia,

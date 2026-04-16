@@ -1,4 +1,4 @@
-import baseConfig from "@proto/config-tailwind/base.config.js";
+import baseConfig from "@protolabsai/config-tailwind/base.config.js";
 
 /** @type {import('tailwindcss').Config} */
 export default {

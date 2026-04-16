@@ -7,7 +7,7 @@
  * Uses isomorphic-dompurify for Node.js and browser compatibility.
  *
  * WARNING: This module is client-only and will throw a build error if
- * imported during SSR. For server-side sanitization, use @proto/utils/security-server
+ * imported during SSR. For server-side sanitization, use @protolabsai/utils/security-server
  */
 
 import "client-only";

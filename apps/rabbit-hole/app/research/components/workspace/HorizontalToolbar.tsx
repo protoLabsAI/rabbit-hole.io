@@ -14,7 +14,7 @@
 
 import React from "react";
 
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 import {
   Popover,
   PopoverContent,
@@ -23,8 +23,8 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@proto/ui/atoms";
-import { PaidFeaturePopover } from "@proto/ui/organisms";
+} from "@protolabsai/ui/atoms";
+import { PaidFeaturePopover } from "@protolabsai/ui/organisms";
 
 import { cn } from "@/lib/utils";
 

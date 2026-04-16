@@ -24,7 +24,7 @@ Interactive map component using Leaflet for full interactivity.
 - Bounds change tracking
 
 ```tsx
-import { MapCanvas } from "@proto/charts/map";
+import { MapCanvas } from "@protolabsai/charts/map";
 
 <MapCanvas
   entities={entities}
@@ -55,7 +55,7 @@ Server-rendered static map image for performance-critical scenarios.
 - Lightweight
 
 ```tsx
-import { StaticMapImage } from "@proto/charts/map";
+import { StaticMapImage } from "@protolabsai/charts/map";
 
 <StaticMapImage
   entities={entities}
@@ -176,7 +176,7 @@ For production with high volume, consider:
 ### Card Grid with Locations
 
 ```tsx
-import { StaticMapImage } from "@proto/charts/map";
+import { StaticMapImage } from "@protolabsai/charts/map";
 
 <div className="grid grid-cols-3 gap-4">
   {entities.map((entity) => (
@@ -199,7 +199,7 @@ import { StaticMapImage } from "@proto/charts/map";
 ### Interactive Exploration
 
 ```tsx
-import { MapCanvas } from "@proto/charts/map";
+import { MapCanvas } from "@protolabsai/charts/map";
 
 <MapCanvas
   entities={allEntities}

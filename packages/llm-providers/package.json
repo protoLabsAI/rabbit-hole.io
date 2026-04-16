@@ -1,5 +1,5 @@
 {
-  "name": "@proto/llm-providers",
+  "name": "@protolabsai/llm-providers",
   "version": "0.1.0",
   "private": true,
   "description": "Multi-provider LLM configuration system with category-based model selection",

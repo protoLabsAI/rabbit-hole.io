@@ -36,7 +36,7 @@ import React, {
 } from "react";
 
 import "@xyflow/react/dist/style.css";
-import type { UserTier } from "@proto/auth/client";
+import type { UserTier } from "@protolabsai/auth/client";
 // DISABLED: Drawing tools - Coming Soon
 // import {
 //   FreehandNode,
@@ -48,9 +48,9 @@ import type { UserTier } from "@proto/auth/client";
 //   useFreehandDrawing,
 //   isDrawingNodeType,
 //   type ToolType,
-// } from "@proto/freehand-drawing";
-import { generateSecureUUID } from "@proto/utils";
-import { getEntityColor, getEntityImage } from "@proto/utils/atlas";
+// } from "@protolabsai/freehand-drawing";
+import { generateSecureUUID } from "@protolabsai/utils";
+import { getEntityColor, getEntityImage } from "@protolabsai/utils/atlas";
 
 import {
   graphToReactFlow,

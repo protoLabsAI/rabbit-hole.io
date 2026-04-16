@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeAll } from "vitest";
 
-import { EntitySchemaRegistry } from "@proto/types";
+import { EntitySchemaRegistry } from "@protolabsai/types";
 
 import {
   getEntityImage,

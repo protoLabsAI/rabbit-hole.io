@@ -25,15 +25,15 @@ import {
 } from "ai";
 import { z } from "zod";
 
-import { getAIModel } from "@proto/llm-providers/server";
+import { getAIModel } from "@protolabsai/llm-providers/server";
 import {
   createTracingContext,
   DeferredToolLoadingMiddleware,
   type MiddlewareContext,
   type ToolExecutor,
   type ExtractionPreview,
-} from "@proto/research-middleware";
-import { generateSecureId } from "@proto/utils";
+} from "@protolabsai/research-middleware";
+import { generateSecureId } from "@protolabsai/utils";
 
 import { getMiddlewareRegistry } from "../../lib/middleware-config";
 import {

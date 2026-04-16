@@ -1,5 +1,5 @@
 {
-  "name": "@proto/forms",
+  "name": "@protolabsai/forms",
   "version": "0.3.3",
   "type": "module",
   "description": "Domain entity form system with dynamic generation from Zod schemas",
@@ -23,8 +23,8 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
-    "@proto/types": "workspace:*",
-    "@proto/ui": "workspace:*",
+    "@protolabsai/types": "workspace:*",
+    "@protolabsai/ui": "workspace:*",
     "react-hook-form": "^7.54.2",
     "zod": "^4.1.12"
   },
@@ -32,7 +32,7 @@
     "react": "^19.0.0"
   },
   "devDependencies": {
-    "@proto/config-typescript": "workspace:*",
+    "@protolabsai/config-typescript": "workspace:*",
     "@types/react": "^19.0.6",
     "tsup": "^8.0.1",
     "typescript": "^5.6.3"

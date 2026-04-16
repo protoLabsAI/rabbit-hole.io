@@ -20,7 +20,7 @@ Interactive multi-phase entity extraction with visual annotations in a Tiptap ed
 ### Basic Implementation
 
 ```tsx
-import { TiptapExtractionPlayground } from "@proto/llm-tools/playgrounds";
+import { TiptapExtractionPlayground } from "@protolabsai/llm-tools/playgrounds";
 
 export default function ExtractionPage() {
   return (

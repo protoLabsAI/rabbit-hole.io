@@ -9,7 +9,7 @@ import archiver from "archiver";
 import { Client as MinIOClient } from "minio";
 import { NextRequest, NextResponse } from "next/server";
 
-import { withAuthAndLogging } from "@proto/auth";
+import { withAuthAndLogging } from "@protolabsai/auth";
 
 import {
   getObjectStoreConfig,

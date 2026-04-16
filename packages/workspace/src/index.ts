@@ -1,5 +1,5 @@
 /**
- * @proto/workspace
+ * @protolabsai/workspace
  *
  * Multi-tab collaborative workspace framework with Yjs persistence
  *

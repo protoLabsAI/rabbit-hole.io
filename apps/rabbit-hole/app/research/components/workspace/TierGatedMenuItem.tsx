@@ -7,9 +7,12 @@
 
 "use client";
 
-import { Icon, type RegisteredIconName } from "@proto/icon-system";
-import { DropdownMenuItem } from "@proto/ui/atoms";
-import { PaidFeaturePopover, type PaidFeatureInfo } from "@proto/ui/organisms";
+import { Icon, type RegisteredIconName } from "@protolabsai/icon-system";
+import { DropdownMenuItem } from "@protolabsai/ui/atoms";
+import {
+  PaidFeaturePopover,
+  type PaidFeatureInfo,
+} from "@protolabsai/ui/organisms";
 
 export interface TierGatedMenuItemProps {
   /** Icon to display */

@@ -18,8 +18,8 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@proto/ui/atoms";
-import { getEntityImage } from "@proto/utils/atlas";
+} from "@protolabsai/ui/atoms";
+import { getEntityImage } from "@protolabsai/utils/atlas";
 
 import { EnhancedTimelineTab } from "./EnhancedTimelineTab";
 import { FamilyRelationshipsSection } from "./relationships/FamilyRelationshipsSection";

@@ -1,4 +1,4 @@
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 
 import { useIsEditing } from "@/context/store/useWorkspaceStore";
 import { cn } from "@/lib/utils";

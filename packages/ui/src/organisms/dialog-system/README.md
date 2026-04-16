@@ -22,5 +22,5 @@ Type errors in `history-navigation/`, `file-upload-button/`, `theme-selector/`, 
 ## Usage
 
 ```tsx
-import { ConditionalDialog, ConfirmPopover } from "@proto/ui/organisms";
+import { ConditionalDialog, ConfirmPopover } from "@protolabsai/ui/organisms";
 ```

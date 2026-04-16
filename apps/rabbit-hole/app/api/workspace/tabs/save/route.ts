@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as Y from "yjs";
 
-import { getUserTier, getTierLimits } from "@proto/auth";
-import { buildWorkspaceRoomId } from "@proto/utils";
+import { getUserTier, getTierLimits } from "@protolabsai/auth";
+import { buildWorkspaceRoomId } from "@protolabsai/utils";
 
 import { getHocuspocusPostgresPool } from "@/lib/hocuspocus-db";
 

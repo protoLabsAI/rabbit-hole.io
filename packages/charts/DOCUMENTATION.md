@@ -1,8 +1,8 @@
-# @proto/charts Documentation
+# @protolabsai/charts Documentation
 
 ## Overview
 
-Data visualization components for `@proto/charts`, including Gantt charts and geographic maps.
+Data visualization components for `@protolabsai/charts`, including Gantt charts and geographic maps.
 
 ## Components
 
@@ -111,12 +111,12 @@ Navigate to:
 ### In Code
 
 ```tsx
-import { GanttChart } from "@proto/charts/gantt";
+import { GanttChart } from "@protolabsai/charts/gantt";
 import type {
   GanttFeature,
   GanttChartGroup,
   GanttMarkerProps,
-} from "@proto/charts/gantt";
+} from "@protolabsai/charts/gantt";
 ```
 
 ### Package README
@@ -251,7 +251,7 @@ Documentation Hierarchy:
 
 ```tsx
 // ✅ Complete, copy-paste ready
-import { GanttChart } from "@proto/charts/gantt";
+import { GanttChart } from "@protolabsai/charts/gantt";
 
 const features = [
   {

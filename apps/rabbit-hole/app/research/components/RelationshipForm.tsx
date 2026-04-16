@@ -12,8 +12,11 @@ import React, { useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import type { Entity, Relationship } from "@proto/types";
-import { generateRelationshipUID, ALL_RELATIONSHIP_TYPES } from "@proto/types";
+import type { Entity, Relationship } from "@protolabsai/types";
+import {
+  generateRelationshipUID,
+  ALL_RELATIONSHIP_TYPES,
+} from "@protolabsai/types";
 import {
   Badge,
   Button,
@@ -35,8 +38,8 @@ import {
   SelectTrigger,
   SelectValue,
   Textarea,
-} from "@proto/ui/atoms";
-import { useToast } from "@proto/ui/hooks";
+} from "@protolabsai/ui/atoms";
+import { useToast } from "@protolabsai/ui/hooks";
 
 // Relationship form schema
 const RelationshipFormSchema = z.object({

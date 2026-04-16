@@ -5,7 +5,7 @@ import { registry } from "@langchain/langgraph/zod";
 import { TokenTextSplitter } from "@langchain/textsplitters";
 import * as z from "zod";
 
-import { getModel } from "@proto/llm-providers/server";
+import { getModel } from "@protolabsai/llm-providers/server";
 
 // Configuration for chunking strategy
 const CHUNK_CONFIG = {

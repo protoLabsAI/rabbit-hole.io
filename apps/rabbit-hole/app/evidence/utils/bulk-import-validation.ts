@@ -3,16 +3,16 @@
  *
  * Comprehensive validation to prevent orphaned nodes and ensure data integrity
  *
- * NOTE: Core schemas moved to @proto/types for sharing between client/server
+ * NOTE: Core schemas moved to @protolabsai/types for sharing between client/server
  */
 
 import { z } from "zod";
 
-// Note: All schemas and types are defined locally to avoid conflicts with @proto/types
+// Note: All schemas and types are defined locally to avoid conflicts with @protolabsai/types
 // This file predates the shared schema migration and uses legacy formats
 
 // Keep validation function here since it's business logic, not just types
-// Entity validation schemas - MOVED TO @proto/types
+// Entity validation schemas - MOVED TO @protolabsai/types
 /*
     export const EntitySchema = z.object({
       id: z.string().min(1, "Entity ID is required"),

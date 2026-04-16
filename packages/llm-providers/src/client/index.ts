@@ -1,5 +1,5 @@
 /**
- * @proto/llm-providers/client
+ * @protolabsai/llm-providers/client
  *
  * Client-safe utilities for browser/React components
  */

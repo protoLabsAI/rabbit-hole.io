@@ -5,10 +5,10 @@
  * and that config changes are propagated via onConfigChange callback.
  */
 
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 
-import { DEFAULT_RESEARCH_SESSION_CONFIG } from "@proto/types";
-import type { ResearchSessionConfig } from "@proto/types";
+import { DEFAULT_RESEARCH_SESSION_CONFIG } from "@protolabsai/types";
+import type { ResearchSessionConfig } from "@protolabsai/types";
 
 describe("ResearchConfigPanel", () => {
   describe("config defaults", () => {
@@ -24,21 +24,27 @@ describe("ResearchConfigPanel", () => {
 
   describe("config mutations", () => {
     it("updates depth correctly", () => {
-      const config: ResearchSessionConfig = { ...DEFAULT_RESEARCH_SESSION_CONFIG };
+      const config: ResearchSessionConfig = {
+        ...DEFAULT_RESEARCH_SESSION_CONFIG,
+      };
       const updated = { ...config, depth: "comprehensive" as const };
       expect(updated.depth).toBe("comprehensive");
       expect(updated.maxEntities).toBe(50); // unchanged
     });
 
     it("updates maxEntities correctly", () => {
-      const config: ResearchSessionConfig = { ...DEFAULT_RESEARCH_SESSION_CONFIG };
+      const config: ResearchSessionConfig = {
+        ...DEFAULT_RESEARCH_SESSION_CONFIG,
+      };
       const updated = { ...config, maxEntities: 100 };
       expect(updated.maxEntities).toBe(100);
       expect(updated.depth).toBe("detailed"); // unchanged
     });
 
     it("updates maxDepth correctly", () => {
-      const config: ResearchSessionConfig = { ...DEFAULT_RESEARCH_SESSION_CONFIG };
+      const config: ResearchSessionConfig = {
+        ...DEFAULT_RESEARCH_SESSION_CONFIG,
+      };
       const updated = { ...config, maxDepth: 5 };
       expect(updated.maxDepth).toBe(5);
     });
@@ -53,8 +59,12 @@ describe("ResearchConfigPanel", () => {
     });
 
     it("toggles search provider off", () => {
-      const config: ResearchSessionConfig = { ...DEFAULT_RESEARCH_SESSION_CONFIG };
-      const providers = config.searchProviders.filter((p) => p !== "duckduckgo");
+      const config: ResearchSessionConfig = {
+        ...DEFAULT_RESEARCH_SESSION_CONFIG,
+      };
+      const providers = config.searchProviders.filter(
+        (p) => p !== "duckduckgo"
+      );
       expect(providers).toEqual(["tavily", "wikipedia"]);
     });
 
@@ -64,9 +74,12 @@ describe("ResearchConfigPanel", () => {
         searchProviders: ["tavily"],
       };
       const providerId = "tavily";
-      const newProviders = config.searchProviders.filter((p) => p !== providerId);
+      const newProviders = config.searchProviders.filter(
+        (p) => p !== providerId
+      );
       // Should not update if result is empty
-      const result = newProviders.length > 0 ? newProviders : config.searchProviders;
+      const result =
+        newProviders.length > 0 ? newProviders : config.searchProviders;
       expect(result).toEqual(["tavily"]);
     });
   });

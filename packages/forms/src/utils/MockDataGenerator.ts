@@ -5,7 +5,7 @@
  * Provides different scenarios: minimal, complete, invalid, and edge cases.
  */
 
-import { generateEntityUID } from "@proto/types";
+import { generateEntityUID } from "@protolabsai/types";
 
 import { EntityType } from "../registry/DomainFormRegistry";
 

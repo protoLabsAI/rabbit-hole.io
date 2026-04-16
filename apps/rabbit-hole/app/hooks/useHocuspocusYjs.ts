@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { IndexeddbPersistence } from "y-indexeddb";
 import * as Y from "yjs";
 
-import { useToast } from "@proto/ui/hooks";
+import { useToast } from "@protolabsai/ui/hooks";
 
 interface UseHocuspocusYjsOptions {
   roomId: string;

@@ -8,12 +8,12 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { getGlobalNeo4jClient } from "@proto/database";
-import { CALCULATIONS } from "@proto/types";
+import { getGlobalNeo4jClient } from "@protolabsai/database";
+import { CALCULATIONS } from "@protolabsai/types";
 import {
   calculatePersonAge,
   calculateRelationshipDuration,
-} from "@proto/utils/atlas";
+} from "@protolabsai/utils/atlas";
 
 interface IndividualRelationshipAnalysis {
   success: boolean;

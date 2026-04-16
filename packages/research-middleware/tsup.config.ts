@@ -15,9 +15,9 @@ export default defineConfig({
   splitting: false,
   sourcemap: true,
   minify: false,
-  external: ["@proto/utils", "@proto/llm-providers", "ai"],
+  external: ["@protolabsai/utils", "@protolabsai/llm-providers", "ai"],
   banner: {
-    js: "/* @proto/research-middleware - Middleware pipeline for AI SDK streamText tool calls */",
+    js: "/* @protolabsai/research-middleware - Middleware pipeline for AI SDK streamText tool calls */",
   },
   outDir: "dist",
   target: "es2020",

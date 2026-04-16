@@ -3,7 +3,7 @@
 import type Graph from "graphology";
 import { useState, useMemo, useCallback } from "react";
 
-import { Badge, Button, Checkbox, Input } from "@proto/ui/atoms";
+import { Badge, Button, Checkbox, Input } from "@protolabsai/ui/atoms";
 
 import type {
   GraphNodeAttributes,

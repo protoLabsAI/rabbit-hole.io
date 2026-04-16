@@ -11,7 +11,7 @@
 import neo4j from "neo4j-driver";
 import { NextRequest, NextResponse } from "next/server";
 
-import { getGlobalNeo4jClient } from "@proto/database";
+import { getGlobalNeo4jClient } from "@protolabsai/database";
 import {
   calculatePersonAge,
   calculateRelationshipDuration,
@@ -19,7 +19,7 @@ import {
   buildRelationshipDetailsQuery,
   validateQueryParams,
   FAMILY_RELATIONSHIP_TYPES,
-} from "@proto/utils/atlas";
+} from "@protolabsai/utils/atlas";
 
 interface PersonDetails {
   uid: string;

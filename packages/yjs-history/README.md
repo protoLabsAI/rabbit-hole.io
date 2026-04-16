@@ -1,4 +1,4 @@
-# @proto/yjs-history
+# @protolabsai/yjs-history
 
 Advanced undo/redo and versioning system for Yjs with React Flow integration.
 
@@ -25,7 +25,7 @@ Advanced undo/redo and versioning system for Yjs with React Flow integration.
 Already installed as workspace package. Import and use:
 
 ```typescript
-import { useYjsHistory, IndexedDBVersionStorage } from "@proto/yjs-history";
+import { useYjsHistory, IndexedDBVersionStorage } from "@protolabsai/yjs-history";
 ```
 
 ## Quick Start
@@ -33,7 +33,7 @@ import { useYjsHistory, IndexedDBVersionStorage } from "@proto/yjs-history";
 ### Basic Undo/Redo
 
 ```typescript
-import { useYjsHistory } from "@proto/yjs-history";
+import { useYjsHistory } from "@protolabsai/yjs-history";
 
 function MyComponent({ ydoc, userId }) {
   const { undo, redo, canUndo, canRedo } = useYjsHistory({
@@ -58,7 +58,7 @@ function MyComponent({ ydoc, userId }) {
 ### React Flow Integration
 
 ```typescript
-import { useReactFlowYjsHistory } from "@proto/yjs-history";
+import { useReactFlowYjsHistory } from "@protolabsai/yjs-history";
 
 function GraphEditor({ ydoc, userId }) {
   const { takeSnapshot, undo, redo, canUndo, canRedo } = useReactFlowYjsHistory(
@@ -85,7 +85,7 @@ function GraphEditor({ ydoc, userId }) {
 ### Named Versions
 
 ```typescript
-import { useYjsHistory, IndexedDBVersionStorage } from "@proto/yjs-history";
+import { useYjsHistory, IndexedDBVersionStorage } from "@protolabsai/yjs-history";
 
 function VersionedEditor({ ydoc, userId }) {
   const {
@@ -202,7 +202,7 @@ interface UseReactFlowYjsHistoryOptions extends UseYjsHistoryOptions {
 Browser-based persistent storage.
 
 ```typescript
-import { IndexedDBVersionStorage } from "@proto/yjs-history";
+import { IndexedDBVersionStorage } from "@protolabsai/yjs-history";
 
 const storage = new IndexedDBVersionStorage("workspace-123");
 ```
@@ -212,7 +212,7 @@ const storage = new IndexedDBVersionStorage("workspace-123");
 In-memory storage (not persistent).
 
 ```typescript
-import { MemoryVersionStorage } from "@proto/yjs-history";
+import { MemoryVersionStorage } from "@protolabsai/yjs-history";
 
 const storage = new MemoryVersionStorage();
 ```
@@ -240,7 +240,7 @@ import {
   searchVersions,
   formatVersionTime,
   getUniqueTags,
-} from "@proto/yjs-history";
+} from "@protolabsai/yjs-history";
 
 // Group versions by date
 const groups = groupVersionsByDate(versions);
@@ -276,7 +276,7 @@ const { undo, redo, canUndo, canRedo } = useYjsUndo({
 });
 
 // After
-import { useYjsHistory } from "@proto/yjs-history";
+import { useYjsHistory } from "@protolabsai/yjs-history";
 
 const { undo, redo, canUndo, canRedo } = useYjsHistory({
   ydoc,
@@ -288,7 +288,7 @@ const { undo, redo, canUndo, canRedo } = useYjsHistory({
 ### Add Versioning to Workspaces
 
 ```typescript
-import { useYjsHistory, IndexedDBVersionStorage } from "@proto/yjs-history";
+import { useYjsHistory, IndexedDBVersionStorage } from "@protolabsai/yjs-history";
 
 function useWorkspace(workspaceId: string) {
   const { ydoc, userId } = useHocuspocusYjs({ roomId });

@@ -1,5 +1,5 @@
 /**
- * Entity Details API v2 - Using @proto/database
+ * Entity Details API v2 - Using @protolabsai/database
  *
  * Refactored to use consolidated database client and query builders.
  * Demonstrates 70% code reduction and standardized patterns.
@@ -11,7 +11,7 @@ import {
   getGlobalNeo4jClient,
   buildEntityDetailsQuery,
   quickHealthCheck,
-} from "@proto/database";
+} from "@protolabsai/database";
 
 interface EntityResponse {
   success: boolean;

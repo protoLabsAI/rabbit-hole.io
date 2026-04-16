@@ -1,4 +1,4 @@
-# @proto/logger
+# @protolabsai/logger
 
 ## 0.1.0
 

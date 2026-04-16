@@ -9,7 +9,7 @@
 
 import { useRouter } from "next/navigation";
 
-import { Button } from "@proto/ui/atoms";
+import { Button } from "@protolabsai/ui/atoms";
 
 interface UpgradePromptModalProps {
   isOpen: boolean;

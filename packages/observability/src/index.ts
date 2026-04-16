@@ -1,5 +1,5 @@
 /**
- * @proto/observability
+ * @protolabsai/observability
  *
  * Observability utilities for LLM tracing and monitoring
  */

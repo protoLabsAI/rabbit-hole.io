@@ -9,7 +9,7 @@
 
 import React, { useState, useRef } from "react";
 
-import { validateRabbitHoleBundle } from "@proto/types";
+import { validateRabbitHoleBundle } from "@protolabsai/types";
 
 interface BulkImportPanelProps {
   isVisible: boolean;

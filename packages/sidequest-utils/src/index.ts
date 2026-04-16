@@ -1,5 +1,5 @@
 /**
- * @proto/sidequest-utils
+ * @protolabsai/sidequest-utils
  *
  * Shared utilities for Sidequest.js job processing.
  * Server-side utilities and type definitions.

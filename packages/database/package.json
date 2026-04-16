@@ -1,5 +1,5 @@
 {
-  "name": "@proto/database",
+  "name": "@protolabsai/database",
   "version": "0.1.0",
   "private": true,
   "description": "Database client and utilities for Neo4j and file-based storage",
@@ -20,7 +20,7 @@
     "test:coverage": "vitest --coverage"
   },
   "dependencies": {
-    "@proto/types": "workspace:*",
+    "@protolabsai/types": "workspace:*",
     "neo4j-driver": "^5.0.0"
   },
   "devDependencies": {

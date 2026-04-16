@@ -11,7 +11,7 @@ import {
   buildTimeSliceUrl,
   getOptimalGranularity,
   globalTimeSliceCache,
-} from "@proto/utils/atlas";
+} from "@protolabsai/utils/atlas";
 
 interface AggregationData {
   granularity: "hour" | "day" | "week" | "month";

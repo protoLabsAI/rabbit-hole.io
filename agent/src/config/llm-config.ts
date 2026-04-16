@@ -1,4 +1,4 @@
-import { getModel } from "@proto/llm-providers/server";
+import { getModel } from "@protolabsai/llm-providers/server";
 
 /**
  * Centralized LLM configuration for agents

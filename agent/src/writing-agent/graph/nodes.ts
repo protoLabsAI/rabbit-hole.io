@@ -10,7 +10,7 @@ import { SystemMessage } from "@langchain/core/messages";
 import type { RunnableConfig } from "@langchain/core/runnables";
 import type { StructuredTool } from "@langchain/core/tools";
 
-import { WRITING_COORDINATOR_PROMPT } from "@proto/llm-tools";
+import { WRITING_COORDINATOR_PROMPT } from "@protolabsai/llm-tools";
 
 import { createLangfuseHandler } from "../../config/langfuse.js";
 import { agentLLMConfig } from "../../config/llm-config.js";

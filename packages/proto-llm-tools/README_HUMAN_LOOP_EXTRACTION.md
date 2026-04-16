@@ -5,7 +5,7 @@ Interactive multi-phase entity extraction with user review and correction at eac
 ## Quick Start
 
 ```typescript
-import { useHumanLoopExtraction } from "@proto/proto-llm-tools/hooks/useHumanLoopExtraction";
+import { useHumanLoopExtraction } from "@protolabsai/proto-llm-tools/hooks/useHumanLoopExtraction";
 
 function MyComponent() {
   const { startExtraction, resumeExtraction, currentState, isWaitingForReview } =

@@ -13,8 +13,8 @@
 
 import React, { useState, useEffect } from "react";
 
-import { UpgradePromptModal } from "@proto/auth/ui";
-import { getEntityImage } from "@proto/utils/atlas";
+import { UpgradePromptModal } from "@protolabsai/auth/ui";
+import { getEntityImage } from "@protolabsai/utils/atlas";
 
 interface ExistingEntity {
   id: string;

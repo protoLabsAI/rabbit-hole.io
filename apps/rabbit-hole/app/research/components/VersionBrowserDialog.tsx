@@ -2,21 +2,21 @@
 
 import { useState, useEffect } from "react";
 
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   Button,
-} from "@proto/ui/atoms";
-import type { VersionMetadata } from "@proto/yjs-history";
+} from "@protolabsai/ui/atoms";
+import type { VersionMetadata } from "@protolabsai/yjs-history";
 import {
   groupVersionsByDate,
   formatVersionTime,
   filterVersionsByTag,
   getUniqueTags,
-} from "@proto/yjs-history";
+} from "@protolabsai/yjs-history";
 
 import { useConfirmDialog } from "./ConfirmDialog";
 

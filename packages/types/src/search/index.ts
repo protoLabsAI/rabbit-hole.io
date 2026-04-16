@@ -2,7 +2,7 @@
  * Search Layer — barrel exports
  *
  * Re-exports all public types from the search sub-package so consumers can
- * import from "@proto/types" or "@proto/types/search" without caring about
+ * import from "@protolabsai/types" or "@protolabsai/types/search" without caring about
  * the internal file layout.
  */
 

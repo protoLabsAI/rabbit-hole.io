@@ -18,7 +18,7 @@ import {
   formatDuration,
   getTimePresets,
   globalTimeSliceCache,
-} from "@proto/utils/atlas";
+} from "@protolabsai/utils/atlas";
 
 import { EntityCard, EntityCardEmptyState } from "./EntityCard";
 import { TimelineChart } from "./TimelineChart";

@@ -7,8 +7,11 @@
 
 import { useEffect, useState, useCallback } from "react";
 
-import type { UserTierLimits } from "@proto/auth";
-import { getUserTierClient, getTierLimitsClient } from "@proto/auth/client";
+import type { UserTierLimits } from "@protolabsai/auth";
+import {
+  getUserTierClient,
+  getTierLimitsClient,
+} from "@protolabsai/auth/client";
 
 interface UseTierAwareLazyLoadOptions<T> {
   featureFlag: keyof UserTierLimits;

@@ -171,7 +171,7 @@ docker compose -f docker-compose.research.yml --env-file .env.research up -d
          │                                 │ Bearer token auth
          ▼                                 ▼
 ┌──────────────────────────────────────────────────────────┐
-│  MCP Server  (@proto/mcp-server)                         │
+│  MCP Server  (@protolabsai/mcp-server)                         │
 │                                                          │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────┐  │
 │  │ index.ts    │  │ http-server │  │ openapi.ts      │  │

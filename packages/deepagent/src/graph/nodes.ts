@@ -7,7 +7,7 @@ import { SystemMessage } from "@langchain/core/messages";
 import type { RunnableConfig } from "@langchain/core/runnables";
 import type { StructuredTool } from "@langchain/core/tools";
 
-import { getModel } from "@proto/llm-providers/server";
+import { getModel } from "@protolabsai/llm-providers/server";
 
 import { COORDINATOR_PROMPT } from "../prompts";
 import type { EntityResearchAgentStateType } from "../state";

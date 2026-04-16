@@ -8,9 +8,9 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { withAuthAndLogging, type AuthenticatedUser } from "@proto/auth";
-import { CreateShareRequest } from "@proto/types";
-import { generateShareUrl, generatePreviewUrl } from "@proto/utils";
+import { withAuthAndLogging, type AuthenticatedUser } from "@protolabsai/auth";
+import { CreateShareRequest } from "@protolabsai/types";
+import { generateShareUrl, generatePreviewUrl } from "@protolabsai/utils";
 
 import { ShareTokenService } from "@/lib/share-token-service";
 

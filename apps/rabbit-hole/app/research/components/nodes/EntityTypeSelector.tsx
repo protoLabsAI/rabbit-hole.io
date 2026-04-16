@@ -15,8 +15,8 @@ import React, {
   useRef,
 } from "react";
 
-import { domainRegistry, getDomainIcon } from "@proto/types";
-import { Popover, PopoverContent, PopoverTrigger } from "@proto/ui/atoms";
+import { domainRegistry, getDomainIcon } from "@protolabsai/types";
+import { Popover, PopoverContent, PopoverTrigger } from "@protolabsai/ui/atoms";
 
 interface EntityTypeOption {
   type: string;

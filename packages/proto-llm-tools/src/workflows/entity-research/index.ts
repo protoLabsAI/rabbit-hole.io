@@ -1,6 +1,9 @@
 import { tool } from "@langchain/core/tools";
 
-import type { EntityResearchInput, EntityResearchOutput } from "@proto/types";
+import type {
+  EntityResearchInput,
+  EntityResearchOutput,
+} from "@protolabsai/types";
 
 import { entityResearchGraph } from "./graph";
 import { EntityResearchSchema } from "./schemas";

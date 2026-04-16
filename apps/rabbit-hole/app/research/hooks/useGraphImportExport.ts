@@ -8,10 +8,10 @@
 import type Graph from "graphology";
 import { useCallback, useRef, useState } from "react";
 
-import type { UserTier } from "@proto/auth/client";
-import { logUserAction } from "@proto/logger";
-import type { RabbitHoleBundleData } from "@proto/types";
-import { useToast } from "@proto/ui/hooks";
+import type { UserTier } from "@protolabsai/auth/client";
+import { logUserAction } from "@protolabsai/logger";
+import type { RabbitHoleBundleData } from "@protolabsai/types";
+import { useToast } from "@protolabsai/ui/hooks";
 
 import type {
   GraphNodeAttributes,

@@ -14,11 +14,11 @@ import {
 } from "../shared-timeline-processor";
 
 // Mock the dependencies
-vi.mock("@proto/database", () => ({
+vi.mock("@protolabsai/database", () => ({
   getGlobalNeo4jClient: vi.fn(),
 }));
 
-vi.mock("@proto/utils", () => ({
+vi.mock("@protolabsai/utils", () => ({
   createNeo4jClientWithIntegerConversion: vi.fn(),
   fetchEntityTimeline: vi.fn(),
   validateTimelineFilters: vi.fn(),
@@ -68,12 +68,14 @@ describe.skip("Shared Timeline Processor", () => {
     vi.clearAllMocks();
 
     // Setup default mocks
-    const { getGlobalNeo4jClient } = vi.mocked(await import("@proto/database"));
+    const { getGlobalNeo4jClient } = vi.mocked(
+      await import("@protolabsai/database")
+    );
     const {
       createNeo4jClientWithIntegerConversion,
       fetchEntityTimeline,
       validateTimelineFilters,
-    } = vi.mocked(await import("@proto/utils"));
+    } = vi.mocked(await import("@protolabsai/utils"));
 
     getGlobalNeo4jClient.mockReturnValue(mockClient as any);
     createNeo4jClientWithIntegerConversion.mockReturnValue(mockClient as any);
@@ -175,7 +177,9 @@ describe.skip("Shared Timeline Processor", () => {
     });
 
     it("should handle entity not found errors", async () => {
-      const { fetchEntityTimeline } = vi.mocked(await import("@proto/utils"));
+      const { fetchEntityTimeline } = vi.mocked(
+        await import("@protolabsai/utils")
+      );
       fetchEntityTimeline.mockRejectedValue(
         new Error("Entity person:nonexistent not found")
       );
@@ -192,7 +196,7 @@ describe.skip("Shared Timeline Processor", () => {
 
     it("should handle filter validation failures", async () => {
       const { validateTimelineFilters } = vi.mocked(
-        await import("@proto/utils")
+        await import("@protolabsai/utils")
       );
       validateTimelineFilters.mockReturnValue({
         isValid: false,
@@ -211,7 +215,9 @@ describe.skip("Shared Timeline Processor", () => {
     });
 
     it("should handle database connection errors", async () => {
-      const { fetchEntityTimeline } = vi.mocked(await import("@proto/utils"));
+      const { fetchEntityTimeline } = vi.mocked(
+        await import("@protolabsai/utils")
+      );
       fetchEntityTimeline.mockRejectedValue(
         new Error("Database connection failed")
       );
@@ -272,7 +278,9 @@ describe.skip("Shared Timeline Processor", () => {
     });
 
     it("should handle mixed success and failure scenarios", async () => {
-      const { fetchEntityTimeline } = vi.mocked(await import("@proto/utils"));
+      const { fetchEntityTimeline } = vi.mocked(
+        await import("@protolabsai/utils")
+      );
 
       // Mock different outcomes for different entities
       fetchEntityTimeline
@@ -437,7 +445,9 @@ describe.skip("Shared Timeline Processor", () => {
 
   describe("Pagination Limits", () => {
     it("should enforce maximum limits", async () => {
-      const { fetchEntityTimeline } = vi.mocked(await import("@proto/utils"));
+      const { fetchEntityTimeline } = vi.mocked(
+        await import("@protolabsai/utils")
+      );
 
       const request: TimelineRequest = {
         entityUid: "person:test_person",
@@ -457,7 +467,9 @@ describe.skip("Shared Timeline Processor", () => {
     });
 
     it("should enforce minimum limits", async () => {
-      const { fetchEntityTimeline } = vi.mocked(await import("@proto/utils"));
+      const { fetchEntityTimeline } = vi.mocked(
+        await import("@protolabsai/utils")
+      );
 
       const request: TimelineRequest = {
         entityUid: "person:test_person",
@@ -477,7 +489,9 @@ describe.skip("Shared Timeline Processor", () => {
     });
 
     it("should use default limit when not specified", async () => {
-      const { fetchEntityTimeline } = vi.mocked(await import("@proto/utils"));
+      const { fetchEntityTimeline } = vi.mocked(
+        await import("@protolabsai/utils")
+      );
 
       const request: TimelineRequest = {
         entityUid: "person:test_person",
@@ -498,7 +512,9 @@ describe.skip("Shared Timeline Processor", () => {
 
   describe("Error Handling", () => {
     it("should handle fetchEntityTimeline failures gracefully", async () => {
-      const { fetchEntityTimeline } = vi.mocked(await import("@proto/utils"));
+      const { fetchEntityTimeline } = vi.mocked(
+        await import("@protolabsai/utils")
+      );
       fetchEntityTimeline.mockRejectedValue(
         new Error("Database connection failed")
       );
@@ -516,7 +532,7 @@ describe.skip("Shared Timeline Processor", () => {
 
     it("should handle filter validation failures", async () => {
       const { validateTimelineFilters } = vi.mocked(
-        await import("@proto/utils")
+        await import("@protolabsai/utils")
       );
       validateTimelineFilters.mockReturnValue({
         isValid: false,
@@ -561,7 +577,9 @@ describe.skip("Shared Timeline Processor", () => {
       const consoleErrorSpy = vi
         .spyOn(console, "error")
         .mockImplementation(() => {});
-      const { fetchEntityTimeline } = vi.mocked(await import("@proto/utils"));
+      const { fetchEntityTimeline } = vi.mocked(
+        await import("@protolabsai/utils")
+      );
       fetchEntityTimeline.mockRejectedValue(new Error("Test error"));
 
       const request: TimelineRequest = {

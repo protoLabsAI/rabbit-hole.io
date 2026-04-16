@@ -17,7 +17,13 @@ export default defineConfig({
   splitting: false,
   sourcemap: true,
   minify: false,
-  external: ["next", "react", "react-dom", "@proto/ui", "@proto/icon-system"],
+  external: [
+    "next",
+    "react",
+    "react-dom",
+    "@protolabsai/ui",
+    "@protolabsai/icon-system",
+  ],
   outDir: "dist",
   target: "es2020",
 });

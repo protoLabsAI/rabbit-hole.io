@@ -16,7 +16,7 @@ import type { IncomingMessage, ServerResponse } from "http";
 
 import { Sidequest } from "sidequest";
 
-import type { IngestionJobData } from "@proto/types";
+import type { IngestionJobData } from "@protolabsai/types";
 
 import { MediaIngestionJob } from "../../jobs/MediaIngestionJob.js";
 

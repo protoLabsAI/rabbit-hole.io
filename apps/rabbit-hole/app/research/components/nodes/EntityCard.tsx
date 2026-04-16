@@ -21,11 +21,14 @@ import { Handle, Position, NodeProps, useStore } from "@xyflow/react";
 import type Graph from "graphology";
 import React, { useState, useMemo, useCallback } from "react";
 
-import { Icon } from "@proto/icon-system";
-import { domainRegistry, getEnrichmentFieldsForEntity } from "@proto/types";
-import { Badge, Button } from "@proto/ui/atoms";
-import { useToast } from "@proto/ui/hooks";
-import { getEntityColor, getEntityImage } from "@proto/utils/atlas";
+import { Icon } from "@protolabsai/icon-system";
+import {
+  domainRegistry,
+  getEnrichmentFieldsForEntity,
+} from "@protolabsai/types";
+import { Badge, Button } from "@protolabsai/ui/atoms";
+import { useToast } from "@protolabsai/ui/hooks";
+import { getEntityColor, getEntityImage } from "@protolabsai/utils/atlas";
 
 import type {
   GraphNodeAttributes,

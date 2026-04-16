@@ -2,8 +2,8 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 
-import { Icon } from "@proto/icon-system";
-import { Badge } from "@proto/ui/atoms";
+import { Icon } from "@protolabsai/icon-system";
+import { Badge } from "@protolabsai/ui/atoms";
 
 interface SearchResult {
   uid: string;

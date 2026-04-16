@@ -11,8 +11,11 @@ import {
   withAuthAndLogging,
   checkAdminRole,
   type AuthenticatedUser,
-} from "@proto/auth";
-import { ShareTokenNotFoundError, ShareTokenRevokedError } from "@proto/types";
+} from "@protolabsai/auth";
+import {
+  ShareTokenNotFoundError,
+  ShareTokenRevokedError,
+} from "@protolabsai/types";
 
 import { ShareTokenService } from "@/lib/share-token-service";
 

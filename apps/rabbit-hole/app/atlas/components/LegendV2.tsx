@@ -7,9 +7,9 @@
 
 import React, { useState, useCallback, useMemo } from "react";
 
-import { getEntityTypesByDomain } from "@proto/forms";
-import { Icon } from "@proto/icon-system";
-import { domainMetadata } from "@proto/types";
+import { getEntityTypesByDomain } from "@protolabsai/forms";
+import { Icon } from "@protolabsai/icon-system";
+import { domainMetadata } from "@protolabsai/types";
 import {
   Button,
   Card,
@@ -20,8 +20,8 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@proto/ui/atoms";
-import { generateLegendData } from "@proto/utils/atlas";
+} from "@protolabsai/ui/atoms";
+import { generateLegendData } from "@protolabsai/utils/atlas";
 
 import type { CanonicalGraphData } from "../../types/canonical-graph";
 

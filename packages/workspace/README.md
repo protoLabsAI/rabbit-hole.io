@@ -1,4 +1,4 @@
-# @proto/workspace
+# @protolabsai/workspace
 
 Type definitions and utilities for multi-tab collaborative workspaces.
 
@@ -13,7 +13,7 @@ Type definitions and utilities for multi-tab collaborative workspaces.
 ## Installation
 
 ```bash
-pnpm add @proto/workspace
+pnpm add @protolabsai/workspace
 ```
 
 ## Usage
@@ -24,12 +24,12 @@ import type {
   WorkspaceTab, 
   CanvasType,
   UtilityTab 
-} from "@proto/workspace";
+} from "@protolabsai/workspace";
 
 import { 
   RESEARCH_EVENTS, 
   dispatchResearchEvent 
-} from "@proto/workspace";
+} from "@protolabsai/workspace";
 
 // Use types in your workspace implementation
 interface MyWorkspaceProps {

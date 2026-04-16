@@ -9,7 +9,7 @@ import type {
   ShareTokenRow,
   CreateShareRequest,
   ShareType,
-} from "@proto/types";
+} from "@protolabsai/types";
 
 import {
   createSecureShareToken,

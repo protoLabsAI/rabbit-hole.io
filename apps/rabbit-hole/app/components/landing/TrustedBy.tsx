@@ -39,7 +39,7 @@ import {
   MarqueeContent,
   MarqueeFade,
   MarqueeItem,
-} from "@proto/ui/molecules";
+} from "@protolabsai/ui/molecules";
 
 interface TrustedByProps {
   /** Controls visibility of the entire component */

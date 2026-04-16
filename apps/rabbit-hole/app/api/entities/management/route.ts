@@ -15,9 +15,9 @@ import {
   checkAdminRole,
   type AuthenticatedUser,
   getTierLimits,
-} from "@proto/auth";
-import { getGlobalNeo4jClient, getEntityCount } from "@proto/database";
-import { createNeo4jClientWithIntegerConversion } from "@proto/utils";
+} from "@protolabsai/auth";
+import { getGlobalNeo4jClient, getEntityCount } from "@protolabsai/database";
+import { createNeo4jClientWithIntegerConversion } from "@protolabsai/utils";
 
 interface EntityWithMetadata {
   uid: string;

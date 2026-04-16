@@ -25,7 +25,7 @@ The `discoverEntitiesTool` is a flexible entity discovery tool that identifies e
 ### Basic Discovery
 
 ```typescript
-import { discoverEntitiesTool } from "@proto/llm-tools";
+import { discoverEntitiesTool } from "@protolabsai/llm-tools";
 
 const result = await discoverEntitiesTool.invoke({
   content: "Marie Curie was a Polish-French physicist who conducted pioneering research on radioactivity at the Sorbonne in Paris. She was the first woman to win a Nobel Prize.",
@@ -243,7 +243,7 @@ Each domain includes specific entity types:
 ### In Multi-Phase Extraction Pipeline
 
 ```typescript
-import { discoverEntitiesTool } from "@proto/llm-tools";
+import { discoverEntitiesTool } from "@protolabsai/llm-tools";
 
 // Phase 1: Discover entities
 const discoveryResult = await discoverEntitiesTool.invoke({

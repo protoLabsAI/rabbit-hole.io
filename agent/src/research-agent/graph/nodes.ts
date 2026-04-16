@@ -1,7 +1,7 @@
 /**
  * Research Agent Graph - Node Implementations
  *
- * Uses shared implementation from @proto/llm-tools
+ * Uses shared implementation from @protolabsai/llm-tools
  */
 
 import {

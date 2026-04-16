@@ -6,7 +6,7 @@
 
 import { Job } from "sidequest";
 
-import { getGlobalNeo4jClient } from "@proto/database";
+import { getGlobalNeo4jClient } from "@protolabsai/database";
 
 interface YouTubeJobData {
   url: string;

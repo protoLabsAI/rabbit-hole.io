@@ -5,8 +5,8 @@
  * Replaces scattered transformation logic and eliminates field mapping errors.
  */
 
-import { ALL_ENTITY_TYPES } from "@proto/types";
-import { getEntityImage, getEntityColor } from "@proto/utils/atlas";
+import { ALL_ENTITY_TYPES } from "@protolabsai/types";
+import { getEntityImage, getEntityColor } from "@protolabsai/utils/atlas";
 
 import type {
   CanonicalNode,

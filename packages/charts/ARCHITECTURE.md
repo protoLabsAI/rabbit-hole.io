@@ -1,6 +1,6 @@
-# @proto/charts Architecture
+# @protolabsai/charts Architecture
 
-**Package:** @proto/charts  
+**Package:** @protolabsai/charts  
 **Version:** 0.1.0  
 **Status:** In Development (Phase 4/9 Complete)
 
@@ -74,10 +74,10 @@ packages/charts/src/
 **Import patterns:**
 ```typescript
 // Specific import (tree-shakeable)
-import { GanttChart, GanttFeature } from "@proto/charts/gantt";
+import { GanttChart, GanttFeature } from "@protolabsai/charts/gantt";
 
 // Root import (also tree-shakeable)
-import { GanttChart } from "@proto/charts";
+import { GanttChart } from "@protolabsai/charts";
 ```
 
 ---
@@ -167,7 +167,7 @@ export const GanttColumn: FC<Props> = ({ index, isSecondary }) => {
 };
 ```
 
-**Dependencies:** Hooks, utils, @proto/ui/atoms, @proto/icon-system
+**Dependencies:** Hooks, utils, @protolabsai/ui/atoms, @protolabsai/icon-system
 
 ### Layer 5: Molecules (Atoms + Hooks)
 
@@ -433,8 +433,8 @@ const { attributes, listeners, setNodeRef } = useDraggable({
 ### Internal Packages
 
 ```typescript
-import { Card, Badge, Button, ContextMenu } from "@proto/ui/atoms";
-import { Icon } from "@proto/icon-system";
+import { Card, Badge, Button, ContextMenu } from "@protolabsai/ui/atoms";
+import { Icon } from "@protolabsai/icon-system";
 import { cn } from "../../lib/utils"; // Internal cn utility
 ```
 
@@ -568,7 +568,7 @@ type GanttContextProps = {
 
 All types exported from `types/index.ts`:
 ```typescript
-import type { GanttFeature, Range, GanttContextProps } from "@proto/charts/gantt";
+import type { GanttFeature, Range, GanttContextProps } from "@protolabsai/charts/gantt";
 ```
 
 ---
@@ -738,14 +738,14 @@ import { GanttProvider, GanttTimeline } from "@/components/ui/shadcn-io/gantt";
 ### New Import (After Migration)
 
 ```typescript
-import { GanttProvider, GanttTimeline } from "@proto/charts/gantt";
+import { GanttProvider, GanttTimeline } from "@protolabsai/charts/gantt";
 ```
 
 ### Parallel Period
 
 During migration, both imports work:
 - Old path: Points to original component
-- New path: Points to @proto/charts
+- New path: Points to @protolabsai/charts
 
 This allows gradual migration without breaking changes.
 
@@ -877,7 +877,7 @@ pnpm run build
 Check import paths:
 ```typescript
 // ❌ Wrong
-import { useGanttContext } from "@proto/charts/gantt";
+import { useGanttContext } from "@protolabsai/charts/gantt";
 
 // ✅ Correct (within package)
 import { useGanttContext } from "../../hooks";

@@ -4,8 +4,12 @@
 
 import { z } from "zod";
 
-import { EntitySchema, RelationshipSchema, EvidenceSchema } from "@proto/types";
-import type { SourceGrounding } from "@proto/types";
+import {
+  EntitySchema,
+  RelationshipSchema,
+  EvidenceSchema,
+} from "@protolabsai/types";
+import type { SourceGrounding } from "@protolabsai/types";
 
 const SourceGroundingSchema: z.ZodType<SourceGrounding> = z.object({
   claimText: z.string(),
@@ -18,7 +22,11 @@ const SourceGroundingSchema: z.ZodType<SourceGrounding> = z.object({
 
 export const EvidenceGathererOutputSchema = z.object({
   evidence: z
-    .array(EvidenceSchema.extend({ grounding: z.array(SourceGroundingSchema).optional() }))
+    .array(
+      EvidenceSchema.extend({
+        grounding: z.array(SourceGroundingSchema).optional(),
+      })
+    )
     .min(1, "Must create at least one evidence node"),
   summary: z.string().describe("Brief summary of gathered evidence"),
 });

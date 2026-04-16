@@ -161,7 +161,7 @@ export {
 // Graph utilities
 export { buildSubagentGraph } from "./workflows/graph/build-subagent";
 
-// Note: React hooks are available via @proto/llm-tools/client
+// Note: React hooks are available via @protolabsai/llm-tools/client
 // Do not export hooks from main entry to avoid bundling in server components
 
 // Re-export types for convenience

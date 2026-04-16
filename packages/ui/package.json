@@ -1,5 +1,5 @@
 {
-  "name": "@proto/ui",
+  "name": "@protolabsai/ui",
   "version": "0.3.3",
   "private": true,
   "description": "Shared UI components, hooks, and utilities",
@@ -65,8 +65,8 @@
   },
   "dependencies": {
     "@icons-pack/react-simple-icons": "^10.0.0",
-    "@proto/icon-system": "workspace:*",
-    "@proto/types": "workspace:*",
+    "@protolabsai/icon-system": "workspace:*",
+    "@protolabsai/types": "workspace:*",
     "@radix-ui/react-alert-dialog": "^1.1.2",
     "@radix-ui/react-avatar": "^1.1.1",
     "@radix-ui/react-checkbox": "^1.1.2",

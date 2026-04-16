@@ -1,4 +1,4 @@
-# @proto/charts Progress Summary
+# @protolabsai/charts Progress Summary
 
 **Updated:** October 19, 2025  
 **Completion:** 100% ✅
@@ -73,7 +73,7 @@
 
 **Migration (2)**
 
-- ✅ Updated EventGanttChart to use @proto/charts/gantt
+- ✅ Updated EventGanttChart to use @protolabsai/charts/gantt
 - ✅ All libs building successfully
 
 **Cleanup (1)**

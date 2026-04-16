@@ -33,7 +33,7 @@ Complete form system for all 77 entity types across 12 domains with Zod validati
 ### Basic Entity Form
 
 ```typescript
-import { EntityForm } from '@proto/forms';
+import { EntityForm } from '@protolabsai/forms';
 
 function MyComponent() {
   return (
@@ -51,7 +51,7 @@ function MyComponent() {
 ### Required Fields Only
 
 ```typescript
-import { EntityForm, QuickEntityForm } from '@proto/forms';
+import { EntityForm, QuickEntityForm } from '@protolabsai/forms';
 
 // Show only essential required fields
 <EntityForm
@@ -71,7 +71,7 @@ import { EntityForm, QuickEntityForm } from '@proto/forms';
 ### Field Blacklisting
 
 ```typescript
-import { EntityForm } from '@proto/forms';
+import { EntityForm } from '@protolabsai/forms';
 
 // Exclude sensitive or unnecessary fields
 <EntityForm
@@ -92,7 +92,7 @@ import { EntityForm } from '@proto/forms';
 ### Domain Form Selector
 
 ```typescript
-import { DomainFormSelector, QuickDomainFormSelector } from '@proto/forms';
+import { DomainFormSelector, QuickDomainFormSelector } from '@protolabsai/forms';
 
 // Cascading domain and entity selection
 <DomainFormSelector
@@ -113,7 +113,7 @@ import { DomainFormSelector, QuickDomainFormSelector } from '@proto/forms';
 ### Direct Entity Form Usage
 
 ```typescript
-import { EntityForm } from '@proto/forms';
+import { EntityForm } from '@protolabsai/forms';
 
 function CreatePerson() {
   return (
@@ -132,7 +132,7 @@ function CreatePerson() {
 ### Mock Data Generation
 
 ```typescript
-import { generateMockData, generateAllScenarios } from "@proto/forms";
+import { generateMockData, generateAllScenarios } from "@protolabsai/forms";
 
 // Generate complete mock data for Person
 const mockPerson = generateMockData("Person", "complete");
@@ -219,7 +219,7 @@ Comprehensive stories available at `http://localhost:6006`:
 
 ```bash
 # Build types package
-pnpm --filter @proto/types build
+pnpm --filter @protolabsai/types build
 
 # Start Storybook
 pnpm storybook

@@ -15,7 +15,7 @@
 import { generateText } from "ai";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { getAIModel } from "@proto/llm-providers/server";
+import { getAIModel } from "@protolabsai/llm-providers/server";
 
 import type { MiddlewareContext, ModelResponse } from "../types";
 
@@ -27,7 +27,7 @@ vi.mock("ai", () => ({
   generateText: vi.fn(),
 }));
 
-vi.mock("@proto/llm-providers/server", () => ({
+vi.mock("@protolabsai/llm-providers/server", () => ({
   getAIModel: vi.fn(() => "mock-model"),
 }));
 import {

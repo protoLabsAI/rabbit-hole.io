@@ -27,7 +27,7 @@ The `extractRelationshipsTool` discovers and extracts relationships between prov
 ### Basic Relationship Extraction
 
 ```typescript
-import { extractRelationshipsTool } from "@proto/llm-tools";
+import { extractRelationshipsTool } from "@protolabsai/llm-tools";
 
 const entities = [
   { uid: "person:albert_einstein", name: "Albert Einstein", type: "Person" },
@@ -276,7 +276,7 @@ const result = await extractRelationshipsTool.invoke({
 ### With Discovery Tool
 
 ```typescript
-import { discoverEntitiesTool, extractRelationshipsTool } from "@proto/llm-tools";
+import { discoverEntitiesTool, extractRelationshipsTool } from "@protolabsai/llm-tools";
 
 // Step 1: Discover entities
 const discovery = await discoverEntitiesTool.invoke({
@@ -299,7 +299,7 @@ import {
   discoverEntitiesTool,
   enrichEntityTool,
   extractRelationshipsTool,
-} from "@proto/llm-tools";
+} from "@protolabsai/llm-tools";
 
 // 1. Discover
 const entities = await discoverEntitiesTool.invoke({

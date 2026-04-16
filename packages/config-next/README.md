@@ -1,4 +1,4 @@
-# @proto/config-next
+# @protolabsai/config-next
 
 Shared Next.js configuration for all apps in the monorepo.
 
@@ -15,7 +15,7 @@ This package provides a base Next.js configuration that includes:
 
 ```js
 // apps/my-app/next.config.js
-import baseConfig from "@proto/config-next/base.config.js";
+import baseConfig from "@protolabsai/config-next/base.config.js";
 
 export default {
   ...baseConfig,
@@ -31,9 +31,9 @@ export default {
 
 ```js
 transpilePackages: [
-  "@proto/ui", // Instant HMR for UI components
-  "@proto/charts", // Instant HMR for charts
-  "@proto/icon-system", // Instant HMR for icons
+  "@protolabsai/ui", // Instant HMR for UI components
+  "@protolabsai/charts", // Instant HMR for charts
+  "@protolabsai/icon-system", // Instant HMR for icons
 ];
 ```
 
@@ -50,9 +50,9 @@ serverExternalPackages: [
   "yjs",
 
   // Server-only packages
-  "@proto/database",
-  "@proto/auth",
-  "@proto/llm-providers",
+  "@protolabsai/database",
+  "@protolabsai/auth",
+  "@protolabsai/llm-providers",
 ];
 ```
 
@@ -78,10 +78,10 @@ mkdir apps/my-app
 cd apps/my-app
 
 # 2. Install config package
-pnpm add -D @proto/config-next
+pnpm add -D @protolabsai/config-next
 
 # 3. Create next.config.js
-import baseConfig from "@proto/config-next/base.config.js";
+import baseConfig from "@protolabsai/config-next/base.config.js";
 
 export default {
   ...baseConfig,

@@ -9,7 +9,7 @@
 import ReactECharts from "echarts-for-react";
 import React, { useMemo } from "react";
 
-import { TimeWindow } from "@proto/utils/atlas";
+import { TimeWindow } from "@protolabsai/utils/atlas";
 
 interface TimelineData {
   timestamp: string;

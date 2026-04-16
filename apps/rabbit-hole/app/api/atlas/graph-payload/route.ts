@@ -7,8 +7,8 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { getGlobalNeo4jClient } from "@proto/database";
-import { convertAllNeo4jParams } from "@proto/utils";
+import { getGlobalNeo4jClient } from "@protolabsai/database";
+import { convertAllNeo4jParams } from "@protolabsai/utils";
 
 interface GraphPayload {
   success: boolean;

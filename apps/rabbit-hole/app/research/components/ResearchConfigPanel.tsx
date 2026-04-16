@@ -10,8 +10,8 @@
 
 import { useState } from "react";
 
-import { Icon } from "@proto/icon-system";
-import type { ResearchDepth, ResearchSessionConfig } from "@proto/types";
+import { Icon } from "@protolabsai/icon-system";
+import type { ResearchDepth, ResearchSessionConfig } from "@protolabsai/types";
 import {
   Button,
   Collapsible,
@@ -25,7 +25,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@proto/ui/atoms";
+} from "@protolabsai/ui/atoms";
 
 const DEPTH_OPTIONS: {
   value: ResearchDepth;

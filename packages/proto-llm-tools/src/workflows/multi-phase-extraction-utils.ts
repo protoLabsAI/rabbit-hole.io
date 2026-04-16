@@ -1,14 +1,14 @@
 /**
  * Multi-Phase Extraction Utilities
  *
- * Domain-aware extraction configuration using @proto/types domain system
+ * Domain-aware extraction configuration using @protolabsai/types domain system
  */
 
 import {
   domainRegistry,
   type DomainConfig,
   EntitySchemaRegistry,
-} from "@proto/types";
+} from "@protolabsai/types";
 
 // ============================================================================
 // Initialization

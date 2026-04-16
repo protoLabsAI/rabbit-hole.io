@@ -2,15 +2,15 @@
 
 import { useState, useTransition } from "react";
 
-import { EntityForm } from "@proto/forms";
-import type { EntityType } from "@proto/forms";
+import { EntityForm } from "@protolabsai/forms";
+import type { EntityType } from "@protolabsai/forms";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@proto/ui/atoms";
+} from "@protolabsai/ui/atoms";
 
 import { DiffConfirmationDialog } from "./DiffConfirmationDialog";
 

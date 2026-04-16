@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { extractTenantIdentifiers } from "@proto/utils/tenancy-edge";
+import { extractTenantIdentifiers } from "@protolabsai/utils/tenancy-edge";
 
 const RESEARCH_ENABLED = process.env.ENABLE_RESEARCH === "true";
 

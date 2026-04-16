@@ -15,9 +15,9 @@ export default defineConfig({
   splitting: false,
   sourcemap: true,
   minify: false,
-  external: ["next", "zod", "@proto/auth", "@proto/types"],
+  external: ["next", "zod", "@protolabsai/auth", "@protolabsai/types"],
   banner: {
-    js: "/* @proto/api-utils - Consolidated API utilities and middleware */",
+    js: "/* @protolabsai/api-utils - Consolidated API utilities and middleware */",
   },
   outDir: "dist",
   target: "es2020",

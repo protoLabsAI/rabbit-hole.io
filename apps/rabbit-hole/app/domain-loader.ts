@@ -5,14 +5,14 @@
  * Synchronous registration with pre-compiled TypeScript configs
  */
 
-import { domainRegistry } from "@proto/types";
+import { domainRegistry } from "@protolabsai/types";
 
 /**
  * Initialize all domains
  * Call this in app/layout.tsx during server initialization
  *
  * Note: This initializes custom domains discovered from custom-domains/ directory.
- * Core domain schemas are available from @proto/types but are not registered
+ * Core domain schemas are available from @protolabsai/types but are not registered
  * with the domain registry system.
  */
 export async function initializeDomains(): Promise<void> {

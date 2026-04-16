@@ -1,5 +1,5 @@
 {
-  "name": "@proto/agent",
+  "name": "@protolabsai/agent",
   "version": "0.1.0",
   "type": "module",
   "description": "",
@@ -47,11 +47,11 @@
     "@opentelemetry/resources": "^2.2.0",
     "@opentelemetry/sdk-node": "^0.208.0",
     "@opentelemetry/semantic-conventions": "^1.38.0",
-    "@proto/deepagent": "workspace:*",
-    "@proto/llm-providers": "workspace:*",
-    "@proto/llm-tools": "workspace:*",
-    "@proto/types": "workspace:*",
-    "@proto/utils": "workspace:*",
+    "@protolabsai/deepagent": "workspace:*",
+    "@protolabsai/llm-providers": "workspace:*",
+    "@protolabsai/llm-tools": "workspace:*",
+    "@protolabsai/types": "workspace:*",
+    "@protolabsai/utils": "workspace:*",
     "dotenv": "^17.2.3",
     "zod": "^4.3.6"
   }

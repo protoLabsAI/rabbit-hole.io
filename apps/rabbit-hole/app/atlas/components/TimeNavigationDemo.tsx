@@ -8,7 +8,7 @@
 
 import React, { useState } from "react";
 
-import { TimeWindow, getTimePresets } from "@proto/utils/atlas";
+import { TimeWindow, getTimePresets } from "@protolabsai/utils/atlas";
 
 import { TimeSliceInfoPanel } from "./TimeSliceInfoPanel";
 

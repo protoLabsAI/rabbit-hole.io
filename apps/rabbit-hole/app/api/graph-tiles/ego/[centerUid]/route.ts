@@ -8,13 +8,13 @@
 import neo4j from "neo4j-driver";
 import { NextRequest, NextResponse } from "next/server";
 
-import { getGlobalNeo4jClient, quickHealthCheck } from "@proto/database";
+import { getGlobalNeo4jClient, quickHealthCheck } from "@protolabsai/database";
 import {
   buildSimpleEgoNetworkQuery,
   getOptimizedEgoLimits,
   validateEgoNetworkParams,
   type EgoNetworkParams,
-} from "@proto/utils/atlas";
+} from "@protolabsai/utils/atlas";
 
 import { sanitizeQueryParams } from "../../../../lib/graph-presenter";
 import type {
@@ -300,7 +300,7 @@ export async function GET(
 
     return NextResponse.json(errorResponse, { status: 500 });
   }
-  // No finally block needed - @proto/database handles connection management
+  // No finally block needed - @protolabsai/database handles connection management
 }
 
 // getToneColor now handled by graph-presenter.ts

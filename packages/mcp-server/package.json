@@ -1,5 +1,5 @@
 {
-  "name": "@proto/mcp-server",
+  "name": "@protolabsai/mcp-server",
   "version": "0.1.0",
   "type": "module",
   "description": "MCP server for Rabbit Hole research and media processing tools",

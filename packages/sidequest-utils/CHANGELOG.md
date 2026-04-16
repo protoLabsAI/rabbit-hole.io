@@ -1,4 +1,4 @@
-# @proto/sidequest-utils
+# @protolabsai/sidequest-utils
 
 ## 0.1.6
 
@@ -6,14 +6,14 @@
 
 - c0435ce: Security: Patch Next.js CVE-2025-66478 (RCE)
 - Updated dependencies [c0435ce]
-  - @proto/ui@0.3.3
+  - @protolabsai/ui@0.3.3
 
 ## 0.1.5
 
 ### Patch Changes
 
 - Updated dependencies [e8b671f]
-  - @proto/ui@0.3.2
+  - @protolabsai/ui@0.3.2
 
 ## 0.1.4
 
@@ -26,21 +26,21 @@
 ### Patch Changes
 
 - Updated dependencies [fb1e4be]
-  - @proto/ui@0.3.1
+  - @protolabsai/ui@0.3.1
 
 ## 0.1.2
 
 ### Patch Changes
 
 - Updated dependencies [f8f13f8]
-  - @proto/ui@0.3.0
+  - @protolabsai/ui@0.3.0
 
 ## 0.1.1
 
 ### Patch Changes
 
 - Updated dependencies [44db068]
-  - @proto/ui@0.2.0
+  - @protolabsai/ui@0.2.0
 
 ## 0.1.0
 
@@ -75,6 +75,6 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @proto/database@0.1.0
-  - @proto/icon-system@0.1.0
-  - @proto/ui@2.2.0
+  - @protolabsai/database@0.1.0
+  - @protolabsai/icon-system@0.1.0
+  - @protolabsai/ui@2.2.0

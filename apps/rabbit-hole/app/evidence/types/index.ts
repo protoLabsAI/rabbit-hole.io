@@ -78,7 +78,7 @@ export {
 
 // Validation utilities
 export { validateEvidenceGraph } from "../utils/validation";
-export { getEntityTypeColor } from "@proto/utils";
+export { getEntityTypeColor } from "@protolabsai/utils";
 
 // Data access
 export {

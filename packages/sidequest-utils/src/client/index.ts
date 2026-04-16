@@ -1,8 +1,8 @@
 /**
- * Client-safe exports for @proto/sidequest-utils
+ * Client-safe exports for @protolabsai/sidequest-utils
  *
  * React Query hooks for job queue management.
- * Import from @proto/sidequest-utils/client in React components.
+ * Import from @protolabsai/sidequest-utils/client in React components.
  */
 
 export {

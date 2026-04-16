@@ -1,5 +1,5 @@
-import { Icon } from "@proto/icon-system";
-import { Button, Textarea } from "@proto/ui/atoms";
+import { Icon } from "@protolabsai/icon-system";
+import { Button, Textarea } from "@protolabsai/ui/atoms";
 
 interface ChatInputProps {
   value: string;

@@ -30,7 +30,7 @@ import {
   TabsList,
   TabsTrigger,
   Textarea,
-} from "@proto/ui/atoms";
+} from "@protolabsai/ui/atoms";
 
 import {
   useTranscribe,

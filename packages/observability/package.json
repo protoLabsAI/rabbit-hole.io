@@ -1,5 +1,5 @@
 {
-  "name": "@proto/observability",
+  "name": "@protolabsai/observability",
   "version": "0.1.0",
   "private": true,
   "description": "Observability utilities for LLM tracing and monitoring",

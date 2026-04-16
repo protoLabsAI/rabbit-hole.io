@@ -10,7 +10,7 @@
 import neo4j from "neo4j-driver";
 import { NextRequest, NextResponse } from "next/server";
 
-import { getGlobalNeo4jClient, type Neo4jClient } from "@proto/database";
+import { getGlobalNeo4jClient, type Neo4jClient } from "@protolabsai/database";
 
 import type {
   CanonicalNode,
@@ -217,7 +217,7 @@ export async function GET(
 
     return NextResponse.json(errorResponse, { status: 500 });
   }
-  // No finally block needed - @proto/database handles connection management
+  // No finally block needed - @protolabsai/database handles connection management
 }
 
 /**

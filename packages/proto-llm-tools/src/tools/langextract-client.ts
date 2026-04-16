@@ -1,7 +1,10 @@
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
 
-import type { LangExtractRequest, LangExtractResponse } from "@proto/types";
+import type {
+  LangExtractRequest,
+  LangExtractResponse,
+} from "@protolabsai/types";
 
 import { langextractConfig } from "../config/langextract-config";
 

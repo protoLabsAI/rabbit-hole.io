@@ -4,12 +4,12 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-import type { CreateShareRequest, ShareTokenRow } from "@proto/types";
+import type { CreateShareRequest, ShareTokenRow } from "@protolabsai/types";
 
 import { ShareTokenService } from "../share-token-service";
 
-// Mock the @proto/database module
-vi.mock("@proto/database", () => ({
+// Mock the @protolabsai/database module
+vi.mock("@protolabsai/database", () => ({
   getGlobalPostgresPool: vi.fn(() => ({
     query: mockQuery,
   })),

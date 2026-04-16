@@ -7,14 +7,14 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { withAuthAndLogging } from "@proto/auth";
-import { getGlobalNeo4jClient } from "@proto/database";
+import { withAuthAndLogging } from "@protolabsai/auth";
+import { getGlobalNeo4jClient } from "@protolabsai/database";
 import {
   CreateFileEntityRelationshipSchema,
   FileEntityLinkingResultSchema,
   safeValidate,
   type FileEntityLinkingResult,
-} from "@proto/types";
+} from "@protolabsai/types";
 
 export const POST = withAuthAndLogging("link file to entities")(async (
   request: NextRequest
@@ -184,7 +184,7 @@ export const POST = withAuthAndLogging("link file to entities")(async (
       { status: 500 }
     );
   }
-  // No finally block needed - @proto/database handles connection management
+  // No finally block needed - @protolabsai/database handles connection management
 });
 
 export async function GET(): Promise<NextResponse> {

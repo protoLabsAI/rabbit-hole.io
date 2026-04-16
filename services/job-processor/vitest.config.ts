@@ -36,11 +36,14 @@ export default defineConfig({
   resolve: {
     alias: {
       // Mirror the workspace alias map from the root vitest.config.ts so that
-      // @proto/* imports resolve to the right source packages.
-      "@proto/types": resolve(__dirname, "../../packages/types/src"),
-      "@proto/utils": resolve(__dirname, "../../packages/utils/src"),
-      "@proto/database": resolve(__dirname, "../../packages/database/src"),
-      "@proto/sidequest-utils": resolve(
+      // @protolabsai/* imports resolve to the right source packages.
+      "@protolabsai/types": resolve(__dirname, "../../packages/types/src"),
+      "@protolabsai/utils": resolve(__dirname, "../../packages/utils/src"),
+      "@protolabsai/database": resolve(
+        __dirname,
+        "../../packages/database/src"
+      ),
+      "@protolabsai/sidequest-utils": resolve(
         __dirname,
         "../../packages/sidequest-utils/src"
       ),

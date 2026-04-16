@@ -8,7 +8,7 @@ export * from "./knowledge-graph";
 export * from "./langextract";
 
 // ==== Atlas Utilities ====
-// NOTE: Atlas utilities should be imported directly from "@proto/utils/atlas"
+// NOTE: Atlas utilities should be imported directly from "@protolabsai/utils/atlas"
 // to avoid naming conflicts with domain utilities (both export getEntityColor)
 
 // ==== Timeline Utilities ====
@@ -81,18 +81,18 @@ export * from "./string-similarity";
 
 // ==== Export Utilities ====
 // Moved to separate client-only export to prevent SSR issues:
-// - Client-side: import from "@proto/utils/export-client"
+// - Client-side: import from "@protolabsai/utils/export-client"
 
 // ==== Security Utilities ====
 // Moved to separate exports to prevent SSR issues:
-// - Client-side: import from "@proto/utils/security-client"
-// - Server-side: import from "@proto/utils/security-server"
+// - Client-side: import from "@protolabsai/utils/security-client"
+// - Server-side: import from "@protolabsai/utils/security-server"
 
 // ==== Multi-Tenancy Utilities ====
 // NOTE: Tenancy utilities use Node.js modules (pg, neo4j-driver)
-// Import from @proto/utils/tenancy in server components/API routes
-// Import from @proto/utils/tenancy-edge in middleware (Edge runtime)
+// Import from @protolabsai/utils/tenancy in server components/API routes
+// Import from @protolabsai/utils/tenancy-edge in middleware (Edge runtime)
 
 // ==== Package Info ====
 export const PACKAGE_VERSION = "0.1.0";
-export const PACKAGE_NAME = "@proto/utils";
+export const PACKAGE_NAME = "@protolabsai/utils";

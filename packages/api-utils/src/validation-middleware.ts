@@ -11,7 +11,7 @@ import {
   withAuth,
   withAuthAndLogging,
   type AuthenticatedUser,
-} from "@proto/auth";
+} from "@protolabsai/auth";
 
 // ==================== Simple Handler Types ====================
 

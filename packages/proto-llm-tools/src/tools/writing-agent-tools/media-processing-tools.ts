@@ -5,7 +5,7 @@
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
 
-import { enqueueYouTubeJob } from "@proto/sidequest-utils/server";
+import { enqueueYouTubeJob } from "@protolabsai/sidequest-utils/server";
 
 /**
  * Extract YouTube Video ID from URL

@@ -2,20 +2,20 @@
 
 import { useState, useEffect } from "react";
 
-import { Icon } from "@proto/icon-system";
-import { DEFAULT_RESEARCH_SESSION_CONFIG } from "@proto/types";
+import { Icon } from "@protolabsai/icon-system";
+import { DEFAULT_RESEARCH_SESSION_CONFIG } from "@protolabsai/types";
 import type {
   PartialBundle,
   ResearchPhase,
   ResearchSessionConfig,
-} from "@proto/types";
+} from "@protolabsai/types";
 import {
   Button,
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
   Badge,
-} from "@proto/ui/atoms";
+} from "@protolabsai/ui/atoms";
 import {
   Conversation,
   ConversationContent,
@@ -35,14 +35,14 @@ import {
   ReasoningContent,
   ReasoningStep,
   MarkdownContent,
-} from "@proto/ui/organisms";
+} from "@protolabsai/ui/organisms";
 import {
   Sources,
   SourcesTrigger,
   SourcesContent,
   SourceItem,
   type Source,
-} from "@proto/ui/organisms";
+} from "@protolabsai/ui/organisms";
 
 import { useMediaIngestion } from "../hooks/useMediaIngestion";
 import { useResearchContext } from "../hooks/useResearchContext";
@@ -117,7 +117,11 @@ export function ResearchChatInterface({
 
   // CopilotKit removed (M4 milestone) — stubs until native deep research API is wired in
   const messages: ExtendedMessage[] = [];
-  const sendMessage = (_msg: { id: string; role: string; content: string }) => {};
+  const sendMessage = (_msg: {
+    id: string;
+    role: string;
+    content: string;
+  }) => {};
   const isLoading = false;
   const agentState: Record<string, any> = {};
 

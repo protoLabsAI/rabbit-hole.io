@@ -11,8 +11,8 @@
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import type { RunnableConfig } from "@langchain/core/runnables";
 
-import type { ResearchSessionConfig } from "@proto/types";
-import { DEFAULT_RESEARCH_SESSION_CONFIG } from "@proto/types";
+import type { ResearchSessionConfig } from "@protolabsai/types";
+import { DEFAULT_RESEARCH_SESSION_CONFIG } from "@protolabsai/types";
 
 import type { EntityResearchAgentStateType } from "../../state";
 import { log } from "../../utils/logger";
@@ -111,13 +111,14 @@ export function createAnalyzeQueryNode(
 
     if (!entityName && state.messages?.length > 0) {
       // Find the last user message to extract the research subject
-      const lastUserMsg = [...state.messages].reverse().find(
-        (m: any) => m.role === "user" || m._getType?.() === "human"
-      );
+      const lastUserMsg = [...state.messages]
+        .reverse()
+        .find((m: any) => m.role === "user" || m._getType?.() === "human");
       if (lastUserMsg) {
-        const content = typeof lastUserMsg.content === "string"
-          ? lastUserMsg.content
-          : String(lastUserMsg.content);
+        const content =
+          typeof lastUserMsg.content === "string"
+            ? lastUserMsg.content
+            : String(lastUserMsg.content);
         entityName = content;
         entityType = "research topic";
       }

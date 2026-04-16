@@ -53,39 +53,39 @@ export default [
             {
               name: "lucide-react",
               message:
-                "Use Icon from @proto/icon-system instead of direct lucide-react imports. See docs/developer/icon-system-migration.md",
+                "Use Icon from @protolabsai/icon-system instead of direct lucide-react imports. See docs/developer/icon-system-migration.md",
             },
             {
               name: "@langchain/openai",
               message:
-                "Use getModel() or getModelByName() from @proto/llm-providers/server instead of direct LangChain imports. Direct LangChain imports are only allowed in packages/llm-providers/",
+                "Use getModel() or getModelByName() from @protolabsai/llm-providers/server instead of direct LangChain imports. Direct LangChain imports are only allowed in packages/llm-providers/",
             },
             {
               name: "@langchain/anthropic",
               message:
-                "Use getModel() or getModelByName() from @proto/llm-providers/server instead of direct LangChain imports. Direct LangChain imports are only allowed in packages/llm-providers/",
+                "Use getModel() or getModelByName() from @protolabsai/llm-providers/server instead of direct LangChain imports. Direct LangChain imports are only allowed in packages/llm-providers/",
             },
             {
               name: "@langchain/google-genai",
               message:
-                "Use getModel() or getModelByName() from @proto/llm-providers/server instead of direct LangChain imports. Direct LangChain imports are only allowed in packages/llm-providers/",
+                "Use getModel() or getModelByName() from @protolabsai/llm-providers/server instead of direct LangChain imports. Direct LangChain imports are only allowed in packages/llm-providers/",
             },
             {
               name: "@langchain/groq",
               message:
-                "Use getModel() or getModelByName() from @proto/llm-providers/server instead of direct LangChain imports. Direct LangChain imports are only allowed in packages/llm-providers/",
+                "Use getModel() or getModelByName() from @protolabsai/llm-providers/server instead of direct LangChain imports. Direct LangChain imports are only allowed in packages/llm-providers/",
             },
             {
               name: "@langchain/ollama",
               message:
-                "Use getModel() or getModelByName() from @proto/llm-providers/server instead of direct LangChain imports. Direct LangChain imports are only allowed in packages/llm-providers/",
+                "Use getModel() or getModelByName() from @protolabsai/llm-providers/server instead of direct LangChain imports. Direct LangChain imports are only allowed in packages/llm-providers/",
             },
           ],
           patterns: [
             {
               group: ["@langchain/*/chat_models"],
               message:
-                "Use getModel() or getModelByName() from @proto/llm-providers/server instead of direct LangChain chat model imports. Direct LangChain imports are only allowed in packages/llm-providers/",
+                "Use getModel() or getModelByName() from @protolabsai/llm-providers/server instead of direct LangChain chat model imports. Direct LangChain imports are only allowed in packages/llm-providers/",
             },
           ],
         },
@@ -96,18 +96,18 @@ export default [
           selector:
             "MemberExpression[object.name='crypto'][property.name='randomUUID']",
           message:
-            "Do not use crypto.randomUUID() directly. Import { generateSecureId } from '@proto/utils' instead for consistent secure ID generation.",
+            "Do not use crypto.randomUUID() directly. Import { generateSecureId } from '@protolabsai/utils' instead for consistent secure ID generation.",
         },
         {
           selector:
             "MemberExpression[object.object.name='window'][object.property.name='crypto'][property.name='randomUUID']",
           message:
-            "Do not use window.crypto.randomUUID() directly. Import { generateSecureId } from '@proto/utils' instead for consistent secure ID generation.",
+            "Do not use window.crypto.randomUUID() directly. Import { generateSecureId } from '@protolabsai/utils' instead for consistent secure ID generation.",
         },
         {
           selector: "NewExpression[callee.name='Pool']",
           message:
-            "Do not create Pool instances directly. Import { getGlobalPostgresPool } from '@proto/database' to use the shared connection pool.",
+            "Do not create Pool instances directly. Import { getGlobalPostgresPool } from '@protolabsai/database' to use the shared connection pool.",
         },
       ],
     },
@@ -218,7 +218,7 @@ export default [
           "newlines-between": "always",
           pathGroups: [
             {
-              pattern: "@proto/**",
+              pattern: "@protolabsai/**",
               group: "external",
               position: "after",
             },

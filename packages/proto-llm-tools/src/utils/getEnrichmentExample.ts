@@ -5,7 +5,7 @@
  * to use in langextract prompts. Falls back to default if no examples found.
  */
 
-import type { EnrichmentExample } from "@proto/types";
+import type { EnrichmentExample } from "@protolabsai/types";
 
 import { getDomainConfig } from "../workflows/multi-phase-extraction-utils";
 

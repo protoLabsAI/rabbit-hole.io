@@ -3,7 +3,7 @@
 import * as SheetPrimitive from "@radix-ui/react-dialog";
 import { useEffect, useState } from "react";
 
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 
 import { Sheet, SheetHeader, SheetTitle } from "../../components/ui/sheet";
 import { getEntityVisual } from "../lib/atlas-schema";

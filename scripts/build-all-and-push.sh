@@ -47,7 +47,7 @@ echo -e "${BLUE}1️⃣  rabbit-hole (Next.js)${NC}"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
 echo "Building Next.js app..."
-pnpm --filter @apps/rabbit-hole build
+pnpm --filter @protolabsai/rabbit-hole build
 
 echo "Building Docker image..."
 docker build -f apps/rabbit-hole/Dockerfile.fast -t rabbit-hole:latest . -q

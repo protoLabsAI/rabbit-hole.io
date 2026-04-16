@@ -1,7 +1,11 @@
 import { WikipediaQueryRun } from "@langchain/community/tools/wikipedia_query_run";
 import { RunnableConfig } from "@langchain/core/runnables";
 
-import { generateEntityUID, type Entity, type Evidence } from "@proto/types";
+import {
+  generateEntityUID,
+  type Entity,
+  type Evidence,
+} from "@protolabsai/types";
 
 import { wikipediaConfig } from "../../../config/wikipedia-config";
 import type { EntityResearchPlaygroundState, GraphNodeData } from "../state";

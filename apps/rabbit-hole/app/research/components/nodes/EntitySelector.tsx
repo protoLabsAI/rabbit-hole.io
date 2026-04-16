@@ -8,8 +8,8 @@ import React, {
   useRef,
 } from "react";
 
-import { domainRegistry, getDomainIcon } from "@proto/types";
-import { Badge } from "@proto/ui/atoms";
+import { domainRegistry, getDomainIcon } from "@protolabsai/types";
+import { Badge } from "@protolabsai/ui/atoms";
 
 interface Entity {
   uid: string;

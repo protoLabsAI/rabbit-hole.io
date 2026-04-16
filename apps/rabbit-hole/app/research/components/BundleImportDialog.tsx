@@ -11,9 +11,9 @@ import type Graph from "graphology";
 import React, { useState, useRef, useCallback } from "react";
 import * as Y from "yjs";
 
-import type { UserTier } from "@proto/auth/client";
-import { validateRabbitHoleBundle } from "@proto/types";
-import type { RabbitHoleBundleData } from "@proto/types";
+import type { UserTier } from "@protolabsai/auth/client";
+import { validateRabbitHoleBundle } from "@protolabsai/types";
+import type { RabbitHoleBundleData } from "@protolabsai/types";
 import {
   Alert,
   AlertDescription,
@@ -44,8 +44,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@proto/ui/atoms";
-import { wouldExceedLimit } from "@proto/utils";
+} from "@protolabsai/ui/atoms";
+import { wouldExceedLimit } from "@protolabsai/utils";
 
 import type {
   GraphNodeAttributes,

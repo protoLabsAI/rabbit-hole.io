@@ -6,9 +6,9 @@ import {
   getTilesForViewport,
   getTileUrl,
   latLngToPixel,
-} from "@proto/charts/map/utils";
-import type { EntityType } from "@proto/types";
-import { getEntityColor } from "@proto/utils/atlas";
+} from "@protolabsai/charts/map/utils";
+import type { EntityType } from "@protolabsai/types";
+import { getEntityColor } from "@protolabsai/utils/atlas";
 
 interface MapImageQuery {
   entities: Array<{

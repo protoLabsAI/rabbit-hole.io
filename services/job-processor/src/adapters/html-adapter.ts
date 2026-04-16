@@ -10,7 +10,7 @@ import type {
   ExtractionResult,
   IngestSource,
   MediaAdapter,
-} from "@proto/types";
+} from "@protolabsai/types";
 
 // ==================== HTML Utilities ====================
 

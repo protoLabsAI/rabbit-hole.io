@@ -2,7 +2,7 @@
 #
 # The production entrypoint is the A2A server (agent/src/a2a-main.ts). The
 # langgraphjs dev server is retained for local debugging only — run it via
-# `pnpm --filter @proto/agent dev` on a dev machine. In production, research
+# `pnpm --filter @protolabsai/agent dev` on a dev machine. In production, research
 # agent graphs are imported directly by the A2A skill producers, so no dev
 # server is needed in the container.
 
@@ -27,7 +27,7 @@ FROM base AS deps
 COPY . .
 
 RUN --mount=type=cache,id=pnpm-agent,target=/pnpm/store \
-    pnpm install --filter=@proto/agent...
+    pnpm install --filter=@protolabsai/agent...
 
 # ============================================
 # BUILDER
@@ -36,10 +36,10 @@ FROM base AS builder
 
 COPY --from=deps /app .
 
-# SKIP_DTS=1 prevents @proto/llm-tools from generating .d.ts files (saves ~4GB RAM)
+# SKIP_DTS=1 prevents @protolabsai/llm-tools from generating .d.ts files (saves ~4GB RAM)
 ENV NODE_ENV=production
 ENV SKIP_DTS=1
-RUN NODE_OPTIONS="--max-old-space-size=4096" pnpm turbo run build --filter=@proto/agent... --concurrency=1
+RUN NODE_OPTIONS="--max-old-space-size=4096" pnpm turbo run build --filter=@protolabsai/agent... --concurrency=1
 
 # ============================================
 # PRODUCTION

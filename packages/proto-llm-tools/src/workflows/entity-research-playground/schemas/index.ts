@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { ALL_ENTITY_TYPES } from "@proto/types";
+import { ALL_ENTITY_TYPES } from "@protolabsai/types";
 
 /**
  * Entity Research Playground Input Schema

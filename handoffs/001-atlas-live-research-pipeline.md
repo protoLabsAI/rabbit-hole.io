@@ -33,7 +33,7 @@ Built the complete pipeline from MCP research tools through Neo4j persistence to
 - [x] 110 merge conflict markers resolved across both branches
 - [x] Pre-commit hook blocks `<<<<<<` markers
 - [x] `.automaker/worktree-init.sh` runs `pnpm install` in new worktrees
-- [x] 24,336 lines of dead code removed (10 route directories, @proto/collab, Clerk remnants)
+- [x] 24,336 lines of dead code removed (10 route directories, @protolabsai/collab, Clerk remnants)
 - [x] Root README rewritten for Rabbit Hole product
 - [x] Product spec at `.automaker/spec.md`
 - [x] Docker compose config — lowered Neo4j heap, removed incompatible GDS plugin

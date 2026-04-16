@@ -7,22 +7,22 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { getUserTier, getTierLimits } from "@proto/auth";
+import { getUserTier, getTierLimits } from "@protolabsai/auth";
 import {
   discoverNode,
   structureNode,
   entityResearchTool,
   summarizeTool,
-} from "@proto/llm-tools";
+} from "@protolabsai/llm-tools";
 import type {
   Evidence,
   Entity,
   Relationship,
   RabbitHoleBundleData,
   EntityResearchInput,
-} from "@proto/types";
-import { getRelationshipTypesForDomains } from "@proto/types";
-import { areSimilarStrings } from "@proto/utils";
+} from "@protolabsai/types";
+import { getRelationshipTypesForDomains } from "@protolabsai/types";
+import { areSimilarStrings } from "@protolabsai/utils";
 
 import {
   createSourceBatches,

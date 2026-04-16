@@ -2,4 +2,4 @@
  * Prompt exports
  */
 
-export { WRITING_COORDINATOR_PROMPT } from "@proto/llm-tools";
+export { WRITING_COORDINATOR_PROMPT } from "@protolabsai/llm-tools";

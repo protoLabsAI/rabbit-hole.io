@@ -1,45 +1,45 @@
-# Circular Dependency Fix - @proto/auth ↔ @proto/ui
+# Circular Dependency Fix - @protolabsai/auth ↔ @protolabsai/ui
 
 **Date:** November 24, 2025  
 **Status:** Fixed ✅
 
 ## Problem
 
-Circular dependency between `@proto/auth` and `@proto/ui`:
+Circular dependency between `@protolabsai/auth` and `@protolabsai/ui`:
 
 ```
-@proto/auth → @proto/ui (peerDependency + devDependency)
+@protolabsai/auth → @protolabsai/ui (peerDependency + devDependency)
      ↓
-@proto/ui → @proto/auth/client (import in ThemedUserButton)
+@protolabsai/ui → @protolabsai/auth/client (import in ThemedUserButton)
      ↑
    CYCLE
 ```
 
 ### Why It Existed
 
-- `@proto/auth` has UI components that use `@proto/ui` atoms/molecules
-- `@proto/ui` had `ThemedUserButton` that imported tier logic from `@proto/auth/client`
+- `@protolabsai/auth` has UI components that use `@protolabsai/ui` atoms/molecules
+- `@protolabsai/ui` had `ThemedUserButton` that imported tier logic from `@protolabsai/auth/client`
 
 ### CI Build Failure
 
 In parallel builds (Turbo):
-1. `@proto/ui` tries to type-check before `@proto/auth` built
-2. Import `@proto/auth/client` fails (dist/client.d.ts doesn't exist)
+1. `@protolabsai/ui` tries to type-check before `@protolabsai/auth` built
+2. Import `@protolabsai/auth/client` fails (dist/client.d.ts doesn't exist)
 3. Build blocked even though marked as devDependency
 
 ### Why It Worked Locally
 
-- Already built `@proto/auth` manually
+- Already built `@protolabsai/auth` manually
 - dist/ files existed
 - Type-checking worked
 
-## Solution: Move Components to @proto/auth/ui ✅
+## Solution: Move Components to @protolabsai/auth/ui ✅
 
 **Rationale:**
 - `ThemedUserButton` is auth-specific (uses Clerk, tiers)
 - `UserStatsPage` is auth-specific (displays user data)
-- `@proto/auth/ui` can import from `@proto/ui` (no cycle)
-- `@proto/auth/ui` can import from `@proto/auth/client` (same package)
+- `@protolabsai/auth/ui` can import from `@protolabsai/ui` (no cycle)
+- `@protolabsai/auth/ui` can import from `@protolabsai/auth/client` (same package)
 
 ### Files Moved
 
@@ -64,15 +64,15 @@ UserStatsPage.tsx
 import { toast } from "../../atoms/toast/use-toast";
 import { ThemeSelector } from "../../theme/components";
 import { useTheme } from "../../theme/provider";
-import { getUserTierClient, getTierLimitsClient } from "@proto/auth/client";
+import { getUserTierClient, getTierLimitsClient } from "@protolabsai/auth/client";
 import { UserStatsPage } from "../user-stats-page";
 ```
 
 **New imports:**
 ```typescript
-import { toast } from "@proto/ui/atoms";
-import { ThemeSelector } from "@proto/ui/theme";
-import { useTheme } from "@proto/ui/theme";
+import { toast } from "@protolabsai/ui/atoms";
+import { ThemeSelector } from "@protolabsai/ui/theme";
+import { useTheme } from "@protolabsai/ui/theme";
 import { getUserTierClient, getTierLimitsClient } from "../client";
 import { UserStatsPage } from "./UserStatsPage";
 ```
@@ -101,7 +101,7 @@ Already commented out (no changes needed):
 
 **File:** `apps/rabbit-hole/app/components/ui/ThemedUserButton.tsx`
 - Already has local implementation
-- Already imports from `@proto/auth/client`
+- Already imports from `@protolabsai/auth/client`
 - No changes needed
 
 **File:** `apps/rabbit-hole/app/atlas/components/AtlasHeader.tsx`
@@ -112,19 +112,19 @@ Already commented out (no changes needed):
 ## Dependency Flow (Fixed)
 
 ```
-@proto/auth/ui
+@protolabsai/auth/ui
    ↓
-   Imports from @proto/ui (atoms, molecules, theme)
+   Imports from @protolabsai/ui (atoms, molecules, theme)
    ✅ No cycle
 
-@proto/auth/ui
+@protolabsai/auth/ui
    ↓
-   Imports from @proto/auth/client
+   Imports from @protolabsai/auth/client
    ✅ Same package, no cycle
 
 Apps
    ↓
-   Import from @proto/auth/ui
+   Import from @protolabsai/auth/ui
    ✅ Correct direction
 ```
 
@@ -135,13 +135,13 @@ Apps
 ```bash
 cd /Users/kj/dev/rabbit-hole.io
 
-# Build @proto/auth first (should work now)
+# Build @protolabsai/auth first (should work now)
 cd packages/auth && pnpm run build
 # ✅ Success - no circular dependency
 
-# Build @proto/ui next (should work)
+# Build @protolabsai/ui next (should work)
 cd ../ui && pnpm run build
-# ✅ Success - no import from @proto/auth/client
+# ✅ Success - no import from @protolabsai/auth/client
 
 # Build all libs
 cd ../.. && pnpm run build:libs
@@ -181,9 +181,9 @@ packages/ui/src/organisms/user-stats-page/index.ts
 
 ### In Apps
 
-**Import from @proto/auth/ui:**
+**Import from @protolabsai/auth/ui:**
 ```typescript
-import { ThemedUserButton, UserStatsPage } from "@proto/auth/ui";
+import { ThemedUserButton, UserStatsPage } from "@protolabsai/auth/ui";
 ```
 
 **Or use local app components:**
@@ -193,13 +193,13 @@ import { ThemedUserButton } from "@/components/ui/ThemedUserButton";
 
 ### In Packages
 
-**DO NOT import auth components from @proto/ui:**
+**DO NOT import auth components from @protolabsai/ui:**
 ```typescript
 // ❌ Wrong - creates cycle
-import { ThemedUserButton } from "@proto/ui/organisms";
+import { ThemedUserButton } from "@protolabsai/ui/organisms";
 
 // ✅ Correct - no cycle
-import { ThemedUserButton } from "@proto/auth/ui";
+import { ThemedUserButton } from "@protolabsai/auth/ui";
 ```
 
 ## Benefits

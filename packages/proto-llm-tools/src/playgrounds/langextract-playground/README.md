@@ -56,8 +56,8 @@ export default function Page() {
 ### Job Queue (Recommended)
 
 ```tsx
-import { useEnqueueLangExtract } from "@proto/sidequest-utils/client";
-import { JobStatusTracker } from "@proto/sidequest-utils/components";
+import { useEnqueueLangExtract } from "@protolabsai/sidequest-utils/client";
+import { JobStatusTracker } from "@protolabsai/sidequest-utils/components";
 
 function MyComponent() {
   const [jobId, setJobId] = useState(null);
@@ -105,7 +105,7 @@ function MyComponent() {
 ### Direct Processing (Testing Only)
 
 ```tsx
-import { useLangExtract } from "@proto/llm-tools/client";
+import { useLangExtract } from "@protolabsai/llm-tools/client";
 
 function MyComponent() {
   const {

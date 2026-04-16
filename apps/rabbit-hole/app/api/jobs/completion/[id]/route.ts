@@ -9,7 +9,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { getJobCompletion } from "@proto/sidequest-utils/server";
+import { getJobCompletion } from "@protolabsai/sidequest-utils/server";
 
 export async function GET(
   request: NextRequest,

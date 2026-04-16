@@ -1,4 +1,4 @@
-# @proto/ui/theme
+# @protolabsai/ui/theme
 
 Complete whitelabel theming system with dynamic CSS variables, View Transitions API animations, and React integration.
 
@@ -14,10 +14,10 @@ Complete whitelabel theming system with dynamic CSS variables, View Transitions 
 
 ## Installation
 
-Already included in @proto/ui. Import the theme subpath:
+Already included in @protolabsai/ui. Import the theme subpath:
 
 ```tsx
-import { ThemeProvider, useTheme } from "@proto/ui/theme";
+import { ThemeProvider, useTheme } from "@protolabsai/ui/theme";
 ```
 
 ## Quick Start
@@ -26,7 +26,7 @@ import { ThemeProvider, useTheme } from "@proto/ui/theme";
 
 ```tsx
 // app/layout.tsx
-import { ThemeProvider } from "@proto/ui/theme";
+import { ThemeProvider } from "@protolabsai/ui/theme";
 
 export default function RootLayout({ children }) {
   return (
@@ -44,7 +44,7 @@ export default function RootLayout({ children }) {
 ```tsx
 "use client";
 
-import { useTheme } from "@proto/ui/theme";
+import { useTheme } from "@protolabsai/ui/theme";
 
 export function MyComponent() {
   const { themeName, colorScheme, setTheme, toggleColorScheme } = useTheme();
@@ -65,7 +65,7 @@ export function MyComponent() {
 ### 3. Add Theme Selector UI
 
 ```tsx
-import { ThemeSelector, CompactThemeSelector } from "@proto/ui/theme";
+import { ThemeSelector, CompactThemeSelector } from "@protolabsai/ui/theme";
 
 // Full theme selector
 <ThemeSelector showColorSchemeToggle />
@@ -108,7 +108,7 @@ const {
 ### ThemeGenerator
 
 ```tsx
-import { ThemeGenerator } from "@proto/ui/theme";
+import { ThemeGenerator } from "@protolabsai/ui/theme";
 
 // Generate CSS variables
 const css = ThemeGenerator.generateCSSVariables(myTheme);
@@ -126,7 +126,7 @@ import {
   isValidThemeName, // Validate theme name
   availableThemes, // Theme registry
   themeDisplayInfo, // UI metadata
-} from "@proto/ui/theme";
+} from "@protolabsai/ui/theme";
 
 const theme = getTheme("corporate-blue");
 const names = getThemeNames(); // ["default", "corporate-blue", ...]
@@ -135,7 +135,7 @@ const names = getThemeNames(); // ["default", "corporate-blue", ...]
 ### View Transitions
 
 ```tsx
-import { startThemeTransition, useThemeTransition } from "@proto/ui/theme";
+import { startThemeTransition, useThemeTransition } from "@protolabsai/ui/theme";
 
 // Manual transition
 await startThemeTransition(() => updateTheme(), {
@@ -155,7 +155,7 @@ See [THEME_CREATION.md](./THEME_CREATION.md) for detailed guide.
 **Quick Example:**
 
 ```tsx
-import { ThemeConfig } from "@proto/ui/theme";
+import { ThemeConfig } from "@protolabsai/ui/theme";
 
 export const myTheme: ThemeConfig = {
   name: "my-theme",
@@ -191,7 +191,7 @@ export const myTheme: ThemeConfig = {
 ## Export Structure
 
 ```
-@proto/ui/theme/
+@protolabsai/ui/theme/
 ├── config/          # ThemeConfig, ColorScale, ThemeBranding
 ├── generator/       # CSS generation, validation, color conversion
 ├── registry/        # Theme registry, example themes, metadata
@@ -213,7 +213,7 @@ import { ThemeGenerator } from "../../themes/generator";
 **After:**
 
 ```tsx
-import { getTheme, ThemeProvider, ThemeGenerator } from "@proto/ui/theme";
+import { getTheme, ThemeProvider, ThemeGenerator } from "@protolabsai/ui/theme";
 ```
 
 ## Advanced Usage
@@ -221,7 +221,7 @@ import { getTheme, ThemeProvider, ThemeGenerator } from "@proto/ui/theme";
 ### Custom Theme Application
 
 ```tsx
-import { ThemeGenerator, type ThemeConfig } from "@proto/ui/theme";
+import { ThemeGenerator, type ThemeConfig } from "@protolabsai/ui/theme";
 
 const customTheme: ThemeConfig = {...};
 
@@ -268,7 +268,7 @@ import type {
   ColorScale,
   ThemeBranding,
   AvailableThemeName,
-} from "@proto/ui/theme";
+} from "@protolabsai/ui/theme";
 ```
 
 ## Browser Support

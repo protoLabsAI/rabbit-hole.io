@@ -1,7 +1,7 @@
 "use client";
 
-import { Icon } from "@proto/icon-system";
-import { Popover, PopoverContent, PopoverTrigger } from "@proto/ui/atoms";
+import { Icon } from "@protolabsai/icon-system";
+import { Popover, PopoverContent, PopoverTrigger } from "@protolabsai/ui/atoms";
 
 import { cn } from "@/lib/utils";
 

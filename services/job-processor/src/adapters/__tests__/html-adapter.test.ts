@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { FileSource } from "@proto/types";
+import type { FileSource } from "@protolabsai/types";
 
 import { HtmlAdapter } from "../html-adapter.js";
 

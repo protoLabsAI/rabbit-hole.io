@@ -16,7 +16,7 @@ import {
   validateJSONDomain,
   convertJSONDomainToZod,
   type JSONDomainConfig,
-} from "@proto/types";
+} from "@protolabsai/types";
 
 interface ScannedDomain {
   path: string;
@@ -161,7 +161,7 @@ ${propsSchemaLines.join("\n")}
 
 import { z } from 'zod';
 
-import type { DomainConfig } from '@proto/types';
+import type { DomainConfig } from '@protolabsai/types';
 
 // Entity Schemas
 ${entitySchemas.join("\n\n")}
@@ -325,7 +325,7 @@ async function generateDomainRegistry(domains: ScannedDomain[]): Promise<void> {
  * Domains: ${domains.length}
  */
 
-import { domainRegistry } from '@proto/types';
+import { domainRegistry } from '@protolabsai/types';
 
 ${imports}
 
@@ -386,7 +386,7 @@ export const customDomainNames: string[] = [];
 }
 
 /**
- * Generate exports for @proto/types package
+ * Generate exports for @protolabsai/types package
  * Allows custom domains to be bundled with the types package
  */
 async function generateTypesPackageExports(
@@ -411,7 +411,7 @@ async function generateTypesPackageExports(
 // No custom domains to export
 `;
     writeFileSync(outputFile, content, "utf-8");
-    console.log(`✅ Generated empty @proto/types exports\n`);
+    console.log(`✅ Generated empty @protolabsai/types exports\n`);
     return;
   }
 
@@ -434,7 +434,7 @@ async function generateTypesPackageExports(
  * 
  * Domains: ${domains.length}
  * 
- * These exports allow custom domains to be bundled with @proto/types,
+ * These exports allow custom domains to be bundled with @protolabsai/types,
  * making them available in all execution contexts (server, client, API routes).
  */
 
@@ -457,12 +457,12 @@ if (typeof window !== "undefined") {
   allCustomDomainConfigs.forEach((config) => {
     domainRegistry.registerIfNeeded(config);
   });
-  console.log(\`✅ [Client] Registered \${allCustomDomainConfigs.length} custom domain(s) from @proto/types\`);
+  console.log(\`✅ [Client] Registered \${allCustomDomainConfigs.length} custom domain(s) from @protolabsai/types\`);
 }
 `;
 
   writeFileSync(outputFile, content, "utf-8");
-  console.log(`✅ Generated @proto/types custom-domains exports\n`);
+  console.log(`✅ Generated @protolabsai/types custom-domains exports\n`);
 }
 
 // Run scanner

@@ -254,7 +254,7 @@ Summary:`;
  *
  * @param communities - Grouped communities from groupCommunities()
  * @param generateText - Function that takes a prompt and returns generated text.
- *   Caller provides this to avoid a hard dependency on @proto/llm-providers.
+ *   Caller provides this to avoid a hard dependency on @protolabsai/llm-providers.
  */
 export async function summarizeAndStoreCommunities(
   communities: Community[],

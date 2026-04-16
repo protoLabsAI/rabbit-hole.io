@@ -14,7 +14,7 @@ Extract entities from text using:
 ## Usage
 
 ```typescript
-import { entityExtractionBasicTool } from "@proto/llm-tools";
+import { entityExtractionBasicTool } from "@protolabsai/llm-tools";
 
 const result = await entityExtractionBasicTool.invoke({
   text: "Albert Einstein worked at Princeton University in New Jersey.",
@@ -74,7 +74,7 @@ console.log(result.entities);
 ```typescript
 // agent/src/human-loop-extraction-agent/graph/nodes.ts
 
-import { entityExtractionBasicTool } from "@proto/llm-tools";
+import { entityExtractionBasicTool } from "@protolabsai/llm-tools";
 
 export async function extractEntitiesNode(state, config) {
   const result = await entityExtractionBasicTool.invoke({
@@ -93,7 +93,7 @@ export async function extractEntitiesNode(state, config) {
 
 - **Focus**: Entities only, no relationships
 - **Simplicity**: Two clear phases (discover → structure)
-- **Reusability**: Import from @proto/llm-tools, use anywhere
+- **Reusability**: Import from @protolabsai/llm-tools, use anywhere
 - **Performance**: Optimized with retry logic and rate limit handling
 - **Extensibility**: Easy to add enrichment or relationships later
 

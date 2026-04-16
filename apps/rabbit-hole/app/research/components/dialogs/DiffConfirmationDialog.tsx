@@ -10,8 +10,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@proto/ui/atoms";
-import { DiffView, calculateDiff } from "@proto/ui/organisms";
+} from "@protolabsai/ui/atoms";
+import { DiffView, calculateDiff } from "@protolabsai/ui/organisms";
 
 interface DiffConfirmationDialogProps {
   isOpen: boolean;

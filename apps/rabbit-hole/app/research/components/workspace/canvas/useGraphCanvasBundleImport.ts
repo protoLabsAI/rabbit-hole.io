@@ -7,8 +7,8 @@
 import type Graph from "graphology";
 import { useEffect, useRef } from "react";
 
-import type { RabbitHoleBundleData } from "@proto/types";
-import { useToast } from "@proto/ui/hooks";
+import type { RabbitHoleBundleData } from "@protolabsai/types";
+import { useToast } from "@protolabsai/ui/hooks";
 
 import type {
   GraphNodeAttributes,

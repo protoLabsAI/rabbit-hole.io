@@ -1,4 +1,4 @@
-# Type Resolution Fix - @proto/llm-tools
+# Type Resolution Fix - @protolabsai/llm-tools
 
 **Date**: October 27, 2025  
 **Fix**: Removed `dts.resolve: true` from tsup configuration  
@@ -39,7 +39,7 @@ dts: {
 
 ### Why This Matters
 
-`dts.resolve: true` tells TypeScript to bundle ALL external type definitions during `.d.ts` file generation. For `@proto/llm-tools`:
+`dts.resolve: true` tells TypeScript to bundle ALL external type definitions during `.d.ts` file generation. For `@protolabsai/llm-tools`:
 
 - **LangChain libraries** have extremely large type graphs (message unions, generics, state types)
 - **11 entry points** × **2 formats** (CJS/ESM) = 22 separate type generation passes
@@ -78,9 +78,9 @@ NODE_OPTIONS='--max-old-space-size=6144' pnpm run build
 **Medium Term** (Weeks):
 
 - See `PACKAGE_SPLIT_STRATEGY.md`
-- Phase 1: Create `@proto/llm-workflows` (isolates LangGraph)
-- Phase 2: Create `@proto/llm-playgrounds` (isolates Tiptap)
-- Phase 3: Create `@proto/entity-researcher` (isolates deep-agent)
+- Phase 1: Create `@protolabsai/llm-workflows` (isolates LangGraph)
+- Phase 2: Create `@protolabsai/llm-playgrounds` (isolates Tiptap)
+- Phase 3: Create `@protolabsai/entity-researcher` (isolates deep-agent)
 
 **Long Term** (Months):
 
@@ -102,13 +102,13 @@ NODE_OPTIONS='--max-old-space-size=6144' pnpm run build
 
 ```typescript
 // Server - unchanged
-import { searchWikipedia, extractionGraph } from "@proto/llm-tools";
+import { searchWikipedia, extractionGraph } from "@protolabsai/llm-tools";
 
 // Client - unchanged
-import { useTranscription } from "@proto/llm-tools/client";
+import { useTranscription } from "@protolabsai/llm-tools/client";
 
 // Playground - unchanged
-import { EntityResearchPlayground } from "@proto/llm-tools/playgrounds";
+import { EntityResearchPlayground } from "@protolabsai/llm-tools/playgrounds";
 ```
 
 ## Files Modified

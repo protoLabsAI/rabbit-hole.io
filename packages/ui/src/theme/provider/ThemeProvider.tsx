@@ -56,7 +56,7 @@ export function ThemeProvider({
 
     // Apply domain overrides if present (async import for client-side)
     if (theme.domainOverrides) {
-      import("@proto/types")
+      import("@protolabsai/types")
         .then(({ applyThemeToDomains, domainRegistry }) => {
           applyThemeToDomains(theme, domainRegistry);
         })
@@ -129,7 +129,7 @@ export function ThemeProvider({
 
     // Apply domain overrides if present (async import)
     if (theme.domainOverrides) {
-      import("@proto/types")
+      import("@protolabsai/types")
         .then(({ applyThemeToDomains, domainRegistry }) => {
           applyThemeToDomains(theme, domainRegistry);
         })

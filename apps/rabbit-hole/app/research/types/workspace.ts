@@ -5,7 +5,7 @@
  * Supports local/offline work with Yjs sync when online.
  */
 
-import type { RegisteredIconName } from "@proto/icon-system";
+import type { RegisteredIconName } from "@protolabsai/icon-system";
 
 export type CanvasType =
   | "graph" // React Flow graph editor

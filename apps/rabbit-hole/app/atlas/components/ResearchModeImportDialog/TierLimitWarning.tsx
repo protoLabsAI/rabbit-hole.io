@@ -7,7 +7,7 @@
 
 "use client";
 
-import { Alert, AlertDescription, AlertTitle } from "@proto/ui/atoms";
+import { Alert, AlertDescription, AlertTitle } from "@protolabsai/ui/atoms";
 
 interface TierLimitWarningProps {
   usage: {

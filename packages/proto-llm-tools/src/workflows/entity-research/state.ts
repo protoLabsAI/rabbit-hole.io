@@ -8,7 +8,7 @@ import type {
   EntityResearchOutput,
   EntityResearchMetadata,
   EntityResearchSource,
-} from "@proto/types";
+} from "@protolabsai/types";
 
 /**
  * Entity Research Input State

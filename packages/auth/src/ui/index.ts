@@ -1,5 +1,5 @@
 /**
- * @proto/auth/ui - Auth UI Components
+ * @protolabsai/auth/ui - Auth UI Components
  *
  * UI components for authentication, authorization, and tier management
  */

@@ -4,7 +4,7 @@
  * Parallel fetching from multiple sources (Wikipedia, files, etc.)
  */
 
-import { queryWikipedia } from "@proto/llm-tools";
+import { queryWikipedia } from "@protolabsai/llm-tools";
 
 export interface SourceData {
   type: "wikipedia" | "file" | "arxiv" | "custom";

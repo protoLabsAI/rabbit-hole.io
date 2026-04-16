@@ -5,7 +5,7 @@
  * for providing context to AI agents.
  */
 
-import { PersonEntity, Relationship } from "@proto/types";
+import { PersonEntity, Relationship } from "@protolabsai/types";
 
 export interface KnowledgeGraphContext {
   personEntities: PersonEntity[];

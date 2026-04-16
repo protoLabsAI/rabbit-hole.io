@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { getConfig } from "@proto/llm-providers/server";
+import { getConfig } from "@protolabsai/llm-providers/server";
 
 /**
  * GET /api/models
