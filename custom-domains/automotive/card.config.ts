@@ -4,7 +4,7 @@
  * Configuration-based card rendering for automotive entities.
  */
 
-import { createCardConfig } from "@proto/types";
+import { createCardConfig } from "@protolabsai/types";
 
 /**
  * Automotive card configuration

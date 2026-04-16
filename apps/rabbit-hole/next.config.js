@@ -1,7 +1,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 
-import baseConfig from "@proto/config-next/base.config.js";
+import baseConfig from "@protolabsai/config-next/base.config.js";
 
 // Load .env.research from the monorepo root (provides API keys + Langfuse config).
 // Next.js only auto-loads .env / .env.local — this ensures research env vars are

@@ -1,13 +1,13 @@
 /**
  * Graph Data Validation Utility
  *
- * Validates test data against @proto/types schemas and transforms
+ * Validates test data against @protolabsai/types schemas and transforms
  * to CanonicalGraphData format for graph visualization.
  */
 
 import { z } from "zod";
 
-import { normalizeEntityType } from "@proto/types";
+import { normalizeEntityType } from "@protolabsai/types";
 
 // Basic entity schema for validation (simplified version for graph visualizer)
 const EntitySchema = z.object({

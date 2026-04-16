@@ -9,7 +9,7 @@
 
 import { Component, ReactNode } from "react";
 
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 
 interface LazyFeatureErrorBoundaryProps {
   children: ReactNode;

@@ -1,6 +1,6 @@
 # LLM Provider Playground
 
-Interactive testing environment for the `@proto/llm-providers` system.
+Interactive testing environment for the `@protolabsai/llm-providers` system.
 
 ## Architecture
 
@@ -11,7 +11,7 @@ Interactive testing environment for the `@proto/llm-providers` system.
 - **Main Component**: 218 lines (orchestrator)
 - **Hooks**: 6 custom hooks for state management
 - **Components**: 6 feature components (chat, metrics, settings, etc.)
-- **Shared Types**: Available via `@proto/types/llm-playground`
+- **Shared Types**: Available via `@protolabsai/types/llm-playground`
 
 ## Features
 

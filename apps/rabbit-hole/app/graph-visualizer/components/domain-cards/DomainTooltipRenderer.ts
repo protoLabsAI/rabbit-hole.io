@@ -3,7 +3,7 @@
  *
  * Follows the Atlas pattern of creating simple HTML tooltips,
  * but generates domain-specific content without React complexity.
- * Uses actual domain metadata and schemas from @proto/types.
+ * Uses actual domain metadata and schemas from @protolabsai/types.
  */
 
 import {
@@ -21,7 +21,7 @@ import {
   INFRASTRUCTURE_DOMAIN_INFO,
   TRANSPORTATION_DOMAIN_INFO,
   ASTRONOMICAL_DOMAIN_INFO,
-} from "@proto/types";
+} from "@protolabsai/types";
 
 import type { DomainNodeData, DomainName } from "./types";
 

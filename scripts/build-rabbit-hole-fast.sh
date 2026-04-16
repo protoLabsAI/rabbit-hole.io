@@ -16,7 +16,7 @@ pnpm run build:libs
 
 echo ""
 echo -e "${BLUE}2. Building Next.js app locally (skipping scan:domains - has export issue)...${NC}"
-pnpm --filter @apps/rabbit-hole build
+pnpm --filter @protolabsai/rabbit-hole build
 
 echo ""
 echo -e "${BLUE}3. Building Docker image (just copies files)...${NC}"

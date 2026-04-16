@@ -8,7 +8,7 @@
  * - Required fields
  */
 
-import type { Entity, Relationship } from "@proto/types";
+import type { Entity, Relationship } from "@protolabsai/types";
 
 export interface ValidationError {
   type: "error" | "warning";

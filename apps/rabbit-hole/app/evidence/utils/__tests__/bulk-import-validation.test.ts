@@ -7,7 +7,7 @@
 
 import { describe, it, expect } from "vitest";
 
-import { EntitySchema } from "@proto/types";
+import { EntitySchema } from "@protolabsai/types";
 
 import {
   validateBulkImport,
@@ -21,7 +21,7 @@ describe.skip("Bulk Import Validation", () => {
   describe("Entity Schema Validation", () => {
     it("should validate a correct entity", () => {
       const validEntity = {
-        uid: "person:test_person", // Updated to match @proto/types schema
+        uid: "person:test_person", // Updated to match @protolabsai/types schema
         entity_type: "person", // Updated field name
         label: "Test Person", // Updated field name
         bio: "A test person",

@@ -182,9 +182,9 @@ From `packages/ui/src/panel-hub/`:
 
 ### Internal Dependencies
 
-- `@proto/icon-system` - Icon components
-- `@proto/auth/client` - User roles and permissions
-- `@proto/utils/atlas` - Entity utilities
+- `@protolabsai/icon-system` - Icon components
+- `@protolabsai/auth/client` - User roles and permissions
+- `@protolabsai/utils/atlas` - Entity utilities
 
 ### External Dependencies
 

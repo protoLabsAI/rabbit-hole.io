@@ -1,4 +1,4 @@
-# @proto/database
+# @protolabsai/database
 
 Centralized database clients for Neo4j (graph data) and PostgreSQL (relational data) with global connection pooling.
 
@@ -16,7 +16,7 @@ Centralized database clients for Neo4j (graph data) and PostgreSQL (relational d
 ### Neo4j (Graph Database)
 
 ```typescript
-import { getGlobalNeo4jClient, buildEntityDetailsQuery } from "@proto/database";
+import { getGlobalNeo4jClient, buildEntityDetailsQuery } from "@protolabsai/database";
 
 // Get entity details
 const client = getGlobalNeo4jClient();
@@ -27,7 +27,7 @@ const result = await client.executeRead(query, params);
 ### PostgreSQL (Relational Database)
 
 ```typescript
-import { getGlobalPostgresPool } from "@proto/database";
+import { getGlobalPostgresPool } from "@protolabsai/database";
 
 // Get collaboration sessions
 const pool = getGlobalPostgresPool();
@@ -58,7 +58,7 @@ const client = createNeo4jClient({
 
 ```typescript
 // Global pool (ALWAYS use this in API routes)
-import { getGlobalPostgresPool } from "@proto/database";
+import { getGlobalPostgresPool } from "@protolabsai/database";
 const pool = getGlobalPostgresPool();
 
 // Execute queries
@@ -136,7 +136,7 @@ const session = driver.session({ database: "neo4j" });
 
 ```typescript
 // Single import, managed connections
-import { getGlobalNeo4jClient } from "@proto/database";
+import { getGlobalNeo4jClient } from "@protolabsai/database";
 const client = getGlobalNeo4jClient();
 ```
 
@@ -163,7 +163,7 @@ export async function GET(request: NextRequest) {
 
 ```typescript
 // ✅ Global pool (efficient)
-import { getGlobalPostgresPool } from "@proto/database";
+import { getGlobalPostgresPool } from "@protolabsai/database";
 
 export async function GET(request: NextRequest) {
   const pool = getGlobalPostgresPool();

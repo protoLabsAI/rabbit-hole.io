@@ -1,10 +1,10 @@
 /**
- * @proto/llm-providers
+ * @protolabsai/llm-providers
  *
  * Types only - safe for client component imports
  * For functionality, use:
- * - Client: @proto/llm-providers/client
- * - Server: @proto/llm-providers/server
+ * - Client: @protolabsai/llm-providers/client
+ * - Server: @protolabsai/llm-providers/server
  */
 
 // Types (safe for client)

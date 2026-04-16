@@ -17,8 +17,8 @@
 import type { Map as LeafletMap, Marker } from "leaflet";
 import { useEffect, useRef, useState } from "react";
 
-import type { EntityType } from "@proto/types";
-import { getEntityColor } from "@proto/utils/atlas";
+import type { EntityType } from "@protolabsai/types";
+import { getEntityColor } from "@protolabsai/utils/atlas";
 
 // Conditional debug logging (only in development)
 const DEBUG = process.env.NODE_ENV === "development";

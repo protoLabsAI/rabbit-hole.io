@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 
-import { ALL_ENTITY_TYPES } from "@proto/types";
+import { ALL_ENTITY_TYPES } from "@protolabsai/types";
 import {
   Card,
   CardContent,
@@ -10,7 +10,7 @@ import {
   CardTitle,
   Button,
   Input,
-} from "@proto/ui/atoms";
+} from "@protolabsai/ui/atoms";
 
 import { ForceGraph } from "./components/ForceGraph";
 

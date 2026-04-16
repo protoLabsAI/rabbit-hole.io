@@ -9,9 +9,12 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { validatePaginationParams, PAGINATION_LIMITS } from "@proto/api-utils";
-import type { JobStatus } from "@proto/sidequest-utils";
-import { listJobs } from "@proto/sidequest-utils/server";
+import {
+  validatePaginationParams,
+  PAGINATION_LIMITS,
+} from "@protolabsai/api-utils";
+import type { JobStatus } from "@protolabsai/sidequest-utils";
+import { listJobs } from "@protolabsai/sidequest-utils/server";
 
 export async function GET(request: NextRequest) {
   try {

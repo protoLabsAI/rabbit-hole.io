@@ -1,5 +1,5 @@
 {
-  "name": "@proto/vector",
+  "name": "@protolabsai/vector",
   "version": "0.1.0",
   "private": true,
   "description": "Qdrant vector search + Ollama embedding utilities",

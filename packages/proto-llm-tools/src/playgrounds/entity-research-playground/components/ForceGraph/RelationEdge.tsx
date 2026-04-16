@@ -7,7 +7,7 @@ import {
 
 /**
  * Sentiment colors for relationship edges
- * Full implementation in @proto/utils/atlas
+ * Full implementation in @protolabsai/utils/atlas
  */
 function getSentimentColor(sentiment: string): string {
   const sentimentColors: Record<string, string> = {

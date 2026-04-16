@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { getUserTier, getTierLimits } from "@proto/auth";
-import { structureNode } from "@proto/llm-tools";
+import { getUserTier, getTierLimits } from "@protolabsai/auth";
+import { structureNode } from "@protolabsai/llm-tools";
 
 export const maxDuration = 60;
 

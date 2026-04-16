@@ -1,4 +1,4 @@
-import { Button } from "@proto/ui/atoms";
+import { Button } from "@protolabsai/ui/atoms";
 
 export interface ExampleCardProps {
   title: string;

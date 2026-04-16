@@ -1,4 +1,4 @@
-import { Badge } from "@proto/ui/atoms";
+import { Badge } from "@protolabsai/ui/atoms";
 
 import type { ProviderModel } from "../../types";
 

@@ -5,7 +5,7 @@
  * canonical storage path in MinIO, then writes a manifest.json.
  */
 
-import { MinioService } from "@proto/utils/storage";
+import { MinioService } from "@protolabsai/utils/storage";
 
 import {
   computeContentHash,

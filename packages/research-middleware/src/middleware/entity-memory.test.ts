@@ -13,7 +13,7 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-import { getGlobalNeo4jClient } from "@proto/database";
+import { getGlobalNeo4jClient } from "@protolabsai/database";
 
 import { createTracingContext } from "../tracing";
 import type { AgentResult, MiddlewareContext } from "../types";
@@ -29,8 +29,8 @@ import {
 // Mocks
 // ---------------------------------------------------------------------------
 
-// Mock @proto/database so tests never touch a real Neo4j instance.
-vi.mock("@proto/database", () => ({
+// Mock @protolabsai/database so tests never touch a real Neo4j instance.
+vi.mock("@protolabsai/database", () => ({
   getGlobalNeo4jClient: vi.fn(),
 }));
 
@@ -299,7 +299,9 @@ describe("EntityMemoryMiddleware", () => {
 
   it("does not throw when Neo4j client throws an error", async () => {
     const mockClient = {
-      executeRead: vi.fn().mockRejectedValue(new Error("Neo4j connection refused")),
+      executeRead: vi
+        .fn()
+        .mockRejectedValue(new Error("Neo4j connection refused")),
     };
     vi.mocked(getGlobalNeo4jClient).mockReturnValue(mockClient as any);
 
@@ -354,7 +356,10 @@ describe("EntityMemoryMiddleware", () => {
     await mw.beforeAgent(ctx);
 
     expect(mockSpanHandle.end).toHaveBeenCalledOnce();
-    const endArg = mockSpanHandle.end.mock.calls[0]![0] as Record<string, unknown>;
+    const endArg = mockSpanHandle.end.mock.calls[0]![0] as Record<
+      string,
+      unknown
+    >;
     expect(endArg).toMatchObject({ hitCount: 1, missCount: 0 });
     expect(typeof endArg["latencyMs"]).toBe("number");
   });
@@ -369,7 +374,10 @@ describe("EntityMemoryMiddleware", () => {
     await mw.beforeAgent(ctx);
 
     expect(mockSpanHandle.end).toHaveBeenCalledOnce();
-    const endArg = mockSpanHandle.end.mock.calls[0]![0] as Record<string, unknown>;
+    const endArg = mockSpanHandle.end.mock.calls[0]![0] as Record<
+      string,
+      unknown
+    >;
     expect(endArg).toMatchObject({ hitCount: 0, missCount: 1 });
   });
 
@@ -386,7 +394,10 @@ describe("EntityMemoryMiddleware", () => {
     await mw.beforeAgent(ctx);
 
     expect(mockSpanHandle.end).toHaveBeenCalledOnce();
-    const endArg = mockSpanHandle.end.mock.calls[0]![0] as Record<string, unknown>;
+    const endArg = mockSpanHandle.end.mock.calls[0]![0] as Record<
+      string,
+      unknown
+    >;
     expect(endArg["error"]).toContain("DB down");
   });
 
@@ -398,8 +409,18 @@ describe("EntityMemoryMiddleware", () => {
     const ctx = makeCtx();
     ctx.state["priorKnowledge"] = {
       entities: [
-        { name: "Alice", type: "Person", relationshipCount: 3, lastUpdated: daysAgo(5) },
-        { name: "Bob", type: "Person", relationshipCount: 1, lastUpdated: daysAgo(5) },
+        {
+          name: "Alice",
+          type: "Person",
+          relationshipCount: 3,
+          lastUpdated: daysAgo(5),
+        },
+        {
+          name: "Bob",
+          type: "Person",
+          relationshipCount: 1,
+          lastUpdated: daysAgo(5),
+        },
       ],
       staleEntities: [],
     } satisfies PriorKnowledge;
@@ -418,7 +439,12 @@ describe("EntityMemoryMiddleware", () => {
     const ctx = makeCtx();
     ctx.state["priorKnowledge"] = {
       entities: [
-        { name: "Alice", type: "Person", relationshipCount: 3, lastUpdated: null },
+        {
+          name: "Alice",
+          type: "Person",
+          relationshipCount: 3,
+          lastUpdated: null,
+        },
       ],
       staleEntities: ["Alice"],
     } satisfies PriorKnowledge;
@@ -438,8 +464,18 @@ describe("EntityMemoryMiddleware", () => {
     const ctx = makeCtx();
     ctx.state["priorKnowledge"] = {
       entities: [
-        { name: "Tesla", type: "Organization", relationshipCount: 10, lastUpdated: daysAgo(5) },
-        { name: "SpaceX", type: "Organization", relationshipCount: 8, lastUpdated: daysAgo(5) },
+        {
+          name: "Tesla",
+          type: "Organization",
+          relationshipCount: 10,
+          lastUpdated: daysAgo(5),
+        },
+        {
+          name: "SpaceX",
+          type: "Organization",
+          relationshipCount: 8,
+          lastUpdated: daysAgo(5),
+        },
       ],
       staleEntities: [],
     } satisfies PriorKnowledge;

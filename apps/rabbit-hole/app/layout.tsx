@@ -2,12 +2,12 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
-import { Toaster } from "@proto/ui/atoms";
+import { Toaster } from "@protolabsai/ui/atoms";
 import {
   getValidatedThemeName,
   getTheme,
   ThemeGenerator,
-} from "@proto/ui/theme";
+} from "@protolabsai/ui/theme";
 
 import { DebugUtilsInitializer } from "./components/DebugUtilsInitializer";
 import { DomainRegistryInitializer } from "./components/DomainRegistryInitializer";

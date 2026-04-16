@@ -23,7 +23,7 @@ The `enrichEntityTool` is a flexible entity enrichment tool that supports both:
 **Note:** Schema-based extraction currently returns empty results. See Linear ticket [RAB-195](https://linear.app/rabbit-hole-dev/issue/RAB-195). Use example-based extraction instead.
 
 ```typescript
-import { enrichEntityTool } from "@proto/llm-tools";
+import { enrichEntityTool } from "@protolabsai/llm-tools";
 
 // ⚠️ This currently doesn't work reliably
 const result = await enrichEntityTool.invoke({
@@ -48,7 +48,7 @@ const result = await enrichEntityTool.invoke({
 This is the recommended approach that works reliably in production.
 
 ```typescript
-import { enrichEntityTool } from "@proto/llm-tools";
+import { enrichEntityTool } from "@protolabsai/llm-tools";
 
 const result = await enrichEntityTool.invoke({
   entityName: "Albert Einstein",
@@ -85,11 +85,11 @@ console.log(result.enrichedData);
 You can use this tool in custom extraction pipelines:
 
 ```typescript
-import { enrichEntityTool } from "@proto/llm-tools";
+import { enrichEntityTool } from "@protolabsai/llm-tools";
 import {
   getEnrichmentFieldsForEntity,
   generateEnrichmentExample,
-} from "@proto/llm-tools";
+} from "@protolabsai/llm-tools";
 
 // Get domain-specific enrichment fields
 const enrichmentFields = getEnrichmentFieldsForEntity("Person", "social");
@@ -245,7 +245,7 @@ const result = await enrichEntityTool.invoke({
 The tool works seamlessly with domain-specific schemas:
 
 ```typescript
-import { getDomainConfig } from "@proto/llm-tools";
+import { getDomainConfig } from "@protolabsai/llm-tools";
 
 const domainConfig = getDomainConfig("social");
 const personSchema = domainConfig.entities.Person.schema;

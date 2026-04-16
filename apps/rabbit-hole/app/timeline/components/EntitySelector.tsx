@@ -10,7 +10,7 @@
 
 import React, { useState, useCallback } from "react";
 
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 import {
   Badge,
   Button,
@@ -19,9 +19,9 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@proto/ui/atoms";
-import { EntitySearch, type SearchableEntity } from "@proto/ui/organisms";
-import { getEntityImage } from "@proto/utils/atlas";
+} from "@protolabsai/ui/atoms";
+import { EntitySearch, type SearchableEntity } from "@protolabsai/ui/organisms";
+import { getEntityImage } from "@protolabsai/utils/atlas";
 
 // ==================== Types ====================
 

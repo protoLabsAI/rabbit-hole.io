@@ -111,8 +111,8 @@ import { GanttColumn } from "../../atoms";
 import { cn } from "../../lib/utils";
 
 // ✅ Package imports for external
-import { Card } from "@proto/ui/atoms";
-import { Icon } from "@proto/icon-system";
+import { Card } from "@protolabsai/ui/atoms";
+import { Icon } from "@protolabsai/icon-system";
 
 // ✅ Direct library imports
 import { format } from "date-fns";

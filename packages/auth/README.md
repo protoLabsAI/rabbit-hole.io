@@ -1,4 +1,4 @@
-# @proto/auth
+# @protolabsai/auth
 
 Centralized authentication middleware for API routes with Clerk integration.
 
@@ -13,7 +13,7 @@ Centralized authentication middleware for API routes with Clerk integration.
 ## Quick Start
 
 ```typescript
-import { withAuthAndLogging } from "@proto/auth";
+import { withAuthAndLogging } from "@protolabsai/auth";
 
 export const POST = withAuthAndLogging("create entity")(async (
   request: NextRequest,
@@ -32,7 +32,7 @@ export const POST = withAuthAndLogging("create entity")(async (
 ### Basic Authentication
 
 ```typescript
-import { withAuth } from "@proto/auth";
+import { withAuth } from "@protolabsai/auth";
 
 export const GET = withAuth(async (request, user) => {
   // Protected route logic
@@ -43,7 +43,7 @@ export const GET = withAuth(async (request, user) => {
 ### With Logging
 
 ```typescript
-import { withAuthAndLogging } from "@proto/auth";
+import { withAuthAndLogging } from "@protolabsai/auth";
 
 export const DELETE = withAuthAndLogging("delete sensitive data")(async (
   request,
@@ -57,7 +57,7 @@ export const DELETE = withAuthAndLogging("delete sensitive data")(async (
 ### Admin Only (Future)
 
 ```typescript
-import { withAdminAuth } from "@proto/auth";
+import { withAdminAuth } from "@protolabsai/auth";
 
 export const POST = withAdminAuth("system maintenance")(async (
   request,
@@ -71,7 +71,7 @@ export const POST = withAdminAuth("system maintenance")(async (
 ### Public Routes
 
 ```typescript
-import { withLogging } from "@proto/auth";
+import { withLogging } from "@protolabsai/auth";
 
 export const GET = withLogging("public data access")(async (request, user) => {
   // No auth required, but still logged
@@ -122,7 +122,7 @@ export const POST = withAuthAndLogging("my action")(async (request, user) => {
 Display user's current subscription tier.
 
 ```typescript
-import { TierBadge } from "@proto/auth/ui";
+import { TierBadge } from "@protolabsai/auth/ui";
 
 <TierBadge />
 ```
@@ -132,7 +132,7 @@ import { TierBadge } from "@proto/auth/ui";
 Modal prompting users to upgrade their subscription.
 
 ```typescript
-import { UpgradePromptModal } from "@proto/auth/ui";
+import { UpgradePromptModal } from "@protolabsai/auth/ui";
 
 <UpgradePromptModal 
   isOpen={showUpgrade}
@@ -147,7 +147,7 @@ import { UpgradePromptModal } from "@proto/auth/ui";
 Conditionally render content based on user roles.
 
 ```typescript
-import { ClientRoleGuard } from "@proto/auth/ui";
+import { ClientRoleGuard } from "@protolabsai/auth/ui";
 
 <ClientRoleGuard minimumRole="admin">
   <AdminOnlyFeature />
@@ -159,7 +159,7 @@ import { ClientRoleGuard } from "@proto/auth/ui";
 UI for managing user roles (admin feature).
 
 ```typescript
-import { RoleManager } from "@proto/auth/ui";
+import { RoleManager } from "@protolabsai/auth/ui";
 
 <RoleManager 
   showPermissions={true}

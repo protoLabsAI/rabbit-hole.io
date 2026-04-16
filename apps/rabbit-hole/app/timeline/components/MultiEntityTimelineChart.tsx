@@ -10,17 +10,17 @@
 
 import React, { useMemo, memo, useCallback } from "react";
 
-import { Icon } from "@proto/icon-system";
-import type { TimelineEvent } from "@proto/types";
+import { Icon } from "@protolabsai/icon-system";
+import type { TimelineEvent } from "@protolabsai/types";
 import {
   Badge,
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "@proto/ui/atoms";
-import { getEntityColors } from "@proto/utils";
-import { getEntityImage } from "@proto/utils/atlas";
+} from "@protolabsai/ui/atoms";
+import { getEntityColors } from "@protolabsai/utils";
+import { getEntityImage } from "@protolabsai/utils/atlas";
 
 import type { MultiEntityTimelineData } from "../hooks/useMultiEntityTimeline";
 import type { TimelineFilters } from "../hooks/useTimelinePageState";

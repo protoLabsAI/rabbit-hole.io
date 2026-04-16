@@ -1,4 +1,4 @@
-# @proto/llm-providers
+# @protolabsai/llm-providers
 
 ## Unreleased
 

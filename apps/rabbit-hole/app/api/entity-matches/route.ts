@@ -7,7 +7,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { getGlobalNeo4jClient } from "@proto/database";
+import { getGlobalNeo4jClient } from "@protolabsai/database";
 
 interface EntityMatchRequest {
   sourceEntityId: string;
@@ -75,7 +75,7 @@ export async function POST(
       );
 
       // Step 2: Use any valid entity type from our modular system
-      const { ALL_ENTITY_TYPES } = await import("@proto/types");
+      const { ALL_ENTITY_TYPES } = await import("@protolabsai/types");
       const entityTypeLabels = sourceLabels.filter((label: string) =>
         ALL_ENTITY_TYPES.includes(label as any)
       );

@@ -1,5 +1,5 @@
 /**
- * @proto/utils/react - React Utilities
+ * @protolabsai/utils/react - React Utilities
  *
  * React-specific utilities including lazy loading patterns
  */

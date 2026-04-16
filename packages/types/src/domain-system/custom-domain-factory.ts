@@ -64,7 +64,7 @@ export function createCustomDomain<
   Object.entries(spec.entities).forEach(([_entityType, schema]) => {
     if (!isValidEntitySchema(schema)) {
       throw new Error(
-        `Entity schema must extend EntitySchema from @proto/types/domains/core`
+        `Entity schema must extend EntitySchema from @protolabsai/types/domains/core`
       );
     }
   });

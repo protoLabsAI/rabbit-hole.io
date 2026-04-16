@@ -7,7 +7,10 @@
 
 import { useEffect } from "react";
 
-import { getUserTierClient, getTierLimitsClient } from "@proto/auth/client";
+import {
+  getUserTierClient,
+  getTierLimitsClient,
+} from "@protolabsai/auth/client";
 
 interface PreloadConfig {
   featureFlag: keyof ReturnType<typeof getTierLimitsClient>;

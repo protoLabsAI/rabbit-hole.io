@@ -1,6 +1,6 @@
 "use client";
 
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 
 // ─── Types ──────────────────────────────────────────────────────────
 

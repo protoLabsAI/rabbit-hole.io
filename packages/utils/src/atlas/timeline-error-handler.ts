@@ -11,7 +11,7 @@ import {
   type TimelineEvent,
   type CompactTimelineData,
   type TimelineFilters,
-} from "@proto/types";
+} from "@protolabsai/types";
 
 export interface TimelineErrorInfo {
   hasError: boolean;

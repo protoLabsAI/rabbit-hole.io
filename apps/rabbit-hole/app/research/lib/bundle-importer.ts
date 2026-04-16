@@ -12,9 +12,9 @@ import type {
   Entity,
   Relationship,
   File as FileEntity,
-} from "@proto/types";
-import { validateRabbitHoleBundle } from "@proto/types";
-import { getEntityColor, getEntityImage } from "@proto/utils/atlas";
+} from "@protolabsai/types";
+import { validateRabbitHoleBundle } from "@protolabsai/types";
+import { getEntityColor, getEntityImage } from "@protolabsai/utils/atlas";
 
 import { vlog } from "@/lib/verbose-logger";
 

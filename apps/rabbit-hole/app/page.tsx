@@ -2,7 +2,7 @@
 
 import { useCallback, useRef, useEffect, useState, useMemo } from "react";
 
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 
 import { ChatMessage } from "./components/search/ChatMessage";
 import { ChatSourcePanel } from "./components/search/ChatSourcePanel";

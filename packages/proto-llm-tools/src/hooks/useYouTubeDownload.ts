@@ -4,7 +4,7 @@
 
 import { useMutation } from "@tanstack/react-query";
 
-import { useToast } from "@proto/ui/hooks";
+import { useToast } from "@protolabsai/ui/hooks";
 
 export interface DownloadFilesParams {
   videoKey: string;

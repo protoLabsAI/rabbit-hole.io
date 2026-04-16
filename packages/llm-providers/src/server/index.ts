@@ -1,5 +1,5 @@
 /**
- * @proto/llm-providers/server
+ * @protolabsai/llm-providers/server
  *
  * Server-only functionality (API routes, Server Components, Server Actions)
  * Uses Node.js APIs - DO NOT import in client components

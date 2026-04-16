@@ -63,28 +63,28 @@ importers:
       '@langchain/langgraph':
         specifier: ^1.2.8
         version: 1.2.8(@langchain/core@1.1.40(@opentelemetry/api@1.9.0)(@opentelemetry/exporter-trace-otlp-proto@0.208.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(openai@4.104.0(ws@8.18.3)(zod@4.3.6))(ws@8.18.3))(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(zod-to-json-schema@3.24.6(zod@4.3.6))(zod@4.3.6)
-      '@proto/api-utils':
+      '@protolabsai/api-utils':
         specifier: workspace:*
         version: link:packages/api-utils
-      '@proto/auth':
+      '@protolabsai/auth':
         specifier: workspace:*
         version: link:packages/auth
-      '@proto/database':
+      '@protolabsai/database':
         specifier: workspace:*
         version: link:packages/database
-      '@proto/icon-system':
+      '@protolabsai/icon-system':
         specifier: workspace:*
         version: link:packages/icon-system
-      '@proto/llm-tools':
+      '@protolabsai/llm-tools':
         specifier: workspace:*
         version: link:packages/proto-llm-tools
-      '@proto/logger':
+      '@protolabsai/logger':
         specifier: workspace:*
         version: link:packages/logger
-      '@proto/types':
+      '@protolabsai/types':
         specifier: workspace:*
         version: link:packages/types
-      '@proto/utils':
+      '@protolabsai/utils':
         specifier: workspace:*
         version: link:packages/utils
       '@radix-ui/react-avatar':
@@ -538,19 +538,19 @@ importers:
       '@opentelemetry/semantic-conventions':
         specifier: ^1.38.0
         version: 1.38.0
-      '@proto/deepagent':
+      '@protolabsai/deepagent':
         specifier: workspace:*
         version: link:../packages/deepagent
-      '@proto/llm-providers':
+      '@protolabsai/llm-providers':
         specifier: workspace:*
         version: link:../packages/llm-providers
-      '@proto/llm-tools':
+      '@protolabsai/llm-tools':
         specifier: workspace:*
         version: link:../packages/proto-llm-tools
-      '@proto/types':
+      '@protolabsai/types':
         specifier: workspace:*
         version: link:../packages/types
-      '@proto/utils':
+      '@protolabsai/utils':
         specifier: workspace:*
         version: link:../packages/utils
       dotenv:
@@ -572,9 +572,15 @@ importers:
       nodemon:
         specifier: ^3.1.10
         version: 3.1.10
+      tsx:
+        specifier: ^4.20.5
+        version: 4.20.5
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
+      vitest:
+        specifier: ^1.6.1
+        version: 1.6.1(@types/node@25.6.0)(happy-dom@20.0.10)(jsdom@27.3.0(canvas@3.2.0)(postcss@8.5.6))(lightningcss@1.30.2)(terser@5.44.0)
 
   apps/rabbit-hole:
     dependencies:
@@ -608,58 +614,58 @@ importers:
       '@hookform/resolvers':
         specifier: ^3.10.0
         version: 3.10.0(react-hook-form@7.63.0(react@19.1.1))
-      '@proto/api-utils':
+      '@protolabsai/api-utils':
         specifier: workspace:*
         version: link:../../packages/api-utils
-      '@proto/auth':
+      '@protolabsai/auth':
         specifier: workspace:*
         version: link:../../packages/auth
-      '@proto/charts':
+      '@protolabsai/charts':
         specifier: workspace:*
         version: link:../../packages/charts
-      '@proto/database':
+      '@protolabsai/database':
         specifier: workspace:*
         version: link:../../packages/database
-      '@proto/forms':
+      '@protolabsai/forms':
         specifier: workspace:*
         version: link:../../packages/forms
-      '@proto/icon-system':
+      '@protolabsai/icon-system':
         specifier: workspace:*
         version: link:../../packages/icon-system
-      '@proto/llm-providers':
+      '@protolabsai/llm-providers':
         specifier: workspace:*
         version: link:../../packages/llm-providers
-      '@proto/llm-tools':
+      '@protolabsai/llm-tools':
         specifier: workspace:*
         version: link:../../packages/proto-llm-tools
-      '@proto/logger':
+      '@protolabsai/logger':
         specifier: workspace:*
         version: link:../../packages/logger
-      '@proto/observability':
+      '@protolabsai/observability':
         specifier: workspace:*
         version: link:../../packages/observability
-      '@proto/research-middleware':
+      '@protolabsai/research-middleware':
         specifier: workspace:*
         version: link:../../packages/research-middleware
-      '@proto/sidequest-utils':
+      '@protolabsai/sidequest-utils':
         specifier: workspace:*
         version: link:../../packages/sidequest-utils
-      '@proto/types':
+      '@protolabsai/types':
         specifier: workspace:*
         version: link:../../packages/types
-      '@proto/ui':
+      '@protolabsai/ui':
         specifier: workspace:*
         version: link:../../packages/ui
-      '@proto/utils':
+      '@protolabsai/utils':
         specifier: workspace:*
         version: link:../../packages/utils
-      '@proto/vector':
+      '@protolabsai/vector':
         specifier: workspace:*
         version: link:../../packages/vector
-      '@proto/workspace':
+      '@protolabsai/workspace':
         specifier: workspace:*
         version: link:../../packages/workspace
-      '@proto/yjs-history':
+      '@protolabsai/yjs-history':
         specifier: workspace:*
         version: link:../../packages/yjs-history
       '@radix-ui/react-avatar':
@@ -930,13 +936,13 @@ importers:
         specifier: ^5.0.8
         version: 5.0.8(@types/react@19.1.13)(immer@10.2.0)(react@19.1.1)(use-sync-external-store@1.6.0(react@19.1.1))
     devDependencies:
-      '@proto/config-next':
+      '@protolabsai/config-next':
         specifier: workspace:*
         version: link:../../packages/config-next
-      '@proto/config-tailwind':
+      '@protolabsai/config-tailwind':
         specifier: workspace:*
         version: link:../../packages/config-tailwind
-      '@proto/config-typescript':
+      '@protolabsai/config-typescript':
         specifier: workspace:*
         version: link:../../packages/config-typescript
       '@types/d3-force':
@@ -987,10 +993,10 @@ importers:
 
   packages/api-utils:
     dependencies:
-      '@proto/auth':
+      '@protolabsai/auth':
         specifier: workspace:*
         version: link:../auth
-      '@proto/types':
+      '@protolabsai/types':
         specifier: workspace:*
         version: link:../types
       next:
@@ -1009,10 +1015,10 @@ importers:
 
   packages/auth:
     dependencies:
-      '@proto/database':
+      '@protolabsai/database':
         specifier: workspace:*
         version: link:../database
-      '@proto/icon-system':
+      '@protolabsai/icon-system':
         specifier: workspace:*
         version: link:../icon-system
       next:
@@ -1022,7 +1028,7 @@ importers:
         specifier: ^19.0.0
         version: 19.1.1
     devDependencies:
-      '@proto/ui':
+      '@protolabsai/ui':
         specifier: workspace:*
         version: link:../ui
       '@types/react':
@@ -1046,16 +1052,16 @@ importers:
       '@dnd-kit/modifiers':
         specifier: ^9.0.0
         version: 9.0.0(@dnd-kit/core@6.3.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(react@19.1.1)
-      '@proto/icon-system':
+      '@protolabsai/icon-system':
         specifier: workspace:*
         version: link:../icon-system
-      '@proto/types':
+      '@protolabsai/types':
         specifier: workspace:*
         version: link:../types
-      '@proto/ui':
+      '@protolabsai/ui':
         specifier: workspace:*
         version: link:../ui
-      '@proto/utils':
+      '@protolabsai/utils':
         specifier: workspace:*
         version: link:../utils
       '@uidotdev/usehooks':
@@ -1117,7 +1123,7 @@ importers:
 
   packages/database:
     dependencies:
-      '@proto/types':
+      '@protolabsai/types':
         specifier: workspace:*
         version: link:../types
       neo4j-driver:
@@ -1148,22 +1154,22 @@ importers:
       '@langchain/langgraph':
         specifier: ^1.2.8
         version: 1.2.8(@langchain/core@1.1.40(@opentelemetry/api@1.9.0)(@opentelemetry/exporter-trace-otlp-proto@0.208.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(openai@6.34.0(ws@8.18.3)(zod@4.3.6))(ws@8.18.3))(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(zod-to-json-schema@3.24.6(zod@4.3.6))(zod@4.3.6)
-      '@proto/database':
+      '@protolabsai/database':
         specifier: workspace:*
         version: link:../database
-      '@proto/llm-providers':
+      '@protolabsai/llm-providers':
         specifier: workspace:*
         version: link:../llm-providers
-      '@proto/observability':
+      '@protolabsai/observability':
         specifier: workspace:*
         version: link:../observability
-      '@proto/types':
+      '@protolabsai/types':
         specifier: workspace:*
         version: link:../types
-      '@proto/utils':
+      '@protolabsai/utils':
         specifier: workspace:*
         version: link:../utils
-      '@proto/vector':
+      '@protolabsai/vector':
         specifier: workspace:*
         version: link:../vector
       zod:
@@ -1191,10 +1197,10 @@ importers:
       '@hookform/resolvers':
         specifier: ^5.2.2
         version: 5.2.2(react-hook-form@7.63.0(react@19.1.1))
-      '@proto/types':
+      '@protolabsai/types':
         specifier: workspace:*
         version: link:../types
-      '@proto/ui':
+      '@protolabsai/ui':
         specifier: workspace:*
         version: link:../ui
       react:
@@ -1207,7 +1213,7 @@ importers:
         specifier: ^4.3.6
         version: 4.3.6
     devDependencies:
-      '@proto/config-typescript':
+      '@protolabsai/config-typescript':
         specifier: workspace:*
         version: link:../config-typescript
       '@types/react':
@@ -1368,25 +1374,25 @@ importers:
       '@langchain/textsplitters':
         specifier: ^1.0.0
         version: 1.0.0(@langchain/core@1.1.40(@opentelemetry/api@1.9.0)(@opentelemetry/exporter-trace-otlp-proto@0.208.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(openai@6.34.0(ws@8.18.3)(zod@4.3.6))(ws@8.18.3))
-      '@proto/deepagent':
+      '@protolabsai/deepagent':
         specifier: workspace:*
         version: link:../deepagent
-      '@proto/icon-system':
+      '@protolabsai/icon-system':
         specifier: workspace:*
         version: link:../icon-system
-      '@proto/llm-providers':
+      '@protolabsai/llm-providers':
         specifier: workspace:*
         version: link:../llm-providers
-      '@proto/sidequest-utils':
+      '@protolabsai/sidequest-utils':
         specifier: workspace:*
         version: link:../sidequest-utils
-      '@proto/types':
+      '@protolabsai/types':
         specifier: workspace:*
         version: link:../types
-      '@proto/ui':
+      '@protolabsai/ui':
         specifier: workspace:*
         version: link:../ui
-      '@proto/utils':
+      '@protolabsai/utils':
         specifier: workspace:*
         version: link:../utils
       '@tanstack/react-query':
@@ -1444,13 +1450,13 @@ importers:
 
   packages/research-middleware:
     dependencies:
-      '@proto/database':
+      '@protolabsai/database':
         specifier: workspace:*
         version: link:../database
-      '@proto/llm-providers':
+      '@protolabsai/llm-providers':
         specifier: workspace:*
         version: link:../llm-providers
-      '@proto/utils':
+      '@protolabsai/utils':
         specifier: workspace:*
         version: link:../utils
       ai:
@@ -1475,13 +1481,13 @@ importers:
 
   packages/sidequest-utils:
     dependencies:
-      '@proto/database':
+      '@protolabsai/database':
         specifier: workspace:*
         version: link:../database
-      '@proto/icon-system':
+      '@protolabsai/icon-system':
         specifier: workspace:*
         version: link:../icon-system
-      '@proto/ui':
+      '@protolabsai/ui':
         specifier: workspace:*
         version: link:../ui
       '@tanstack/react-query':
@@ -1540,10 +1546,10 @@ importers:
       '@icons-pack/react-simple-icons':
         specifier: ^10.0.0
         version: 10.2.0(react@19.1.1)
-      '@proto/icon-system':
+      '@protolabsai/icon-system':
         specifier: workspace:*
         version: link:../icon-system
-      '@proto/types':
+      '@protolabsai/types':
         specifier: workspace:*
         version: link:../types
       '@radix-ui/react-alert-dialog':
@@ -1667,10 +1673,10 @@ importers:
 
   packages/utils:
     dependencies:
-      '@proto/database':
+      '@protolabsai/database':
         specifier: workspace:*
         version: link:../database
-      '@proto/types':
+      '@protolabsai/types':
         specifier: workspace:*
         version: link:../types
       chroma-js:
@@ -1698,13 +1704,13 @@ importers:
         specifier: ^19.0.0
         version: 19.1.1
     devDependencies:
-      '@proto/auth':
+      '@protolabsai/auth':
         specifier: workspace:*
         version: link:../auth
-      '@proto/icon-system':
+      '@protolabsai/icon-system':
         specifier: workspace:*
         version: link:../icon-system
-      '@proto/ui':
+      '@protolabsai/ui':
         specifier: workspace:*
         version: link:../ui
       '@types/chroma-js':
@@ -1762,7 +1768,7 @@ importers:
 
   packages/workspace:
     dependencies:
-      '@proto/icon-system':
+      '@protolabsai/icon-system':
         specifier: workspace:*
         version: link:../icon-system
       react:
@@ -1772,7 +1778,7 @@ importers:
         specifier: ^13.6.x
         version: 13.6.27
     devDependencies:
-      '@proto/config-typescript':
+      '@protolabsai/config-typescript':
         specifier: workspace:*
         version: link:../config-typescript
       '@types/react':
@@ -1827,22 +1833,22 @@ importers:
 
   services/job-processor:
     dependencies:
-      '@proto/database':
+      '@protolabsai/database':
         specifier: workspace:*
         version: link:../../packages/database
-      '@proto/llm-providers':
+      '@protolabsai/llm-providers':
         specifier: workspace:*
         version: link:../../packages/llm-providers
-      '@proto/sidequest-utils':
+      '@protolabsai/sidequest-utils':
         specifier: workspace:*
         version: link:../../packages/sidequest-utils
-      '@proto/types':
+      '@protolabsai/types':
         specifier: workspace:*
         version: link:../../packages/types
-      '@proto/utils':
+      '@protolabsai/utils':
         specifier: workspace:*
         version: link:../../packages/utils
-      '@proto/vector':
+      '@protolabsai/vector':
         specifier: workspace:*
         version: link:../../packages/vector
       '@sidequest/postgres-backend':
@@ -27200,7 +27206,7 @@ snapshots:
       isstream: 0.1.2
       jsonwebtoken: 9.0.2
       mime-types: 2.1.35
-      retry-axios: 2.6.0(axios@1.12.2(debug@4.4.3))
+      retry-axios: 2.6.0(axios@1.12.2)
       tough-cookie: 4.1.4
     transitivePeerDependencies:
       - supports-color
@@ -30870,7 +30876,7 @@ snapshots:
       onetime: 7.0.0
       signal-exit: 4.1.0
 
-  retry-axios@2.6.0(axios@1.12.2(debug@4.4.3)):
+  retry-axios@2.6.0(axios@1.12.2):
     dependencies:
       axios: 1.12.2(debug@4.4.3)
 

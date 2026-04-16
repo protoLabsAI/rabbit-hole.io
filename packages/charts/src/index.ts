@@ -1,5 +1,5 @@
 /**
- * @proto/charts - Data visualization components
+ * @protolabsai/charts - Data visualization components
  *
  * Main export file for chart components
  */

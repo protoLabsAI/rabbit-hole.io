@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { withAuthAndLogging } from "@proto/auth";
+import { withAuthAndLogging } from "@protolabsai/auth";
 
 export const dynamic = "force-dynamic";
 

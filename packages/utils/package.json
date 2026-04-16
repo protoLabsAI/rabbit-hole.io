@@ -1,5 +1,5 @@
 {
-  "name": "@proto/utils",
+  "name": "@protolabsai/utils",
   "version": "0.3.0",
   "description": "Design token utilities and color manipulation tools for Proto project",
   "main": "dist/index.js",
@@ -70,8 +70,8 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@proto/database": "workspace:*",
-    "@proto/types": "workspace:*",
+    "@protolabsai/database": "workspace:*",
+    "@protolabsai/types": "workspace:*",
     "chroma-js": "^3.1.2",
     "client-only": "^0.0.1",
     "dompurify": "^3.2.4",
@@ -84,20 +84,20 @@
     "react": "^19.0.0"
   },
   "peerDependenciesMeta": {
-    "@proto/auth": {
+    "@protolabsai/auth": {
       "optional": true
     },
-    "@proto/icon-system": {
+    "@protolabsai/icon-system": {
       "optional": true
     },
-    "@proto/ui": {
+    "@protolabsai/ui": {
       "optional": true
     }
   },
   "devDependencies": {
-    "@proto/auth": "workspace:*",
-    "@proto/icon-system": "workspace:*",
-    "@proto/ui": "workspace:*",
+    "@protolabsai/auth": "workspace:*",
+    "@protolabsai/icon-system": "workspace:*",
+    "@protolabsai/ui": "workspace:*",
     "@types/chroma-js": "^3.1.1",
     "@types/dompurify": "^3.2.0",
     "@types/jsdom": "^21.1.7",

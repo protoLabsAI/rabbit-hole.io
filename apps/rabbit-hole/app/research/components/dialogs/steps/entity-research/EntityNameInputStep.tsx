@@ -2,8 +2,8 @@
 
 import { useState, useCallback, useMemo } from "react";
 
-import { Icon } from "@proto/icon-system";
-import { domainRegistry } from "@proto/types";
+import { Icon } from "@protolabsai/icon-system";
+import { domainRegistry } from "@protolabsai/types";
 import {
   Button,
   Input,
@@ -16,8 +16,8 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@proto/ui/atoms";
-import { DomainEntityTypeSelector } from "@proto/ui/organisms";
+} from "@protolabsai/ui/atoms";
+import { DomainEntityTypeSelector } from "@protolabsai/ui/organisms";
 
 export interface EntityResearchConfig {
   entityName: string;

@@ -88,7 +88,7 @@ updateNodePosition(graph, "node-1", 150, 250);
 
 ```tsx
 import { createNode, updateNode, moveNode } from "./sync/neo4j";
-import { getNeo4jClient } from "@proto/database";
+import { getNeo4jClient } from "@protolabsai/database";
 
 const client = getNeo4jClient();
 
@@ -160,7 +160,7 @@ function MyGraph() {
 All renderers automatically apply domain colors and icons:
 
 ```tsx
-import { getEntityColor, getEntityImage } from "@proto/utils/atlas";
+import { getEntityColor, getEntityImage } from "@protolabsai/utils/atlas";
 
 const color = getEntityColor("Person"); // #4F46E5 (social domain)
 const icon = getEntityImage("Person"); // 👤

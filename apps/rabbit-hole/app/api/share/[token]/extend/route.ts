@@ -7,8 +7,8 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { withAuthAndLogging, type AuthenticatedUser } from "@proto/auth";
-import { ShareTokenNotFoundError } from "@proto/types";
+import { withAuthAndLogging, type AuthenticatedUser } from "@protolabsai/auth";
+import { ShareTokenNotFoundError } from "@protolabsai/types";
 
 import { ShareTokenService } from "@/lib/share-token-service";
 

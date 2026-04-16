@@ -10,8 +10,8 @@
 
 import { useMemo } from "react";
 
-import { Icon } from "@proto/icon-system";
-import type { UtilityTab } from "@proto/ui/templates";
+import { Icon } from "@protolabsai/icon-system";
+import type { UtilityTab } from "@protolabsai/ui/templates";
 
 interface MapUtilityPanelProps {
   markers?: Array<{ name: string; coordinates: [number, number] }>;

@@ -8,16 +8,16 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "paths": {
-      "@proto/llm-providers": ["../llm-providers/src"],
-      "@proto/llm-providers/*": ["../llm-providers/src/*"],
-      "@proto/observability": ["../observability/src"],
-      "@proto/types": ["../types/src"],
-      "@proto/vector": ["../vector/src"],
-      "@proto/vector/*": ["../vector/src/*"],
-      "@proto/database": ["../database/src"],
-      "@proto/database/*": ["../database/src/*"],
-      "@proto/utils": ["../utils/src"],
-      "@proto/utils/*": ["../utils/src/*"]
+      "@protolabsai/llm-providers": ["../llm-providers/src"],
+      "@protolabsai/llm-providers/*": ["../llm-providers/src/*"],
+      "@protolabsai/observability": ["../observability/src"],
+      "@protolabsai/types": ["../types/src"],
+      "@protolabsai/vector": ["../vector/src"],
+      "@protolabsai/vector/*": ["../vector/src/*"],
+      "@protolabsai/database": ["../database/src"],
+      "@protolabsai/database/*": ["../database/src/*"],
+      "@protolabsai/utils": ["../utils/src"],
+      "@protolabsai/utils/*": ["../utils/src/*"]
     },
     "composite": true,
     "incremental": true

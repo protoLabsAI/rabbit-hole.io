@@ -1,4 +1,4 @@
-# @proto/types
+# @protolabsai/types
 
 ## 0.1.0
 

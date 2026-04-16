@@ -22,9 +22,9 @@ export default defineConfig({
     "react-dom",
     "@tanstack/react-query",
     "sidequest",
-    "@proto/database",
-    "@proto/icon-system",
-    "@proto/ui",
+    "@protolabsai/database",
+    "@protolabsai/icon-system",
+    "@protolabsai/ui",
     "pg",
   ],
 });

@@ -5,13 +5,13 @@
  * Ensures consistent parameter handling, validation, and data transformation.
  */
 
-import { getGlobalNeo4jClient } from "@proto/database";
-import { createNeo4jClientWithIntegerConversion } from "@proto/utils";
+import { getGlobalNeo4jClient } from "@protolabsai/database";
+import { createNeo4jClientWithIntegerConversion } from "@protolabsai/utils";
 import {
   fetchEntityTimeline,
   validateTimelineFilters,
   type TimelineFilters,
-} from "@proto/utils/atlas";
+} from "@protolabsai/utils/atlas";
 
 // ==================== Types ====================
 

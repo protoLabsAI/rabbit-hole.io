@@ -7,7 +7,7 @@
  * Now passes null until re-wired to native deep research API.
  */
 
-import type { PartialBundle } from "@proto/types";
+import type { PartialBundle } from "@protolabsai/types";
 
 interface AgentBundleBridgeProps {
   children: (partialBundle: PartialBundle | null) => React.ReactNode;

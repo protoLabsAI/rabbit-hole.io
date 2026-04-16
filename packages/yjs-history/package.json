@@ -1,5 +1,5 @@
 {
-  "name": "@proto/yjs-history",
+  "name": "@protolabsai/yjs-history",
   "version": "0.1.2",
   "description": "Advanced undo/redo and versioning system for Yjs with React Flow integration",
   "type": "module",

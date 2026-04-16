@@ -1,7 +1,7 @@
 /**
  * Neo4j Integer Conversion Utilities
  *
- * Internal utilities for handling Neo4j integer parameter conversion within @proto/database.
+ * Internal utilities for handling Neo4j integer parameter conversion within @protolabsai/database.
  */
 
 import neo4j from "neo4j-driver";

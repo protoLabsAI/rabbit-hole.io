@@ -11,8 +11,8 @@ import {
   withAuthAndLogging,
   checkAdminRole,
   type AuthenticatedUser,
-} from "@proto/auth";
-import { generateShareUrl, generatePreviewUrl } from "@proto/utils";
+} from "@protolabsai/auth";
+import { generateShareUrl, generatePreviewUrl } from "@protolabsai/utils";
 
 import { ShareTokenService } from "@/lib/share-token-service";
 

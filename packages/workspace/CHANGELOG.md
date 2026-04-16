@@ -1,4 +1,4 @@
-# @proto/workspace
+# @protolabsai/workspace
 
 ## 0.1.0
 
@@ -33,4 +33,4 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @proto/icon-system@0.1.0
+  - @protolabsai/icon-system@0.1.0

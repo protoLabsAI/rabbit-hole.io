@@ -1,4 +1,4 @@
-# @proto/logger
+# @protolabsai/logger
 
 Pino-based structured logging with user engagement tracking.
 
@@ -15,7 +15,7 @@ import {
   logUserAction,
   logFeatureUsage,
   logAuth,
-} from "@proto/logger";
+} from "@protolabsai/logger";
 
 // Page view
 logPageView({

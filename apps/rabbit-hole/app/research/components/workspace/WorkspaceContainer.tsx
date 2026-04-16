@@ -2,9 +2,12 @@
 
 import React, { useCallback } from "react";
 
-import { getUserTierClient, getTierLimitsClient } from "@proto/auth/client";
-import { useToast } from "@proto/ui/hooks";
-import type { CanvasType } from "@proto/workspace";
+import {
+  getUserTierClient,
+  getTierLimitsClient,
+} from "@protolabsai/auth/client";
+import { useToast } from "@protolabsai/ui/hooks";
+import type { CanvasType } from "@protolabsai/workspace";
 
 import { DialogRegistry } from "@/components/ui/DialogRegistry";
 

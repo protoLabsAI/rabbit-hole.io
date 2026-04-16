@@ -2,8 +2,14 @@
 
 import { useState, useMemo } from "react";
 
-import { getEnrichmentFieldsForEntity } from "@proto/types";
-import { Badge, Button, Checkbox, Label, Textarea } from "@proto/ui/atoms";
+import { getEnrichmentFieldsForEntity } from "@protolabsai/types";
+import {
+  Badge,
+  Button,
+  Checkbox,
+  Label,
+  Textarea,
+} from "@protolabsai/ui/atoms";
 
 export interface EnrichmentConfig {
   selectedFields: string[];

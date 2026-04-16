@@ -1,4 +1,4 @@
-# @proto/sidequest-utils
+# @protolabsai/sidequest-utils
 
 Shared utilities and React hooks for Sidequest.js job queue processing.
 
@@ -10,9 +10,9 @@ This package is part of the Proto monorepo workspace and automatically available
 
 This package provides three separate entry points:
 
-1. **`@proto/sidequest-utils`** - Base types (server-safe, no imports)
-2. **`@proto/sidequest-utils/client`** - React hooks (client-side only)
-3. **`@proto/sidequest-utils/server`** - Server utilities (Next.js API routes)
+1. **`@protolabsai/sidequest-utils`** - Base types (server-safe, no imports)
+2. **`@protolabsai/sidequest-utils/client`** - React hooks (client-side only)
+3. **`@protolabsai/sidequest-utils/server`** - Server utilities (Next.js API routes)
 
 ## Critical: Next.js API Route Pattern
 
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
 
 ```typescript
 // app/api/jobs/enqueue-youtube/route.ts
-import { enqueueYouTubeJob } from "@proto/sidequest-utils/server";
+import { enqueueYouTubeJob } from "@protolabsai/sidequest-utils/server";
 
 export async function POST(request: Request) {
   const job = await enqueueYouTubeJob({
@@ -67,7 +67,7 @@ import {
   enqueueTextExtractionJob,
   getJobStatus,
   listJobs,
-} from "@proto/sidequest-utils/server";
+} from "@protolabsai/sidequest-utils/server";
 
 // Enqueue jobs
 const job = await enqueueYouTubeJob({
@@ -97,7 +97,7 @@ import {
   useJobStatus,
   useJobList,
   useJobNotifications,
-} from "@proto/sidequest-utils/client";
+} from "@protolabsai/sidequest-utils/client";
 
 function MyComponent() {
   const [jobId, setJobId] = useState<string | null>(null);
@@ -138,7 +138,7 @@ import type {
   JobStatus,
   YouTubeJobData,
   TextExtractionJobData,
-} from "@proto/sidequest-utils";
+} from "@protolabsai/sidequest-utils";
 ```
 
 ## API Reference
@@ -383,7 +383,7 @@ interface EnqueueResponse {
 ```
 Next.js API Route
   ↓
-@proto/sidequest-utils/server
+@protolabsai/sidequest-utils/server
   ↓
 PostgreSQL (sidequestjs.jobs table)
   ↓
@@ -414,7 +414,7 @@ Module not found: Can't resolve './ROOT/node_modules/.pnpm/node-cron@4.2.1/node_
 
 **Solution:** Separate concerns:
 
-- **Next.js API routes**: Use `@proto/sidequest-utils/server` (PostgreSQL only)
+- **Next.js API routes**: Use `@protolabsai/sidequest-utils/server` (PostgreSQL only)
 - **Job processor service**: Imports Sidequest.js (runs in Docker)
 
 ## Development
@@ -433,7 +433,7 @@ pnpm type-check
 ## Package Structure
 
 ```
-@proto/sidequest-utils/
+@protolabsai/sidequest-utils/
 ├── src/
 │   ├── types.ts                # Shared types (server-safe)
 │   ├── index.ts                # Re-export types only
@@ -454,18 +454,18 @@ pnpm type-check
 
 ```typescript
 // Types only (works anywhere)
-import type { Job } from "@proto/sidequest-utils";
+import type { Job } from "@protolabsai/sidequest-utils";
 
 // Client hooks (React components only)
-import { useJobStatus } from "@proto/sidequest-utils/client";
+import { useJobStatus } from "@protolabsai/sidequest-utils/client";
 
 // Server utilities (API routes, server components)
-import { enqueueYouTubeJob } from "@proto/sidequest-utils/server";
+import { enqueueYouTubeJob } from "@protolabsai/sidequest-utils/server";
 ```
 
 ## Dependencies
 
-- `@proto/database` - PostgreSQL pool for job status queries
+- `@protolabsai/database` - PostgreSQL pool for job status queries
 - `@tanstack/react-query` - React hooks state management
 - `react` (peer) - Required for client hooks
 
@@ -477,9 +477,9 @@ import { enqueueYouTubeJob } from "@proto/sidequest-utils/server";
 
 ## Related Packages
 
-- **@proto/database** - PostgreSQL and Neo4j clients
-- **@proto/types** - Shared type definitions
-- **@proto/ui** - UI components (JobStatusTracker)
+- **@protolabsai/database** - PostgreSQL and Neo4j clients
+- **@protolabsai/types** - Shared type definitions
+- **@protolabsai/ui** - UI components (JobStatusTracker)
 - **services/job-processor** - Background job execution service
 
 ## Environment Variables

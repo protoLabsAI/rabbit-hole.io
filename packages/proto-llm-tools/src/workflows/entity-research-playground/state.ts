@@ -1,6 +1,11 @@
 import { Annotation } from "@langchain/langgraph";
 
-import type { EntityType, Entity, Evidence, Relationship } from "@proto/types";
+import type {
+  EntityType,
+  Entity,
+  Evidence,
+  Relationship,
+} from "@protolabsai/types";
 
 /**
  * Entity Research Playground Configuration State

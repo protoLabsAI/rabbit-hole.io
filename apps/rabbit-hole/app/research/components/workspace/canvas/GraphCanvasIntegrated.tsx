@@ -13,13 +13,13 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import type { ImperativePanelHandle } from "react-resizable-panels";
 
-import type { UserTier } from "@proto/auth/client";
-import { getEntityTypesByDomain } from "@proto/forms";
+import type { UserTier } from "@protolabsai/auth/client";
+import { getEntityTypesByDomain } from "@protolabsai/forms";
 // DISABLED: Drawing tools - Coming Soon
-// import { InspectorPanel, type ToolType } from "@proto/freehand-drawing";
-import { Icon } from "@proto/icon-system";
-import { logUserAction } from "@proto/logger";
-import type { PartialBundle, RabbitHoleBundleData } from "@proto/types";
+// import { InspectorPanel, type ToolType } from "@protolabsai/freehand-drawing";
+import { Icon } from "@protolabsai/icon-system";
+import { logUserAction } from "@protolabsai/logger";
+import type { PartialBundle, RabbitHoleBundleData } from "@protolabsai/types";
 import {
   Popover,
   PopoverContent,
@@ -27,9 +27,9 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
   ResizableHandle,
-} from "@proto/ui/atoms";
-import { useToast } from "@proto/ui/hooks";
-import type { VersionMetadata } from "@proto/yjs-history";
+} from "@protolabsai/ui/atoms";
+import { useToast } from "@protolabsai/ui/hooks";
+import type { VersionMetadata } from "@protolabsai/yjs-history";
 
 import { useContextMenu } from "@/context-menu";
 import type { GraphNodeAttributes } from "@/graph-visualizer/model/graph";

@@ -7,7 +7,7 @@ import type { BaseMessage } from "@langchain/core/messages";
 import { Annotation } from "@langchain/langgraph";
 import { z } from "zod";
 
-import type { ResearchSessionConfig, PartialBundle } from "@proto/types";
+import type { ResearchSessionConfig, PartialBundle } from "@protolabsai/types";
 
 import type { Todo, SearxngInfobox } from "./types";
 

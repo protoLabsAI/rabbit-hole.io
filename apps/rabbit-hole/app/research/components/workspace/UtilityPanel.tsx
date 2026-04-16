@@ -13,8 +13,13 @@
 
 import React, { useState, useCallback, useEffect, useMemo } from "react";
 
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@proto/ui/atoms";
-import type { UtilityTab } from "@proto/ui/templates";
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from "@protolabsai/ui/atoms";
+import type { UtilityTab } from "@protolabsai/ui/templates";
 
 interface UtilityPanelProps {
   universalTabs?: UtilityTab[];
@@ -57,7 +62,6 @@ export function UtilityPanel({
     }
 
     setActiveTab(allTabs[0].id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [layoutId]);
 
   // Save tab to localStorage when it changes

@@ -207,7 +207,7 @@ Production agent configurations using this domain:
 
 ## Agent Config Schema
 
-Agents in this domain map to JSON configs in the `@proto/deep-agent` package:
+Agents in this domain map to JSON configs in the `@protolabsai/deep-agent` package:
 
 ```json
 {

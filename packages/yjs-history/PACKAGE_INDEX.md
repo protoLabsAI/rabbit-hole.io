@@ -1,4 +1,4 @@
-# @proto/yjs-history - Package Index
+# @protolabsai/yjs-history - Package Index
 
 **Version:** 1.0.0  
 **Status:** ✅ Production Ready  
@@ -97,7 +97,7 @@ Duration:   570ms
 ## API at a Glance
 
 ```typescript
-import { useYjsHistory, IndexedDBVersionStorage } from "@proto/yjs-history";
+import { useYjsHistory, IndexedDBVersionStorage } from "@protolabsai/yjs-history";
 
 const {
   // Basic undo/redo

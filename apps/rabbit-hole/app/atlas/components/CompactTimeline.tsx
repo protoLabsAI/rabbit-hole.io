@@ -13,8 +13,8 @@ import type {
   CompactTimelineData,
   CompactTimelinePeriod,
   Granularity,
-} from "@proto/types";
-import { Button } from "@proto/ui/atoms";
+} from "@protolabsai/types";
+import { Button } from "@protolabsai/ui/atoms";
 
 import { TimelineControls, type TimeRange } from "./TimelineControls";
 

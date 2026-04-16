@@ -1,4 +1,4 @@
-# Langfuse Cost Tracking in @proto/llm-providers
+# Langfuse Cost Tracking in @protolabsai/llm-providers
 
 ## Current Implementation Status ✅
 

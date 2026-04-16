@@ -1,0 +1,39 @@
+name: Dev Notes
+
+# Fires on every push to main and posts a one-line summary to the
+# rabbit-hole.io Discord dev channel. Keeps the channel aware of what's
+# landing between tagged releases.
+#
+# Separate from Release Notes — that one fires on tag push with a
+# Claude-polished multi-commit changelog. This one is raw, single-commit,
+# fire-and-forget.
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: dev-notes-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  post-dev-commit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    # Skip cleanly when no dev webhook is configured — the dev channel is
+    # optional and should never block a main push.
+    if: vars.DEV_NOTES_ENABLED == 'true'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1 # only the commit that triggered the push
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Post commit to Discord dev channel
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_DEV_WEBHOOK }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: node scripts/post-dev-commit.mjs

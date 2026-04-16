@@ -10,7 +10,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
-import { enqueueYouTubeJob } from "@proto/sidequest-utils/server";
+import { enqueueYouTubeJob } from "@protolabsai/sidequest-utils/server";
 
 // Request validation schema
 const EnqueueYouTubeSchema = z.object({

@@ -113,7 +113,7 @@ Agent(subagent_type: "rabbit-hole:entity-extractor",
 The MCP server also supports Streamable HTTP transport for network agents. Start the HTTP server on port 3398:
 
 ```bash
-MCP_AUTH_TOKEN=$(openssl rand -hex 32) pnpm --filter @proto/mcp-server start:http
+MCP_AUTH_TOKEN=$(openssl rand -hex 32) pnpm --filter @protolabsai/mcp-server start:http
 ```
 
 Remote clients connect via:

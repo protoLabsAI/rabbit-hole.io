@@ -8,13 +8,16 @@
 import neo4j from "neo4j-driver";
 import { NextRequest } from "next/server";
 
-import { getGlobalNeo4jClient } from "@proto/database";
+import { getGlobalNeo4jClient } from "@protolabsai/database";
 import {
   ShareTokenNotFoundError,
   ShareTokenExpiredError,
   ShareTokenRevokedError,
-} from "@proto/types";
-import { fetchEntityTimeline, type TimelineEvent } from "@proto/utils/atlas";
+} from "@protolabsai/types";
+import {
+  fetchEntityTimeline,
+  type TimelineEvent,
+} from "@protolabsai/utils/atlas";
 
 import { ShareTokenService } from "@/lib/share-token-service";
 

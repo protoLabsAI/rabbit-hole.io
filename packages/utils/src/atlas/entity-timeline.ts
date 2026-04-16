@@ -5,7 +5,7 @@
  * Supports both point events and duration events for the EventTimelineChart component.
  */
 
-// Local Neo4j client interface to avoid importing neo4j-driver via @proto/database
+// Local Neo4j client interface to avoid importing neo4j-driver via @protolabsai/database
 interface Neo4jClient {
   executeRead(
     query: string,

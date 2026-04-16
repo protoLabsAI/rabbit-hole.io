@@ -8,14 +8,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
-import { getUserTier, getTierLimits } from "@proto/auth";
+import { getUserTier, getTierLimits } from "@protolabsai/auth";
 import {
   langextractConfig,
   getEnrichmentFieldsForEntity,
   generateEnrichmentExample,
   queryWikipedia,
-} from "@proto/llm-tools";
-import { extractAndMergeLangExtractResponse } from "@proto/utils";
+} from "@protolabsai/llm-tools";
+import { extractAndMergeLangExtractResponse } from "@protolabsai/utils";
 
 // Schema for validating LangExtract response shape
 const LangExtractResponseSchema = z

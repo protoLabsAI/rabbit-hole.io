@@ -1,5 +1,5 @@
 {
-  "name": "@proto/research-middleware",
+  "name": "@protolabsai/research-middleware",
   "version": "0.1.0",
   "description": "DeerFlow-inspired middleware pipeline for AI SDK streamText tool calls",
   "main": "dist/index.js",
@@ -20,9 +20,9 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@proto/database": "workspace:*",
-    "@proto/llm-providers": "workspace:*",
-    "@proto/utils": "workspace:*",
+    "@protolabsai/database": "workspace:*",
+    "@protolabsai/llm-providers": "workspace:*",
+    "@protolabsai/utils": "workspace:*",
     "ai": "^6.0.116",
     "langfuse": "^3.38.6"
   },

@@ -5,13 +5,13 @@
  * searchGraph uses hybrid BM25 (Neo4j fulltext) + vector (Qdrant) with RRF fusion.
  */
 
-import { getGlobalNeo4jClient } from "@proto/database";
-import { createNeo4jClientWithIntegerConversion } from "@proto/utils";
+import { getGlobalNeo4jClient } from "@protolabsai/database";
+import { createNeo4jClientWithIntegerConversion } from "@protolabsai/utils";
 import {
   searchKgVector,
   reciprocalRankFusion,
   searchCommunitySummaries,
-} from "@proto/vector";
+} from "@protolabsai/vector";
 
 // ── Types ────────────────────────────────────────────────────────────
 

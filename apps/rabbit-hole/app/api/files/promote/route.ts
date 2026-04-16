@@ -12,7 +12,7 @@ import {
 } from "@aws-sdk/client-s3";
 import { NextRequest, NextResponse } from "next/server";
 
-import { withAuthAndLogging } from "@proto/auth";
+import { withAuthAndLogging } from "@protolabsai/auth";
 
 import {
   getObjectStoreConfig,

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 
 // ─── Types ──────────────────────────────────────────────────────────
 

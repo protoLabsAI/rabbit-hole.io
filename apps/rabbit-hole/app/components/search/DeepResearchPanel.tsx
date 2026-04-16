@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useRef } from "react";
 
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 
 import type { DeepResearchState } from "../../hooks/useDeepResearch";
 

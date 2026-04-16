@@ -14,7 +14,7 @@ import {
 } from "@xyflow/react";
 import React from "react";
 
-import { getSentimentColor } from "@proto/utils/atlas";
+import { getSentimentColor } from "@protolabsai/utils/atlas";
 
 interface RelationEdgeData {
   type?: string;

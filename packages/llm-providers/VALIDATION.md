@@ -44,7 +44,7 @@ To fix:
 ## Programmatic Validation
 
 ```typescript
-import { getProvider, validateProviderModels } from "@proto/llm-providers";
+import { getProvider, validateProviderModels } from "@protolabsai/llm-providers";
 
 const provider = getProvider("openai");
 const result = await validateProviderModels(provider, {

@@ -17,9 +17,14 @@ import {
 } from "nuqs";
 import { useCallback } from "react";
 
-// Import types from @proto/types as single source of truth
-import type { ResearchSettings, TimeWindow, ResearchSessionConfig, ResearchDepth } from "@proto/types";
-import { DEFAULT_RESEARCH_SESSION_CONFIG } from "@proto/types";
+// Import types from @protolabsai/types as single source of truth
+import type {
+  ResearchSettings,
+  TimeWindow,
+  ResearchSessionConfig,
+  ResearchDepth,
+} from "@protolabsai/types";
+import { DEFAULT_RESEARCH_SESSION_CONFIG } from "@protolabsai/types";
 
 // ==================== Validators ====================
 
@@ -235,10 +240,19 @@ export function useResearchPageState() {
   );
 
   // Session config for research agent
-  const [researchDepth, setResearchDepth] = useQueryState("depth", parseResearchDepth);
-  const [maxEntities, setMaxEntities] = useQueryState("maxEntities", parseMaxEntities);
+  const [researchDepth, setResearchDepth] = useQueryState(
+    "depth",
+    parseResearchDepth
+  );
+  const [maxEntities, setMaxEntities] = useQueryState(
+    "maxEntities",
+    parseMaxEntities
+  );
   const [maxDepth, setMaxDepth] = useQueryState("maxDepth", parseMaxDepth);
-  const [searchProviders, setSearchProviders] = useQueryState("providers", parseSearchProviders);
+  const [searchProviders, setSearchProviders] = useQueryState(
+    "providers",
+    parseSearchProviders
+  );
 
   const sessionConfig: ResearchSessionConfig = {
     depth: researchDepth as ResearchDepth,

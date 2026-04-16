@@ -7,7 +7,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 
 let prismInstance: typeof import("prismjs") | null = null;
 

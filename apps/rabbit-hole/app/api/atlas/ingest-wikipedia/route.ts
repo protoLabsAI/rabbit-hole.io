@@ -13,9 +13,9 @@ import { generateObject } from "ai";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
-import { getGlobalNeo4jClient } from "@proto/database";
-import { getAIModel } from "@proto/llm-providers/server";
-import { generateSecureId } from "@proto/utils";
+import { getGlobalNeo4jClient } from "@protolabsai/database";
+import { getAIModel } from "@protolabsai/llm-providers/server";
+import { generateSecureId } from "@protolabsai/utils";
 
 // ── Job state store ───────────────────────────────────────────────────────────
 

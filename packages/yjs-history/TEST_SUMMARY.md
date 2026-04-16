@@ -1,4 +1,4 @@
-# @proto/yjs-history Test Summary
+# @protolabsai/yjs-history Test Summary
 
 **Status:** ✅ 77 Passing | ⏭️ 3 Skipped | 80 Total  
 **Coverage:** 96.25% (77/80)  
@@ -288,7 +288,7 @@ describe("Error Handling", () => {
 
 ## Conclusion
 
-The `@proto/yjs-history` package has **comprehensive test coverage** with 77 passing tests covering:
+The `@protolabsai/yjs-history` package has **comprehensive test coverage** with 77 passing tests covering:
 
 - ✅ Core undo/redo functionality
 - ✅ Version snapshot management

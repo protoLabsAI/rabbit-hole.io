@@ -4,7 +4,7 @@
  * Registry of available canvas types and their renderers.
  */
 
-import { MapCanvas } from "@proto/charts/map";
+import { MapCanvas } from "@protolabsai/charts/map";
 import type {
   CanvasRenderer,
   CanvasType,
@@ -14,7 +14,7 @@ import type {
   TableCanvasData,
   KanbanCanvasData,
   MindmapCanvasData,
-} from "@proto/workspace";
+} from "@protolabsai/workspace";
 
 // Import canvas components
 import { GraphCanvasIntegrated } from "./GraphCanvasIntegrated";

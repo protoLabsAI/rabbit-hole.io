@@ -1,10 +1,10 @@
-# @proto/ui
+# @protolabsai/ui
 
 Shared UI component library organized by Atomic Design principles.
 
 ## Overview
 
-**@proto/ui** is a monorepo-wide design system providing reusable components from basic primitives to complex organisms and templates. All components are built on shadcn/ui with full TypeScript support and Storybook documentation.
+**@protolabsai/ui** is a monorepo-wide design system providing reusable components from basic primitives to complex organisms and templates. All components are built on shadcn/ui with full TypeScript support and Storybook documentation.
 
 ## Architecture: Atomic Design
 
@@ -28,31 +28,31 @@ pnpm install
 
 ```tsx
 // Atoms - basic primitives
-import { Button, Badge, Input } from "@proto/ui/atoms";
+import { Button, Badge, Input } from "@protolabsai/ui/atoms";
 
 // Molecules - simple compositions
-import { StatusBadge, AvatarStack } from "@proto/ui/molecules";
+import { StatusBadge, AvatarStack } from "@protolabsai/ui/molecules";
 
 // Organisms - complex features
 import {
   AILoader,
   Conversation,
   PaidFeaturePopover,
-} from "@proto/ui/organisms";
+} from "@protolabsai/ui/organisms";
 
 // Templates - layouts
-import { ResizableChatLayout, PanelHub } from "@proto/ui/templates";
+import { ResizableChatLayout, PanelHub } from "@protolabsai/ui/templates";
 ```
 
 ### Import Everything (Tree-shakeable)
 
 ```tsx
-import { Button, StatusBadge, PanelHub } from "@proto/ui";
+import { Button, StatusBadge, PanelHub } from "@protolabsai/ui";
 ```
 
 ## Theming System
 
-@proto/ui includes a complete whitelabel theming system:
+@protolabsai/ui includes a complete whitelabel theming system:
 
 ```tsx
 import {
@@ -61,7 +61,7 @@ import {
   ThemeGenerator,
   getTheme,
   type ThemeConfig,
-} from "@proto/ui/theme";
+} from "@protolabsai/ui/theme";
 
 // Wrap app
 <ThemeProvider defaultThemeName="corporate-blue">{children}</ThemeProvider>;
@@ -236,9 +236,9 @@ packages/ui/src/
 
 ### Peer Dependencies
 
-- `@proto/auth` - (some components only)
-- `@proto/utils` - Utility functions
-- `@proto/types` - (theme domain integration only)
+- `@protolabsai/auth` - (some components only)
+- `@protolabsai/utils` - Utility functions
+- `@protolabsai/types` - (theme domain integration only)
 
 ## Development
 
@@ -267,7 +267,7 @@ Some components remain in `app/components/ui/` due to app-specific dependencies:
 
 These components are documented in the package but not exported. Copy them to your app when needed.
 
-**Note:** ThemeSelector and ThemeProvider are now available in `@proto/ui/theme`.
+**Note:** ThemeSelector and ThemeProvider are now available in `@protolabsai/ui/theme`.
 
 ## Migration Status
 

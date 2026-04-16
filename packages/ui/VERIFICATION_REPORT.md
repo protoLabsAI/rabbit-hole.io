@@ -1,4 +1,4 @@
-# @proto/ui Verification Report
+# @protolabsai/ui Verification Report
 
 **Date:** 2025-10-19  
 **Version:** 2.0.0  
@@ -32,7 +32,7 @@
 
 ## Storybook Stories ✅
 
-### Migrated to @proto/ui (5 stories)
+### Migrated to @protolabsai/ui (5 stories)
 
 1. `Organisms/AI Chat/Chat Interface`
 2. `Organisms/Feature Gating/Paid Feature Popover`
@@ -59,13 +59,13 @@
 
 ```tsx
 // ✅ Working
-import { Button } from "@proto/ui/atoms";
-import { StatusBadge } from "@proto/ui/molecules";
-import { PaidFeaturePopover } from "@proto/ui/organisms";
-import { PanelHub } from "@proto/ui/templates";
+import { Button } from "@protolabsai/ui/atoms";
+import { StatusBadge } from "@protolabsai/ui/molecules";
+import { PaidFeaturePopover } from "@protolabsai/ui/organisms";
+import { PanelHub } from "@protolabsai/ui/templates";
 
 // ✅ Also works
-import { Button, PanelHub } from "@proto/ui";
+import { Button, PanelHub } from "@protolabsai/ui";
 ```
 
 ### Components Excluded from Exports
@@ -128,8 +128,8 @@ packages/ui/
 
 ### Peer Dependencies
 
-- ✅ @proto/auth (available)
-- ✅ @proto/utils (available)
+- ✅ @protolabsai/auth (available)
+- ✅ @protolabsai/utils (available)
 - ✅ lucide-react (npm package)
 
 ---
@@ -140,20 +140,20 @@ Verified these work:
 
 ```tsx
 // Root import
-import { Button } from "@proto/ui";
+import { Button } from "@protolabsai/ui";
 
 // Atomic level imports
-import { Button } from "@proto/ui/atoms";
-import { StatusBadge } from "@proto/ui/molecules";
-import { Conversation } from "@proto/ui/organisms";
-import { PanelHub } from "@proto/ui/templates";
+import { Button } from "@protolabsai/ui/atoms";
+import { StatusBadge } from "@protolabsai/ui/molecules";
+import { Conversation } from "@protolabsai/ui/organisms";
+import { PanelHub } from "@protolabsai/ui/templates";
 
 // Multiple from same level
-import { Button, Badge, Card } from "@proto/ui/atoms";
+import { Button, Badge, Card } from "@protolabsai/ui/atoms";
 
 // Cross-level imports
-import { Button } from "@proto/ui/atoms";
-import { StatusBadge } from "@proto/ui/molecules";
+import { Button } from "@protolabsai/ui/atoms";
+import { StatusBadge } from "@protolabsai/ui/molecules";
 ```
 
 ---
@@ -165,7 +165,7 @@ Configuration in `.storybook/main.ts`:
 ```ts
 stories: [
   "../app/**/*.stories.@(js|jsx|ts|tsx|mdx)",
-  "../packages/**/*.stories.@(js|jsx|ts|tsx|mdx)", // ← Finds @proto/ui stories
+  "../packages/**/*.stories.@(js|jsx|ts|tsx|mdx)", // ← Finds @protolabsai/ui stories
 ];
 ```
 
@@ -217,12 +217,12 @@ Removed 4 dialog system story files that depended on DialogRegistry:
 
 ## Ready for Production ✅
 
-**@proto/ui v2.0.0** is ready for immediate use in new code.
+**@protolabsai/ui v2.0.0** is ready for immediate use in new code.
 
 Start importing:
 
 ```tsx
-import { Button } from "@proto/ui/atoms";
+import { Button } from "@protolabsai/ui/atoms";
 ```
 
 ---

@@ -10,13 +10,13 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { GET } from "../[entityUid]/route";
 
 // Mock the Neo4j client and utilities
-vi.mock("@proto/database", () => ({
+vi.mock("@protolabsai/database", () => ({
   getGlobalNeo4jClient: vi.fn(() => ({
     executeRead: vi.fn(),
   })),
 }));
 
-vi.mock("@proto/utils/atlas", () => ({
+vi.mock("@protolabsai/utils/atlas", () => ({
   fetchEntityTimeline: vi.fn(),
   validateTimelineFilters: vi.fn(() => ({ isValid: true })),
 }));
@@ -38,7 +38,7 @@ describe.skip("Entity Timeline API", () => {
 
   describe("Parameter Handling", () => {
     it("should handle limit parameter with neo4j.int conversion", async () => {
-      const { fetchEntityTimeline } = await import("@proto/utils/atlas");
+      const { fetchEntityTimeline } = await import("@protolabsai/utils/atlas");
       const mockFetchEntityTimeline = vi.mocked(fetchEntityTimeline);
 
       mockFetchEntityTimeline.mockResolvedValue({
@@ -76,7 +76,7 @@ describe.skip("Entity Timeline API", () => {
     });
 
     it("should handle requests without limit parameter", async () => {
-      const { fetchEntityTimeline } = await import("@proto/utils/atlas");
+      const { fetchEntityTimeline } = await import("@protolabsai/utils/atlas");
       const mockFetchEntityTimeline = vi.mocked(fetchEntityTimeline);
 
       mockFetchEntityTimeline.mockResolvedValue({
@@ -112,7 +112,7 @@ describe.skip("Entity Timeline API", () => {
     });
 
     it("should enforce maximum limit boundaries", async () => {
-      const { fetchEntityTimeline } = await import("@proto/utils/atlas");
+      const { fetchEntityTimeline } = await import("@protolabsai/utils/atlas");
       const mockFetchEntityTimeline = vi.mocked(fetchEntityTimeline);
 
       mockFetchEntityTimeline.mockResolvedValue({
@@ -142,7 +142,7 @@ describe.skip("Entity Timeline API", () => {
   describe("Date Range Validation", () => {
     it("should handle valid date ranges", async () => {
       const { fetchEntityTimeline, validateTimelineFilters } = await import(
-        "@proto/utils/atlas"
+        "@protolabsai/utils/atlas"
       );
       const mockFetchEntityTimeline = vi.mocked(fetchEntityTimeline);
       const mockValidateTimelineFilters = vi.mocked(validateTimelineFilters);
@@ -178,7 +178,9 @@ describe.skip("Entity Timeline API", () => {
     });
 
     it("should reject invalid date formats", async () => {
-      const { validateTimelineFilters } = await import("@proto/utils/atlas");
+      const { validateTimelineFilters } = await import(
+        "@protolabsai/utils/atlas"
+      );
       const mockValidateTimelineFilters = vi.mocked(validateTimelineFilters);
 
       mockValidateTimelineFilters.mockReturnValue({
@@ -202,7 +204,7 @@ describe.skip("Entity Timeline API", () => {
   describe("Error Handling", () => {
     it("should handle entity not found errors", async () => {
       const { fetchEntityTimeline, validateTimelineFilters } = await import(
-        "@proto/utils/atlas"
+        "@protolabsai/utils/atlas"
       );
       const mockFetchEntityTimeline = vi.mocked(fetchEntityTimeline);
       const mockValidateTimelineFilters = vi.mocked(validateTimelineFilters);
@@ -229,7 +231,7 @@ describe.skip("Entity Timeline API", () => {
 
     it("should handle database connection errors", async () => {
       const { fetchEntityTimeline, validateTimelineFilters } = await import(
-        "@proto/utils/atlas"
+        "@protolabsai/utils/atlas"
       );
       const mockFetchEntityTimeline = vi.mocked(fetchEntityTimeline);
       const mockValidateTimelineFilters = vi.mocked(validateTimelineFilters);
@@ -258,7 +260,7 @@ describe.skip("Entity Timeline API", () => {
   describe("Response Format", () => {
     it("should return properly formatted timeline response", async () => {
       const { fetchEntityTimeline, validateTimelineFilters } = await import(
-        "@proto/utils/atlas"
+        "@protolabsai/utils/atlas"
       );
       const mockFetchEntityTimeline = vi.mocked(fetchEntityTimeline);
       const mockValidateTimelineFilters = vi.mocked(validateTimelineFilters);

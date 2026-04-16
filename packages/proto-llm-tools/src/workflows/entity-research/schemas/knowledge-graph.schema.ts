@@ -3,7 +3,7 @@ import { z } from "zod";
 /**
  * Knowledge Graph Schema
  * Handles existing entities and relationships for context
- * Using passthrough to accept any entity/relationship structure from @proto/types
+ * Using passthrough to accept any entity/relationship structure from @protolabsai/types
  */
 export const ExistingEntitiesSchema = z
   .array(z.object({}).passthrough())

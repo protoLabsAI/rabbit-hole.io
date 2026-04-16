@@ -1,5 +1,10 @@
-import { Icon } from "@proto/icon-system";
-import { Card, CardContent, CardHeader, CardTitle } from "@proto/ui/atoms";
+import { Icon } from "@protolabsai/icon-system";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@protolabsai/ui/atoms";
 
 interface MetricCardProps {
   title: string;

@@ -11,9 +11,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
-import { getUserTierClient, getTierLimitsClient } from "@proto/auth/client";
-import { TierBadge } from "@proto/auth/ui";
-import { Icon } from "@proto/icon-system";
+import {
+  getUserTierClient,
+  getTierLimitsClient,
+} from "@protolabsai/auth/client";
+import { TierBadge } from "@protolabsai/auth/ui";
+import { Icon } from "@protolabsai/icon-system";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,8 +24,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@proto/ui/atoms";
-import { TierGatedMenuItem } from "@proto/ui/organisms";
+} from "@protolabsai/ui/atoms";
+import { TierGatedMenuItem } from "@protolabsai/ui/organisms";
 
 import { ThemeSelector } from "@/components/ui/ThemeSelector";
 import { useTheme } from "@/context/ThemeProvider";

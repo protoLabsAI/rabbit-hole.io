@@ -204,7 +204,7 @@ Add UI card rendering (optional):
 
 ```typescript
 // custom-domains/my_domain/card.config.ts
-import { createCardConfig } from "@proto/types";
+import { createCardConfig } from "@protolabsai/types";
 
 export const myDomainCardConfig = createCardConfig()
   .useDefaultComponent()

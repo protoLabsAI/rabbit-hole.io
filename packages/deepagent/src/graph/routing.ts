@@ -9,7 +9,7 @@
 
 import { END } from "@langchain/langgraph";
 
-import { DEFAULT_RESEARCH_SESSION_CONFIG } from "@proto/types";
+import { DEFAULT_RESEARCH_SESSION_CONFIG } from "@protolabsai/types";
 
 import type { EntityResearchAgentStateType } from "../state";
 import { log } from "../utils/logger";

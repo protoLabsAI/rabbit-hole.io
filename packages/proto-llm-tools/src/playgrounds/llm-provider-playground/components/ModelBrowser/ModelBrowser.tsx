@@ -1,4 +1,4 @@
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 import {
   Button,
   Card,
@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
   ScrollArea,
-} from "@proto/ui/atoms";
+} from "@protolabsai/ui/atoms";
 
 import type { ModelBrowserProps } from "../../types";
 

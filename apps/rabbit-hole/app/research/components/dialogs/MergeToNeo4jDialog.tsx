@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { Button } from "@proto/ui/atoms";
+import { Button } from "@protolabsai/ui/atoms";
 
 import type { MergeResults } from "../../actions/research-merge";
 import { useMergeResearch } from "../../hooks/queries/useResearchMerge";

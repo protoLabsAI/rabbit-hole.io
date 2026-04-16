@@ -1,6 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-import type { EntityResearchInput, EntityResearchSource } from "@proto/types";
+import type {
+  EntityResearchInput,
+  EntityResearchSource,
+} from "@protolabsai/types";
 
 import { entityResearchTool } from "../index";
 

@@ -2,8 +2,11 @@
 
 import { useState, useCallback, useEffect } from "react";
 
-import { useToast } from "@proto/ui/hooks";
-import { MultiStepDialog, MultiStepDialogStep } from "@proto/ui/organisms";
+import { useToast } from "@protolabsai/ui/hooks";
+import {
+  MultiStepDialog,
+  MultiStepDialogStep,
+} from "@protolabsai/ui/organisms";
 
 import type { GraphNodeAttributes } from "@/graph-visualizer/model/graph";
 

@@ -42,18 +42,18 @@ export class CommunityRecomputationJob extends Job {
 
     try {
       // Dynamic imports to avoid loading heavy deps at module level
-      const { getGlobalNeo4jClient } = await import("@proto/database");
+      const { getGlobalNeo4jClient } = await import("@protolabsai/database");
       const { createNeo4jClientWithIntegerConversion } = await import(
-        "@proto/utils"
+        "@protolabsai/utils"
       );
-      const { runCommunityPipeline } = await import("@proto/vector");
+      const { runCommunityPipeline } = await import("@protolabsai/vector");
 
       const baseClient = getGlobalNeo4jClient();
       const client = createNeo4jClientWithIntegerConversion(baseClient);
 
       // LLM text generation function using the fast model (haiku)
       const { generateText } = await import("ai");
-      const { getAIModel } = await import("@proto/llm-providers/server");
+      const { getAIModel } = await import("@protolabsai/llm-providers/server");
       const model = getAIModel("fast");
 
       const generateFn = async (prompt: string): Promise<string> => {

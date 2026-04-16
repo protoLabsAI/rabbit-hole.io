@@ -13,7 +13,7 @@ import { tool, type ToolRunnableConfig } from "@langchain/core/tools";
 import { Command, getCurrentTaskInput } from "@langchain/langgraph";
 import { z } from "zod";
 
-import { searchResearchMemory } from "@proto/vector";
+import { searchResearchMemory } from "@protolabsai/vector";
 
 const VECTOR_ENABLED = !!(
   process.env.QDRANT_URL && process.env.OLLAMA_ENDPOINT

@@ -12,7 +12,7 @@ import type {
   CompactTimelineData,
   CompactTimelineSummary,
   Granularity,
-} from "@proto/types";
+} from "@protolabsai/types";
 
 /**
  * Get the start of a time period based on granularity

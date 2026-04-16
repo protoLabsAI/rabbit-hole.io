@@ -171,7 +171,7 @@ import {
 - Groups by provider and category
 - Displays metadata badges (Free, Fast, etc.)
 - Persists selection to localStorage
-- Integrates with `@proto/llm-providers` configuration
+- Integrates with `@protolabsai/llm-providers` configuration
 
 **Custom Model Selector:**
 

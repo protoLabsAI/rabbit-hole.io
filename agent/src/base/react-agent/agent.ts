@@ -21,8 +21,8 @@ import {
 import dotenv from "dotenv";
 import * as z from "zod";
 
-import { getModel } from "@proto/llm-providers/server";
-import { wikipediaSearchTool } from "@proto/llm-tools";
+import { getModel } from "@protolabsai/llm-providers/server";
+import { wikipediaSearchTool } from "@protolabsai/llm-tools";
 
 dotenv.config();
 

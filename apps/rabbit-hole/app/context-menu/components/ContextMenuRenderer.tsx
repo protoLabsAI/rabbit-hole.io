@@ -3,7 +3,7 @@
 import { useRouter, usePathname } from "next/navigation";
 import React from "react";
 
-import { getUserRoleClient, hasMinimumRole } from "@proto/auth/client";
+import { getUserRoleClient, hasMinimumRole } from "@protolabsai/auth/client";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,8 +14,8 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "@proto/ui/atoms";
-import { useToast } from "@proto/ui/hooks";
+} from "@protolabsai/ui/atoms";
+import { useToast } from "@protolabsai/ui/hooks";
 
 import { useContextMenu } from "../core/hooks";
 import type {

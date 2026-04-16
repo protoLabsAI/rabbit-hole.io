@@ -2,7 +2,7 @@
  * File Metadata Processing API
  *
  * Processes uploaded files and extracts metadata including suggested entity IDs.
- * Integrates with @proto/utils file processing utilities.
+ * Integrates with @protolabsai/utils file processing utilities.
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -10,7 +10,7 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   processFileMetadata,
   type FileProcessingResult,
-} from "@proto/utils/file-processing";
+} from "@protolabsai/utils/file-processing";
 
 import { withAuthAndLogging } from "../../../lib/auth-middleware";
 

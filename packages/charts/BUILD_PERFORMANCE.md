@@ -40,8 +40,8 @@ DTS dist/index.d.ts       1.25 KB
    - `date-fns` - Date utility types
    - `jotai` - Atom state types
    - `react` - Component types
-   - `@proto/ui` - UI component types
-   - `@proto/icon-system` - Icon types
+   - `@protolabsai/ui` - UI component types
+   - `@protolabsai/icon-system` - Icon types
 
 ## Performance Is Acceptable
 
@@ -100,9 +100,9 @@ Saves ~200-300ms by skipping .map file generation.
 
 | Package       | Files | Build Time | Notes                         |
 | ------------- | ----- | ---------- | ----------------------------- |
-| @proto/charts | 54    | 3s         | Acceptable for complexity     |
-| @proto/ui     | ~100+ | 5-7s       | More components, longer build |
-| @proto/types  | ~20   | 1s         | Type definitions only         |
+| @protolabsai/charts | 54    | 3s         | Acceptable for complexity     |
+| @protolabsai/ui     | ~100+ | 5-7s       | More components, longer build |
+| @protolabsai/types  | ~20   | 1s         | Type definitions only         |
 
 ## Recommendations
 

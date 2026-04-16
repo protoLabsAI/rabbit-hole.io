@@ -12,7 +12,7 @@ import {
   ShareTokenExpiredError,
   ShareTokenRevokedError,
   type ShareToken,
-} from "@proto/types";
+} from "@protolabsai/types";
 
 import { ShareTokenService } from "@/lib/share-token-service";
 

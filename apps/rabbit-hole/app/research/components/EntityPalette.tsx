@@ -12,9 +12,9 @@
 import type Graph from "graphology";
 import React, { useMemo } from "react";
 
-import { getEntityTypesByDomain } from "@proto/forms";
-import { Icon } from "@proto/icon-system";
-import { getEntityColor, getEntityImage } from "@proto/utils/atlas";
+import { getEntityTypesByDomain } from "@protolabsai/forms";
+import { Icon } from "@protolabsai/icon-system";
+import { getEntityColor, getEntityImage } from "@protolabsai/utils/atlas";
 
 import type {
   GraphNodeAttributes,

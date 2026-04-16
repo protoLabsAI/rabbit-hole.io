@@ -9,7 +9,7 @@ import type {
   Evidence,
   Entity,
   Relationship,
-} from "@proto/types";
+} from "@protolabsai/types";
 
 import { queryWikipedia } from "./src/config/wikipedia-config";
 import { extractionGraph } from "./src/workflows/multi-phase-extraction";

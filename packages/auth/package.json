@@ -1,5 +1,5 @@
 {
-  "name": "@proto/auth",
+  "name": "@protolabsai/auth",
   "version": "2.0.4",
   "private": true,
   "description": "Authentication middleware and utilities for API routes",
@@ -30,16 +30,16 @@
     "test:coverage": "vitest --coverage"
   },
   "dependencies": {
-    "@proto/database": "workspace:*",
-    "@proto/icon-system": "workspace:*",
+    "@protolabsai/database": "workspace:*",
+    "@protolabsai/icon-system": "workspace:*",
     "next": "^15.1.0"
   },
   "peerDependencies": {
-    "@proto/ui": "workspace:*",
+    "@protolabsai/ui": "workspace:*",
     "react": "^19.0.0"
   },
   "devDependencies": {
-    "@proto/ui": "workspace:*",
+    "@protolabsai/ui": "workspace:*",
     "@types/react": "^19.0.6",
     "tsup": "^8.0.1",
     "typescript": "^5.5.4",

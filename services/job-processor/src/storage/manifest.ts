@@ -6,7 +6,7 @@
  * extraction results reference, and timestamps.
  */
 
-import { MinioService } from "@proto/utils/storage";
+import { MinioService } from "@protolabsai/utils/storage";
 
 // ---------------------------------------------------------------------------
 // Types

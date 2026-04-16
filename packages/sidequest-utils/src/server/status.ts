@@ -4,7 +4,7 @@
  * Query job status directly from PostgreSQL.
  */
 
-import { getJobQueuePool } from "@proto/database";
+import { getJobQueuePool } from "@protolabsai/database";
 
 import type { Job, JobStatus } from "../types";
 

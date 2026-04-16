@@ -5,7 +5,7 @@
  * Dynamically generated from domain configs
  */
 
-import { domainRegistry, getEntityTypesForDomains } from "@proto/types";
+import { domainRegistry, getEntityTypesForDomains } from "@protolabsai/types";
 
 export interface PresetConfig {
   label: string;

@@ -1,4 +1,4 @@
-# @proto/ui Changelog
+# @protolabsai/ui Changelog
 
 ## 0.3.3
 
@@ -37,13 +37,13 @@
 - f8f13f8: Extracted reusable components from app to workspace packages
 
   **New Package:**
-  - Created `@proto/forms` with domain entity form system (77 entity types)
+  - Created `@protolabsai/forms` with domain entity form system (77 entity types)
   - Includes EntityForm, DomainFormSelector, DynamicFormFields, mock data generation
 
   **Extended Packages:**
-  - `@proto/ui`: Added DataTable component to organisms/data-table export
-  - `@proto/auth`: Added UI components (TierBadge, UpgradePromptModal, ClientRoleGuard, RoleManager) via ./ui export
-  - `@proto/utils`: Added React utilities (lazy loading, error boundaries, tier-aware HOC) via ./react/lazy-loading export
+  - `@protolabsai/ui`: Added DataTable component to organisms/data-table export
+  - `@protolabsai/auth`: Added UI components (TierBadge, UpgradePromptModal, ClientRoleGuard, RoleManager) via ./ui export
+  - `@protolabsai/utils`: Added React utilities (lazy loading, error boundaries, tier-aware HOC) via ./react/lazy-loading export
 
   **Fixes:**
   - Fixed yjs-history `groupVersionsByDate` calculation for "yesterday" grouping
@@ -63,18 +63,18 @@
   Extracted reusable components from app to workspace packages with comprehensive fixes for dependencies, build order, and Storybook integration.
 
   **New Package:**
-  - Created `@proto/forms` with domain entity form system (77 entity types)
+  - Created `@protolabsai/forms` with domain entity form system (77 entity types)
   - Includes EntityForm, DomainFormSelector, DynamicFormFields, mock data generation, Storybook utilities
 
   **Extended Packages:**
-  - `@proto/ui`: Added DataTable component to organisms/data-table export, EntitySearch with optional icon provider
-  - `@proto/auth`: Added UI components (TierBadge, UpgradePromptModal, ClientRoleGuard, RoleManager) via ./ui export
-  - `@proto/utils`: Added React utilities (lazy loading, error boundaries, tier-aware HOC) via ./react/lazy-loading export
+  - `@protolabsai/ui`: Added DataTable component to organisms/data-table export, EntitySearch with optional icon provider
+  - `@protolabsai/auth`: Added UI components (TierBadge, UpgradePromptModal, ClientRoleGuard, RoleManager) via ./ui export
+  - `@protolabsai/utils`: Added React utilities (lazy loading, error boundaries, tier-aware HOC) via ./react/lazy-loading export
 
   **Dependency Fixes:**
-  - Added missing workspace dependencies: `@proto/types` and `@proto/icon-system` to `@proto/ui`
-  - Added `@proto/utils` to `@proto/llm-tools` (4 files importing from utils)
-  - Resolved circular dependency (@proto/utils ↔ @proto/ui) by making EntitySearch accept optional `getEntityIcon` prop
+  - Added missing workspace dependencies: `@protolabsai/types` and `@protolabsai/icon-system` to `@protolabsai/ui`
+  - Added `@protolabsai/utils` to `@protolabsai/llm-tools` (4 files importing from utils)
+  - Resolved circular dependency (@protolabsai/utils ↔ @protolabsai/ui) by making EntitySearch accept optional `getEntityIcon` prop
   - Fixed yjs-history `groupVersionsByDate` calculation for "yesterday" grouping
   - Fixed SSR compatibility in utils by properly externalizing React dependencies
 
@@ -86,10 +86,10 @@
   **Storybook:**
   - Fixed 24 story files importing from old paths
   - Standardized on `@rabbit-hole` alias for app imports (consistency)
-  - Extracted components use `@proto/*` workspace packages
-  - Added `@/` and `@proto/forms` aliases to webpack config
-  - ResizableChatLayout story now imports from `@proto/ui/templates`
-  - Added missing exports (DOMAIN_SELECTOR_ARG, STORY_ENTITY_TYPES_BY_DOMAIN) to @proto/forms
+  - Extracted components use `@protolabsai/*` workspace packages
+  - Added `@/` and `@protolabsai/forms` aliases to webpack config
+  - ResizableChatLayout story now imports from `@protolabsai/ui/templates`
+  - Added missing exports (DOMAIN_SELECTOR_ARG, STORY_ENTITY_TYPES_BY_DOMAIN) to @protolabsai/forms
 
   **Git Hooks:**
   - Enhanced pre-push hook with comprehensive package type-checking and clear error messages
@@ -136,7 +136,7 @@
 
 ### Added
 
-**Theme System (`@proto/ui/theme`)**
+**Theme System (`@protolabsai/ui/theme`)**
 
 - Complete whitelabel theming system migrated from `themes/` and `app/context/`
 - ThemeProvider with React Context and hooks
@@ -148,7 +148,7 @@
 
 **New Exports:**
 
-- `@proto/ui/theme` - Subpath export for theming system
+- `@protolabsai/ui/theme` - Subpath export for theming system
 
 **Dependencies:**
 
@@ -176,7 +176,7 @@
 
 - **Atomic Design Migration**: Complete restructure using Atomic Design principles
   - Components now organized in `atoms/`, `molecules/`, `organisms/`, `templates/`
-  - New import paths: `@proto/ui/atoms`, `@proto/ui/molecules`, etc.
+  - New import paths: `@protolabsai/ui/atoms`, `@protolabsai/ui/molecules`, etc.
   - Storybook categories updated to reflect atomic hierarchy
 
 ### Added
@@ -184,7 +184,7 @@
 **Atoms (28 components):**
 
 - All shadcn/ui primitives: Button, Badge, Input, Card, Dialog, etc.
-- Icon component: Lucide icon wrapper (no @proto/icon-system dependency)
+- Icon component: Lucide icon wrapper (no @protolabsai/icon-system dependency)
 - Form components: Form, Select
 - Layout primitives: Tabs, Resizable, Sheet, ScrollArea
 - Navigation: ContextMenu, DropdownMenu
@@ -236,8 +236,8 @@
 
 **Peer Dependencies:**
 
-- `@proto/auth` (workspace:\*)
-- `@proto/utils` (workspace:\*)
+- `@protolabsai/auth` (workspace:\*)
+- `@protolabsai/utils` (workspace:\*)
 
 ### Infrastructure
 
@@ -261,7 +261,7 @@ App-specific components (with context/hook dependencies) remain in `app/componen
 - FileUploadButton, ThemeSelector, ThemedUserButton
 - UserStatsPage
 
-These are documented but not exported from @proto/ui.
+These are documented but not exported from @protolabsai/ui.
 
 ---
 

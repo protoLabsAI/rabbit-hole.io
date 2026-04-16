@@ -9,8 +9,11 @@
 
 import React, { Suspense, ComponentType } from "react";
 
-import type { UserTierLimits } from "@proto/auth";
-import { getUserTierClient, getTierLimitsClient } from "@proto/auth/client";
+import type { UserTierLimits } from "@protolabsai/auth";
+import {
+  getUserTierClient,
+  getTierLimitsClient,
+} from "@protolabsai/auth/client";
 
 import { LazyFeatureErrorBoundary } from "./LazyFeatureErrorBoundary";
 import { GenericFeatureLoadingSkeleton } from "./LoadingStates";

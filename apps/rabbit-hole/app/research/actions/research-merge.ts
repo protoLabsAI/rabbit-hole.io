@@ -3,9 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-import { getGlobalNeo4jClient } from "@proto/database";
-import { logger } from "@proto/logger";
-import { convertAllNeo4jParams } from "@proto/utils";
+import { getGlobalNeo4jClient } from "@protolabsai/database";
+import { logger } from "@protolabsai/logger";
+import { convertAllNeo4jParams } from "@protolabsai/utils";
 
 import type { ResearchBundle } from "../lib/bundle-validator";
 

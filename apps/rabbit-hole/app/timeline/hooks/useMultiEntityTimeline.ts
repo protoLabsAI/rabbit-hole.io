@@ -9,7 +9,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 
-import type { TimelineEvent, CompactTimelineSummary } from "@proto/types";
+import type { TimelineEvent, CompactTimelineSummary } from "@protolabsai/types";
 
 import type { TimeWindow, TimelineFilters } from "./useTimelinePageState";
 

@@ -1,5 +1,5 @@
-import { Icon } from "@proto/icon-system";
-import { Badge, Button, Input, Label } from "@proto/ui/atoms";
+import { Icon } from "@protolabsai/icon-system";
+import { Badge, Button, Input, Label } from "@protolabsai/ui/atoms";
 
 interface ApiKeyInputProps {
   provider: string;

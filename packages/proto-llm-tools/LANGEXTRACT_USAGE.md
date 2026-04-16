@@ -21,7 +21,7 @@ services:
 ### 2. Recommended: Job Queue Pattern (Server-Side)
 
 ```typescript
-import { enqueueLangExtract } from "@proto/llm-tools";
+import { enqueueLangExtract } from "@protolabsai/llm-tools";
 
 // Server-side API route
 export async function POST(request: NextRequest) {
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
 ### 3. Alternative: Direct Processing (Legacy)
 
 ```typescript
-import { langextractClientTool } from "@proto/llm-tools";
+import { langextractClientTool } from "@protolabsai/llm-tools";
 
 // Direct call (not recommended for production)
 const result = await langextractClientTool.invoke({
@@ -63,7 +63,7 @@ console.log(result.extractedData);
 ### 3. Check Service Health
 
 ```typescript
-import { isLangExtractAvailable, getLangExtractModels } from "@proto/llm-tools";
+import { isLangExtractAvailable, getLangExtractModels } from "@protolabsai/llm-tools";
 
 // Health check
 const healthy = await isLangExtractAvailable();
@@ -80,7 +80,7 @@ console.log(models.gemini_models); // ["gemini-2.5-flash", ...]
 ### 4. Configuration Override
 
 ```typescript
-import { langextractClientTool, langextractConfig } from "@proto/llm-tools";
+import { langextractClientTool, langextractConfig } from "@protolabsai/llm-tools";
 
 // Use default config (recommended)
 const result1 = await langextractClientTool.invoke({
@@ -106,7 +106,7 @@ const result2 = await langextractClientTool.invoke({
 ```typescript
 // app/api/extract/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { enqueueLangExtract } from "@proto/llm-tools";
+import { enqueueLangExtract } from "@protolabsai/llm-tools";
 
 export const maxDuration = 300; // 5 minutes for polling
 
@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
 ```typescript
 // Using in a LangGraph node
 import { StateGraph } from "@langchain/langgraph";
-import { langextractClientTool } from "@proto/llm-tools";
+import { langextractClientTool } from "@protolabsai/llm-tools";
 
 const workflow = new StateGraph({
   channels: {
@@ -162,7 +162,7 @@ workflow.addNode("extract", async (state) => {
 // agent/src/tools/custom-extraction.ts
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
-import { langextractClientTool } from "@proto/llm-tools";
+import { langextractClientTool } from "@protolabsai/llm-tools";
 
 export const customExtractionTool = tool(
   async (input) => {
@@ -190,7 +190,7 @@ export const customExtractionTool = tool(
 ### With Few-Shot Examples
 
 ```typescript
-import { langextractClientTool } from "@proto/llm-tools";
+import { langextractClientTool } from "@protolabsai/llm-tools";
 
 const result = await langextractClientTool.invoke({
   textOrDocuments: [
@@ -217,7 +217,7 @@ const result = await langextractClientTool.invoke({
 import {
   langextractClientTool,
   isLangExtractAvailable,
-} from "@proto/llm-tools";
+} from "@protolabsai/llm-tools";
 
 async function extractWithFallback(text: string) {
   // Check availability first
@@ -301,7 +301,7 @@ echo $LANGEXTRACT_URL
 
 ```typescript
 // Add timeout and retry logic
-import { langextractConfig } from "@proto/llm-tools";
+import { langextractConfig } from "@protolabsai/llm-tools";
 
 const controller = new AbortController();
 const timeout = setTimeout(() => controller.abort(), 10000); // 10s timeout
@@ -322,7 +322,7 @@ try {
 ```bash
 # Debug: Check what URL is being used
 node -e "
-const { getLangExtractServiceUrl } = require('@proto/llm-tools');
+const { getLangExtractServiceUrl } = require('@protolabsai/llm-tools');
 console.log('Service URL:', getLangExtractServiceUrl());
 "
 ```

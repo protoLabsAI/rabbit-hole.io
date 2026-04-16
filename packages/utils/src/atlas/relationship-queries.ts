@@ -6,7 +6,7 @@
  * and platform relationship analysis.
  */
 
-import type { EntityType } from "@proto/types";
+import type { EntityType } from "@protolabsai/types";
 
 const buildPublicTenantFilter = (
   varName: string = "n",

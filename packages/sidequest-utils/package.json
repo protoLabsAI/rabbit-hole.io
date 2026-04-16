@@ -1,5 +1,5 @@
 {
-  "name": "@proto/sidequest-utils",
+  "name": "@protolabsai/sidequest-utils",
   "version": "0.1.6",
   "description": "Shared utilities for Sidequest.js job processing",
   "type": "module",
@@ -36,9 +36,9 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@proto/database": "workspace:*",
-    "@proto/icon-system": "workspace:*",
-    "@proto/ui": "workspace:*",
+    "@protolabsai/database": "workspace:*",
+    "@protolabsai/icon-system": "workspace:*",
+    "@protolabsai/ui": "workspace:*",
     "@tanstack/react-query": "^5.90.2",
     "clsx": "^2.1.0",
     "tailwind-merge": "^2.5.4",

@@ -8,7 +8,7 @@ import type { StructuredTool } from "@langchain/core/tools";
 import { StateGraph, START, END } from "@langchain/langgraph";
 import { ToolNode } from "@langchain/langgraph/prebuilt";
 
-import { getModel } from "@proto/llm-providers/server";
+import { getModel } from "@protolabsai/llm-providers/server";
 
 import { summarizeTool } from "../../core/summarize/index.js";
 import {

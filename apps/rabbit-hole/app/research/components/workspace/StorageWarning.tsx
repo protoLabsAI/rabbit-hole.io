@@ -12,8 +12,8 @@ import {
   Alert,
   AlertDescription,
   AlertTitle,
-} from "@proto/ui/atoms";
-import { formatBytes } from "@proto/utils";
+} from "@protolabsai/ui/atoms";
+import { formatBytes } from "@protolabsai/utils";
 
 import type { StorageQuotaState } from "../../hooks/useStorageQuota";
 

@@ -9,7 +9,7 @@ Generic Least Recently Used cache with TTL support.
 ### Quick Start
 
 ```typescript
-import { LRUCache } from "@proto/utils";
+import { LRUCache } from "@protolabsai/utils";
 
 const cache = new LRUCache<string, Data>({
   maxSize: 100,

@@ -2,7 +2,7 @@
  * Deep Agent - Type Definitions
  */
 
-import type { Entity, EntityType } from "@proto/types";
+import type { Entity, EntityType } from "@protolabsai/types";
 
 export interface SubAgent {
   name: string;

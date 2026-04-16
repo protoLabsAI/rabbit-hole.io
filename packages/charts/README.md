@@ -1,4 +1,4 @@
-# @proto/charts
+# @protolabsai/charts
 
 Professional data visualization components for the Proto platform.
 
@@ -15,11 +15,11 @@ Professional data visualization components for the Proto platform.
 
 ```bash
 # In monorepo workspace
-pnpm add @proto/charts
+pnpm add @protolabsai/charts
 
 # Dependencies
 # - @dnd-kit/core
-# - @proto/ui
+# - @protolabsai/ui
 # - date-fns
 # - jotai
 ```
@@ -29,7 +29,7 @@ pnpm add @proto/charts
 ### Simple Gantt Chart
 
 ```tsx
-import { GanttChart } from "@proto/charts/gantt";
+import { GanttChart } from "@protolabsai/charts/gantt";
 
 const features = [
   {
@@ -58,7 +58,7 @@ function MyGantt() {
 ### Grouped Features
 
 ```tsx
-import { GanttChart } from "@proto/charts/gantt";
+import { GanttChart } from "@protolabsai/charts/gantt";
 
 const groups = [
   {
@@ -104,7 +104,7 @@ function GroupedGantt() {
 ### With Markers
 
 ```tsx
-import { GanttChart } from "@proto/charts/gantt";
+import { GanttChart } from "@protolabsai/charts/gantt";
 
 const markers = [
   {
@@ -176,7 +176,7 @@ import {
   GanttFeatureList,
   GanttFeatureRow,
   GanttToday,
-} from "@proto/charts/gantt";
+} from "@protolabsai/charts/gantt";
 
 function CustomGantt({ groups }) {
   return (
@@ -211,7 +211,7 @@ function CustomGantt({ groups }) {
 
 ```diff
 - import { GanttChart } from "../../../components/ui/shadcn-io/gantt";
-+ import { GanttChart } from "@proto/charts/gantt";
++ import { GanttChart } from "@protolabsai/charts/gantt";
 
 // API remains the same
 <GanttChart features={features} />

@@ -17,12 +17,12 @@ The active surface is the **Search Engine** at `/`. Everything else (Atlas, Rese
 - **Monorepo**: pnpm workspace + Turborepo
 - **Testing**: Vitest
 - **Linting**: ESLint flat config with strict import ordering
-- **AI SDK**: Use `getAIModel()` from `@proto/llm-providers/server` for AI SDK models (streamText, generateText)
-- **LangChain**: Use `getModel()` from `@proto/llm-providers/server` for LangChain models (legacy paths)
-- Use `getGlobalNeo4jClient()` from `@proto/database`
-- Use `getGlobalPostgresPool()` from `@proto/database`
-- Use `generateSecureId()` from `@proto/utils`
-- Use `Icon` from `@proto/icon-system`
+- **AI SDK**: Use `getAIModel()` from `@protolabsai/llm-providers/server` for AI SDK models (streamText, generateText)
+- **LangChain**: Use `getModel()` from `@protolabsai/llm-providers/server` for LangChain models (legacy paths)
+- Use `getGlobalNeo4jClient()` from `@protolabsai/database`
+- Use `getGlobalPostgresPool()` from `@protolabsai/database`
+- Use `generateSecureId()` from `@protolabsai/utils`
+- Use `Icon` from `@protolabsai/icon-system`
 - Default theme: `prod-environment` (🐰 rabbit-hole.io)
 
 ## Search Engine Architecture
@@ -38,7 +38,7 @@ The active surface is the **Search Engine** at `/`. Everything else (Atlas, Rese
 
 The agent decides tool order and iteration. `stopWhen: stepCountIs(5)`.
 
-**Middleware pipeline** (`@proto/research-middleware`): DeerFlow-inspired composable middleware wraps the streamText agent loop. Hooks fire at lifecycle points: `beforeAgent`, `beforeModel`, `afterModel`, `wrapToolCall`, `afterAgent`. Middleware registered in `app/lib/middleware-config.ts`:
+**Middleware pipeline** (`@protolabsai/research-middleware`): DeerFlow-inspired composable middleware wraps the streamText agent loop. Hooks fire at lifecycle points: `beforeAgent`, `beforeModel`, `afterModel`, `wrapToolCall`, `afterAgent`. Middleware registered in `app/lib/middleware-config.ts`:
 
 | Middleware | Hook | Purpose |
 |---|---|---|

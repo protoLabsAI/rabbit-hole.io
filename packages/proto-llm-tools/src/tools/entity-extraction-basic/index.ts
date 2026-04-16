@@ -14,7 +14,7 @@ import { z } from "zod";
 import {
   calculateStringSimilarity,
   mergeLangExtractEntities,
-} from "@proto/utils";
+} from "@protolabsai/utils";
 
 import { langextractConfig } from "../../config/langextract-config";
 import { enqueueLangExtract } from "../../utils/enqueueLangExtract";

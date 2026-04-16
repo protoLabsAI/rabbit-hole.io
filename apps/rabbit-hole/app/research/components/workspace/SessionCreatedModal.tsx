@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 import {
   Button,
   Dialog,
@@ -11,8 +11,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@proto/ui/atoms";
-import { useToast } from "@proto/ui/hooks";
+} from "@protolabsai/ui/atoms";
+import { useToast } from "@protolabsai/ui/hooks";
 
 interface SessionCreatedModalProps {
   open: boolean;

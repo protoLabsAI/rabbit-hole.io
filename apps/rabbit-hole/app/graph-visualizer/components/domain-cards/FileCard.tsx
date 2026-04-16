@@ -8,7 +8,7 @@
 
 import React from "react";
 
-import { Button } from "@proto/ui/atoms";
+import { Button } from "@protolabsai/ui/atoms";
 
 import { useFileUploadDialog } from "@/hooks/ui/useFileUploadDialog";
 

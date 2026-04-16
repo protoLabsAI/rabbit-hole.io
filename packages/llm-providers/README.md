@@ -1,4 +1,4 @@
-# @proto/llm-providers
+# @protolabsai/llm-providers
 
 Multi-provider LLM configuration system with category-based model selection for flexible, vendor-neutral AI development.
 
@@ -17,13 +17,13 @@ Multi-provider LLM configuration system with category-based model selection for 
 ### Installation
 
 ```bash
-pnpm add @proto/llm-providers
+pnpm add @protolabsai/llm-providers
 ```
 
 ### Basic Usage
 
 ```typescript
-import { getModel } from "@proto/llm-providers";
+import { getModel } from "@protolabsai/llm-providers";
 
 // Get default smart model from default provider
 const model = getModel("smart");
@@ -65,7 +65,7 @@ import {
   getModel,
   type ProviderName,
   type ModelCategory,
-} from "@proto/llm-providers/server";
+} from "@protolabsai/llm-providers/server";
 
 // ✅ Full autocomplete for category and provider
 const model = getModel("smart", "anthropic");
@@ -178,7 +178,7 @@ LLM_CONFIG_PATH=./config/my-llm-config.json
 ### Using Fake Provider
 
 ```typescript
-import { setupFakeProvider, testScenarios } from "@proto/llm-providers/testing";
+import { setupFakeProvider, testScenarios } from "@protolabsai/llm-providers/testing";
 
 // Quick setup
 setupFakeProvider({
@@ -238,7 +238,7 @@ const model = factory.getModel("smart", "openai");
 
 ```typescript
 // agent/src/config/llm-config.ts
-import { getModel } from "@proto/llm-providers";
+import { getModel } from "@protolabsai/llm-providers";
 
 export const agentLLMConfig = {
   research: () => getModel("smart", "openai", { temperature: 0.1 }),

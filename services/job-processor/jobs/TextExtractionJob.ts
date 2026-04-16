@@ -7,8 +7,8 @@
 
 import { Job } from "sidequest";
 
-import type { TextExtractionJobData } from "@proto/sidequest-utils";
-import { MinioService } from "@proto/utils/storage";
+import type { TextExtractionJobData } from "@protolabsai/sidequest-utils";
+import { MinioService } from "@protolabsai/utils/storage";
 
 export class TextExtractionJob extends Job {
   private minioService = new MinioService();

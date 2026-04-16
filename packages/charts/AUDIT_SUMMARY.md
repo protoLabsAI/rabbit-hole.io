@@ -1,7 +1,7 @@
 # Charts Package Audit Summary
 
 **Date:** December 6, 2025  
-**Package:** `@proto/charts`
+**Package:** `@protolabsai/charts`
 
 ## Issues Found & Fixed
 
@@ -9,8 +9,8 @@
 
 **Removed from `dependencies`:**
 
-- `@proto/types` - No imports found in codebase
-- `@proto/utils` - No imports found in codebase
+- `@protolabsai/types` - No imports found in codebase
+- `@protolabsai/utils` - No imports found in codebase
 - `zod` - No imports found in codebase
 
 **Impact:** Reduced bundle size, cleaner dependency tree
@@ -30,7 +30,7 @@
 
 Updated `tsup.config.ts` to remove externals for packages no longer used:
 
-- Removed: `@proto/types`, `@proto/utils`, `zod`
+- Removed: `@protolabsai/types`, `@protolabsai/utils`, `zod`
 - Kept: All actively used dependencies
 
 ## Current Dependencies (Clean)
@@ -39,8 +39,8 @@ Updated `tsup.config.ts` to remove externals for packages no longer used:
 
 1. `@dnd-kit/core` ✅ - Drag & drop context
 2. `@dnd-kit/modifiers` ✅ - Drag restrictions
-3. `@proto/icon-system` ✅ - Icon components
-4. `@proto/ui` ✅ - UI components (Card, Button, etc.)
+3. `@protolabsai/icon-system` ✅ - Icon components
+4. `@protolabsai/ui` ✅ - UI components (Card, Button, etc.)
 5. `@uidotdev/usehooks` ✅ - Mouse & scroll hooks
 6. `clsx` ✅ - Utility function
 7. `date-fns` ✅ - Date utilities (11 files)
@@ -139,7 +139,7 @@ packages/charts/src/
   pie-chart/    # Future
 ```
 
-All chart types will export from `@proto/charts/{chart-type}` pattern.
+All chart types will export from `@protolabsai/charts/{chart-type}` pattern.
 
 
 

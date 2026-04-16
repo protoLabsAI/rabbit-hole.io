@@ -38,7 +38,7 @@
 
 **Verification:**
 ```typescript
-import { GanttHeader } from "@proto/charts/gantt";
+import { GanttHeader } from "@protolabsai/charts/gantt";
 // Should compile without errors
 ```
 
@@ -85,7 +85,7 @@ const feature = {
 - [ ] Create `molecules/gantt-feature-card/gantt-feature-card.tsx`
 - [ ] Create `molecules/gantt-feature-card/index.ts`
 - [ ] Integrate @dnd-kit/core useDraggable
-- [ ] Use @proto/ui Card component
+- [ ] Use @protolabsai/ui Card component
 - [ ] Implement dragging state management
 - [ ] Add cursor styling
 - [ ] Add exports to `molecules/index.ts`
@@ -93,7 +93,7 @@ const feature = {
 
 **Key Dependencies:**
 - @dnd-kit/core `useDraggable`
-- @proto/ui `Card` component
+- @protolabsai/ui `Card` component
 - `useGanttDragging` hook
 
 **Verification:**
@@ -188,7 +188,7 @@ import {
   GanttSidebarItem,
   GanttFeatureCard,
   GanttDragHelper,
-} from "@proto/charts/gantt";
+} from "@protolabsai/charts/gantt";
 
 // All should import without errors
 ```
@@ -234,7 +234,7 @@ After Phase 5:
 **Code Quality:**
 - [x] All molecules use extracted hooks
 - [x] All molecules follow established patterns
-- [x] @proto/ui components used where applicable
+- [x] @protolabsai/ui components used where applicable
 - [x] Proper TypeScript types
 - [x] Clean, readable code
 

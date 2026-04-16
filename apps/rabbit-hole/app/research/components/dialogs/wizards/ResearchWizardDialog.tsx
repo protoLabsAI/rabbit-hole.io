@@ -3,9 +3,17 @@
 import type Graph from "graphology";
 import { useState, useCallback, useEffect } from "react";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@proto/ui/atoms";
-import { useToast } from "@proto/ui/hooks";
-import { MultiStepDialog, MultiStepDialogStep } from "@proto/ui/organisms";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@protolabsai/ui/atoms";
+import { useToast } from "@protolabsai/ui/hooks";
+import {
+  MultiStepDialog,
+  MultiStepDialogStep,
+} from "@protolabsai/ui/organisms";
 
 import type {
   GraphNodeAttributes,

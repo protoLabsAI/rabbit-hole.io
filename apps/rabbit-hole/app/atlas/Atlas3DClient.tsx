@@ -17,7 +17,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import type { ForceGraphMethods } from "react-force-graph-3d";
 
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 
 import Atlas3DDetailPanel from "./components/Atlas3DDetailPanel";
 import Atlas3DSearchBar from "./components/Atlas3DSearchBar";

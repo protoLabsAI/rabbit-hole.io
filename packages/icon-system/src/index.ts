@@ -1,5 +1,5 @@
 /**
- * @proto/icon-system
+ * @protolabsai/icon-system
  *
  * Simple icon wrapper for lucide-react
  */

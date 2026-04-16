@@ -5,7 +5,7 @@
  * Platform, Movement, Event) using the unified entity research workflow.
  *
  * TODO: Add public + tenant data isolation
- * - Import: resolveTenantFromHeaders, buildPublicTenantFilter from @proto/utils
+ * - Import: resolveTenantFromHeaders, buildPublicTenantFilter from @protolabsai/utils
  * - Add tenant resolution before queries
  * - Add WHERE clauses with buildPublicTenantFilter() to all Neo4j queries
  * - Add orgId parameter to all query executions
@@ -19,9 +19,9 @@ import {
   getUserTier,
   getTierLimits,
   TierLimitError,
-} from "@proto/auth";
-import { getEntityCount } from "@proto/database";
-import { entityResearchTool } from "@proto/llm-tools";
+} from "@protolabsai/auth";
+import { getEntityCount } from "@protolabsai/database";
+import { entityResearchTool } from "@protolabsai/llm-tools";
 import type {
   EntityResearchInput,
   EntityResearchOutput,
@@ -29,9 +29,9 @@ import type {
   EntityResearchDepth,
   EntityResearchFocus,
   EntityResearchSource,
-} from "@proto/types";
-import { RESEARCH_LIMITS } from "@proto/types";
-import { getKnowledgeGraphContext } from "@proto/utils";
+} from "@protolabsai/types";
+import { RESEARCH_LIMITS } from "@protolabsai/types";
+import { getKnowledgeGraphContext } from "@protolabsai/utils";
 
 export async function POST(request: NextRequest) {
   // Check authentication

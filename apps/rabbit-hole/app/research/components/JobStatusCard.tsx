@@ -7,17 +7,37 @@
  * progress indicator and dismiss action.
  */
 
-import { Icon } from "@proto/icon-system";
-import { Button, Badge, Progress } from "@proto/ui/atoms";
+import { Icon } from "@protolabsai/icon-system";
+import { Button, Badge } from "@protolabsai/ui/atoms";
 
 import type { IngestionJob } from "../hooks/useMediaIngestion";
 
 const STATUS_CONFIG = {
-  idle: { icon: "circle" as const, label: "Idle", color: "text-muted-foreground" },
-  uploading: { icon: "upload" as const, label: "Uploading", color: "text-blue-500" },
-  processing: { icon: "loader" as const, label: "Processing", color: "text-primary" },
-  completed: { icon: "check-circle" as const, label: "Complete", color: "text-green-500" },
-  failed: { icon: "alert-circle" as const, label: "Failed", color: "text-destructive" },
+  idle: {
+    icon: "circle" as const,
+    label: "Idle",
+    color: "text-muted-foreground",
+  },
+  uploading: {
+    icon: "upload" as const,
+    label: "Uploading",
+    color: "text-blue-500",
+  },
+  processing: {
+    icon: "loader" as const,
+    label: "Processing",
+    color: "text-primary",
+  },
+  completed: {
+    icon: "check-circle" as const,
+    label: "Complete",
+    color: "text-green-500",
+  },
+  failed: {
+    icon: "alert-circle" as const,
+    label: "Failed",
+    color: "text-destructive",
+  },
 } as const;
 
 interface JobStatusCardProps {

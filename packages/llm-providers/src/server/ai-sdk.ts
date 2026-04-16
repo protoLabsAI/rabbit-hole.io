@@ -5,7 +5,7 @@
  * Uses @ai-sdk/anthropic directly (not LangChain) for optimal streaming.
  *
  * Usage:
- *   import { getAIModel } from "@proto/llm-providers/server";
+ *   import { getAIModel } from "@protolabsai/llm-providers/server";
  *   const model = getAIModel("smart");
  *   const result = await streamText({ model, ... });
  */

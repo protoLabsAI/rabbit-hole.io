@@ -1,5 +1,5 @@
 /**
- * @proto/auth/client - Client-only exports
+ * @protolabsai/auth/client - Client-only exports
  *
  * Pure client-side authentication utilities with no server dependencies.
  * Use this for all React components and client-side code.

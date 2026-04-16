@@ -356,7 +356,7 @@ Worker picks up and executes
 ### From Next.js API Routes
 
 ```typescript
-import { enqueueYouTubeJob } from "@proto/sidequest-utils/server";
+import { enqueueYouTubeJob } from "@protolabsai/sidequest-utils/server";
 
 export async function POST(request: Request) {
   // Internally calls: POST http://localhost:8680/enqueue/youtube
@@ -409,7 +409,7 @@ export function createAPIServer(port = 8680) {
 ### From React Components
 
 ```typescript
-import { useEnqueueYouTube, useJobStatus } from "@proto/sidequest-utils/client";
+import { useEnqueueYouTube, useJobStatus } from "@protolabsai/sidequest-utils/client";
 
 function MyComponent() {
   const { mutate: enqueue } = useEnqueueYouTube();
@@ -628,7 +628,7 @@ queues: [
 ## Related Documentation
 
 - [Testing Guide](./TESTING_GUIDE.md) - How to test the job processor
-- [@proto/sidequest-utils](../../packages/sidequest-utils/README.md) - Client/server utilities
+- [@protolabsai/sidequest-utils](../../packages/sidequest-utils/README.md) - Client/server utilities
 - [Sidequest.js Docs](https://github.com/valtech-sd/sidequest.js)
 
 ## Graceful Shutdown

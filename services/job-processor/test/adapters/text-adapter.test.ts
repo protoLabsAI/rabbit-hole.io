@@ -10,7 +10,7 @@ import { fileURLToPath } from "url";
 
 import { describe, expect, it } from "vitest";
 
-import type { FileSource } from "@proto/types";
+import type { FileSource } from "@protolabsai/types";
 
 import { TextAdapter } from "../../src/adapters/text-adapter.js";
 

@@ -1,0 +1,44 @@
+name: Release Notes
+
+# Fires on v*.*.* tag push to post polished release notes to the
+# rabbit-hole.io Discord release channel (#releases-rabbit-hole).
+#
+# release.yml pushes tags with GH_PAT (PAT with workflows scope) so this
+# workflow fires automatically — GitHub's recursion block only applies to
+# tags pushed with GITHUB_TOKEN. workflow_dispatch is kept as a manual
+# fallback for missed or re-run postings.
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to post notes for (e.g. v0.1.0). Defaults to latest tag on the workflow's checked-out commit."
+        type: string
+        required: false
+
+concurrency:
+  group: release-notes-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  post-release-notes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history so git describe finds the previous tag
+          ref: ${{ inputs.tag || github.ref }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Post release notes to Discord
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_RELEASE_WEBHOOK }}
+        run: node scripts/post-release-notes.mjs

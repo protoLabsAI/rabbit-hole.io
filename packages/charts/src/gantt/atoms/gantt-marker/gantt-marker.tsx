@@ -4,13 +4,13 @@ import { formatDate } from "date-fns";
 import { memo, useMemo, useCallback } from "react";
 import type { FC } from "react";
 
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuTrigger,
-} from "@proto/ui/atoms";
+} from "@protolabsai/ui/atoms";
 
 import { useGanttContext } from "../../hooks";
 import { cn } from "../../lib/utils";

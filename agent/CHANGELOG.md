@@ -1,4 +1,4 @@
-# @proto/agent
+# @protolabsai/agent
 
 ## 0.1.8
 
@@ -6,15 +6,15 @@
 
 - c0435ce: Security: Patch Next.js CVE-2025-66478 (RCE)
 - Updated dependencies [c0435ce]
-  - @proto/llm-tools@0.1.7
-  - @proto/utils@0.3.0
+  - @protolabsai/llm-tools@0.1.7
+  - @protolabsai/utils@0.3.0
 
 ## 0.1.7
 
 ### Patch Changes
 
 - Updated dependencies [64668b6]
-  - @proto/llm-tools@0.1.6
+  - @protolabsai/llm-tools@0.1.6
 
 ## 0.1.6
 
@@ -30,37 +30,37 @@
 ### Patch Changes
 
 - Updated dependencies [e8b671f]
-  - @proto/llm-tools@0.1.5
-  - @proto/utils@0.3.0
+  - @protolabsai/llm-tools@0.1.5
+  - @protolabsai/utils@0.3.0
 
 ## 0.1.4
 
 ### Patch Changes
 
-- @proto/llm-tools@0.1.4
+- @protolabsai/llm-tools@0.1.4
 
 ## 0.1.3
 
 ### Patch Changes
 
-- @proto/utils@0.3.0
-- @proto/llm-tools@0.1.3
+- @protolabsai/utils@0.3.0
+- @protolabsai/llm-tools@0.1.3
 
 ## 0.1.2
 
 ### Patch Changes
 
 - Updated dependencies [f8f13f8]
-  - @proto/utils@0.3.0
-  - @proto/llm-tools@0.1.2
+  - @protolabsai/utils@0.3.0
+  - @protolabsai/llm-tools@0.1.2
 
 ## 0.1.1
 
 ### Patch Changes
 
 - Updated dependencies [44db068]
-  - @proto/utils@0.2.0
-  - @proto/llm-tools@0.1.1
+  - @protolabsai/utils@0.2.0
+  - @protolabsai/llm-tools@0.1.1
 
 ## 0.1.0
 
@@ -95,7 +95,7 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @proto/llm-providers@0.1.0
-  - @proto/llm-tools@0.1.0
-  - @proto/types@0.1.0
-  - @proto/utils@0.1.0
+  - @protolabsai/llm-providers@0.1.0
+  - @protolabsai/llm-tools@0.1.0
+  - @protolabsai/types@0.1.0
+  - @protolabsai/utils@0.1.0

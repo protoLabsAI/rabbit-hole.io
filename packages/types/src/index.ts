@@ -14,7 +14,7 @@ export {
 
 // Note: Custom domains loading (allCustomDomainConfigs) uses Node.js fs/path modules
 // and is not exported from main index. Import directly from
-// "@proto/types/src/custom-domains" in Node.js scripts only.
+// "@protolabsai/types/src/custom-domains" in Node.js scripts only.
 
 // Collaboration Sessions
 export * from "./collaboration-session";

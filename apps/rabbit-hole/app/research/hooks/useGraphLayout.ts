@@ -8,8 +8,8 @@
 import type Graph from "graphology";
 import { useCallback, useState } from "react";
 
-import type { UserTier } from "@proto/auth/client";
-import { logUserAction } from "@proto/logger";
+import type { UserTier } from "@protolabsai/auth/client";
+import { logUserAction } from "@protolabsai/logger";
 
 import type {
   GraphNodeAttributes,

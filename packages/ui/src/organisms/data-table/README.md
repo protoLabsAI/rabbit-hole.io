@@ -92,7 +92,7 @@ Demonstrates entity data from the knowledge graph:
 
 ### FileManagementTable
 
-Demonstrates file management with `FileEntity` types from `@proto/types`:
+Demonstrates file management with `FileEntity` types from `@protolabsai/types`:
 
 - Processing state badges (processed, processing, queued, failed)
 - File type icons (PDF, images, video, audio, CSV, JSON)
@@ -116,9 +116,9 @@ Demonstrates file management with `FileEntity` types from `@proto/types`:
 
 Both stories use actual types:
 
-- **EntityDataTable**: Based on `BaseEntity` from `@proto/types`
-- **FileManagementTable**: Based on `FileEntity` from `@proto/types`
-- **FileProcessingState**: Enum from `@proto/types/file-schemas`
+- **EntityDataTable**: Based on `BaseEntity` from `@protolabsai/types`
+- **FileManagementTable**: Based on `FileEntity` from `@protolabsai/types`
+- **FileProcessingState**: Enum from `@protolabsai/types/file-schemas`
 
 ## Theme Testing
 

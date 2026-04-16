@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { useHumanLoopExtraction } from "@proto/llm-tools/client";
+import { useHumanLoopExtraction } from "@protolabsai/llm-tools/client";
 
 /**
  * Example: Basic Human-in-the-Loop Extraction

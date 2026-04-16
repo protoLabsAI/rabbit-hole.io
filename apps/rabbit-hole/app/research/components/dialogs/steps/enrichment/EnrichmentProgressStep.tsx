@@ -1,6 +1,6 @@
 "use client";
 
-import { Progress } from "@proto/ui/atoms";
+import { Progress } from "@protolabsai/ui/atoms";
 
 interface EnrichmentProgressStepProps {
   status: string;

@@ -9,7 +9,7 @@ import {
   buildEntityCreatorGraph,
   buildRelationshipMapperGraph,
   buildBundleAssemblerGraph,
-} from "@proto/deepagent/subagents";
+} from "@protolabsai/deepagent/subagents";
 
 export {
   buildEvidenceGathererGraph,

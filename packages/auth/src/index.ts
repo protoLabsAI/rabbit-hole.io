@@ -1,5 +1,5 @@
 /**
- * @proto/auth - Authentication Package
+ * @protolabsai/auth - Authentication Package
  *
  * Centralized authentication middleware and role-based access control utilities.
  */

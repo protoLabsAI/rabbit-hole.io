@@ -2,9 +2,9 @@
 
 import { useState, useCallback, useRef } from "react";
 
-import { domainRegistry } from "@proto/types";
-import { Button, Slider } from "@proto/ui/atoms";
-import { DomainEntityTypeSelector } from "@proto/ui/organisms";
+import { domainRegistry } from "@protolabsai/types";
+import { Button, Slider } from "@protolabsai/ui/atoms";
+import { DomainEntityTypeSelector } from "@protolabsai/ui/organisms";
 
 export interface FileExtractionConfig {
   file: File;

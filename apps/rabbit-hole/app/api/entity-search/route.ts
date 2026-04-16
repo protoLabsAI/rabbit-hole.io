@@ -8,14 +8,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
-import { withAuthAndLogging } from "@proto/auth";
-import { getGlobalNeo4jClient } from "@proto/database";
-import { safeValidate, SearchResponse, PAGINATION_LIMITS } from "@proto/types";
-import { createNeo4jClientWithIntegerConversion } from "@proto/utils";
+import { withAuthAndLogging } from "@protolabsai/auth";
+import { getGlobalNeo4jClient } from "@protolabsai/database";
+import {
+  safeValidate,
+  SearchResponse,
+  PAGINATION_LIMITS,
+} from "@protolabsai/types";
+import { createNeo4jClientWithIntegerConversion } from "@protolabsai/utils";
 
 const resolveTenantFromHeaders = async (request: any) => {
   const { resolveTenantFromHeaders: resolver } = await import(
-    "@proto/utils/tenancy-server"
+    "@protolabsai/utils/tenancy-server"
   );
   return resolver(request);
 };

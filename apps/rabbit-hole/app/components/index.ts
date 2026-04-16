@@ -10,11 +10,11 @@
 // Performance Monitoring
 export { WebVitalsMonitor } from "./WebVitalsMonitor";
 
-// Hooks (now in @proto/ui package)
-export { useToast, toast } from "@proto/ui/hooks";
+// Hooks (now in @protolabsai/ui package)
+export { useToast, toast } from "@protolabsai/ui/hooks";
 
-// UI Components now in @proto/ui package
-// import from @proto/ui/atoms, @proto/ui/molecules, @proto/ui/organisms, or @proto/ui/templates
+// UI Components now in @protolabsai/ui package
+// import from @protolabsai/ui/atoms, @protolabsai/ui/molecules, @protolabsai/ui/organisms, or @protolabsai/ui/templates
 // App-specific UI components:
 export { DialogRegistry } from "./ui/DialogRegistry";
 export { ThemeSelector } from "./ui/ThemeSelector";

@@ -1,4 +1,4 @@
-# @proto/charts - Current Status
+# @protolabsai/charts - Current Status
 
 **Last Updated:** October 19, 2025  
 **Phase:** Complete ✅
@@ -79,7 +79,7 @@ import {
   type Range,
   getOffset,
   useGanttContext,
-} from "@proto/charts/gantt";
+} from "@protolabsai/charts/gantt";
 ```
 
 ---

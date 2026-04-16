@@ -12,7 +12,7 @@ import {
   EntityType,
   ALL_RELATIONSHIP_TYPES,
   RelationshipType,
-} from "@proto/types";
+} from "@protolabsai/types";
 
 // Use types from the schema system (single source of truth)
 const ALLOWED_RELATIONSHIP_TYPES = ALL_RELATIONSHIP_TYPES;

@@ -14,12 +14,12 @@ export default {
   // ✅ React components, UI libraries, browser utilities
   // ❌ Server packages with Node.js APIs or native dependencies
   transpilePackages: [
-    "@proto/ui", // Atomic Design component library (52 components)
-    "@proto/charts", // Chart components (Gantt, etc.)
-    "@proto/icon-system", // Icon components
-    "@proto/utils", // Utility functions (atlas, domain helpers)
-    "@proto/types", // Type definitions and Zod schemas
-    "@proto/llm-tools", // LLM playground components (client-safe parts only)
+    "@protolabsai/ui", // Atomic Design component library (52 components)
+    "@protolabsai/charts", // Chart components (Gantt, etc.)
+    "@protolabsai/icon-system", // Icon components
+    "@protolabsai/utils", // Utility functions (atlas, domain helpers)
+    "@protolabsai/types", // Type definitions and Zod schemas
+    "@protolabsai/llm-tools", // LLM playground components (client-safe parts only)
     "@xyflow/react", // ReactFlow - force graph visualization
     "d3-force", // D3 force simulation
     "@copilotkit/react-core", // CopilotKit React hooks
@@ -42,11 +42,11 @@ export default {
     "@langchain/community",
 
     // Server-only workspace packages (not transpiled)
-    "@proto/database",
-    "@proto/auth",
-    "@proto/llm-providers",
-    "@proto/logger",
-    "@proto/prompts",
+    "@protolabsai/database",
+    "@protolabsai/auth",
+    "@protolabsai/llm-providers",
+    "@protolabsai/logger",
+    "@protolabsai/prompts",
   ],
 
   // Turbopack-specific configuration for dynamic require issues

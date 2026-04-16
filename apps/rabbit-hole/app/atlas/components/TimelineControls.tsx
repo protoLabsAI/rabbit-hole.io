@@ -9,14 +9,14 @@
 
 import React, { useState } from "react";
 
-import { Icon } from "@proto/icon-system";
-import type { Granularity } from "@proto/types";
+import { Icon } from "@protolabsai/icon-system";
+import type { Granularity } from "@protolabsai/types";
 import {
   Button,
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@proto/ui/atoms";
+} from "@protolabsai/ui/atoms";
 
 export interface TimeRange {
   from: string; // ISO date string

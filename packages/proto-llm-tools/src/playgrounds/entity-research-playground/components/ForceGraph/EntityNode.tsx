@@ -2,7 +2,7 @@ import { Handle, Position, type NodeProps } from "@xyflow/react";
 
 /**
  * Default entity colors by type (subset for playground)
- * Full implementation in @proto/utils/atlas
+ * Full implementation in @protolabsai/utils/atlas
  */
 const ENTITY_COLORS: Record<string, string> = {
   Person: "#3B82F6",

@@ -4,7 +4,7 @@
  * Validation and utility functions for entity type selection
  */
 
-import { domainRegistry } from "@proto/types";
+import { domainRegistry } from "@protolabsai/types";
 
 /**
  * Validation constraints for entity type selection

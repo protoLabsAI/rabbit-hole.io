@@ -7,7 +7,7 @@
 
 import { useCallback, useState, useEffect } from "react";
 
-import type { FileProcessingResult } from "@proto/utils/file-processing";
+import type { FileProcessingResult } from "@protolabsai/utils/file-processing";
 
 import { vlog } from "@/lib/verbose-logger";
 

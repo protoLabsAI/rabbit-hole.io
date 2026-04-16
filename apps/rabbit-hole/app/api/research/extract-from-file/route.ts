@@ -8,10 +8,10 @@
 import mammoth from "mammoth";
 import { NextRequest, NextResponse } from "next/server";
 
-import { getUserTier, getTierLimits } from "@proto/auth";
-import { entityExtractionBasicTool } from "@proto/llm-tools/tools/entity-extraction-basic";
-import type { Evidence, RabbitHoleBundleData } from "@proto/types";
-import { domainRegistry } from "@proto/types";
+import { getUserTier, getTierLimits } from "@protolabsai/auth";
+import { entityExtractionBasicTool } from "@protolabsai/llm-tools/tools/entity-extraction-basic";
+import type { Evidence, RabbitHoleBundleData } from "@protolabsai/types";
+import { domainRegistry } from "@protolabsai/types";
 
 // Extend timeout for long-running extractions with job queue polling
 export const maxDuration = 300; // 5 minutes

@@ -7,7 +7,7 @@
 import {
   fetchFileByCanonicalKey,
   type FileEntityWithOwnership,
-} from "@proto/database";
+} from "@protolabsai/database";
 
 export interface FileAccessResult {
   allowed: boolean;

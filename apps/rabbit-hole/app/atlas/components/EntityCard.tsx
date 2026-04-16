@@ -9,7 +9,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 
-import type { CompactTimelineData } from "@proto/types";
+import type { CompactTimelineData } from "@protolabsai/types";
 
 import { batchTimelineFetcher } from "../utils/batch-timeline-fetcher";
 

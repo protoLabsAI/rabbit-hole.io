@@ -1,10 +1,10 @@
 /**
- * Client-safe exports for @proto/llm-tools
+ * Client-safe exports for @protolabsai/llm-tools
  *
  * This entry point only exports browser-compatible code without
  * Node.js dependencies (no LangChain, no LangGraph workflows).
  *
- * Import from @proto/llm-tools/client in React components and Storybook.
+ * Import from @protolabsai/llm-tools/client in React components and Storybook.
  */
 
 // React Hooks (browser-safe)

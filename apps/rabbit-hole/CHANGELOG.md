@@ -1,4 +1,4 @@
-# @apps/rabbit-hole
+# @protolabsai/rabbit-hole
 
 ## 0.4.2
 
@@ -6,16 +6,16 @@
 
 - c0435ce: Security: Patch Next.js CVE-2025-66478 (RCE)
 - Updated dependencies [c0435ce]
-  - @proto/llm-tools@0.1.7
-  - @proto/sidequest-utils@0.1.6
-  - @proto/ui@0.3.3
-  - @proto/auth@2.0.4
-  - @proto/charts@0.1.5
-  - @proto/forms@0.3.3
-  - @proto/freehand-drawing@0.1.7
-  - @proto/graph-editor@0.1.6
-  - @proto/utils@0.3.0
-  - @proto/api-utils@0.1.6
+  - @protolabsai/llm-tools@0.1.7
+  - @protolabsai/sidequest-utils@0.1.6
+  - @protolabsai/ui@0.3.3
+  - @protolabsai/auth@2.0.4
+  - @protolabsai/charts@0.1.5
+  - @protolabsai/forms@0.3.3
+  - @protolabsai/freehand-drawing@0.1.7
+  - @protolabsai/graph-editor@0.1.6
+  - @protolabsai/utils@0.3.0
+  - @protolabsai/api-utils@0.1.6
 
 ## 0.4.1
 
@@ -30,7 +30,7 @@
   - Removed Card wrapper from progress card for cleaner appearance
 
 - Updated dependencies [64668b6]
-  - @proto/llm-tools@0.1.6
+  - @protolabsai/llm-tools@0.1.6
 
 ## 0.4.0
 
@@ -48,24 +48,24 @@
 
 - Updated dependencies [e8b671f]
 - Updated dependencies [e8b671f]
-  - @proto/ui@0.3.2
-  - @proto/llm-tools@0.1.5
-  - @proto/auth@2.0.3
-  - @proto/charts@0.1.4
-  - @proto/forms@0.3.2
-  - @proto/freehand-drawing@0.1.6
-  - @proto/graph-editor@0.1.5
-  - @proto/sidequest-utils@0.1.5
-  - @proto/utils@0.3.0
-  - @proto/api-utils@0.1.5
+  - @protolabsai/ui@0.3.2
+  - @protolabsai/llm-tools@0.1.5
+  - @protolabsai/auth@2.0.3
+  - @protolabsai/charts@0.1.4
+  - @protolabsai/forms@0.3.2
+  - @protolabsai/freehand-drawing@0.1.6
+  - @protolabsai/graph-editor@0.1.5
+  - @protolabsai/sidequest-utils@0.1.5
+  - @protolabsai/utils@0.3.0
+  - @protolabsai/api-utils@0.1.5
 
 ## 0.3.1
 
 ### Patch Changes
 
 - Updated dependencies [f36511a]
-  - @proto/sidequest-utils@0.1.4
-  - @proto/llm-tools@0.1.4
+  - @protolabsai/sidequest-utils@0.1.4
+  - @protolabsai/llm-tools@0.1.4
 
 ## 0.3.0
 
@@ -166,7 +166,7 @@
 
   Migrated all native browser `alert()` and `confirm()` dialogs to modern, accessible UI components:
   - Added `ConfirmDialog` component with provider-based context API for promise-based confirmations
-  - Replaced blocking native dialogs with non-blocking styled components from @proto/ui
+  - Replaced blocking native dialogs with non-blocking styled components from @protolabsai/ui
   - Improved UX with keyboard navigation (Tab, ESC) and screen reader support
   - Updated research workspace (graph operations, version history, entity cards)
   - Updated dashboard (session management with ConfirmPopover)
@@ -189,11 +189,11 @@
 ### Patch Changes
 
 - Updated dependencies [8a48e27]
-  - @proto/auth@2.0.2
-  - @proto/api-utils@0.1.4
-  - @proto/freehand-drawing@0.1.5
-  - @proto/graph-editor@0.1.4
-  - @proto/utils@0.3.0
+  - @protolabsai/auth@2.0.2
+  - @protolabsai/api-utils@0.1.4
+  - @protolabsai/freehand-drawing@0.1.5
+  - @protolabsai/graph-editor@0.1.4
+  - @protolabsai/utils@0.3.0
 
 ## 0.1.4
 
@@ -219,7 +219,7 @@
   - Freehand nodes default to `draggable: false`, dynamically enabled on selection
 
 - Updated dependencies [c355041]
-  - @proto/freehand-drawing@0.1.4
+  - @protolabsai/freehand-drawing@0.1.4
 
 ## 0.1.3
 
@@ -240,16 +240,16 @@
 
 - Updated dependencies [fb1e4be]
 - Updated dependencies [fb1e4be]
-  - @proto/freehand-drawing@0.1.3
-  - @proto/auth@2.0.1
-  - @proto/ui@0.3.1
-  - @proto/api-utils@0.1.3
-  - @proto/graph-editor@0.1.3
-  - @proto/utils@0.3.0
-  - @proto/charts@0.1.3
-  - @proto/forms@0.3.1
-  - @proto/llm-tools@0.1.3
-  - @proto/sidequest-utils@0.1.3
+  - @protolabsai/freehand-drawing@0.1.3
+  - @protolabsai/auth@2.0.1
+  - @protolabsai/ui@0.3.1
+  - @protolabsai/api-utils@0.1.3
+  - @protolabsai/graph-editor@0.1.3
+  - @protolabsai/utils@0.3.0
+  - @protolabsai/charts@0.1.3
+  - @protolabsai/forms@0.3.1
+  - @protolabsai/llm-tools@0.1.3
+  - @protolabsai/sidequest-utils@0.1.3
 
 ## 0.1.2
 
@@ -258,13 +258,13 @@
 - f8f13f8: Extracted reusable components from app to workspace packages
 
   **New Package:**
-  - Created `@proto/forms` with domain entity form system (77 entity types)
+  - Created `@protolabsai/forms` with domain entity form system (77 entity types)
   - Includes EntityForm, DomainFormSelector, DynamicFormFields, mock data generation
 
   **Extended Packages:**
-  - `@proto/ui`: Added DataTable component to organisms/data-table export
-  - `@proto/auth`: Added UI components (TierBadge, UpgradePromptModal, ClientRoleGuard, RoleManager) via ./ui export
-  - `@proto/utils`: Added React utilities (lazy loading, error boundaries, tier-aware HOC) via ./react/lazy-loading export
+  - `@protolabsai/ui`: Added DataTable component to organisms/data-table export
+  - `@protolabsai/auth`: Added UI components (TierBadge, UpgradePromptModal, ClientRoleGuard, RoleManager) via ./ui export
+  - `@protolabsai/utils`: Added React utilities (lazy loading, error boundaries, tier-aware HOC) via ./react/lazy-loading export
 
   **Fixes:**
   - Fixed yjs-history `groupVersionsByDate` calculation for "yesterday" grouping
@@ -276,18 +276,18 @@
   - Removed 6 component directories (forms, data, layouts, auth, billing, lazy-loading)
 
 - Updated dependencies [f8f13f8]
-  - @proto/forms@0.3.0
-  - @proto/ui@0.3.0
-  - @proto/auth@2.0.0
-  - @proto/utils@0.3.0
-  - @proto/yjs-history@0.1.2
-  - @proto/charts@0.1.2
-  - @proto/freehand-drawing@0.1.2
-  - @proto/graph-editor@0.1.2
-  - @proto/llm-tools@0.1.2
-  - @proto/sidequest-utils@0.1.2
-  - @proto/api-utils@0.1.2
-  - @proto/collab@0.1.2
+  - @protolabsai/forms@0.3.0
+  - @protolabsai/ui@0.3.0
+  - @protolabsai/auth@2.0.0
+  - @protolabsai/utils@0.3.0
+  - @protolabsai/yjs-history@0.1.2
+  - @protolabsai/charts@0.1.2
+  - @protolabsai/freehand-drawing@0.1.2
+  - @protolabsai/graph-editor@0.1.2
+  - @protolabsai/llm-tools@0.1.2
+  - @protolabsai/sidequest-utils@0.1.2
+  - @protolabsai/api-utils@0.1.2
+  - @protolabsai/collab@0.1.2
 
 ## 0.1.1
 
@@ -298,18 +298,18 @@
   Extracted reusable components from app to workspace packages with comprehensive fixes for dependencies, build order, and Storybook integration.
 
   **New Package:**
-  - Created `@proto/forms` with domain entity form system (77 entity types)
+  - Created `@protolabsai/forms` with domain entity form system (77 entity types)
   - Includes EntityForm, DomainFormSelector, DynamicFormFields, mock data generation, Storybook utilities
 
   **Extended Packages:**
-  - `@proto/ui`: Added DataTable component to organisms/data-table export, EntitySearch with optional icon provider
-  - `@proto/auth`: Added UI components (TierBadge, UpgradePromptModal, ClientRoleGuard, RoleManager) via ./ui export
-  - `@proto/utils`: Added React utilities (lazy loading, error boundaries, tier-aware HOC) via ./react/lazy-loading export
+  - `@protolabsai/ui`: Added DataTable component to organisms/data-table export, EntitySearch with optional icon provider
+  - `@protolabsai/auth`: Added UI components (TierBadge, UpgradePromptModal, ClientRoleGuard, RoleManager) via ./ui export
+  - `@protolabsai/utils`: Added React utilities (lazy loading, error boundaries, tier-aware HOC) via ./react/lazy-loading export
 
   **Dependency Fixes:**
-  - Added missing workspace dependencies: `@proto/types` and `@proto/icon-system` to `@proto/ui`
-  - Added `@proto/utils` to `@proto/llm-tools` (4 files importing from utils)
-  - Resolved circular dependency (@proto/utils ↔ @proto/ui) by making EntitySearch accept optional `getEntityIcon` prop
+  - Added missing workspace dependencies: `@protolabsai/types` and `@protolabsai/icon-system` to `@protolabsai/ui`
+  - Added `@protolabsai/utils` to `@protolabsai/llm-tools` (4 files importing from utils)
+  - Resolved circular dependency (@protolabsai/utils ↔ @protolabsai/ui) by making EntitySearch accept optional `getEntityIcon` prop
   - Fixed yjs-history `groupVersionsByDate` calculation for "yesterday" grouping
   - Fixed SSR compatibility in utils by properly externalizing React dependencies
 
@@ -321,10 +321,10 @@
   **Storybook:**
   - Fixed 24 story files importing from old paths
   - Standardized on `@rabbit-hole` alias for app imports (consistency)
-  - Extracted components use `@proto/*` workspace packages
-  - Added `@/` and `@proto/forms` aliases to webpack config
-  - ResizableChatLayout story now imports from `@proto/ui/templates`
-  - Added missing exports (DOMAIN_SELECTOR_ARG, STORY_ENTITY_TYPES_BY_DOMAIN) to @proto/forms
+  - Extracted components use `@protolabsai/*` workspace packages
+  - Added `@/` and `@protolabsai/forms` aliases to webpack config
+  - ResizableChatLayout story now imports from `@protolabsai/ui/templates`
+  - Added missing exports (DOMAIN_SELECTOR_ARG, STORY_ENTITY_TYPES_BY_DOMAIN) to @protolabsai/forms
 
   **Git Hooks:**
   - Enhanced pre-push hook with comprehensive package type-checking and clear error messages
@@ -338,18 +338,18 @@
   - Fixed import order in auto-generated `.generated/custom-domains/registry.ts`
 
 - Updated dependencies [44db068]
-  - @proto/forms@0.2.0
-  - @proto/ui@0.2.0
-  - @proto/auth@1.0.0
-  - @proto/utils@0.2.0
-  - @proto/yjs-history@0.1.1
-  - @proto/charts@0.1.1
-  - @proto/freehand-drawing@0.1.1
-  - @proto/graph-editor@0.1.1
-  - @proto/llm-tools@0.1.1
-  - @proto/sidequest-utils@0.1.1
-  - @proto/api-utils@0.1.1
-  - @proto/collab@0.1.1
+  - @protolabsai/forms@0.2.0
+  - @protolabsai/ui@0.2.0
+  - @protolabsai/auth@1.0.0
+  - @protolabsai/utils@0.2.0
+  - @protolabsai/yjs-history@0.1.1
+  - @protolabsai/charts@0.1.1
+  - @protolabsai/freehand-drawing@0.1.1
+  - @protolabsai/graph-editor@0.1.1
+  - @protolabsai/llm-tools@0.1.1
+  - @protolabsai/sidequest-utils@0.1.1
+  - @protolabsai/api-utils@0.1.1
+  - @protolabsai/collab@0.1.1
 
 ## 0.1.0
 
@@ -384,22 +384,22 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @proto/api-utils@0.1.0
-  - @proto/assets@0.1.0
-  - @proto/auth@0.1.0
-  - @proto/charts@0.2.0
-  - @proto/collab@0.1.0
-  - @proto/database@0.1.0
-  - @proto/freehand-drawing@0.1.0
-  - @proto/graph-editor@0.2.0
-  - @proto/icon-system@0.1.0
-  - @proto/llm-providers@0.1.0
-  - @proto/llm-tools@0.1.0
-  - @proto/logger@0.1.0
-  - @proto/prompts@0.1.0
-  - @proto/sidequest-utils@1.1.0
-  - @proto/types@0.1.0
-  - @proto/ui@2.2.0
-  - @proto/utils@0.1.0
-  - @proto/workspace@0.2.0
-  - @proto/yjs-history@1.1.0
+  - @protolabsai/api-utils@0.1.0
+  - @protolabsai/assets@0.1.0
+  - @protolabsai/auth@0.1.0
+  - @protolabsai/charts@0.2.0
+  - @protolabsai/collab@0.1.0
+  - @protolabsai/database@0.1.0
+  - @protolabsai/freehand-drawing@0.1.0
+  - @protolabsai/graph-editor@0.2.0
+  - @protolabsai/icon-system@0.1.0
+  - @protolabsai/llm-providers@0.1.0
+  - @protolabsai/llm-tools@0.1.0
+  - @protolabsai/logger@0.1.0
+  - @protolabsai/prompts@0.1.0
+  - @protolabsai/sidequest-utils@1.1.0
+  - @protolabsai/types@0.1.0
+  - @protolabsai/ui@2.2.0
+  - @protolabsai/utils@0.1.0
+  - @protolabsai/workspace@0.2.0
+  - @protolabsai/yjs-history@1.1.0

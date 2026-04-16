@@ -6,8 +6,8 @@
 
 "use client";
 
-import { Icon } from "@proto/icon-system";
-import type { RegisteredIconName } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
+import type { RegisteredIconName } from "@protolabsai/icon-system";
 
 export type LayoutMode = "saved" | "dagre" | "force";
 

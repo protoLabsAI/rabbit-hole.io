@@ -100,13 +100,13 @@ rabbit-hole.io/
 │   ├── app/api/entity-search/ # Full-text entity lookup
 │   └── app/api/ingest-bundle/ # Bundle ingestion
 ├── packages/
-│   ├── @proto/types               # Zod schemas, bundle format, entity types
-│   ├── @proto/database            # Neo4j + PostgreSQL clients
-│   ├── @proto/mcp-server          # MCP tools (stdio + HTTP, port 3398)
-│   ├── @proto/research-middleware # AI SDK middleware chain (EntityMemory, Reflection, etc.)
-│   ├── @proto/llm-providers       # LLM abstraction (Claude, GPT, Gemini)
-│   ├── @proto/ui                  # Component library (atoms/molecules/organisms)
-│   └── @proto/utils               # Graph algorithms, atlas config
+│   ├── @protolabsai/types               # Zod schemas, bundle format, entity types
+│   ├── @protolabsai/database            # Neo4j + PostgreSQL clients
+│   ├── @protolabsai/mcp-server          # MCP tools (stdio + HTTP, port 3398)
+│   ├── @protolabsai/research-middleware # AI SDK middleware chain (EntityMemory, Reflection, etc.)
+│   ├── @protolabsai/llm-providers       # LLM abstraction (Claude, GPT, Gemini)
+│   ├── @protolabsai/ui                  # Component library (atoms/molecules/organisms)
+│   └── @protolabsai/utils               # Graph algorithms, atlas config
 ├── services/job-processor/    # Media ingestion + job queue (Sidequest)
 ├── agent/                     # LangGraph agent server
 ├── migrations/                # Neo4j schema migrations
@@ -116,7 +116,7 @@ rabbit-hole.io/
 
 ## MCP Integration
 
-The `@proto/mcp-server` provides tools for Claude Code and other MCP clients:
+The `@protolabsai/mcp-server` provides tools for Claude Code and other MCP clients:
 
 | Tool | Purpose |
 |------|---------|
@@ -137,9 +137,9 @@ The `@proto/mcp-server` provides tools for Claude Code and other MCP clients:
 
 - **Search**: Neo4j full-text (Lucene), Tavily, Wikipedia, DuckDuckGo
 - **Graph database**: Neo4j 5 with APOC
-- **AI**: AI SDK v6 (`streamText`, `generateObject`), Claude via `@proto/llm-providers`, LangGraph agents
+- **AI**: AI SDK v6 (`streamText`, `generateObject`), Claude via `@protolabsai/llm-providers`, LangGraph agents
 - **Framework**: Next.js 15, React 19, TypeScript
-- **UI**: Tailwind CSS, @proto/ui component library, Lucide icons
+- **UI**: Tailwind CSS, @protolabsai/ui component library, Lucide icons
 - **Media**: Job processor with adapters for PDF, audio, video, text, HTML
 - **Storage**: PostgreSQL (Sidequest job queue), MinIO (S3-compatible)
 - **Monorepo**: pnpm workspaces + Turborepo

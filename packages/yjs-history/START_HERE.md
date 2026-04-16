@@ -1,4 +1,4 @@
-# 🎯 START HERE - @proto/yjs-history
+# 🎯 START HERE - @protolabsai/yjs-history
 
 **Ready to integrate? Follow this guide.**
 
@@ -35,7 +35,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    @proto/yjs-history                       │
+│                    @protolabsai/yjs-history                       │
 │                                                             │
 │  Features:                                                  │
 │  • Undo/Redo with Y.UndoManager                            │
@@ -146,7 +146,7 @@ Do you need undo/redo?
 
 ```typescript
 // 1. Import (replace old import)
-import { useYjsHistory, IndexedDBVersionStorage } from "@proto/yjs-history";
+import { useYjsHistory, IndexedDBVersionStorage } from "@protolabsai/yjs-history";
 
 // 2. Use (replace useYjsUndo call)
 const { undo, redo, canUndo, canRedo } = useYjsHistory({

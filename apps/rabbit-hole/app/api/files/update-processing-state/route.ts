@@ -7,15 +7,15 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { withAuthAndLogging } from "@proto/auth";
-import { getGlobalNeo4jClient } from "@proto/database";
+import { withAuthAndLogging } from "@protolabsai/auth";
+import { getGlobalNeo4jClient } from "@protolabsai/database";
 import {
   ProcessingStateUpdateSchema,
   safeValidate,
   type FileProcessingState,
-} from "@proto/types";
+} from "@protolabsai/types";
 
-// FileProcessingState type is imported from @proto/types
+// FileProcessingState type is imported from @protolabsai/types
 
 interface UpdateProcessingStateRequest {
   fileUid: string;

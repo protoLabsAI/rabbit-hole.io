@@ -11,8 +11,8 @@ import { type ClassValue, clsx } from "clsx";
 import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
-import { Icon } from "@proto/icon-system";
-import { Badge, Card, CardContent, Progress } from "@proto/ui/atoms";
+import { Icon } from "@protolabsai/icon-system";
+import { Badge, Card, CardContent, Progress } from "@protolabsai/ui/atoms";
 
 import { useJobStatus, useJobNotifications } from "../../client";
 

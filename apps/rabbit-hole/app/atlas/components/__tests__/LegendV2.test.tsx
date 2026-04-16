@@ -9,14 +9,14 @@ import userEvent from "@testing-library/user-event";
 import React from "react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 
-import * as atlasUtils from "@proto/utils/atlas";
+import * as atlasUtils from "@protolabsai/utils/atlas";
 
 import type { CanonicalGraphData } from "../../../types/canonical-graph";
 import { LegendV2 } from "../LegendV2";
 
 // Mock the external dependencies
 
-vi.mock("@proto/utils/atlas", () => ({
+vi.mock("@protolabsai/utils/atlas", () => ({
   generateLegendData: vi.fn(),
   getEntityColor: vi.fn().mockReturnValue("#3B82F6"),
   getEntityImage: vi.fn().mockReturnValue("👤"),

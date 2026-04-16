@@ -1,11 +1,11 @@
 /**
  * Langfuse Tracing Utilities for Deep Agent
  *
- * Direct SDK integration for observability. Uses @proto/observability
+ * Direct SDK integration for observability. Uses @protolabsai/observability
  * singleton Langfuse client for consistent tracing across the agent.
  */
 
-import { getLangfuse, isLangfuseEnabled } from "@proto/observability";
+import { getLangfuse, isLangfuseEnabled } from "@protolabsai/observability";
 
 export interface TraceContext {
   sessionId: string;

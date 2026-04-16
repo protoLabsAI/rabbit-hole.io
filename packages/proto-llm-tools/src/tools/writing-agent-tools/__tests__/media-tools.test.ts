@@ -11,7 +11,7 @@ import {
 } from "../media-processing-tools.js";
 
 // Mock dependencies
-vi.mock("@proto/sidequest-utils/server", () => ({
+vi.mock("@protolabsai/sidequest-utils/server", () => ({
   enqueueYouTubeJob: vi.fn().mockResolvedValue({
     jobId: "test_job_123",
   }),

@@ -6,7 +6,7 @@
  * types: spouse, child, parent, sibling.
  */
 
-import { getStatusEmoji } from "@proto/utils/atlas";
+import { getStatusEmoji } from "@protolabsai/utils/atlas";
 
 import { FamilyMemberLink } from "../../shared/EntityLink";
 

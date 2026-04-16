@@ -22,7 +22,7 @@
 
 import { generateText } from "ai";
 
-import { getAIModel } from "@proto/llm-providers/server";
+import { getAIModel } from "@protolabsai/llm-providers/server";
 
 import type {
   AgentResult,
@@ -135,9 +135,7 @@ export function buildExtractionContext(
         typeof (args as Record<string, unknown>)["query"] === "string"
           ? (args as Record<string, unknown>)["query"]
           : "";
-      parts.push(
-        `### ${toolName}${query ? ` (query: "${query}")` : ""}`
-      );
+      parts.push(`### ${toolName}${query ? ` (query: "${query}")` : ""}`);
       // Cap each tool result to avoid oversized prompts.
       const serialised = JSON.stringify(result, null, 2);
       parts.push(serialised.slice(0, MAX_CHARS_PER_TOOL_RESULT));
@@ -254,7 +252,9 @@ export function parseExtractionResult(text: string): ExtractionPreview | null {
     }));
 
   const relationships: ExtractedRelationship[] = (
-    Array.isArray(raw["relationships"]) ? (raw["relationships"] as unknown[]) : []
+    Array.isArray(raw["relationships"])
+      ? (raw["relationships"] as unknown[])
+      : []
   )
     .filter(
       (r): r is Record<string, unknown> =>
@@ -339,10 +339,7 @@ export class StructuredExtractionMiddleware implements ResearchMiddleware {
    * The extraction LLM call is tracked as a Langfuse generation with
    * entity count, relationship count, and confidence as quality metadata.
    */
-  async afterAgent(
-    ctx: MiddlewareContext,
-    result: AgentResult
-  ): Promise<void> {
+  async afterAgent(ctx: MiddlewareContext, result: AgentResult): Promise<void> {
     const finalText = result.text ?? "";
     if (finalText.length < MIN_TEXT_LENGTH) return;
 

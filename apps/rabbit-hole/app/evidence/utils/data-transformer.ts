@@ -1,6 +1,6 @@
 import { Node, Edge } from "@xyflow/react";
 
-import { getEntityTypeColor } from "@proto/utils";
+import { getEntityTypeColor } from "@protolabsai/utils";
 
 import type {
   EvidenceGraphData,

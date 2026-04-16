@@ -1,7 +1,7 @@
 /**
- * Testing utilities for @proto/llm-providers
+ * Testing utilities for @protolabsai/llm-providers
  *
- * Import from "@proto/llm-providers/testing" in test files
+ * Import from "@protolabsai/llm-providers/testing" in test files
  */
 
 export {

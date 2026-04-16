@@ -9,8 +9,8 @@
  * - Lock pan/zoom
  */
 
-import { Icon } from "@proto/icon-system";
-import { RESEARCH_EVENTS, dispatchResearchEvent } from "@proto/workspace";
+import { Icon } from "@protolabsai/icon-system";
+import { RESEARCH_EVENTS, dispatchResearchEvent } from "@protolabsai/workspace";
 
 import { cn } from "@/lib/utils";
 

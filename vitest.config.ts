@@ -108,78 +108,93 @@ export default defineConfig({
       "@/types": path.resolve(__dirname, "./apps/rabbit-hole/app/types"),
       "@/context": path.resolve(__dirname, "./apps/rabbit-hole/app/context"),
       "@/utils": path.resolve(__dirname, "./apps/rabbit-hole/app/utils"),
-      "@proto/types": path.resolve(__dirname, "./packages/types/src"),
-      "@proto/utils": path.resolve(__dirname, "./packages/utils/src"),
-      "@proto/database": path.resolve(__dirname, "./packages/database/src"),
-      "@proto/auth": path.resolve(__dirname, "./packages/auth/src"),
-      // @proto/deepagent subpaths
-      "@proto/deepagent/tools": path.resolve(
+      "@protolabsai/types": path.resolve(__dirname, "./packages/types/src"),
+      "@protolabsai/utils": path.resolve(__dirname, "./packages/utils/src"),
+      "@protolabsai/database": path.resolve(
+        __dirname,
+        "./packages/database/src"
+      ),
+      "@protolabsai/auth": path.resolve(__dirname, "./packages/auth/src"),
+      // @protolabsai/deepagent subpaths
+      "@protolabsai/deepagent/tools": path.resolve(
         __dirname,
         "./packages/deepagent/src/tools"
       ),
-      "@proto/deepagent/subagents": path.resolve(
+      "@protolabsai/deepagent/subagents": path.resolve(
         __dirname,
         "./packages/deepagent/src/subagents"
       ),
-      "@proto/deepagent/prompts": path.resolve(
+      "@protolabsai/deepagent/prompts": path.resolve(
         __dirname,
         "./packages/deepagent/src/prompts"
       ),
-      "@proto/deepagent/state": path.resolve(
+      "@protolabsai/deepagent/state": path.resolve(
         __dirname,
         "./packages/deepagent/src/state.ts"
       ),
-      "@proto/deepagent/graph": path.resolve(
+      "@protolabsai/deepagent/graph": path.resolve(
         __dirname,
         "./packages/deepagent/src/graph"
       ),
-      "@proto/deepagent": path.resolve(__dirname, "./packages/deepagent/src"),
-      "@proto/llm-tools/tools/entity-extraction-basic": path.resolve(
+      "@protolabsai/deepagent": path.resolve(
+        __dirname,
+        "./packages/deepagent/src"
+      ),
+      "@protolabsai/llm-tools/tools/entity-extraction-basic": path.resolve(
         __dirname,
         "./packages/proto-llm-tools/src/tools/entity-extraction-basic"
       ),
-      "@proto/llm-tools/playgrounds": path.resolve(
+      "@protolabsai/llm-tools/playgrounds": path.resolve(
         __dirname,
         "./packages/proto-llm-tools/src/playgrounds"
       ),
-      "@proto/llm-tools/client": path.resolve(
+      "@protolabsai/llm-tools/client": path.resolve(
         __dirname,
         "./packages/proto-llm-tools/src/client.ts"
       ),
-      "@proto/llm-tools": path.resolve(
+      "@protolabsai/llm-tools": path.resolve(
         __dirname,
         "./packages/proto-llm-tools/src"
       ),
-      "@proto/api-utils": path.resolve(__dirname, "./packages/api-utils/src"),
-      "@proto/sidequest-utils": path.resolve(
+      "@protolabsai/api-utils": path.resolve(
+        __dirname,
+        "./packages/api-utils/src"
+      ),
+      "@protolabsai/sidequest-utils": path.resolve(
         __dirname,
         "./packages/sidequest-utils/src"
       ),
-      "@proto/sidequest-utils/client": path.resolve(
+      "@protolabsai/sidequest-utils/client": path.resolve(
         __dirname,
         "./packages/sidequest-utils/src/client"
       ),
-      "@proto/sidequest-utils/server": path.resolve(
+      "@protolabsai/sidequest-utils/server": path.resolve(
         __dirname,
         "./packages/sidequest-utils/src/server"
       ),
-      "@proto/ui": path.resolve(__dirname, "./packages/ui/src"),
-      "@proto/ui/atoms": path.resolve(__dirname, "./packages/ui/src/atoms"),
-      "@proto/ui/molecules": path.resolve(
+      "@protolabsai/ui": path.resolve(__dirname, "./packages/ui/src"),
+      "@protolabsai/ui/atoms": path.resolve(
+        __dirname,
+        "./packages/ui/src/atoms"
+      ),
+      "@protolabsai/ui/molecules": path.resolve(
         __dirname,
         "./packages/ui/src/molecules"
       ),
-      "@proto/ui/organisms": path.resolve(
+      "@protolabsai/ui/organisms": path.resolve(
         __dirname,
         "./packages/ui/src/organisms"
       ),
-      "@proto/ui/templates": path.resolve(
+      "@protolabsai/ui/templates": path.resolve(
         __dirname,
         "./packages/ui/src/templates"
       ),
-      "@proto/ui/theme": path.resolve(__dirname, "./packages/ui/src/theme"),
-      "@proto/charts": path.resolve(__dirname, "./packages/charts/src"),
-      "@proto/charts/gantt": path.resolve(
+      "@protolabsai/ui/theme": path.resolve(
+        __dirname,
+        "./packages/ui/src/theme"
+      ),
+      "@protolabsai/charts": path.resolve(__dirname, "./packages/charts/src"),
+      "@protolabsai/charts/gantt": path.resolve(
         __dirname,
         "./packages/charts/src/gantt"
       ),

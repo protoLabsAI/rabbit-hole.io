@@ -8,7 +8,7 @@
  * - Map style selector
  */
 
-import { Icon } from "@proto/icon-system";
+import { Icon } from "@protolabsai/icon-system";
 
 interface MapToolbarButtonsProps {
   onToggleLayers?: () => void;

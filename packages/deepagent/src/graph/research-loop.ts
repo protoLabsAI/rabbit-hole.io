@@ -19,7 +19,7 @@ import type { BaseMessage } from "@langchain/core/messages";
 import type { RunnableConfig } from "@langchain/core/runnables";
 import type { StructuredTool } from "@langchain/core/tools";
 
-import { upsertResearchChunks } from "@proto/vector";
+import { upsertResearchChunks } from "@protolabsai/vector";
 
 import type { EntityResearchAgentStateType } from "../state";
 import { communitySearchTool } from "../tools/community-search";

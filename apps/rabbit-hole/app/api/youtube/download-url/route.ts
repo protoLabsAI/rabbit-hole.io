@@ -5,8 +5,8 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { withAuthAndLogging } from "@proto/auth";
-import { youtubeProcessorConfig } from "@proto/llm-tools";
+import { withAuthAndLogging } from "@protolabsai/auth";
+import { youtubeProcessorConfig } from "@protolabsai/llm-tools";
 
 export const dynamic = "force-dynamic";
 
