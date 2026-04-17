@@ -2,24 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { extractTenantIdentifiers } from "@protolabsai/utils/tenancy-edge";
 
-const RESEARCH_ENABLED = process.env.ENABLE_RESEARCH === "true";
-
 export default function middleware(request: NextRequest) {
-  // Block the standalone Research workspace in production.
-  // /api/research/deep is kept — it powers the search page's deep research mode.
-  if (!RESEARCH_ENABLED) {
-    const { pathname } = request.nextUrl;
-    const isResearchPage =
-      pathname === "/research" || pathname.startsWith("/research/");
-    const isResearchApi =
-      pathname.startsWith("/api/research/") &&
-      !pathname.startsWith("/api/research/deep");
-
-    if (isResearchPage || isResearchApi) {
-      return new NextResponse(null, { status: 404 });
-    }
-  }
-
   // Extract tenant identifiers from URL (no database calls - edge compatible)
   const tenantIds = extractTenantIdentifiers(request);
 
