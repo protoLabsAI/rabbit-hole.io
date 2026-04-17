@@ -44,7 +44,15 @@ RUN NODE_OPTIONS="--max-old-space-size=4096" pnpm turbo run build --filter=@prot
 # ============================================
 FROM node:20-alpine AS production
 
-RUN apk add --no-cache curl
+# Runtime binaries for the media ingestion adapters (this service is the
+# consolidated media pipeline — what proto-starter kept as separate
+# langextract-service / youtube-processor-service / faster-whisper-server):
+#   ffmpeg / ffprobe → audio-adapter + video-adapter (metadata, transcode)
+#   yt-dlp          → video-adapter's YouTube path
+#   curl            → healthchecks
+#
+# yt-dlp is Python-based and pulled from Alpine's community repo.
+RUN apk add --no-cache curl ffmpeg yt-dlp
 
 WORKDIR /app
 
