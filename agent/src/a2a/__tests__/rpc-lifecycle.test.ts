@@ -105,31 +105,53 @@ describe("A2A RPC lifecycle", () => {
     expect(result.status.state).toBe("submitted");
     const taskId = result.id;
 
-    // Register config AFTER the initial send. Spec requires this flow to work.
+    // Register config AFTER the initial send — spec shape:
+    // { taskId, pushNotificationConfig: { url, authentication?, id? } }
     const set = await rpc({
       jsonrpc: "2.0",
       id: 2,
       method: "tasks/pushNotificationConfig/set",
-      params: { taskId, id: "cfg1", url: "https://example.com/cb" },
+      params: {
+        taskId,
+        pushNotificationConfig: {
+          id: "cfg1",
+          url: "https://example.com/cb",
+        },
+      },
     });
-    expect((set.result as { id: string }).id).toBe("cfg1");
+    // Response matches Quinn's canonical shape.
+    const setResult = set.result as {
+      taskId: string;
+      pushNotificationConfig: { id: string; url: string };
+    };
+    expect(setResult.taskId).toBe(taskId);
+    expect(setResult.pushNotificationConfig.id).toBe("cfg1");
+    expect(setResult.pushNotificationConfig.url).toBe("https://example.com/cb");
 
+    // list returns an array of {taskId, pushNotificationConfig} per config.
     const list = await rpc({
       jsonrpc: "2.0",
       id: 3,
       method: "tasks/pushNotificationConfig/list",
       params: { taskId },
     });
-    const listed = (list.result as { configs: unknown[] }).configs;
+    const listed = list.result as Array<{
+      taskId: string;
+      pushNotificationConfig: { url: string };
+    }>;
     expect(listed).toHaveLength(1);
+    expect(listed[0]!.pushNotificationConfig.url).toBe(
+      "https://example.com/cb"
+    );
 
+    // delete clears the single-slot config, returns {deleted: true}.
     const del = await rpc({
       jsonrpc: "2.0",
       id: 4,
       method: "tasks/pushNotificationConfig/delete",
-      params: { taskId, id: "cfg1" },
+      params: { taskId },
     });
-    expect((del.result as { removed: boolean }).removed).toBe(true);
+    expect((del.result as { deleted: boolean }).deleted).toBe(true);
   });
 
   it("agent card served at both well-known paths", async () => {

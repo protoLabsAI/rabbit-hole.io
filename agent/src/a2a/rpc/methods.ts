@@ -39,16 +39,16 @@ export interface MessageSendParams {
 }
 
 /**
- * A2A spec `Task` object — what `message/send`, `tasks/get`, and
- * `tasks/cancel` return. `@a2a-js/sdk` routes on `kind: "task"` to
- * extract id + artifacts; the discriminator is load-bearing.
+ * Blocking `message/send` result — matches Quinn's reference handler:
+ * just `{id, contextId, status}`. The SDK builds a Task object from
+ * these fields; extra keys (kind, artifacts) are OK but not required
+ * for the blocking path. `tasks/get` returns the full Task shape
+ * (with kind + artifacts) for consumers that need the current state.
  */
 export interface MessageSendResult {
-  kind: "task";
   id: string;
   contextId: string;
   status: TaskRecord["status"];
-  artifacts?: TaskRecord["artifact"][];
 }
 
 export interface TasksGetParams {
@@ -102,11 +102,9 @@ export function registerMessageMethods(
       }
     });
     const result: MessageSendResult = {
-      kind: "task",
       id: record.taskId,
       contextId: record.contextId,
       status: submittedStatus,
-      artifacts: [record.artifact],
     };
     return result;
   });
@@ -121,8 +119,8 @@ export function registerTaskMethods(
     const record = taskStore.get(taskId);
     if (!record) {
       throw new RpcHandlerError(
-        JSON_RPC_ERRORS.INVALID_PARAMS,
-        `Unknown taskId: ${taskId}`
+        JSON_RPC_ERRORS.TASK_NOT_FOUND,
+        `Task not found: ${taskId}`
       );
     }
     return serializeTask(record);
@@ -133,8 +131,18 @@ export function registerTaskMethods(
     const { canceled, state } = taskStore.cancel(taskId);
     if (state === "unknown") {
       throw new RpcHandlerError(
-        JSON_RPC_ERRORS.INVALID_PARAMS,
-        `Unknown task id: ${taskId}`
+        JSON_RPC_ERRORS.TASK_NOT_FOUND,
+        `Task not found: ${taskId}`
+      );
+    }
+    // Quinn's reference handler returns -32002 when cancel hits a task
+    // that's already in a terminal state — canceled/completed/failed.
+    // Our atomic cancel returns canceled:false with the existing
+    // terminal state; surface that as the spec error.
+    if (!canceled && (state === "completed" || state === "failed")) {
+      throw new RpcHandlerError(
+        JSON_RPC_ERRORS.TASK_ALREADY_TERMINAL,
+        `Task already terminal: ${state}`
       );
     }
     const result: TasksCancelResult = { id: taskId, state, canceled };
@@ -151,29 +159,20 @@ export function registerPushMethods(
     const cfg = parsePushConfig(params);
     if (!taskStore.get(cfg.taskId)) {
       throw new RpcHandlerError(
-        JSON_RPC_ERRORS.INVALID_PARAMS,
-        `Unknown taskId: ${cfg.taskId}`
+        JSON_RPC_ERRORS.TASK_NOT_FOUND,
+        `Task not found: ${cfg.taskId}`
       );
     }
     pushStore.set(cfg);
-    return { taskId: cfg.taskId, id: cfg.id };
+    // Quinn's response shape: {taskId, pushNotificationConfig: {url, id}}.
+    // The SDK reads back `pushNotificationConfig` as the registered config.
+    return {
+      taskId: cfg.taskId,
+      pushNotificationConfig: { url: cfg.url, id: cfg.id },
+    };
   });
 
   router.register("tasks/pushNotificationConfig/get", async (params) => {
-    const p = parseTaskIdAndConfigId(params);
-    const cfg = pushStore.get(p.taskId, p.id);
-    if (!cfg) {
-      throw new RpcHandlerError(
-        JSON_RPC_ERRORS.INVALID_PARAMS,
-        `No config ${p.id} for task ${p.taskId}`
-      );
-    }
-    return cfg;
-  });
-
-  router.register("tasks/pushNotificationConfig/list", async (params) => {
-    // Push config methods use `taskId` (not `id`) to reference the target task —
-    // distinct from the A2A task lifecycle methods which use `id`.
     if (!isObject(params) || typeof params["taskId"] !== "string") {
       throw new RpcHandlerError(
         JSON_RPC_ERRORS.INVALID_PARAMS,
@@ -181,13 +180,62 @@ export function registerPushMethods(
       );
     }
     const taskId = params["taskId"];
-    return { taskId, configs: pushStore.list(taskId) };
+    if (!taskStore.get(taskId)) {
+      throw new RpcHandlerError(
+        JSON_RPC_ERRORS.TASK_NOT_FOUND,
+        `Task not found: ${taskId}`
+      );
+    }
+    // Single-slot: return the first config, or null if none.
+    const configs = pushStore.list(taskId);
+    const cfg = configs[0];
+    if (!cfg) return null;
+    return {
+      taskId,
+      pushNotificationConfig: { url: cfg.url, id: cfg.id },
+    };
+  });
+
+  router.register("tasks/pushNotificationConfig/list", async (params) => {
+    if (!isObject(params) || typeof params["taskId"] !== "string") {
+      throw new RpcHandlerError(
+        JSON_RPC_ERRORS.INVALID_PARAMS,
+        "params.taskId is required (string)"
+      );
+    }
+    const taskId = params["taskId"];
+    if (!taskStore.get(taskId)) {
+      throw new RpcHandlerError(
+        JSON_RPC_ERRORS.TASK_NOT_FOUND,
+        `Task not found: ${taskId}`
+      );
+    }
+    // Array shape: [{url, id}, ...] per spec.
+    return pushStore.list(taskId).map((c) => ({
+      taskId,
+      pushNotificationConfig: { url: c.url, id: c.id },
+    }));
   });
 
   router.register("tasks/pushNotificationConfig/delete", async (params) => {
-    const p = parseTaskIdAndConfigId(params);
-    const removed = pushStore.delete(p.taskId, p.id);
-    return { taskId: p.taskId, id: p.id, removed };
+    if (!isObject(params) || typeof params["taskId"] !== "string") {
+      throw new RpcHandlerError(
+        JSON_RPC_ERRORS.INVALID_PARAMS,
+        "params.taskId is required (string)"
+      );
+    }
+    const taskId = params["taskId"];
+    if (!taskStore.get(taskId)) {
+      throw new RpcHandlerError(
+        JSON_RPC_ERRORS.TASK_NOT_FOUND,
+        `Task not found: ${taskId}`
+      );
+    }
+    // Delete all configs for this task (single-slot model).
+    for (const c of pushStore.list(taskId)) {
+      pushStore.delete(taskId, c.id);
+    }
+    return { deleted: true };
   });
 }
 
