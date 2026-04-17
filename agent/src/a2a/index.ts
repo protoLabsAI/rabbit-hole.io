@@ -155,8 +155,8 @@ function wrapAutoSubscribe(
   if (!original) return;
   router.register("message/send", async (params, ctx) => {
     const result = await original(params, ctx);
-    const record = result as { taskId?: string };
-    if (record.taskId) delivery.subscribeTask(record.taskId);
+    const record = result as { id?: string };
+    if (record.id) delivery.subscribeTask(record.id);
     return result;
   });
 }

@@ -26,26 +26,33 @@ import { JSON_RPC_ERRORS } from "./types.js";
 // ── Params / Result types ───────────────────────────────────────────
 
 export interface MessageSendParams {
-  /** Skill id from the agent card (e.g. "search", "deep_research") */
-  skill?: string;
-  /** Free-form message text */
-  input?: string;
+  /** A2A spec: message object carrying the user turn */
+  message?: {
+    messageId?: string;
+    role?: string;
+    parts?: Array<{ kind?: string; type?: string; text?: string }>;
+  };
+  /** A2A spec: metadata bag — skillHint selects the producer */
+  metadata?: Record<string, unknown>;
   /** Optional conversation context — chains multiple sends into one context */
   contextId?: string;
 }
 
 export interface MessageSendResult {
-  taskId: string;
+  /** A2A spec field name for the task identifier */
+  id: string;
   contextId: string;
   status: TaskRecord["status"];
 }
 
 export interface TasksGetParams {
-  taskId: string;
+  /** A2A spec field name */
+  id: string;
 }
 
 export interface TasksCancelResult {
-  taskId: string;
+  /** A2A spec field name */
+  id: string;
   state: string;
   canceled: boolean;
 }
@@ -60,7 +67,10 @@ export function registerMessageMethods(
   producers: ProducerRegistry
 ): void {
   router.register("message/send", async (params) => {
-    const { skill, input, contextId } = parseSendParams(params);
+    const { skill, input, contextId } = parseSendParams(
+      params,
+      Object.keys(producers)
+    );
     const producer = producers[skill];
     if (!producer) {
       throw new RpcHandlerError(
@@ -86,7 +96,7 @@ export function registerMessageMethods(
       }
     });
     const result: MessageSendResult = {
-      taskId: record.taskId,
+      id: record.taskId,
       contextId: record.contextId,
       status: submittedStatus,
     };
@@ -116,10 +126,10 @@ export function registerTaskMethods(
     if (state === "unknown") {
       throw new RpcHandlerError(
         JSON_RPC_ERRORS.INVALID_PARAMS,
-        `Unknown taskId: ${taskId}`
+        `Unknown task id: ${taskId}`
       );
     }
-    const result: TasksCancelResult = { taskId, state, canceled };
+    const result: TasksCancelResult = { id: taskId, state, canceled };
     return result;
   });
 }
@@ -154,7 +164,15 @@ export function registerPushMethods(
   });
 
   router.register("tasks/pushNotificationConfig/list", async (params) => {
-    const { taskId } = parseTaskId(params);
+    // Push config methods use `taskId` (not `id`) to reference the target task —
+    // distinct from the A2A task lifecycle methods which use `id`.
+    if (!isObject(params) || typeof params["taskId"] !== "string") {
+      throw new RpcHandlerError(
+        JSON_RPC_ERRORS.INVALID_PARAMS,
+        "params.taskId is required (string)"
+      );
+    }
+    const taskId = params["taskId"];
     return { taskId, configs: pushStore.list(taskId) };
   });
 
@@ -170,7 +188,7 @@ export function registerPushMethods(
 function serializeTask(record: TaskRecord): unknown {
   return {
     kind: "task",
-    taskId: record.taskId,
+    id: record.taskId,
     contextId: record.contextId,
     skill: record.skill,
     status: record.status,
@@ -183,7 +201,10 @@ function serializeTask(record: TaskRecord): unknown {
 
 // ── Param parsers ───────────────────────────────────────────────────
 
-function parseSendParams(raw: unknown): {
+function parseSendParams(
+  raw: unknown,
+  availableSkills: readonly string[] = []
+): {
   skill: string;
   input: string;
   contextId?: string;
@@ -194,37 +215,89 @@ function parseSendParams(raw: unknown): {
       "params must be an object"
     );
   }
-  const skill = raw["skill"];
-  const input = raw["input"];
-  if (typeof skill !== "string" || skill.length === 0) {
+
+  // Skill resolution order:
+  //   1. params.message.metadata.skill / .skillHint   (A2A spec — SDK writes here)
+  //   2. params.metadata.skill         / .skillHint   (some clients attach at params root)
+  //   3. params.skill                                  (legacy shape kept for back-compat)
+  //   4. single skill fallback — if the agent only offers one, use that
+  const message = isObject(raw["message"]) ? raw["message"] : undefined;
+  const msgMeta =
+    message && isObject(message["metadata"]) ? message["metadata"] : undefined;
+  const rootMeta = isObject(raw["metadata"]) ? raw["metadata"] : undefined;
+  const skill =
+    pickString(msgMeta, "skill") ??
+    pickString(msgMeta, "skillHint") ??
+    pickString(rootMeta, "skill") ??
+    pickString(rootMeta, "skillHint") ??
+    pickString(raw, "skill") ??
+    (availableSkills.length === 1 ? availableSkills[0] : undefined);
+  if (!skill) {
     throw new RpcHandlerError(
       JSON_RPC_ERRORS.INVALID_PARAMS,
-      "params.skill is required"
+      availableSkills.length > 0
+        ? `skill is required — set via message.metadata.skill (available: ${availableSkills.join(", ")})`
+        : "skill is required — set via message.metadata.skill"
     );
   }
-  if (typeof input !== "string") {
+
+  // Input text — A2A spec pulls from params.message.parts[].text; legacy
+  // shape used params.input. Concat text parts in order so multi-part
+  // messages round-trip losslessly.
+  let input = "";
+  if (message && Array.isArray(message["parts"])) {
+    const chunks: string[] = [];
+    for (const p of message["parts"]) {
+      if (
+        isObject(p) &&
+        (p["kind"] === "text" || p["type"] === "text") &&
+        typeof p["text"] === "string"
+      ) {
+        chunks.push(p["text"]);
+      }
+    }
+    input = chunks.join("\n").trim();
+  }
+  if (input.length === 0) {
+    const legacy = pickString(raw, "input");
+    if (legacy) input = legacy;
+  }
+  if (input.length === 0) {
     throw new RpcHandlerError(
       JSON_RPC_ERRORS.INVALID_PARAMS,
-      "params.input is required (string)"
+      'input text is required — set via message.parts[{kind:"text", text}] or legacy params.input'
     );
   }
-  const contextId = raw["contextId"];
+
+  // contextId can live on message or at params root.
+  const contextId =
+    (message && pickString(message, "contextId")) ??
+    pickString(raw, "contextId");
   const result: { skill: string; input: string; contextId?: string } = {
     skill,
     input,
   };
-  if (typeof contextId === "string") result.contextId = contextId;
+  if (contextId) result.contextId = contextId;
   return result;
 }
 
+function pickString(
+  obj: Record<string, unknown> | undefined,
+  key: string
+): string | undefined {
+  if (!obj) return undefined;
+  const v = obj[key];
+  return typeof v === "string" && v.length > 0 ? v : undefined;
+}
+
 function parseTaskId(raw: unknown): { taskId: string } {
-  if (!isObject(raw) || typeof raw["taskId"] !== "string") {
+  if (!isObject(raw) || typeof raw["id"] !== "string") {
     throw new RpcHandlerError(
       JSON_RPC_ERRORS.INVALID_PARAMS,
-      "params.taskId is required (string)"
+      "params.id is required (string)"
     );
   }
-  return { taskId: raw["taskId"] };
+  return { taskId: raw["id"] };
 }
 
 function parseTaskIdAndConfigId(raw: unknown): { taskId: string; id: string } {

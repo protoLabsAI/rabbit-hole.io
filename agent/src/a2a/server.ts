@@ -164,12 +164,12 @@ async function handleMessageStream(
     writeJson(res, 200, response ?? { error: "no_response" });
     return;
   }
-  const result = response.result as { taskId?: string };
-  if (!result.taskId) {
-    writeJson(res, 500, { error: "missing_taskId" });
+  const result = response.result as { id?: string };
+  if (!result.id) {
+    writeJson(res, 500, { error: "missing_id" });
     return;
   }
-  openSseStream(res, cfg.taskStore, result.taskId, {
+  openSseStream(res, cfg.taskStore, result.id, {
     sendInitialSnapshot: false,
   });
 }
@@ -183,15 +183,11 @@ async function handleResubscribe(
     writeJson(
       res,
       400,
-      rpcError(
-        null,
-        JSON_RPC_ERRORS.INVALID_PARAMS,
-        "params.taskId is required"
-      )
+      rpcError(null, JSON_RPC_ERRORS.INVALID_PARAMS, "params.id is required")
     );
     return;
   }
-  const taskId = body["params"]["taskId"];
+  const taskId = body["params"]["id"];
   if (typeof taskId !== "string") {
     writeJson(
       res,
@@ -199,7 +195,7 @@ async function handleResubscribe(
       rpcError(
         null,
         JSON_RPC_ERRORS.INVALID_PARAMS,
-        "params.taskId is required (string)"
+        "params.id is required (string)"
       )
     );
     return;
