@@ -96,11 +96,14 @@ describe("A2A RPC lifecycle", () => {
       jsonrpc: "2.0",
       id: 1,
       method: "message/send",
-      params: { skill: "search", input: "hi" },
+      params: {
+        message: { role: "user", parts: [{ kind: "text", text: "hi" }] },
+        metadata: { skillHint: "search" },
+      },
     });
-    const result = send.result as { taskId: string; status: { state: string } };
+    const result = send.result as { id: string; status: { state: string } };
     expect(result.status.state).toBe("submitted");
-    const taskId = result.taskId;
+    const taskId = result.id;
 
     // Register config AFTER the initial send. Spec requires this flow to work.
     const set = await rpc({

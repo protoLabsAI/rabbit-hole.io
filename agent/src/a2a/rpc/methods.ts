@@ -26,26 +26,33 @@ import { JSON_RPC_ERRORS } from "./types.js";
 // ── Params / Result types ───────────────────────────────────────────
 
 export interface MessageSendParams {
-  /** Skill id from the agent card (e.g. "search", "deep_research") */
-  skill?: string;
-  /** Free-form message text */
-  input?: string;
+  /** A2A spec: message object carrying the user turn */
+  message?: {
+    messageId?: string;
+    role?: string;
+    parts?: Array<{ kind?: string; type?: string; text?: string }>;
+  };
+  /** A2A spec: metadata bag — skillHint selects the producer */
+  metadata?: Record<string, unknown>;
   /** Optional conversation context — chains multiple sends into one context */
   contextId?: string;
 }
 
 export interface MessageSendResult {
-  taskId: string;
+  /** A2A spec field name for the task identifier */
+  id: string;
   contextId: string;
   status: TaskRecord["status"];
 }
 
 export interface TasksGetParams {
-  taskId: string;
+  /** A2A spec field name */
+  id: string;
 }
 
 export interface TasksCancelResult {
-  taskId: string;
+  /** A2A spec field name */
+  id: string;
   state: string;
   canceled: boolean;
 }
@@ -86,7 +93,7 @@ export function registerMessageMethods(
       }
     });
     const result: MessageSendResult = {
-      taskId: record.taskId,
+      id: record.taskId,
       contextId: record.contextId,
       status: submittedStatus,
     };
@@ -116,10 +123,10 @@ export function registerTaskMethods(
     if (state === "unknown") {
       throw new RpcHandlerError(
         JSON_RPC_ERRORS.INVALID_PARAMS,
-        `Unknown taskId: ${taskId}`
+        `Unknown task id: ${taskId}`
       );
     }
-    const result: TasksCancelResult = { taskId, state, canceled };
+    const result: TasksCancelResult = { id: taskId, state, canceled };
     return result;
   });
 }
@@ -154,7 +161,15 @@ export function registerPushMethods(
   });
 
   router.register("tasks/pushNotificationConfig/list", async (params) => {
-    const { taskId } = parseTaskId(params);
+    // Push config methods use `taskId` (not `id`) to reference the target task —
+    // distinct from the A2A task lifecycle methods which use `id`.
+    if (!isObject(params) || typeof params["taskId"] !== "string") {
+      throw new RpcHandlerError(
+        JSON_RPC_ERRORS.INVALID_PARAMS,
+        "params.taskId is required (string)"
+      );
+    }
+    const taskId = params["taskId"];
     return { taskId, configs: pushStore.list(taskId) };
   });
 
@@ -170,7 +185,7 @@ export function registerPushMethods(
 function serializeTask(record: TaskRecord): unknown {
   return {
     kind: "task",
-    taskId: record.taskId,
+    id: record.taskId,
     contextId: record.contextId,
     skill: record.skill,
     status: record.status,
@@ -194,20 +209,34 @@ function parseSendParams(raw: unknown): {
       "params must be an object"
     );
   }
-  const skill = raw["skill"];
-  const input = raw["input"];
+
+  // A2A spec: skill comes from params.metadata.skillHint
+  const metadata = raw["metadata"];
+  const skill = isObject(metadata) ? metadata["skillHint"] : undefined;
   if (typeof skill !== "string" || skill.length === 0) {
     throw new RpcHandlerError(
       JSON_RPC_ERRORS.INVALID_PARAMS,
-      "params.skill is required"
+      "params.metadata.skillHint is required"
     );
   }
-  if (typeof input !== "string") {
-    throw new RpcHandlerError(
-      JSON_RPC_ERRORS.INVALID_PARAMS,
-      "params.input is required (string)"
-    );
+
+  // A2A spec: input text comes from params.message.parts[].text
+  const message = raw["message"];
+  let input = "";
+  if (isObject(message)) {
+    const parts = message["parts"];
+    if (Array.isArray(parts)) {
+      input = parts
+        .filter(
+          (p): p is Record<string, unknown> =>
+            isObject(p) && (p["kind"] === "text" || p["type"] === "text")
+        )
+        .map((p) => (typeof p["text"] === "string" ? p["text"] : ""))
+        .join("\n")
+        .trim();
+    }
   }
+
   const contextId = raw["contextId"];
   const result: { skill: string; input: string; contextId?: string } = {
     skill,
@@ -218,13 +247,13 @@ function parseSendParams(raw: unknown): {
 }
 
 function parseTaskId(raw: unknown): { taskId: string } {
-  if (!isObject(raw) || typeof raw["taskId"] !== "string") {
+  if (!isObject(raw) || typeof raw["id"] !== "string") {
     throw new RpcHandlerError(
       JSON_RPC_ERRORS.INVALID_PARAMS,
-      "params.taskId is required (string)"
+      "params.id is required (string)"
     );
   }
-  return { taskId: raw["taskId"] };
+  return { taskId: raw["id"] };
 }
 
 function parseTaskIdAndConfigId(raw: unknown): { taskId: string; id: string } {
