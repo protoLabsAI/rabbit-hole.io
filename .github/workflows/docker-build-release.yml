@@ -68,14 +68,6 @@ jobs:
             context: .
             dockerfile: services/job-processor/Dockerfile
             build-args: ""
-          - name: langextract
-            context: ./services/langextract-service
-            dockerfile: ./services/langextract-service/Dockerfile
-            build-args: ""
-          - name: youtube-processor
-            context: ./services/youtube-processor-service
-            dockerfile: ./services/youtube-processor-service/Dockerfile
-            build-args: ""
 
     steps:
       - name: Checkout code
@@ -219,8 +211,6 @@ jobs:
             echo "- 🐳 rabbit-hole" >> $GITHUB_STEP_SUMMARY
             echo "- 🤖 agent" >> $GITHUB_STEP_SUMMARY
             echo "- ⚙️ job-processor" >> $GITHUB_STEP_SUMMARY
-            echo "- 🔍 langextract" >> $GITHUB_STEP_SUMMARY
-            echo "- 📺 youtube-processor" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "**Platform:** linux/amd64" >> $GITHUB_STEP_SUMMARY
             echo "**Security:** ✅ Scanned, signed, SBOM included" >> $GITHUB_STEP_SUMMARY
@@ -243,8 +233,6 @@ jobs:
             docker pull ghcr.io/protolabsai/rabbit-hole/rabbit-hole:${{ github.ref_name }}
             docker pull ghcr.io/protolabsai/rabbit-hole/agent:${{ github.ref_name }}
             docker pull ghcr.io/protolabsai/rabbit-hole/job-processor:${{ github.ref_name }}
-            docker pull ghcr.io/protolabsai/rabbit-hole/langextract:${{ github.ref_name }}
-            docker pull ghcr.io/protolabsai/rabbit-hole/youtube-processor:${{ github.ref_name }}
             ```
 
             Deployed to homelab-iac `stacks/rabbit-hole/` via Watchtower on `:latest` push.
