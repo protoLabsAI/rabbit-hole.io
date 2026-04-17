@@ -1,47 +1,50 @@
 /**
  * Server-Sent Events transport for the A2A streaming methods.
  *
- * Spec requirements enforced here:
- *  - Every event is a JSON-RPC 2.0 response frame
- *      { jsonrpc: "2.0", id: <originalRequestId>, result: <event> }
- *    so @a2a-js/sdk (and anything else reading the stream as JSON-RPC)
- *    can correlate chunks back to the original call. Bare event payloads
- *    without the envelope fail the SDK with "Expected id N, got undefined".
- *  - Every event carries a `kind` discriminator (task | status-update |
- *    artifact-update | message). Omission causes the SDK to drop events.
- *  - On :resubscribe reconnect, emit the full accumulated text with
- *    append:false, then switch to append:true deltas. Consumers track
- *    last_sent_len to avoid duplicates; we snapshot once at attach time.
- *  - Terminal sequence is two events: artifact-update (lastChunk:true,
- *    append:false, full artifact) THEN status-update (final:true).
- *    TaskStore.finish() emits these in the correct order; this transport
- *    closes the stream after the final:true status-update.
- *  - Producer lifecycle is decoupled from the consumer — the subscriber
- *    registered here unsubscribes when the client disconnects but the
- *    producer keeps running in the store until it finishes on its own.
+ * Wire format matches Quinn's reference handler (protoLabsAI/quinn
+ * a2a_handler.py) point-for-point — Quinn is the canonical spec
+ * implementation per the build-an-a2a-agent + a2a-streaming guides.
+ *
+ * Frame envelope: every SSE `data: ` line is a JSON-RPC 2.0 response
+ *
+ *   data: {"jsonrpc":"2.0","id":<rpcId>,"result":<event>}\n\n
+ *
+ * Inner event shapes (kind discriminator is mandatory; the SDK silently
+ * drops frames missing it):
+ *
+ *   kind: "task"            → { id, contextId, status, artifacts? }
+ *                             (Task snapshot — uses `id`, not `taskId`)
+ *   kind: "status-update"   → { taskId, contextId, status, final }
+ *                             (TaskStatusUpdateEvent — uses `taskId`)
+ *   kind: "artifact-update" → { taskId, contextId, artifact, append, lastChunk }
+ *
+ * Terminal sequence (strict order):
+ *
+ *   1. artifact-update with append:false, lastChunk:true (full artifact)
+ *   2. status-update   with final:true   (terminal state)
+ *   3. `data: [DONE]\n\n`
+ *
+ * Producer lifecycle is decoupled from the consumer — subscribers
+ * unsubscribe on client disconnect but the producer keeps running in
+ * the store, so `:resubscribe` attaches cleanly.
  */
 
 import type { ServerResponse } from "node:http";
 
 import type { StoreEvent, TaskRecord, TaskStore } from "../store/task-store.js";
 
-export interface SseEvent {
+type SseEvent = {
   kind: "task" | "status-update" | "artifact-update" | "message";
-  taskId: string;
-  contextId: string;
   [key: string]: unknown;
-}
+};
 
 export interface SseOpenOpts {
   /** Emit a full artifact snapshot with append:false on attach (resubscribe). */
   sendInitialSnapshot: boolean;
   /**
-   * The `id` from the original JSON-RPC request (`message/stream`,
-   * `message/sendStream`, `tasks/resubscribe`). Each SSE frame is wrapped
-   * as `{jsonrpc:"2.0", id:<requestId>, result:<event>}` so the SDK can
-   * correlate chunks. Use `null` for REST callers hitting
-   * `GET /tasks/{id}:subscribe` directly — the envelope is still emitted
-   * (SDK tolerates null id) but no correlation is expected.
+   * The `id` from the original JSON-RPC request. Echoed in every frame's
+   * envelope for SDK correlation. `null` for REST callers hitting
+   * `GET /tasks/{id}:subscribe` directly — valid per JSON-RPC spec.
    */
   requestId: string | number | null;
 }
@@ -53,11 +56,9 @@ const SSE_HEADERS = {
   "x-accel-buffering": "no",
 } as const;
 
-/**
- * Open an SSE stream on the given response and attach a store subscriber.
- * Caller is responsible for having already validated auth + that the task
- * exists. Returns the live attachment so callers can abort early.
- */
+/** Spec terminator — the SDK reads `[DONE]` as close-of-stream signal. */
+const DONE_SENTINEL = "data: [DONE]\n\n";
+
 export function openSseStream(
   res: ServerResponse,
   taskStore: TaskStore,
@@ -76,19 +77,17 @@ export function openSseStream(
 
   const requestId = opts.requestId;
 
-  // Initial `kind: "task"` event — full snapshot so reconnecting consumers
-  // see current state before deltas start streaming.
+  // Initial Task snapshot — uses `id` (not taskId), optional artifacts.
   writeEvent(res, requestId, {
     kind: "task",
-    taskId,
+    id: taskId,
     contextId: record.contextId,
     status: record.status,
-    artifact: record.artifact,
-    final: false,
+    artifacts: [record.artifact],
   });
 
-  // On :resubscribe we also emit a non-append artifact-update with the
-  // accumulated text so the client can rebuild its buffer in one shot.
+  // On :resubscribe, also emit a non-append artifact-update with the
+  // accumulated text so the client rebuilds its buffer in one shot.
   if (opts.sendInitialSnapshot && record.artifact.parts[0]?.text) {
     writeEvent(res, requestId, {
       kind: "artifact-update",
@@ -106,6 +105,8 @@ export function openSseStream(
     closed = true;
     unsubscribe();
     try {
+      // Terminal sentinel — spec-mandated close signal.
+      res.write(DONE_SENTINEL);
       res.end();
     } catch {
       /* already closed */
@@ -114,22 +115,17 @@ export function openSseStream(
 
   const unsubscribe = taskStore.subscribe(taskId, (event) => {
     if (closed) return;
-    const payload = enrichEvent(event, record);
-    writeEvent(res, requestId, payload);
-    // Close the stream after the terminal status-update (final:true). The
-    // preceding artifact-update with lastChunk:true is part of the spec's
-    // 2-event terminal sequence and goes out first — see TaskStore.finish.
+    writeEvent(res, requestId, enrichEvent(event, record));
     if (event.kind === "status-update" && event.final) {
       close();
     }
   });
 
-  // Client disconnect → stop pushing but leave producer running in store.
   res.on("close", close);
   res.on("error", close);
 
-  // Heartbeat every 15s so proxies (cloudflared, etc.) don't time out the
-  // connection during long-running research tasks.
+  // Heartbeat every 15s so proxies don't time out long-running streams.
+  // Uses SSE comment (`: ...\n\n`) so consumers don't see it as an event.
   const heartbeat = setInterval(() => {
     if (closed) {
       clearInterval(heartbeat);
@@ -147,24 +143,21 @@ export function openSseStream(
 }
 
 function enrichEvent(event: StoreEvent, record: TaskRecord): SseEvent {
-  // Every enriched event carries both `taskId` (our internal name) and
-  // `id` (A2A spec) so clients reading either key find the value.
-  const base = {
-    taskId: record.taskId,
-    id: record.taskId,
-    contextId: record.contextId,
-  };
   if (event.kind === "status-update") {
+    // TaskStatusUpdateEvent — spec uses `taskId`, not `id`.
     return {
       kind: "status-update",
-      ...base,
+      taskId: record.taskId,
+      contextId: record.contextId,
       status: event.status,
       final: event.final,
     };
   }
+  // TaskArtifactUpdateEvent — singular `artifact`, not `artifacts` array.
   return {
     kind: "artifact-update",
-    ...base,
+    taskId: record.taskId,
+    contextId: record.contextId,
     artifact: event.artifact,
     append: event.append,
     lastChunk: event.lastChunk,
@@ -176,14 +169,7 @@ function writeEvent(
   requestId: string | number | null,
   event: SseEvent
 ): void {
-  // JSON-RPC 2.0 response envelope per the SDK's expectation. The SDK
-  // rejects events whose `id` doesn't match the original request, so the
-  // requestId threaded through from server.ts must be identical.
-  const frame = {
-    jsonrpc: "2.0" as const,
-    id: requestId,
-    result: event,
-  };
+  const frame = { jsonrpc: "2.0" as const, id: requestId, result: event };
   try {
     res.write(`data: ${JSON.stringify(frame)}\n\n`);
   } catch {

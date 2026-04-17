@@ -2,10 +2,6 @@
 
 import React, { useCallback } from "react";
 
-import {
-  getUserTierClient,
-  getTierLimitsClient,
-} from "@protolabsai/auth/client";
 import { useToast } from "@protolabsai/ui/hooks";
 import type { CanvasType } from "@protolabsai/workspace";
 
@@ -19,6 +15,12 @@ import { getCanvasRenderer } from "./canvas/CanvasRegistry";
 import { TabBar } from "./TabBar";
 import { WorkspacePersistence } from "./WorkspacePersistence";
 
+// Single-user mode: auth/tier scaffolding removed. Stable module-level
+// constants keep prop identities stable and avoid a render loop through
+// the workspace memo tree.
+const USER_ID = "local-user";
+const USER_TIER = "enterprise" as const;
+
 export interface PendingImport {
   entityUid: string;
   settings: any;
@@ -30,44 +32,14 @@ export interface PendingImport {
 interface WorkspaceContainerProps {
   workspaceId: string;
   defaultCanvasType?: CanvasType;
-  canUseAIChat?: boolean;
   pendingImport?: PendingImport | null;
 }
 
 export function WorkspaceContainer({
   workspaceId,
   defaultCanvasType = "graph",
-  canUseAIChat = false,
   pendingImport = null,
 }: WorkspaceContainerProps) {
-  const userId = "local-user";
-  const organization = { id: "local-org", name: "Local Org" } as any;
-
-  // Collaboration settings stub (hooks removed)
-  const showPresence = false;
-
-  // Auth guard
-  if (!userId) {
-    return (
-      <div className="h-screen flex items-center justify-center">
-        <div className="text-center max-w-md">
-          <div className="text-6xl mb-4">🔐</div>
-          <h2 className="text-2xl font-semibold mb-2">Sign In Required</h2>
-          <p className="text-muted-foreground mb-4">
-            Sign in to access your workspace.
-          </p>
-
-          <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90">
-            Sign In
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // User workspaces work without org (Free/Basic tier)
-  // Only Team+ tier requires org (not implemented yet)
-
   return (
     <>
       <WorkspacePersistence
@@ -78,15 +50,11 @@ export function WorkspaceContainer({
           <WorkspaceContent
             context={context}
             workspaceId={workspaceId}
-            showPresence={showPresence}
-            canUseAIChat={canUseAIChat}
-            organization={organization}
             pendingImport={pendingImport}
           />
         )}
       </WorkspacePersistence>
 
-      {/* Centralized Dialog Management */}
       <DialogRegistry />
     </>
   );
@@ -95,31 +63,14 @@ export function WorkspaceContainer({
 interface WorkspaceContentProps {
   context: any;
   workspaceId: string;
-  showPresence: boolean;
-  canUseAIChat?: boolean;
-  organization: any;
   pendingImport?: PendingImport | null;
 }
 
 function WorkspaceContent({
   context,
   workspaceId,
-  showPresence,
-  canUseAIChat = false,
-  organization,
   pendingImport = null,
 }: WorkspaceContentProps) {
-  const userId = "local-user";
-  const user = {
-    id: "local-user",
-    firstName: "Local",
-    lastName: "User",
-    fullName: "Local User",
-    imageUrl: "",
-    publicMetadata: { tier: "free", role: "admin" },
-    emailAddresses: [{ emailAddress: "local@localhost" }],
-    primaryEmailAddress: { emailAddress: "local@localhost" },
-  } as any;
   const { toast } = useToast();
   const [isViewMode, setIsViewMode] = React.useState(false);
 
@@ -151,26 +102,15 @@ function WorkspaceContent({
     localStorage.setItem("workspace-single-tab-mode", String(singleTabMode));
   }, [singleTabMode]);
 
-  // Collaboration store stubs (modules removed)
+  // Collaboration dropped with the multiplayer pieces — these remain as
+  // no-op shims until the canvas stops asking for them.
   const removeSession = (_tabId: string) => {};
   const getSessionForTab = (_tabId: string): string | null => null;
-  const getActiveCount = () => 0;
-  const addSession = (
-    _tabId: string,
-    _sessionId: string,
-    _shareLink: string
-  ) => {};
 
-  // Tier checking for collaboration
-  const userTier = getUserTierClient(user || null);
-  const tierLimits = getTierLimitsClient(userTier);
-  const canUseCollaboration = tierLimits.maxActiveSessions > 0;
-
-  // Handle entity import from URL parameters
   const { isPreparingImport, importError, pendingBundle, targetTabId } =
     useEntityImportFromUrl({
       ydoc: context.ydoc,
-      userId: userId || "",
+      userId: USER_ID,
       workspace: context.workspace,
       workspaceReady: context.ready,
       pendingImport,
@@ -181,14 +121,11 @@ function WorkspaceContent({
     activeTab,
     ready,
     error,
-    mode,
     updateCanvasData,
     switchTab,
     addTab,
     closeTab,
     reorderTabs,
-    users,
-    followMode,
     canUndo,
     canRedo,
     undo,
@@ -198,10 +135,9 @@ function WorkspaceContent({
     listVersions,
   } = context;
 
-  // Determine if user is owner
-  const isOwner = workspace?.metadata?.owner === userId;
+  // Single-user mode — the local user always owns the workspace.
+  const isOwner = true;
 
-  // Keyboard shortcuts for undo/redo
   useWorkspaceKeyboardShortcuts({
     canUndo: canUndo || false,
     canRedo: canRedo || false,
@@ -210,7 +146,6 @@ function WorkspaceContent({
     enabled: true,
   });
 
-  // Stable callback for canvas data changes
   const handleCanvasDataChange = useCallback(
     (data: any) => {
       updateCanvasData(data);
@@ -218,39 +153,10 @@ function WorkspaceContent({
     [updateCanvasData]
   );
 
-  // Collaboration session handlers - Zustand prevents re-render loops
-  const handleSessionCreated = useCallback(
-    (sessionId: string, shareLink: string) => {
-      if (!activeTab) return;
-
-      addSession(activeTab.id, sessionId, shareLink);
-
-      const count = getActiveCount();
-      toast({
-        title: "Session Created",
-        description: `Active sessions: ${count}/${tierLimits.maxActiveSessions}`,
-      });
-    },
-    [activeTab, addSession, getActiveCount, tierLimits.maxActiveSessions, toast]
-  );
-
-  const handleSessionEnded = useCallback(() => {
-    if (!activeTab) return;
-
-    removeSession(activeTab.id);
-
-    const count = getActiveCount();
-    toast({
-      title: "Session Ended",
-      description: `Active sessions: ${count}/${tierLimits.maxActiveSessions}`,
-    });
-  }, [
-    activeTab,
-    removeSession,
-    getActiveCount,
-    tierLimits.maxActiveSessions,
-    toast,
-  ]);
+  // Collaboration removed — these remain as stable no-ops so the canvas
+  // prop surface stays unchanged.
+  const handleSessionCreated = useCallback(() => {}, []);
+  const handleSessionEnded = useCallback(() => {}, []);
 
   // Enhanced closeTab with session cleanup
   const handleCloseTab = useCallback(
@@ -439,92 +345,40 @@ function WorkspaceContent({
 
       {/* Canvas - full height */}
       <div className="flex-1 relative overflow-hidden">
-        {canUseAIChat ? (
-          <AgentBundleBridge>
-            {(agentPartialBundle) => (
-              <CanvasComponent
-                data={activeTab.canvasData}
-                onDataChange={handleCanvasDataChange}
-                readOnly={
-                  isViewMode || !isOwner || activeTab.visibility === "view"
-                }
-                canUndo={canUndo}
-                canRedo={canRedo}
-                onUndo={undo}
-                onRedo={redo}
-                saveVersion={saveVersion}
-                loadVersion={loadVersion}
-                listVersions={listVersions}
-                ydoc={context.ydoc}
-                userId={userId || undefined}
-                userTier={userTier}
-                canUseAIChat={canUseAIChat}
-                workspaceId={workspaceId}
-                tabId={activeTab.id}
-                tabName={activeTab.name}
-                canUseCollaboration={canUseCollaboration}
-                workspaceReady={ready}
-                activeSessionId={currentSessionId}
-                onSessionCreated={handleSessionCreated}
-                onSessionEnded={handleSessionEnded}
-                pendingBundle={
-                  activeTab.id === targetTabId ? pendingBundle : null
-                }
-                agentPartialBundle={agentPartialBundle}
-              />
-            )}
-          </AgentBundleBridge>
-        ) : (
-          <CanvasComponent
-            data={activeTab.canvasData}
-            onDataChange={handleCanvasDataChange}
-            readOnly={isViewMode || !isOwner || activeTab.visibility === "view"}
-            canUndo={canUndo}
-            canRedo={canRedo}
-            onUndo={undo}
-            onRedo={redo}
-            saveVersion={saveVersion}
-            loadVersion={loadVersion}
-            listVersions={listVersions}
-            ydoc={context.ydoc}
-            userId={userId || undefined}
-            userTier={userTier}
-            canUseAIChat={canUseAIChat}
-            workspaceId={workspaceId}
-            tabId={activeTab.id}
-            tabName={activeTab.name}
-            canUseCollaboration={canUseCollaboration}
-            workspaceReady={ready}
-            activeSessionId={currentSessionId}
-            onSessionCreated={handleSessionCreated}
-            onSessionEnded={handleSessionEnded}
-            pendingBundle={activeTab.id === targetTabId ? pendingBundle : null}
-          />
-        )}
-
-        {/* Collaboration panel */}
-        {showPresence && users && users.size > 1 && (
-          <div className="absolute top-4 right-4 z-10 bg-card/95 backdrop-blur rounded-lg shadow-lg border p-4 max-w-xs">
-            <div className="text-sm space-y-2">
-              <div className="font-semibold">Collaborators ({users.size})</div>
-              {Array.from(users.values()).map((user: any) => (
-                <div
-                  key={user.userId}
-                  className="text-xs text-muted-foreground"
-                >
-                  {user.userName || user.userId}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Follow mode indicator */}
-        {followMode?.enabled && followMode?.followingUserId && (
-          <div className="absolute bottom-4 left-4 z-40 bg-primary text-primary-foreground px-3 py-2 rounded-lg text-sm shadow-lg">
-            Following {users?.get(followMode.followingUserId)?.userName}
-          </div>
-        )}
+        <AgentBundleBridge>
+          {(agentPartialBundle) => (
+            <CanvasComponent
+              data={activeTab.canvasData}
+              onDataChange={handleCanvasDataChange}
+              readOnly={
+                isViewMode || !isOwner || activeTab.visibility === "view"
+              }
+              canUndo={canUndo}
+              canRedo={canRedo}
+              onUndo={undo}
+              onRedo={redo}
+              saveVersion={saveVersion}
+              loadVersion={loadVersion}
+              listVersions={listVersions}
+              ydoc={context.ydoc}
+              userId={USER_ID}
+              userTier={USER_TIER}
+              canUseAIChat={true}
+              workspaceId={workspaceId}
+              tabId={activeTab.id}
+              tabName={activeTab.name}
+              canUseCollaboration={false}
+              workspaceReady={ready}
+              activeSessionId={currentSessionId}
+              onSessionCreated={handleSessionCreated}
+              onSessionEnded={handleSessionEnded}
+              pendingBundle={
+                activeTab.id === targetTabId ? pendingBundle : null
+              }
+              agentPartialBundle={agentPartialBundle}
+            />
+          )}
+        </AgentBundleBridge>
       </div>
     </div>
   );

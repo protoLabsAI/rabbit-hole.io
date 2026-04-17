@@ -12,10 +12,6 @@
 
 import { useState, useCallback, useEffect, useMemo } from "react";
 
-import {
-  getUserTierClient,
-  getTierLimitsClient,
-} from "@protolabsai/auth/client";
 import { logPageView, logWorkspaceOperation } from "@protolabsai/logger";
 import { ResizableChatLayout } from "@protolabsai/ui/templates";
 import type { CanvasType } from "@protolabsai/workspace";
@@ -23,32 +19,20 @@ import type { CanvasType } from "@protolabsai/workspace";
 import { ConfirmDialogProvider } from "./components/ConfirmDialog";
 import { ResearchChatInterface } from "./components/ResearchChatInterface";
 import { WorkspaceContainer } from "./components/workspace/WorkspaceContainer";
-import { useFeaturePreloader } from "./hooks/useFeaturePreloader";
 import { useResearchPageState } from "./hooks/useResearchPageState";
 import { QueryProvider } from "./providers";
 
 // Register context menu items for research routes
 import "../context-menu/registry/researchMenus.direct";
 
+// Single-user mode: auth/tier scaffolding removed. A stable module-level
+// userId avoids new-object-per-render churn that cascaded through the
+// workspace memo tree and pinned the page in a render loop.
+const USER_ID = "local-user";
+
 export default function ResearchClientWorkspace() {
-  const userId = "local-user";
-  const user = {
-    id: "local-user",
-    firstName: "Local",
-    lastName: "User",
-    fullName: "Local User",
-    imageUrl: "",
-    publicMetadata: { tier: "free", role: "admin" },
-    emailAddresses: [{ emailAddress: "local@localhost" }],
-    primaryEmailAddress: { emailAddress: "local@localhost" },
-  } as any;
   const research = useResearchPageState();
   const [mounted, setMounted] = useState(false);
-
-  // Check tier for AI chat access
-  const userTier = getUserTierClient(user || null);
-  const tierLimits = getTierLimitsClient(userTier);
-  const canUseAIChat = tierLimits.hasAIChatAccess;
 
   // Prepare pending import from URL parameters (memoized to prevent re-render loops)
   const pendingImport = useMemo(
@@ -70,9 +54,6 @@ export default function ResearchClientWorkspace() {
       research.timeWindow,
     ]
   );
-
-  // Preload paid features in background for eligible users
-  useFeaturePreloader();
 
   // Get canvas type from URL
   const [canvasType] = useState<CanvasType>(() => {
@@ -106,11 +87,10 @@ export default function ResearchClientWorkspace() {
     setMounted(true);
   }, []);
 
-  // Update workspace ID when userId becomes available
+  // Resolve the active workspace ID on mount: URL override → saved → default.
   useEffect(() => {
-    if (!userId || typeof window === "undefined") return;
+    if (typeof window === "undefined") return;
 
-    // Check URL first
     const urlParams = new URLSearchParams(window.location.search);
     const urlWorkspaceId = urlParams.get("workspaceId");
     if (urlWorkspaceId) {
@@ -118,19 +98,13 @@ export default function ResearchClientWorkspace() {
       return;
     }
 
-    // Generate user-default workspace ID
-    const defaultWorkspaceId = `ws-default-${userId}`;
+    const defaultWorkspaceId = `ws-default-${USER_ID}`;
     localStorage.setItem("current-workspace-id", defaultWorkspaceId);
     setWorkspaceId(defaultWorkspaceId);
-  }, [userId]);
+  }, []);
 
   useEffect(() => {
-    if (
-      userId &&
-      workspaceId &&
-      workspaceId !== "workspace-loading" &&
-      mounted
-    ) {
+    if (workspaceId && workspaceId !== "workspace-loading" && mounted) {
       const sessionId =
         sessionStorage.getItem("sessionId") ||
         `session-${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -138,8 +112,7 @@ export default function ResearchClientWorkspace() {
 
       logPageView({
         page: "/research",
-        userId,
-        tier: (user?.publicMetadata?.tier as string) || undefined,
+        userId: USER_ID,
         sessionId,
         referrer: document.referrer,
         userAgent: navigator.userAgent,
@@ -148,36 +121,21 @@ export default function ResearchClientWorkspace() {
       logWorkspaceOperation({
         operation: "load",
         workspaceId,
-        userId,
-        tier: (user?.publicMetadata?.tier as string) || undefined,
+        userId: USER_ID,
       });
     }
-  }, [userId, workspaceId, mounted, user?.publicMetadata?.tier]);
+  }, [workspaceId, mounted]);
 
+  const setChatOpen = research.setChatOpen;
   const handleChatCollapseChange = useCallback(
     (collapsed: boolean) => {
-      research.setChatOpen(!collapsed);
+      setChatOpen(!collapsed);
     },
-    [research]
+    [setChatOpen]
   );
 
-  // Wait for proper workspace ID before rendering
   const isWorkspaceReady = workspaceId !== "workspace-loading" && mounted;
 
-  // // Custom chat header with workspace info
-  const chatHeader = (
-    <div className="flex items-center justify-between px-4 py-3 border-b">
-      <div>
-        <h2 className="text-lg font-semibold">Research Agent</h2>
-        <p className="text-xs text-muted-foreground">
-          Collaborative Workspace
-          {isWorkspaceReady && ` • ${workspaceId.slice(0, 12)}`}
-        </p>
-      </div>
-    </div>
-  );
-
-  // Conditionally wrap with CopilotKit based on tier
   const content = !isWorkspaceReady ? (
     <div className="h-screen flex items-center justify-center bg-background">
       <div className="text-center">
@@ -187,29 +145,24 @@ export default function ResearchClientWorkspace() {
     </div>
   ) : (
     <div className="h-screen bg-background">
-      {/* Main Content - Full viewport height */}
       <div className="h-screen">
         <ResizableChatLayout
           chatTitle="Research Agent"
           chatDescription="AI-powered research with collaborative workspace"
           chatInterface={
-            canUseAIChat ? (
-              <ResearchChatInterface
-                sessionConfig={research.sessionConfig}
-                onSessionConfigChange={research.setSessionConfig}
-              />
-            ) : (
-              <div />
-            )
+            <ResearchChatInterface
+              sessionConfig={research.sessionConfig}
+              onSessionConfigChange={research.setSessionConfig}
+            />
           }
           layoutId="research-workspace-layout"
-          collapsible={canUseAIChat}
-          defaultChatSize={canUseAIChat ? 33 : 0}
-          minChatSize={canUseAIChat ? 20 : 0}
-          maxChatSize={canUseAIChat ? 50 : 0}
+          collapsible={true}
+          defaultChatSize={33}
+          minChatSize={20}
+          maxChatSize={50}
           showResizeHandle={false}
           hideFloatingToggle={true}
-          defaultCollapsed={!research.chatOpen || !canUseAIChat}
+          defaultCollapsed={!research.chatOpen}
           onCollapseChange={handleChatCollapseChange}
           customChatHeader={undefined}
           showChatHeader={false}
@@ -217,7 +170,6 @@ export default function ResearchClientWorkspace() {
           <WorkspaceContainer
             workspaceId={workspaceId}
             defaultCanvasType={canvasType}
-            canUseAIChat={canUseAIChat}
             pendingImport={pendingImport}
           />
         </ResizableChatLayout>
