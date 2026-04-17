@@ -98,7 +98,12 @@ async function dispatch(
       writeJson(res, 404, { error: "not_found", taskId });
       return;
     }
-    openSseStream(res, cfg.taskStore, taskId, { sendInitialSnapshot: true });
+    // REST callers don't have a JSON-RPC request id — pass null and the
+    // SSE envelope will carry { jsonrpc:"2.0", id:null, result:<event> }.
+    openSseStream(res, cfg.taskStore, taskId, {
+      sendInitialSnapshot: true,
+      requestId: null,
+    });
     return;
   }
 
@@ -153,11 +158,15 @@ async function handleMessageStream(
   body: unknown,
   cfg: ServerConfig
 ): Promise<void> {
+  // Capture the JSON-RPC request id BEFORE dispatching so we can echo it
+  // back in every SSE frame for correlation by the SDK.
+  const requestId = extractRequestId(body);
+
   // Reuse message/send to validate + create the task, but capture the
   // result so we know which task to stream.
   const response = await cfg.router.dispatch(
     { ...(body as Record<string, unknown>), method: "message/send" },
-    { requestId: null, apiKey: cfg.apiKey }
+    { requestId, apiKey: cfg.apiKey }
   );
   if (!response || "error" in response) {
     // Error path — surface as JSON before the SSE upgrade happens.
@@ -171,6 +180,7 @@ async function handleMessageStream(
   }
   openSseStream(res, cfg.taskStore, result.id, {
     sendInitialSnapshot: false,
+    requestId,
   });
 }
 
@@ -179,32 +189,52 @@ async function handleResubscribe(
   body: unknown,
   cfg: ServerConfig
 ): Promise<void> {
+  const requestId = extractRequestId(body);
   if (!isObject(body) || !isObject(body["params"])) {
     writeJson(
       res,
       400,
-      rpcError(null, JSON_RPC_ERRORS.INVALID_PARAMS, "params.id is required")
-    );
-    return;
-  }
-  const taskId = body["params"]["id"];
-  if (typeof taskId !== "string") {
-    writeJson(
-      res,
-      400,
       rpcError(
-        null,
+        requestId,
         JSON_RPC_ERRORS.INVALID_PARAMS,
-        "params.id is required (string)"
+        "params.id is required"
       )
     );
     return;
   }
-  if (!cfg.taskStore.get(taskId)) {
-    writeJson(res, 404, { error: "not_found", taskId });
+  // Accept both `id` (A2A spec) and `taskId` (legacy) for back-compat.
+  const params = body["params"];
+  const rawId =
+    (typeof params["id"] === "string" && params["id"]) ||
+    (typeof params["taskId"] === "string" && params["taskId"]) ||
+    null;
+  if (!rawId) {
+    writeJson(
+      res,
+      400,
+      rpcError(
+        requestId,
+        JSON_RPC_ERRORS.INVALID_PARAMS,
+        "params.id (or legacy params.taskId) is required (string)"
+      )
+    );
     return;
   }
-  openSseStream(res, cfg.taskStore, taskId, { sendInitialSnapshot: true });
+  if (!cfg.taskStore.get(rawId)) {
+    writeJson(res, 404, { error: "not_found", id: rawId });
+    return;
+  }
+  openSseStream(res, cfg.taskStore, rawId, {
+    sendInitialSnapshot: true,
+    requestId,
+  });
+}
+
+function extractRequestId(body: unknown): string | number | null {
+  if (!isObject(body)) return null;
+  const id = body["id"];
+  if (typeof id === "string" || typeof id === "number") return id;
+  return null;
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────
