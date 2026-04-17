@@ -78,7 +78,7 @@ interface GraphCanvasIntegratedProps {
   userTier?: UserTier; // User tier for limit enforcement
   canUseAIChat?: boolean; // Tier enforcement for AI chat
   disableAutoPersist?: boolean; // Disable persist effect (for session mode where SessionCanvas handles persistence)
-  provider?: any; // HocuspocusProvider for live collaboration
+  provider?: any; // IndexeddbPersistence (local Y.Doc persistence; multiplayer removed)
   updateCursor?: (x: number | null, y: number | null) => void; // Cursor tracking callback
   onCursorsUpdate?: (
     cursors: Array<{

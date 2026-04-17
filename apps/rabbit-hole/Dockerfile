@@ -42,9 +42,6 @@ RUN pnpm run scan:domains
 
 # Build Next.js app without standalone output tracing (saves ~2GB RAM)
 # We copy the full workspace to production instead.
-ARG NEXT_PUBLIC_YJS_WS_URL
-ENV NEXT_PUBLIC_YJS_WS_URL=${NEXT_PUBLIC_YJS_WS_URL:-ws://localhost:1234}
-
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 ENV SKIP_ENV_VALIDATION=1
