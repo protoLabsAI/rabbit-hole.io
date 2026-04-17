@@ -38,11 +38,17 @@ export interface MessageSendParams {
   contextId?: string;
 }
 
+/**
+ * A2A spec `Task` object — what `message/send`, `tasks/get`, and
+ * `tasks/cancel` return. `@a2a-js/sdk` routes on `kind: "task"` to
+ * extract id + artifacts; the discriminator is load-bearing.
+ */
 export interface MessageSendResult {
-  /** A2A spec field name for the task identifier */
+  kind: "task";
   id: string;
   contextId: string;
   status: TaskRecord["status"];
+  artifacts?: TaskRecord["artifact"][];
 }
 
 export interface TasksGetParams {
@@ -96,9 +102,11 @@ export function registerMessageMethods(
       }
     });
     const result: MessageSendResult = {
+      kind: "task",
       id: record.taskId,
       contextId: record.contextId,
       status: submittedStatus,
+      artifacts: [record.artifact],
     };
     return result;
   });
@@ -186,13 +194,16 @@ export function registerPushMethods(
 // ── Serialization helpers ───────────────────────────────────────────
 
 function serializeTask(record: TaskRecord): unknown {
+  // A2A Task shape: `kind: "task"`, `id` (not taskId), `artifacts` array
+  // (not singular artifact). skill/createdAt/updatedAt are our-own extras
+  // — non-spec keys are allowed on a Task object (SDK ignores unknowns).
   return {
     kind: "task",
     id: record.taskId,
     contextId: record.contextId,
     skill: record.skill,
     status: record.status,
-    artifact: record.artifact,
+    artifacts: [record.artifact],
     ...(record.error && { error: record.error }),
     createdAt: new Date(record.createdAt).toISOString(),
     updatedAt: new Date(record.updatedAt).toISOString(),
@@ -314,6 +325,19 @@ function parseTaskIdAndConfigId(raw: unknown): { taskId: string; id: string } {
   return { taskId: raw["taskId"], id: raw["id"] };
 }
 
+/**
+ * Accept every shape callers use for
+ * `tasks/pushNotificationConfig/set`:
+ *
+ *   A2A spec (what @a2a-js/sdk sends):
+ *     { taskId, pushNotificationConfig: { url, authentication: { credentials }, id? } }
+ *
+ *   Quinn-style wrapper (identical but alternate key):
+ *     { taskId, taskPushNotificationConfig: { url, ... } }
+ *
+ *   Legacy flat shape kept for back-compat:
+ *     { taskId, url, token?, id? }
+ */
 function parsePushConfig(raw: unknown): PushNotificationConfig {
   if (!isObject(raw)) {
     throw new RpcHandlerError(
@@ -322,21 +346,49 @@ function parsePushConfig(raw: unknown): PushNotificationConfig {
     );
   }
   const taskId = raw["taskId"];
-  const url = raw["url"];
   if (typeof taskId !== "string") {
     throw new RpcHandlerError(
       JSON_RPC_ERRORS.INVALID_PARAMS,
       "params.taskId is required (string)"
     );
   }
-  if (typeof url !== "string") {
+
+  // Look for a nested config object (spec) — try both property names.
+  const nested = isObject(raw["pushNotificationConfig"])
+    ? raw["pushNotificationConfig"]
+    : isObject(raw["taskPushNotificationConfig"])
+      ? raw["taskPushNotificationConfig"]
+      : undefined;
+
+  // Authenticator payload (spec): credentials carry the Bearer token.
+  const nestedAuth =
+    nested && isObject(nested["authentication"])
+      ? nested["authentication"]
+      : undefined;
+
+  const url =
+    (nested && typeof nested["url"] === "string" ? nested["url"] : undefined) ??
+    (typeof raw["url"] === "string" ? raw["url"] : undefined);
+  if (typeof url !== "string" || url.length === 0) {
     throw new RpcHandlerError(
       JSON_RPC_ERRORS.INVALID_PARAMS,
-      "params.url is required (string)"
+      "pushNotificationConfig.url is required (string) — spec shape: params.pushNotificationConfig.url; legacy: params.url"
     );
   }
-  const id = typeof raw["id"] === "string" ? raw["id"] : undefined;
-  const token = typeof raw["token"] === "string" ? raw["token"] : undefined;
+
+  const id =
+    (nested && typeof nested["id"] === "string" ? nested["id"] : undefined) ??
+    (typeof raw["id"] === "string" ? raw["id"] : undefined);
+
+  const token =
+    (nestedAuth && typeof nestedAuth["credentials"] === "string"
+      ? nestedAuth["credentials"]
+      : undefined) ??
+    (nested && typeof nested["token"] === "string"
+      ? nested["token"]
+      : undefined) ??
+    (typeof raw["token"] === "string" ? raw["token"] : undefined);
+
   return {
     taskId,
     id: id ?? taskId,

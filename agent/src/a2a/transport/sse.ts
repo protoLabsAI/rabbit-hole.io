@@ -77,14 +77,17 @@ export function openSseStream(
   const requestId = opts.requestId;
 
   // Initial `kind: "task"` event — full snapshot so reconnecting consumers
-  // see current state before deltas start streaming.
+  // see current state before deltas start streaming. Shape matches the A2A
+  // spec's Task type: `id` (not taskId), `artifacts` array (not singular).
+  // @a2a-js/sdk routes on `kind: "task"` and then reads id + artifacts to
+  // populate its Task handler; getting either name wrong is silently
+  // dropped as "unparseable".
   writeEvent(res, requestId, {
     kind: "task",
     taskId,
     contextId: record.contextId,
     status: record.status,
-    artifact: record.artifact,
-    final: false,
+    artifacts: [record.artifact],
   });
 
   // On :resubscribe we also emit a non-append artifact-update with the
@@ -147,24 +150,22 @@ export function openSseStream(
 }
 
 function enrichEvent(event: StoreEvent, record: TaskRecord): SseEvent {
-  // Every enriched event carries both `taskId` (our internal name) and
-  // `id` (A2A spec) so clients reading either key find the value.
-  const base = {
-    taskId: record.taskId,
-    id: record.taskId,
-    contextId: record.contextId,
-  };
+  // TaskStatusUpdateEvent / TaskArtifactUpdateEvent per the A2A spec use
+  // `taskId` + `contextId`. Don't add a parallel `id` field — the SDK's
+  // discriminated-union type checking rejects extra unexpected keys.
   if (event.kind === "status-update") {
     return {
       kind: "status-update",
-      ...base,
+      taskId: record.taskId,
+      contextId: record.contextId,
       status: event.status,
       final: event.final,
     };
   }
   return {
     kind: "artifact-update",
-    ...base,
+    taskId: record.taskId,
+    contextId: record.contextId,
     artifact: event.artifact,
     append: event.append,
     lastChunk: event.lastChunk,
