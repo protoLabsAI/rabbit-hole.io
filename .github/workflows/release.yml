@@ -21,7 +21,11 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # Use GH_PAT so the changesets-generated Version Packages PR
+          # triggers CI on its own branch. PRs opened via GITHUB_TOKEN are
+          # recursion-blocked from firing further workflows, which would
+          # otherwise leave the PR stuck "expecting 5 status checks".
+          token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v5
@@ -50,7 +54,12 @@ jobs:
           commit: "chore: version packages"
           title: "chore: version packages"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # GH_PAT (fallback GITHUB_TOKEN) so the PR this action opens is
+          # authored by a user, not github-actions[bot] — only then do
+          # downstream workflows (CI, branch-protection checks) run on
+          # the PR. Without this, the Version Packages PR sits stuck
+          # "expecting 5 status checks" forever.
+          GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
           # NPM_TOKEN: ${{ secrets.NPM_TOKEN }}  # Not needed until publishing enabled
 
       - name: Tag release
