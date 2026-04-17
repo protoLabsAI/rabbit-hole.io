@@ -108,7 +108,9 @@ interface ResearchEditorProps {
       off: (event: string, handler: () => void) => void;
       setLocalStateField: (field: string, value: unknown) => void;
     };
-  }; // HocuspocusProvider for live collaboration
+  }; // local Y.Doc provider (IndexeddbPersistence). Historically this
+  // slot also accepted a HocuspocusProvider for live collaboration;
+  // multiplayer was dropped — only local persistence flows in now.
   userId?: string; // User ID for awareness
   updateCursor?: (x: number | null, y: number | null) => void; // Cursor tracking callback
   onCursorsUpdate?: (

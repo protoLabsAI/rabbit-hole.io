@@ -32,7 +32,7 @@ interface GraphCanvasStateProps {
   };
   disableAutoPersist?: boolean;
   onDataChange: (data: any) => void;
-  provider?: any; // HocuspocusProvider | IndexeddbPersistence | null
+  provider?: any; // IndexeddbPersistence | null (local Y.Doc persistence; multiplayer provider removed)
   userId?: string | null;
 }
 

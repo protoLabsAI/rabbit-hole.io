@@ -21,7 +21,6 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@floating-ui/dom": "^1.7.4",
-    "@hocuspocus/provider": "3.2.5",
     "@hookform/resolvers": "^3.10.0",
     "@protolabsai/api-utils": "workspace:*",
     "@protolabsai/auth": "workspace:*",
@@ -123,10 +122,8 @@
     "three": "^0.183.2",
     "tldraw": "^4.0.3",
     "web-vitals": "^5.1.0",
-    "ws": "^8.18.3",
     "y-indexeddb": "^9.0.12",
     "y-protocols": "^1.0.6",
-    "y-websocket": "^3.0.0",
     "yjs": "^13.6.27",
     "zod": "^4.1.12",
     "zustand": "^5.0.8"
