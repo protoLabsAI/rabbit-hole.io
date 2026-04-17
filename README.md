@@ -20,7 +20,7 @@ Rabbit Hole is an AI search engine backed by a living knowledge graph. When you 
 |---------|-------------|
 | **Search** (`/`) | AI search engine. Graph search + web research + streaming answers + user-triggered KG ingest + deep research mode. |
 | **Atlas** (`/atlas`) | 3D knowledge graph visualization (react-force-graph-3d) |
-| **Research** (`/research`) | Research workspace (React Flow canvas, entity cards, enrichment wizards). Dev-only — gated by `ENABLE_RESEARCH=true`. |
+| **Research** (`/research`) | Research workspace (React Flow canvas, entity cards, enrichment wizards). |
 
 ## Quick Start
 
@@ -92,7 +92,7 @@ rabbit-hole.io/
 ├── apps/rabbit-hole/          # Next.js application
 │   ├── app/                   # Search engine landing page
 │   ├── app/atlas/             # 3D knowledge graph visualization
-│   ├── app/research/          # Research workspace (dev-only, gated by ENABLE_RESEARCH)
+│   ├── app/research/          # Research workspace
 │   ├── app/evidence/          # Evidence management
 │   ├── app/lib/search.ts      # Shared search utilities (graph, web, wiki)
 │   ├── app/api/chat/          # AI SDK v6 agentic search + ingest

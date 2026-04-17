@@ -93,11 +93,15 @@ export function buildAgentCard(cfg: AgentCardConfig): AgentCard {
   // Strip trailing slash and any /a2a suffix the caller might have baked in,
   // then append /a2a canonically so the url field always ends in /a2a as the spec requires.
   const base = cfg.advertiseUrl.replace(/\/+$/, "").replace(/\/a2a$/, "");
+  // Strip leading "v" — callers pass AGENT_VERSION from a git tag ("v0.1.0")
+  // but the spec + semver want the bare version ("0.1.0"). Normalize once
+  // here so consumers don't end up with "vv0.1.0" from "v" + "v0.1.0".
+  const version = cfg.version.replace(/^v/, "");
   return {
     name: cfg.name,
     description: cfg.description,
     url: `${base}/a2a`,
-    version: cfg.version,
+    version,
     provider: { organization: "protoLabsAI" },
     capabilities: {
       streaming: true,

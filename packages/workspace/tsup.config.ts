@@ -18,7 +18,6 @@ export default defineConfig({
     "react-dom",
     "next",
     "yjs",
-    "@hocuspocus/provider",
     "@tanstack/react-query",
     "nuqs",
     "zustand",
