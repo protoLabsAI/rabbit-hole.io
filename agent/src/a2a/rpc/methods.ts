@@ -67,7 +67,10 @@ export function registerMessageMethods(
   producers: ProducerRegistry
 ): void {
   router.register("message/send", async (params) => {
-    const { skill, input, contextId } = parseSendParams(params);
+    const { skill, input, contextId } = parseSendParams(
+      params,
+      Object.keys(producers)
+    );
     const producer = producers[skill];
     if (!producer) {
       throw new RpcHandlerError(
@@ -198,7 +201,10 @@ function serializeTask(record: TaskRecord): unknown {
 
 // ── Param parsers ───────────────────────────────────────────────────
 
-function parseSendParams(raw: unknown): {
+function parseSendParams(
+  raw: unknown,
+  availableSkills: readonly string[] = []
+): {
   skill: string;
   input: string;
   contextId?: string;
@@ -210,40 +216,78 @@ function parseSendParams(raw: unknown): {
     );
   }
 
-  // A2A spec: skill comes from params.metadata.skillHint
-  const metadata = raw["metadata"];
-  const skill = isObject(metadata) ? metadata["skillHint"] : undefined;
-  if (typeof skill !== "string" || skill.length === 0) {
+  // Skill resolution order:
+  //   1. params.message.metadata.skill / .skillHint   (A2A spec — SDK writes here)
+  //   2. params.metadata.skill         / .skillHint   (some clients attach at params root)
+  //   3. params.skill                                  (legacy shape kept for back-compat)
+  //   4. single skill fallback — if the agent only offers one, use that
+  const message = isObject(raw["message"]) ? raw["message"] : undefined;
+  const msgMeta =
+    message && isObject(message["metadata"]) ? message["metadata"] : undefined;
+  const rootMeta = isObject(raw["metadata"]) ? raw["metadata"] : undefined;
+  const skill =
+    pickString(msgMeta, "skill") ??
+    pickString(msgMeta, "skillHint") ??
+    pickString(rootMeta, "skill") ??
+    pickString(rootMeta, "skillHint") ??
+    pickString(raw, "skill") ??
+    (availableSkills.length === 1 ? availableSkills[0] : undefined);
+  if (!skill) {
     throw new RpcHandlerError(
       JSON_RPC_ERRORS.INVALID_PARAMS,
-      "params.metadata.skillHint is required"
+      availableSkills.length > 0
+        ? `skill is required — set via message.metadata.skill (available: ${availableSkills.join(", ")})`
+        : "skill is required — set via message.metadata.skill"
     );
   }
 
-  // A2A spec: input text comes from params.message.parts[].text
-  const message = raw["message"];
+  // Input text — A2A spec pulls from params.message.parts[].text; legacy
+  // shape used params.input. Concat text parts in order so multi-part
+  // messages round-trip losslessly.
   let input = "";
-  if (isObject(message)) {
-    const parts = message["parts"];
-    if (Array.isArray(parts)) {
-      input = parts
-        .filter(
-          (p): p is Record<string, unknown> =>
-            isObject(p) && (p["kind"] === "text" || p["type"] === "text")
-        )
-        .map((p) => (typeof p["text"] === "string" ? p["text"] : ""))
-        .join("\n")
-        .trim();
+  if (message && Array.isArray(message["parts"])) {
+    const chunks: string[] = [];
+    for (const p of message["parts"]) {
+      if (
+        isObject(p) &&
+        (p["kind"] === "text" || p["type"] === "text") &&
+        typeof p["text"] === "string"
+      ) {
+        chunks.push(p["text"]);
+      }
     }
+    input = chunks.join("\n").trim();
+  }
+  if (input.length === 0) {
+    const legacy = pickString(raw, "input");
+    if (legacy) input = legacy;
+  }
+  if (input.length === 0) {
+    throw new RpcHandlerError(
+      JSON_RPC_ERRORS.INVALID_PARAMS,
+      'input text is required — set via message.parts[{kind:"text", text}] or legacy params.input'
+    );
   }
 
-  const contextId = raw["contextId"];
+  // contextId can live on message or at params root.
+  const contextId =
+    (message && pickString(message, "contextId")) ??
+    pickString(raw, "contextId");
   const result: { skill: string; input: string; contextId?: string } = {
     skill,
     input,
   };
-  if (typeof contextId === "string") result.contextId = contextId;
+  if (contextId) result.contextId = contextId;
   return result;
+}
+
+function pickString(
+  obj: Record<string, unknown> | undefined,
+  key: string
+): string | undefined {
+  if (!obj) return undefined;
+  const v = obj[key];
+  return typeof v === "string" && v.length > 0 ? v : undefined;
 }
 
 function parseTaskId(raw: unknown): { taskId: string } {
