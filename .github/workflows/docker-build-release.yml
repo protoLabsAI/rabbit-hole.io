@@ -122,9 +122,11 @@ jobs:
           cache-from: type=registry,ref=${{ env.REGISTRY }}/protolabsai/rabbit-hole/cache:${{ matrix.service.name }}-release
           cache-to: type=registry,ref=${{ env.REGISTRY }}/protolabsai/rabbit-hole/cache:${{ matrix.service.name }}-release,mode=max
           # The agent image bakes its tag into the A2A card so consumers see
-          # the shipped version. Other services don't use build-args yet.
+          # the shipped version. Use steps.meta.outputs.version (clean
+          # semver, no leading "v") rather than github.ref_name (which
+          # includes the "v" prefix and would double up in the card).
           build-args: |
-            ${{ matrix.service.name == 'agent' && format('AGENT_VERSION={0}', github.ref_name) || '' }}
+            ${{ matrix.service.name == 'agent' && format('AGENT_VERSION={0}', steps.meta.outputs.version) || '' }}
           provenance: true
           sbom: true
           # Add network configuration for better reliability
