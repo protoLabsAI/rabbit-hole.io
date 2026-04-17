@@ -144,7 +144,10 @@ export function SideNavigationPanel({
   // Get current active tab
   const currentTab = tabs.find((tab) => tab.id === activeTab);
 
-  // Restore state from localStorage
+  // Restore state from localStorage — mount-only. Including `tabs` in deps
+  // caused a re-render cascade (callers often pass a fresh array every render),
+  // which re-fired this effect every frame and spammed console warnings.
+
   useEffect(() => {
     try {
       const savedCollapsed = localStorage.getItem(`${layoutId}-nav-collapsed`);
@@ -159,7 +162,7 @@ export function SideNavigationPanel({
     } catch (e) {
       console.warn("Failed to restore navigation state:", e);
     }
-  }, [layoutId, tabs]);
+  }, [layoutId]);
 
   // Save collapsed state
   useEffect(() => {

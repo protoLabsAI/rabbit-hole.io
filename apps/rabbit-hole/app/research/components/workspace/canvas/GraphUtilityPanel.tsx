@@ -65,7 +65,9 @@ export function useGraphUtilityTabs({
   const [entityCardSize, setEntityCardSize] = useState<CardSize>("medium");
   const [hideEmptyEntities, setHideEmptyEntities] = useState(false);
 
-  const entityTypesByDomain = getEntityTypesByDomain();
+  // Memoize so downstream useMemo deps are stable — otherwise domainTabs
+  // rebuilds every render and the whole SideNavigationPanel resets.
+  const entityTypesByDomain = useMemo(() => getEntityTypesByDomain(), []);
 
   // Count entities per type
   const entityCounts = useMemo(() => {
