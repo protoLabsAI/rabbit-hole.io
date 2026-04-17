@@ -48,21 +48,13 @@ interface WorkspacePersistenceProps {
   children: (context: PersistenceContext) => React.ReactNode;
 }
 
+const USER_ID = "local-user";
+
 export function WorkspacePersistence({
   workspaceId,
   canvasType = "graph",
   children,
 }: WorkspacePersistenceProps) {
-  const user = {
-    id: "local-user",
-    firstName: "Local",
-    lastName: "User",
-    fullName: "Local User",
-    imageUrl: "",
-    publicMetadata: { tier: "free", role: "admin" },
-    emailAddresses: [{ emailAddress: "local@localhost" }],
-    primaryEmailAddress: { emailAddress: "local@localhost" },
-  } as any;
   const workspace = useWorkspace(workspaceId, {
     mode: "editing",
     canvasType,
@@ -92,7 +84,7 @@ export function WorkspacePersistence({
       loadVersion: workspace.loadVersion,
       listVersions: workspace.listVersions,
       ydoc: workspace.ydoc,
-      userId: user?.id,
+      userId: USER_ID,
     }),
     [
       workspace.workspace,
@@ -115,7 +107,6 @@ export function WorkspacePersistence({
       workspace.loadVersion,
       workspace.listVersions,
       workspace.ydoc,
-      user?.id,
     ]
   );
 
