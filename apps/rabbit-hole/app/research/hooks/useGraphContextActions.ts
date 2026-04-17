@@ -11,11 +11,6 @@
 import type Graph from "graphology";
 import { useCallback, useMemo } from "react";
 
-import {
-  getUserRoleClient,
-  hasMinimumRole,
-  USER_ROLES,
-} from "@protolabsai/auth/client";
 import { logUserAction } from "@protolabsai/logger";
 import { useToast } from "@protolabsai/ui/hooks";
 
@@ -77,16 +72,6 @@ export function useGraphContextActions({
 }: UseGraphContextActionsOptions): ResearchMenuActions {
   const { toast } = useToast();
   const { confirm: confirmDialog } = useConfirmDialog();
-  const user = {
-    id: "local-user",
-    firstName: "Local",
-    lastName: "User",
-    fullName: "Local User",
-    imageUrl: "",
-    publicMetadata: { tier: "free", role: "admin" },
-    emailAddresses: [{ emailAddress: "local@localhost" }],
-    primaryEmailAddress: { emailAddress: "local@localhost" },
-  } as any;
 
   const onAddEntity = useCallback(
     (context?: { flowX?: number; flowY?: number; x?: number; y?: number }) => {
@@ -352,20 +337,7 @@ export function useGraphContextActions({
   );
 
   const onMergeToNeo4j = useCallback(() => {
-    // 1. Check super admin permission
-    const userRole = getUserRoleClient(user ?? null);
-    const isSuperAdmin = hasMinimumRole(userRole, USER_ROLES.SUPER_ADMIN);
-
-    if (!isSuperAdmin) {
-      toast({
-        title: "Permission Denied",
-        description: "Merge to Neo4j requires super admin access",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // 2. Generate bundle from graph
+    // Single-user mode: merge is always allowed. Generate bundle from graph.
     const entities = graph.mapNodes((nodeId) => {
       const attrs = graph.getNodeAttributes(nodeId);
       return {
@@ -422,7 +394,7 @@ export function useGraphContextActions({
         variant: "destructive",
       });
     }
-  }, [graph, userId, tabId, toast, user, onOpenMergeDialog]);
+  }, [graph, userId, tabId, toast, onOpenMergeDialog]);
 
   return useMemo(
     () => ({
