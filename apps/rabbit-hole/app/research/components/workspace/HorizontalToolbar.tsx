@@ -3,13 +3,10 @@
 /**
  * Horizontal Toolbar
  *
- * Capability-driven toolbar with:
- * - AI Chat and Collaboration controls
- * - Undo/Redo buttons
- * - Canvas-specific buttons (injected via slot)
- * - Settings with tabs (Toolbar, Canvas)
+ * Single-user mode: chat, utility panel, and collaboration controls removed.
+ * Now limited to undo/redo, canvas-specific buttons, and settings.
  *
- * Note: Navigation controls (zoom, fit, lock) moved to CanvasNavigationToolbar (bottom-left)
+ * Navigation controls (zoom, fit, lock) live in CanvasNavigationToolbar (bottom-left).
  */
 
 import React from "react";
@@ -24,72 +21,33 @@ import {
   TabsList,
   TabsTrigger,
 } from "@protolabsai/ui/atoms";
-import { PaidFeaturePopover } from "@protolabsai/ui/organisms";
 
 import { cn } from "@/lib/utils";
-
-import type {
-  ToolbarButtonCapabilities,
-  CanvasType,
-} from "../../types/workspace";
 
 import { ToolbarSettings } from "./toolbar/ToolbarSettings";
 import { UndoRedoButtons } from "./toolbar/UndoRedoButtons";
 
 interface HorizontalToolbarProps {
-  capabilities: ToolbarButtonCapabilities;
-  canvasType: CanvasType;
   canvasSettings: React.ReactNode;
   canvasButtonsSlot?: React.ReactNode;
-  onToggleChat: () => void;
-  canUseAIChat?: boolean; // Tier enforcement for AI chat
-  onToggleUtilityPanel?: () => void; // Toggle utility panel
-  isUtilityPanelCollapsed?: boolean; // Whether utility panel is collapsed
   isLoading?: boolean;
   canUndo?: boolean;
   canRedo?: boolean;
   onUndo?: () => void;
   onRedo?: () => void;
   className?: string;
-  // Collaboration props
-  workspaceId?: string;
-  tabId?: string;
-  tabName?: string;
-  canvasData?: any;
-  canUseCollaboration?: boolean; // Tier enforcement for collaboration
-  workspaceReady?: boolean; // Whether workspace is fully loaded
-  onSessionCreated?: (sessionId: string, shareLink: string) => void;
-  onSessionEnded?: () => void;
-  activeSessionId?: string | null;
 }
 
 export function HorizontalToolbar({
-  capabilities,
-  canvasType,
   canvasSettings,
   canvasButtonsSlot,
-  canvasData,
-  onToggleChat,
-  canUseAIChat = false,
-  onToggleUtilityPanel,
-  isUtilityPanelCollapsed = false,
   isLoading,
   canUndo = false,
   canRedo = false,
   onUndo = () => {},
   onRedo = () => {},
   className,
-  workspaceId,
-  tabId,
-  tabName,
-  canUseCollaboration = false,
-  workspaceReady = false,
-  onSessionCreated,
-  onSessionEnded,
-  activeSessionId,
 }: HorizontalToolbarProps) {
-  // Only show collaboration for supported canvas types
-  const supportsCollaboration = ["graph", "map", "gantt"].includes(canvasType);
   return (
     <div
       className={cn(
@@ -98,102 +56,6 @@ export function HorizontalToolbar({
       )}
     >
       <div className="flex items-center gap-1 px-2 py-2">
-        {/* Chat toggle - with tier restriction */}
-        <PaidFeaturePopover
-          hasAccess={canUseAIChat}
-          trigger="both"
-          hoverDelay={800}
-          feature={{
-            name: "AI Chat",
-            icon: <Icon name="sparkles" size={20} className="text-primary" />,
-            description:
-              "Unlock AI-powered research assistance with natural language queries, entity discovery, and intelligent relationship suggestions.",
-            benefits: [
-              "100 AI queries per day",
-              "Research agent chat interface",
-              "Auto relationship discovery",
-              "Smart entity suggestions",
-            ],
-            tier: "basic",
-          }}
-          align="start"
-          side="right"
-          disabledClassName="p-2 rounded-md transition-colors text-muted-foreground/40"
-        >
-          <button
-            type="button"
-            onClick={onToggleChat}
-            className="p-2 rounded-md transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"
-            title="Toggle AI Chat"
-          >
-            <Icon name="message-square" size={16} />
-          </button>
-        </PaidFeaturePopover>
-
-        {/* Utility Panel toggle */}
-        {onToggleUtilityPanel && (
-          <button
-            type="button"
-            onClick={onToggleUtilityPanel}
-            className={cn(
-              "p-2 rounded-md transition-colors",
-              isUtilityPanelCollapsed
-                ? "text-muted-foreground hover:text-foreground hover:bg-muted"
-                : "text-foreground bg-muted"
-            )}
-            title={
-              isUtilityPanelCollapsed
-                ? "Show Utility Panel"
-                : "Hide Utility Panel"
-            }
-          >
-            <Icon name="panel-bottom" size={16} />
-          </button>
-        )}
-
-        {/* Collaboration - with tier restriction */}
-        {supportsCollaboration && workspaceId && tabId && (
-          <>
-            <PaidFeaturePopover
-              hasAccess={canUseCollaboration}
-              trigger="both"
-              hoverDelay={800}
-              feature={{
-                name: "Real-Time Collaboration",
-                icon: <Icon name="globe" size={20} className="text-primary" />,
-                description:
-                  "Share your canvas with others for real-time collaborative editing. Perfect for team research and data analysis.",
-                benefits: [
-                  "Share per-canvas collaboration sessions",
-                  "Real-time sync with teammates",
-                  "Guest editor or viewer modes",
-                  "Session controls and management",
-                ],
-                tier: "basic",
-              }}
-              align="start"
-              side="right"
-              disabledClassName="p-2 rounded-md transition-colors text-muted-foreground/40"
-            >
-              <div className="relative">
-                {/* TODO: TabCollaborationMenu was removed */}
-                <button
-                  type="button"
-                  className="p-2 rounded-md transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"
-                  title="Collaboration (coming soon)"
-                  disabled
-                >
-                  <Icon name="globe" size={16} />
-                </button>
-              </div>
-            </PaidFeaturePopover>
-          </>
-        )}
-
-        {/* Separator */}
-        <div className="h-4 w-px bg-border mx-1" />
-
-        {/* Undo/Redo (editing mode only) */}
         <UndoRedoButtons
           canUndo={canUndo}
           canRedo={canRedo}
@@ -201,13 +63,10 @@ export function HorizontalToolbar({
           onRedo={onRedo}
         />
 
-        {/* Separator before canvas-specific buttons */}
         {canvasButtonsSlot && <div className="h-4 w-px bg-border mx-1" />}
 
-        {/* Canvas-specific buttons */}
         {canvasButtonsSlot}
 
-        {/* Separator before settings */}
         <div className="h-4 w-px bg-border mx-1" />
 
         {/* Settings with tabs */}
@@ -232,12 +91,10 @@ export function HorizontalToolbar({
                 <TabsTrigger value="canvas">Canvas</TabsTrigger>
               </TabsList>
 
-              {/* Toolbar Settings Tab */}
               <TabsContent value="toolbar" className="p-4">
                 <ToolbarSettings />
               </TabsContent>
 
-              {/* Canvas-Specific Settings Tab */}
               <TabsContent value="canvas" className="p-4">
                 {canvasSettings || (
                   <div className="text-center py-8 text-muted-foreground text-sm">
@@ -249,7 +106,6 @@ export function HorizontalToolbar({
           </PopoverContent>
         </Popover>
 
-        {/* Loading indicator */}
         {isLoading && (
           <div className="flex items-center gap-2 px-2 border-l">
             <Icon
