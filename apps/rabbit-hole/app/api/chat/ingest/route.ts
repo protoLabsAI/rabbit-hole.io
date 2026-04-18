@@ -29,10 +29,11 @@ export async function POST(request: NextRequest) {
   }
 
   const { query, text } = validation.data;
-  const rabbitHoleUrl =
+  const rabbitHoleUrl = (
     process.env.RABBIT_HOLE_URL ||
     process.env.NEXT_PUBLIC_APP_URL ||
-    "http://localhost:3000";
+    "http://localhost:3000"
+  ).replace(/\/+$/, "");
 
   try {
     // Extract entities using fast model
