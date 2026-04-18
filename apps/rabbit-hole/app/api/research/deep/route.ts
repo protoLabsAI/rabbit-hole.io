@@ -26,6 +26,7 @@ import {
 
 import {
   searchCommunities,
+  graphHasData,
   searchGraph,
   searchWeb,
   searchWikipedia,
@@ -101,10 +102,9 @@ async function runResearch(
   const allNotes: string[] = [];
   const allFindings: string[] = [];
   let totalSearches = 0;
-  // Set to true after iteration 1 if the KG returned 0 results for the main
-  // query. When empty we skip all per-dimension graph calls and run a second
-  // web search instead, so no steps are wasted on an unpopulated graph.
-  let graphIsEmpty = false;
+  // Fast upfront check — if Neo4j has no nodes, skip ALL graph searches.
+  // Checked once silently before any research loop; no UI event emitted.
+  const graphIsEmpty = !(await graphHasData().catch(() => false));
 
   const trackSearch = () => {
     totalSearches++;
@@ -210,92 +210,43 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
         dimensionCount: dimensionsToResearch.length,
       });
 
-      // Search knowledge graph first (only on first iteration)
-      if (iteration === 1) {
+      // Search community summaries only when the graph has data
+      if (!graphIsEmpty) {
         checkAbort(researchId);
-        emit("search.started", { query, source: "graph" });
-        const graphSearchSpan = tracing.createSpan("search:graph", {
+        emit("search.started", { query, source: "communities" });
+        const communitySearchSpan = tracing.createSpan("search:communities", {
           query,
-          source: "initial",
         });
+        let communityResults: CommunitySearchResult[] = [];
         try {
-          const graphResults = await withRetry(() => searchGraph(query, 15));
+          communityResults = await withRetry(() => searchCommunities(query, 5));
           trackSearch();
-          graphSearchSpan.end({ resultCount: graphResults.length });
+          communitySearchSpan.end({ resultCount: communityResults.length });
           emit("search.completed", {
             query,
-            source: "graph",
-            resultCount: graphResults.length,
+            source: "communities",
+            resultCount: communityResults.length,
           });
-          if (graphResults.length > 0) {
-            const graphNote = `Knowledge graph entities: ${graphResults.map((e) => `${e.name} (${e.type})`).join(", ")}`;
-            allNotes.push(graphNote);
-            for (const e of graphResults) {
-              allSources.push({
-                title: e.name,
-                url: `#entity:${e.uid}`,
-                type: "graph",
-              });
-            }
-            const finding = `Found ${graphResults.length} existing entities in the knowledge graph`;
+          if (communityResults.length > 0) {
+            const communityNote = `Community themes: ${communityResults
+              .map(
+                (c) =>
+                  `Community ${c.communityId} (${c.entityCount} entities — ${c.topEntities.slice(0, 3).join(", ")}): ${c.summary}`
+              )
+              .join("\n")}`;
+            allNotes.push(communityNote);
+            const finding = `Found ${communityResults.length} relevant community clusters with thematic context`;
             allFindings.push(finding);
             updateResearch(researchId, { findings: allFindings });
             emit("research.finding", { text: finding });
-          } else {
-            // KG is empty — skip all further graph calls and invest the budget
-            // in additional web searches per dimension instead.
-            graphIsEmpty = true;
           }
         } catch {
-          graphSearchSpan.end({ resultCount: 0, error: true });
+          communitySearchSpan.end({ resultCount: 0, error: true });
           emit("search.completed", {
             query,
-            source: "graph",
+            source: "communities",
             resultCount: 0,
           });
-          graphIsEmpty = true;
-        }
-
-        // Search community summaries only when the graph has data
-        if (!graphIsEmpty) {
-          checkAbort(researchId);
-          emit("search.started", { query, source: "communities" });
-          const communitySearchSpan = tracing.createSpan("search:communities", {
-            query,
-          });
-          let communityResults: CommunitySearchResult[] = [];
-          try {
-            communityResults = await withRetry(() =>
-              searchCommunities(query, 5)
-            );
-            trackSearch();
-            communitySearchSpan.end({ resultCount: communityResults.length });
-            emit("search.completed", {
-              query,
-              source: "communities",
-              resultCount: communityResults.length,
-            });
-            if (communityResults.length > 0) {
-              const communityNote = `Community themes: ${communityResults
-                .map(
-                  (c) =>
-                    `Community ${c.communityId} (${c.entityCount} entities — ${c.topEntities.slice(0, 3).join(", ")}): ${c.summary}`
-                )
-                .join("\n")}`;
-              allNotes.push(communityNote);
-              const finding = `Found ${communityResults.length} relevant community clusters with thematic context`;
-              allFindings.push(finding);
-              updateResearch(researchId, { findings: allFindings });
-              emit("research.finding", { text: finding });
-            }
-          } catch {
-            communitySearchSpan.end({ resultCount: 0, error: true });
-            emit("search.completed", {
-              query,
-              source: "communities",
-              resultCount: 0,
-            });
-          }
         }
       }
 
