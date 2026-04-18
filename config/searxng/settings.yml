@@ -1,15 +1,141 @@
-use_default_settings: true
+use_default_settings:
+  engines:
+    # Disable noisy or low-quality engines for our use case
+    remove:
+      - baidu
+      - yahoo
+      - aol
+      - yandex
+      - seznam
+      - naver
+      - sogou
+      - qwant     # no time_range support, often rate-limited
+      - 360search
+      - presearch
+      - swisscows
 
 server:
   # secret_key injected via SEARXNG_SECRET env var
   # generate: openssl rand -hex 32
   limiter: false
-  image_proxy: true
+  image_proxy: false  # not needed for API-only usage
 
 search:
   safe_search: 0
   default_lang: "en"
+  max_page: 5
   # json required for API access (Next.js app + LangGraph agent)
   formats:
     - html
     - json
+  # How long to suspend an engine after errors
+  suspended_times:
+    SearxEngineAccessDenied: 120     # 2 min (default 180)
+    SearxEngineCaptcha: 1800         # 30 min (default 3600)
+    SearxEngineTooManyRequests: 90   # 90 sec (default 180)
+    cf_SearxEngineCaptcha: 86400     # 1 day (default 15 days)
+    cf_SearxEngineAccessDenied: 3600 # 1 hr (default 1 day)
+
+outgoing:
+  request_timeout: 4.0      # per-engine timeout
+  max_request_timeout: 8.0  # hard ceiling; academic engines can be slow
+  pool_connections: 100
+  pool_maxsize: 20
+  keepalive_expiry: 5.0
+  enable_http2: true
+
+engines:
+  # ── General (always on) ───────────────────────────────────────────
+  - name: google
+    engine: google
+    shortcut: go
+    disabled: false
+    timeout: 4.0
+    weight: 1.2           # slight boost — most comprehensive index
+
+  - name: duckduckgo
+    engine: duckduckgo
+    shortcut: ddg
+    disabled: false
+    timeout: 4.0
+
+  - name: brave
+    engine: brave
+    shortcut: bra
+    disabled: false       # disabled by default in SearXNG — enable it
+    timeout: 4.0
+    categories: general
+    time_range_support: true
+
+  - name: startpage
+    engine: startpage
+    shortcut: sp
+    disabled: false
+    timeout: 4.0
+
+  - name: mojeek
+    engine: mojeek
+    shortcut: moj
+    disabled: false       # independent index, good diversity
+    timeout: 4.0
+
+  # ── Social / Community ────────────────────────────────────────────
+  - name: reddit
+    engine: reddit
+    shortcut: re
+    disabled: false       # disabled by default — enable for community depth
+    categories: social media
+
+  - name: hackernews
+    engine: hackernews
+    shortcut: hn
+    disabled: false
+    categories: social media
+
+  # ── Technical / Code ─────────────────────────────────────────────
+  - name: github
+    engine: github
+    shortcut: gh
+    disabled: false
+    categories: it
+
+  - name: stackoverflow
+    engine: stackoverflow
+    shortcut: st
+    disabled: false
+    categories: it
+
+  # ── Academic / Science ───────────────────────────────────────────
+  - name: arxiv
+    engine: arxiv
+    shortcut: arx
+    disabled: false
+    categories: science, scientific publications
+    timeout: 6.0
+
+  - name: semantic scholar
+    engine: semantic_scholar
+    shortcut: ss
+    disabled: false       # disabled by default — enable it
+    categories: science, scientific publications
+    timeout: 8.0
+
+  - name: pubmed
+    engine: pubmed
+    shortcut: pm
+    disabled: false
+    categories: science, scientific publications
+    timeout: 6.0
+
+  # ── Knowledge / Reference ────────────────────────────────────────
+  - name: wikidata
+    engine: wikidata
+    shortcut: wd
+    disabled: false
+    weight: 2.0           # keep default weight boost — structured facts
+
+  - name: wikipedia
+    engine: wikipedia
+    shortcut: wp
+    disabled: false
+    weight: 1.5
