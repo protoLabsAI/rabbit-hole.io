@@ -11,14 +11,18 @@ User types query
 useChat (DefaultChatTransport) → POST /api/chat
     │
     ▼
+[middleware chain: EntityMemory, ResearchPlanner, ParallelDecomposition]
+    │
+    ▼
 streamText({
   model: getAIModel("smart"),
-  tools: { searchGraph, searchWeb, searchWikipedia },
-  stopWhen: stepCountIs(5)
+  tools: { searchGraph, searchWeb, searchWikipedia, searchCommunities, askClarification },
+  stopWhen: stepCountIs(7)
 })
     │
-    ├─ LLM calls searchGraph (Neo4j full-text, sub-5ms)
-    ├─ If thin results → calls searchWeb (Tavily) + searchWikipedia
+    ├─ LLM starts with searchWeb (SearXNG) — web-first when graph is empty
+    ├─ searchGraph skipped until graph has content (graphIsEmpty flag)
+    ├─ searchWeb category routing: general / social media / it / science
     └─ Streams answer as UIMessage parts (text + tool calls)
 ```
 
@@ -45,11 +49,13 @@ User-controlled, not automatic. "Add to Knowledge Graph" button on each message 
 
 | Function | Purpose |
 |----------|---------|
-| `searchGraph(query, limit)` | Neo4j full-text search via Lucene index |
-| `searchWeb(query, maxResults)` | Tavily advanced web search |
+| `searchGraph(query, limit)` | Neo4j hybrid BM25 + vector search with RRF fusion |
+| `searchWeb(query, maxResults, options?)` | SearXNG meta-search (categories: general/social media/it/science/news) |
 | `searchWikipedia(query)` | Wikipedia article fetch |
 | `buildLuceneQuery(rawQuery)` | Escape and wildcard-suffix for Lucene |
-| `withRetry(fn, maxRetries, delayMs)` | Retry wrapper with exponential backoff |
+| `withRetry(fn, options)` | Retry wrapper with exponential backoff |
+
+`WebSearchOptions`: `categories`, `engines`, `pageno`, `timeRange`
 
 ### Key Files
 
@@ -89,8 +95,8 @@ Phase 2: PLAN REVIEW
   └─ Dimensions shown to user (auto-continues after 1.5s)
 
 Phase 3: RESEARCH LOOP (per dimension, up to 3 iterations)
-  ├─ searchGraph → check existing knowledge (with retry)
-  ├─ searchWeb → Tavily advanced search (with retry)
+  ├─ searchGraph → check existing knowledge, skip when graphIsEmpty (with retry)
+  ├─ searchWeb → SearXNG (categories: general + social media/it on gap iterations) (with retry)
   ├─ searchWikipedia → article text (with retry)
   ├─ Compress findings via generateObject (summary + keyFinding)
   └─ EVALUATE: LLM checks coverage gaps

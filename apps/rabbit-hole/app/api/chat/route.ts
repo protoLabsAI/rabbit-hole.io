@@ -49,12 +49,24 @@ const SEARXNG_ENABLED = !!process.env.SEARXNG_ENDPOINT;
 
 const searchWebTool = tool({
   description:
-    "Search the web using SearXNG for recent results. Use when the knowledge graph doesn't have enough information.",
+    "Search the web using SearXNG. Call multiple times with different queries and categories to build comprehensive coverage.",
   inputSchema: z.object({
-    query: z.string().describe("Web search query"),
+    query: z.string().describe("Search query"),
+    categories: z
+      .enum(["general", "social media", "it", "news", "science"])
+      .optional()
+      .describe(
+        'Search category. "general" (default) = broad web (Google, Brave, DDG). ' +
+          '"social media" = Reddit & Hacker News — community discussions, real-world experience, debates. ' +
+          '"it" = GitHub, Stack Overflow, Arch Wiki — code, repos, technical docs. ' +
+          '"science" = arXiv, Semantic Scholar, PubMed — academic papers. ' +
+          '"news" = Google News, Reuters — recent events and announcements.'
+      ),
   }),
-  execute: async (input: { query: string }) => {
-    const results = await searchWeb(input.query);
+  execute: async (input: { query: string; categories?: string }) => {
+    const results = await searchWeb(input.query, 10, {
+      categories: input.categories,
+    });
     return { results };
   },
 });
@@ -62,7 +74,7 @@ const searchWebTool = tool({
 const searchTools = {
   searchGraph: tool({
     description:
-      "Search the knowledge graph for existing entities by name, alias, or tag. Always call this first to check what we already know.",
+      "Search the local knowledge graph for entities already collected on this topic. Call this to surface prior research — useful when the graph has been populated, but not required first.",
     inputSchema: z.object({
       query: z.string().describe("Search query for the knowledge graph"),
     }),
@@ -144,14 +156,32 @@ const searchTools = {
 
 // ─── System Prompt ──────────────────────────────────────────────────
 
-const SYSTEM_PROMPT = `You are Rabbit Hole, an AI search engine powered by a living knowledge graph. You answer questions by searching the graph and the web.
+const SYSTEM_PROMPT = `You are Rabbit Hole, an AI search engine backed by a living knowledge graph. You answer questions by searching multiple sources and synthesizing comprehensive, well-cited answers.
 
 ## Workflow
-1. ALWAYS call searchGraph first to check existing knowledge
-2. If the graph has good results (3+ entities), use them to answer
-3. For broad or thematic questions ("what are the main themes?", "how do these connect?"), call searchCommunities
-4. ${SEARXNG_ENABLED ? "If the graph is thin, call searchWeb for more context" : "If the graph is thin, rely on your training knowledge and say so — web search is not available"}
-5. Synthesize all findings into a clear, well-cited answer
+${
+  SEARXNG_ENABLED
+    ? `1. Search the web first — use searchWeb with a precise query to get current, authoritative results
+2. Search Wikipedia for foundational context on people, organizations, places, and well-known topics
+3. If results are thin or the question has multiple angles, search the web again with a different query formulation
+4. Check the knowledge graph (searchGraph) if you suspect prior research exists on this topic
+5. For broad thematic questions ("what are the main themes?", "how do these connect?"), use searchCommunities
+6. Synthesize everything into a clear, well-cited answer — more sources = better answer`
+    : `1. Check the knowledge graph (searchGraph) for existing research on this topic
+2. Search Wikipedia for foundational context on well-known topics
+3. For broad thematic questions, use searchCommunities
+4. Synthesize all findings — web search is not available, so use graph + Wikipedia + your knowledge`
+}
+
+## Getting Good Coverage
+- Run searchWeb multiple times with different queries AND different categories
+- Start with "general" (default) for broad results, then go deeper:
+  - Query involves code, libraries, tools, or CLI → search again with categories: "it" (GitHub + Stack Overflow)
+  - Query is "what do people think/use/recommend" → search with categories: "social media" (Reddit + HN)
+  - Query involves recent events, releases, or announcements → use categories: "news"
+  - Query involves research papers or academic topics → use categories: "science" (arXiv + Semantic Scholar)
+- Example: for "best state management in React", run: (1) general "React state management 2024", (2) it "zustand vs redux comparison github", (3) social media "React state management Reddit"
+- If the graph returns no results, skip further graph calls and invest those steps in deeper web searches across categories
 
 ## Citations (REQUIRED)
 - Every factual claim MUST include an inline [N] citation where N matches the source's citationNumber
@@ -161,7 +191,7 @@ const SYSTEM_PROMPT = `You are Rabbit Hole, an AI search engine powered by a liv
 - Do NOT omit citations. Every claim that can be traced to a source must have one
 
 ## Answer Format
-- Answer directly and concisely
+- Answer directly and thoroughly
 - Use markdown for readability
 - If information is uncertain, say so
 - Do NOT use emojis in responses — the only exceptions are ✓ and ✗ when used to denote true/false or present/absent data in tables or lists
@@ -301,7 +331,7 @@ export async function POST(request: Request) {
       ? {
           searchWeb: {
             ...searchWebTool,
-            execute: async (input: { query: string }) =>
+            execute: async (input: { query: string; categories?: string }) =>
               chain.wrapToolCall(
                 ctx,
                 "searchWeb",
@@ -386,7 +416,7 @@ export async function POST(request: Request) {
     system: SYSTEM_PROMPT,
     messages: modelMessages,
     tools: wrappedTools,
-    stopWhen: stepCountIs(5),
+    stopWhen: stepCountIs(7),
 
     // beforeModel: fires before each LLM turn.
     // Uses AI SDK's prepareStep to intercept the messages array per-step.
