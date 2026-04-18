@@ -4,6 +4,8 @@ import { Icon } from "@protolabsai/icon-system";
 
 import { cn } from "@/lib/utils";
 
+import type { DrawingTool } from "../canvas/DrawingLayer";
+
 export type GraphLayout = "elk" | "force" | "manual";
 
 interface GraphToolbarButtonsProps {
@@ -12,9 +14,10 @@ interface GraphToolbarButtonsProps {
   onImport?: () => void;
   onExport?: () => void;
   filterPopover?: React.ReactNode;
-  // Version management
   onSaveVersion?: () => void;
   onVersionBrowserOpen?: () => void;
+  drawingTool?: DrawingTool;
+  onDrawingToolChange?: (tool: DrawingTool) => void;
 }
 
 export function GraphToolbarButtons({
@@ -25,6 +28,8 @@ export function GraphToolbarButtons({
   filterPopover,
   onSaveVersion,
   onVersionBrowserOpen,
+  drawingTool = null,
+  onDrawingToolChange,
 }: GraphToolbarButtonsProps) {
   return (
     <>
@@ -53,6 +58,48 @@ export function GraphToolbarButtons({
 
       {(onSaveVersion || onVersionBrowserOpen) && (
         <div className="h-4 w-px bg-border mx-1" />
+      )}
+
+      {/* Drawing tools — pencil toggles draw mode, eraser toggles erase mode.
+          Clicking the active tool again exits drawing. */}
+      {onDrawingToolChange && (
+        <>
+          <button
+            type="button"
+            onClick={() => onDrawingToolChange("pencil")}
+            className={cn(
+              "p-2 rounded-md transition-all",
+              drawingTool === "pencil"
+                ? "bg-primary/20 text-primary ring-2 ring-primary/50"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+            )}
+            title={
+              drawingTool === "pencil"
+                ? "Pencil (active — click to exit)"
+                : "Pencil — draw on the canvas"
+            }
+          >
+            <Icon name="pencil" size={16} />
+          </button>
+          <button
+            type="button"
+            onClick={() => onDrawingToolChange("eraser")}
+            className={cn(
+              "p-2 rounded-md transition-all",
+              drawingTool === "eraser"
+                ? "bg-primary/20 text-primary ring-2 ring-primary/50"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+            )}
+            title={
+              drawingTool === "eraser"
+                ? "Eraser (active — click to exit)"
+                : "Eraser — click or drag over strokes to delete"
+            }
+          >
+            <Icon name="trash-2" size={16} />
+          </button>
+          <div className="h-4 w-px bg-border mx-1" />
+        </>
       )}
 
       {/* Filter Entity Types */}

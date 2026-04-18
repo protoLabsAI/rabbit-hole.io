@@ -37,18 +37,6 @@ import React, {
 
 import "@xyflow/react/dist/style.css";
 import type { UserTier } from "@protolabsai/auth/client";
-// DISABLED: Drawing tools - Coming Soon
-// import {
-//   FreehandNode,
-//   RectangleNode,
-//   CircleNode,
-//   LineNode,
-//   TextNode,
-//   Freehand,
-//   useFreehandDrawing,
-//   isDrawingNodeType,
-//   type ToolType,
-// } from "@protolabsai/freehand-drawing";
 import { generateSecureUUID } from "@protolabsai/utils";
 import { getEntityColor, getEntityImage } from "@protolabsai/utils/atlas";
 
@@ -67,6 +55,11 @@ import { EdgeTypeSelector } from "./dialogs/EdgeTypeSelector";
 import { RelationEdge } from "./edges/RelationEdge";
 import { EntityCard } from "./nodes/EntityCard";
 import { EntityTypeSelector } from "./nodes/EntityTypeSelector";
+import {
+  DrawingLayer,
+  type DrawingStroke,
+  type DrawingTool,
+} from "./workspace/canvas/DrawingLayer";
 
 const nodeTypes = {
   entity: EntityCard,
@@ -123,20 +116,14 @@ interface ResearchEditorProps {
       opacity: number;
     }>
   ) => void;
-  // DISABLED: Drawing tools - Coming Soon
-  // Freehand drawing props - kept for easy re-enablement
-  ydoc?: any; // Yjs document for freehand sync
-  tabId?: string; // Tab ID for scoping freehand drawings per tab
+  ydoc?: any;
+  tabId?: string;
   userTier?: UserTier;
-  // onFreehandReady?: (toggle: () => void) => void;
-  // onFreehandToggle?: (enabled: boolean) => void;
-  // onFreehandToolChange?: (tool: ToolType) => void;
-  // onFreehandNodeCreated?: (nodeId: string) => void;
-  // onFreehandError?: (error: Error) => void;
-  // onFreehandSettingsReady?: (settings: any, onSettingsChange: (updates: any) => void) => void;
-  // onFreehandToolChangeReady?: (handleToolChange: (tool: ToolType) => void) => void;
-  // onSelectedDrawingNodeChange?: (node: Node | null) => void;
-  // onSelectedDrawingNodeUpdateReady?: (updateNode: (updates: any) => void) => void;
+  // Drawing layer — pencil / eraser live inside the viewport.
+  drawingTool?: DrawingTool;
+  drawingStrokes?: DrawingStroke[];
+  onDrawingStrokeAdd?: (stroke: DrawingStroke) => void;
+  onDrawingStrokeRemove?: (strokeId: string) => void;
 }
 
 export function ResearchEditor({
@@ -163,16 +150,10 @@ export function ResearchEditor({
   ydoc,
   tabId,
   userTier = "free",
-  // DISABLED: Drawing tools - Coming Soon
-  // onFreehandReady,
-  // onFreehandToggle,
-  // onFreehandToolChange,
-  // onFreehandNodeCreated,
-  // onFreehandError,
-  // onFreehandSettingsReady,
-  // onFreehandToolChangeReady,
-  // onSelectedDrawingNodeChange,
-  // onSelectedDrawingNodeUpdateReady,
+  drawingTool = null,
+  drawingStrokes = [],
+  onDrawingStrokeAdd,
+  onDrawingStrokeRemove,
 }: ResearchEditorProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -1242,9 +1223,9 @@ export function ResearchEditor({
         minZoom={0.1}
         maxZoom={2}
         deleteKeyCode="Delete"
-        nodesDraggable={isDraggingEnabled}
-        nodesConnectable={isDraggingEnabled}
-        panOnDrag={!isInteractionLocked} // Default: pan with left mouse drag
+        nodesDraggable={isDraggingEnabled && drawingTool === null}
+        nodesConnectable={isDraggingEnabled && drawingTool === null}
+        panOnDrag={!isInteractionLocked && drawingTool === null}
         selectionKeyCode="Shift" // Shift+drag for box selection
         multiSelectionKeyCode="Shift" // Shift+click for multi-select
         zoomOnScroll={!isInteractionLocked}
@@ -1253,6 +1234,12 @@ export function ResearchEditor({
         proOptions={{ hideAttribution: true }}
       >
         <Background />
+        <DrawingLayer
+          activeTool={drawingTool}
+          strokes={drawingStrokes}
+          onStrokeAdd={(s) => onDrawingStrokeAdd?.(s)}
+          onStrokeRemove={(id) => onDrawingStrokeRemove?.(id)}
+        />
         <Controls
           position="top-left"
           showZoom={false}

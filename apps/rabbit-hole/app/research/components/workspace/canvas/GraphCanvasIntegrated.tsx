@@ -10,7 +10,7 @@
  * See: app/research/REACT_FLOW_DATA_FLOW.md for complete sequence diagram
  */
 
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 
 import type { UserTier } from "@protolabsai/auth/client";
 import { getEntityTypesByDomain } from "@protolabsai/forms";
@@ -43,6 +43,7 @@ import { HorizontalToolbar } from "../HorizontalToolbar";
 import { CanvasNavigationToolbar } from "../toolbar/CanvasNavigationToolbar";
 import { GraphToolbarButtons } from "../toolbar/GraphToolbarButtons";
 
+import type { DrawingStroke, DrawingTool } from "./DrawingLayer";
 import { GraphSettings } from "./GraphSettings";
 import { useGraphCanvasActions } from "./useGraphCanvasActions";
 import { useGraphCanvasBundleImport } from "./useGraphCanvasBundleImport";
@@ -183,6 +184,42 @@ export function GraphCanvasIntegrated({
 
   // Filter popover state (not moved to state hook - simple local state)
   const [showFilterPopover, setShowFilterPopover] = useState(false);
+
+  // Drawing layer state — pencil / eraser live on top of the flow canvas.
+  const [drawingTool, setDrawingTool] = useState<DrawingTool>(null);
+  const initialStrokes = useMemo<DrawingStroke[]>(() => {
+    const fromData = (data as { strokes?: DrawingStroke[] } | undefined)
+      ?.strokes;
+    return Array.isArray(fromData) ? fromData : [];
+  }, [data]);
+  const [drawingStrokes, setDrawingStrokes] =
+    useState<DrawingStroke[]>(initialStrokes);
+  const persistStrokesRef = useRef(drawingStrokes);
+  persistStrokesRef.current = drawingStrokes;
+
+  const handleDrawingStrokeAdd = useCallback(
+    (stroke: DrawingStroke) => {
+      setDrawingStrokes((prev) => {
+        const next = [...prev, stroke];
+        onDataChange({ ...data, strokes: next });
+        return next;
+      });
+    },
+    [data, onDataChange]
+  );
+  const handleDrawingStrokeRemove = useCallback(
+    (strokeId: string) => {
+      setDrawingStrokes((prev) => {
+        const next = prev.filter((s) => s.id !== strokeId);
+        onDataChange({ ...data, strokes: next });
+        return next;
+      });
+    },
+    [data, onDataChange]
+  );
+  const handleDrawingToolChange = useCallback((tool: DrawingTool) => {
+    setDrawingTool((prev) => (prev === tool ? null : tool));
+  }, []);
 
   // Version browser dialog state
   const [showVersionBrowser, setShowVersionBrowser] = useState(false);
@@ -740,6 +777,8 @@ export function GraphCanvasIntegrated({
               filterPopover={filterPopover}
               onSaveVersion={handleSaveVersion}
               onVersionBrowserOpen={handleOpenVersionBrowser}
+              drawingTool={drawingTool}
+              onDrawingToolChange={handleDrawingToolChange}
             />
           }
           canUndo={canUndo}
@@ -786,6 +825,10 @@ export function GraphCanvasIntegrated({
             ydoc={ydoc}
             tabId={tabId}
             userTier={userTier}
+            drawingTool={drawingTool}
+            drawingStrokes={drawingStrokes}
+            onDrawingStrokeAdd={handleDrawingStrokeAdd}
+            onDrawingStrokeRemove={handleDrawingStrokeRemove}
           />
 
           <CanvasNavigationToolbar
