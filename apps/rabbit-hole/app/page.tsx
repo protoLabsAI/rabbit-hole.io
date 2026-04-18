@@ -235,6 +235,55 @@ export default function SearchPage() {
     [sessionMgr, reset]
   );
 
+  /**
+   * Follow-up from a completed deep research report.
+   *
+   * - Deep research / due-diligence mode → start a fresh research job (no context injection)
+   * - Chat mode → inject the report as synthetic prior conversation, then stream a chat answer
+   *
+   * The injected assistant message gives the chat model full context so follow-up
+   * answers reference the report without re-running the full pipeline.
+   */
+  const handleResearchFollowUp = useCallback(
+    (query: string, _files?: any[], mode?: SearchMode) => {
+      if (mode === "deep-research" || mode === "due-diligence") {
+        handleDeepResearch(query, mode);
+        return;
+      }
+
+      // Inject research report as prior conversation context
+      if (activeResearch && research?.report) {
+        setMessages([
+          {
+            id: `rctx-${Date.now()}-u`,
+            role: "user",
+            parts: [{ type: "text", text: activeResearch.query }],
+          },
+          {
+            id: `rctx-${Date.now()}-a`,
+            role: "assistant",
+            // Truncate to avoid overwhelming the context window
+            parts: [{ type: "text", text: research.report.slice(0, 12000) }],
+          },
+        ] as any);
+      }
+
+      setActiveResearch(null);
+      if (!sessionMgr.activeSessionId) {
+        sessionMgr.createSession(query);
+      }
+      search(query);
+    },
+    [
+      activeResearch,
+      research,
+      setMessages,
+      search,
+      sessionMgr,
+      handleDeepResearch,
+    ]
+  );
+
   const handleIngest = useCallback(
     async (text: string) => {
       const lastUser = [...messages].reverse().find((m) => m.role === "user");
@@ -479,6 +528,7 @@ export default function SearchPage() {
                 research={research}
                 query={activeResearch.query}
                 onIngest={handleResearchIngest}
+                onFollowUp={handleResearchFollowUp}
               />
             ) : (
               <>
