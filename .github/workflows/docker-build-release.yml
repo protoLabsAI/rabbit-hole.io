@@ -86,7 +86,9 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          # GH_PAT (write:packages scope) required to push new packages to GHCR.
+          # GITHUB_TOKEN 403s when the package doesn't yet exist in the registry.
+          password: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
 
       - name: Generate Docker metadata
         id: meta
