@@ -18,10 +18,18 @@ const STORE_NAME = "versions";
  * Stores version snapshots in browser IndexedDB
  */
 export class IndexedDBVersionStorage implements VersionStorage {
-  private dbPromise: Promise<IDBDatabase>;
+  private dbPromise: Promise<IDBDatabase> | null = null;
 
   constructor(private namespace: string = "default") {
-    this.dbPromise = this.initDB();
+    // Defer initDB — safe to construct server-side (Next.js SSR/SSG).
+    // The DB is opened lazily on first actual read/write.
+  }
+
+  private getDB(): Promise<IDBDatabase> {
+    if (!this.dbPromise) {
+      this.dbPromise = this.initDB();
+    }
+    return this.dbPromise;
   }
 
   private async initDB(): Promise<IDBDatabase> {
@@ -56,7 +64,7 @@ export class IndexedDBVersionStorage implements VersionStorage {
   }
 
   async save(snapshot: VersionSnapshot): Promise<void> {
-    const db = await this.dbPromise;
+    const db = await this.getDB();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE_NAME, "readwrite");
       const store = tx.objectStore(STORE_NAME);
@@ -68,7 +76,7 @@ export class IndexedDBVersionStorage implements VersionStorage {
   }
 
   async load(versionId: string): Promise<VersionSnapshot | null> {
-    const db = await this.dbPromise;
+    const db = await this.getDB();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE_NAME, "readonly");
       const store = tx.objectStore(STORE_NAME);
@@ -80,7 +88,7 @@ export class IndexedDBVersionStorage implements VersionStorage {
   }
 
   async list(): Promise<VersionMetadata[]> {
-    const db = await this.dbPromise;
+    const db = await this.getDB();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE_NAME, "readonly");
       const store = tx.objectStore(STORE_NAME);
@@ -108,7 +116,7 @@ export class IndexedDBVersionStorage implements VersionStorage {
   }
 
   async delete(versionId: string): Promise<void> {
-    const db = await this.dbPromise;
+    const db = await this.getDB();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE_NAME, "readwrite");
       const store = tx.objectStore(STORE_NAME);
@@ -120,7 +128,7 @@ export class IndexedDBVersionStorage implements VersionStorage {
   }
 
   async clear(): Promise<void> {
-    const db = await this.dbPromise;
+    const db = await this.getDB();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE_NAME, "readwrite");
       const store = tx.objectStore(STORE_NAME);

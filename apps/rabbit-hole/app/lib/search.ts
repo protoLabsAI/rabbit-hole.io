@@ -35,6 +35,36 @@ export interface WebSearchResult {
   url: string;
   snippet: string;
   score?: number;
+  publishedDate?: string;
+  /** Which SearXNG engines surfaced this result — high overlap = higher confidence */
+  engines?: string[];
+}
+
+/**
+ * Optional parameters for searchWeb.
+ *
+ * categories — SearXNG category tab to query (comma-separated for multi):
+ *   "general"      → Google, DDG, Brave, Startpage (default broad web)
+ *   "social media" → Reddit, Hacker News (community discussion & real-world experience)
+ *   "it"           → GitHub, Stack Overflow, Arch Wiki, Docker Hub (code & tech docs)
+ *   "science"      → arXiv, Semantic Scholar, PubMed (academic papers)
+ *   "news"         → Google News, Bing News, Reuters (recency-sensitive topics)
+ *
+ * engines — override categories entirely with specific engine names (comma-separated),
+ *   e.g. "reddit,hackernews" or "github,stackoverflow"
+ *
+ * pageno — 1-based page number. Page 2+ fetches different results from engines
+ *   that support pagination (Google, DDG, Brave, Startpage). Engines without
+ *   paging support are silently skipped on page 2+.
+ *
+ * timeRange — filter by recency. Silently ignored by engines that don't support it
+ *   (arXiv, Semantic Scholar, Wikipedia, Qwant).
+ */
+export interface WebSearchOptions {
+  categories?: string;
+  engines?: string;
+  pageno?: number;
+  timeRange?: "day" | "week" | "month" | "year";
 }
 
 export interface WikiSearchResult {
@@ -209,7 +239,8 @@ export async function searchCommunities(
 
 export async function searchWeb(
   query: string,
-  maxResults = 6
+  maxResults = 6,
+  options?: WebSearchOptions
 ): Promise<WebSearchResult[]> {
   const endpoint = process.env.SEARXNG_ENDPOINT;
   if (!endpoint) return [];
@@ -217,7 +248,17 @@ export async function searchWeb(
   const url = new URL("/search", endpoint);
   url.searchParams.set("q", query);
   url.searchParams.set("format", "json");
-  url.searchParams.set("pageno", "1");
+  url.searchParams.set("language", "en");
+  url.searchParams.set("pageno", String(options?.pageno ?? 1));
+
+  if (options?.engines) {
+    url.searchParams.set("engines", options.engines);
+  } else if (options?.categories) {
+    url.searchParams.set("categories", options.categories);
+  }
+  if (options?.timeRange) {
+    url.searchParams.set("time_range", options.timeRange);
+  }
 
   const res = await fetch(url.toString(), {
     headers: { Accept: "application/json" },
@@ -230,6 +271,8 @@ export async function searchWeb(
       url: string;
       content: string;
       score?: number;
+      publishedDate?: string;
+      engines?: string[];
     }>;
   };
 
@@ -237,8 +280,11 @@ export async function searchWeb(
     data.results?.slice(0, maxResults).map((r) => ({
       title: r.title,
       url: r.url,
-      snippet: r.content?.slice(0, 500),
+      // 800 chars — enough for meaningful compression without truncating key facts
+      snippet: r.content?.slice(0, 800),
       score: r.score,
+      publishedDate: r.publishedDate,
+      engines: r.engines,
     })) ?? []
   );
 }

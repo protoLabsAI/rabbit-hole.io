@@ -101,6 +101,10 @@ async function runResearch(
   const allNotes: string[] = [];
   const allFindings: string[] = [];
   let totalSearches = 0;
+  // Set to true after iteration 1 if the KG returned 0 results for the main
+  // query. When empty we skip all per-dimension graph calls and run a second
+  // web search instead, so no steps are wasted on an unpopulated graph.
+  let graphIsEmpty = false;
 
   const trackSearch = () => {
     totalSearches++;
@@ -233,11 +237,14 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
                 type: "graph",
               });
             }
-            // Surface as a finding
             const finding = `Found ${graphResults.length} existing entities in the knowledge graph`;
             allFindings.push(finding);
             updateResearch(researchId, { findings: allFindings });
             emit("research.finding", { text: finding });
+          } else {
+            // KG is empty — skip all further graph calls and invest the budget
+            // in additional web searches per dimension instead.
+            graphIsEmpty = true;
           }
         } catch {
           graphSearchSpan.end({ resultCount: 0, error: true });
@@ -246,44 +253,49 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
             source: "graph",
             resultCount: 0,
           });
+          graphIsEmpty = true;
         }
 
-        // Search community summaries for thematic context
-        checkAbort(researchId);
-        emit("search.started", { query, source: "communities" });
-        const communitySearchSpan = tracing.createSpan("search:communities", {
-          query,
-        });
-        let communityResults: CommunitySearchResult[] = [];
-        try {
-          communityResults = await withRetry(() => searchCommunities(query, 5));
-          trackSearch();
-          communitySearchSpan.end({ resultCount: communityResults.length });
-          emit("search.completed", {
+        // Search community summaries only when the graph has data
+        if (!graphIsEmpty) {
+          checkAbort(researchId);
+          emit("search.started", { query, source: "communities" });
+          const communitySearchSpan = tracing.createSpan("search:communities", {
             query,
-            source: "communities",
-            resultCount: communityResults.length,
           });
-          if (communityResults.length > 0) {
-            const communityNote = `Community themes: ${communityResults
-              .map(
-                (c) =>
-                  `Community ${c.communityId} (${c.entityCount} entities — ${c.topEntities.slice(0, 3).join(", ")}): ${c.summary}`
-              )
-              .join("\n")}`;
-            allNotes.push(communityNote);
-            const finding = `Found ${communityResults.length} relevant community clusters with thematic context`;
-            allFindings.push(finding);
-            updateResearch(researchId, { findings: allFindings });
-            emit("research.finding", { text: finding });
+          let communityResults: CommunitySearchResult[] = [];
+          try {
+            communityResults = await withRetry(() =>
+              searchCommunities(query, 5)
+            );
+            trackSearch();
+            communitySearchSpan.end({ resultCount: communityResults.length });
+            emit("search.completed", {
+              query,
+              source: "communities",
+              resultCount: communityResults.length,
+            });
+            if (communityResults.length > 0) {
+              const communityNote = `Community themes: ${communityResults
+                .map(
+                  (c) =>
+                    `Community ${c.communityId} (${c.entityCount} entities — ${c.topEntities.slice(0, 3).join(", ")}): ${c.summary}`
+                )
+                .join("\n")}`;
+              allNotes.push(communityNote);
+              const finding = `Found ${communityResults.length} relevant community clusters with thematic context`;
+              allFindings.push(finding);
+              updateResearch(researchId, { findings: allFindings });
+              emit("research.finding", { text: finding });
+            }
+          } catch {
+            communitySearchSpan.end({ resultCount: 0, error: true });
+            emit("search.completed", {
+              query,
+              source: "communities",
+              resultCount: 0,
+            });
           }
-        } catch {
-          communitySearchSpan.end({ resultCount: 0, error: true });
-          emit("search.completed", {
-            query,
-            source: "communities",
-            resultCount: 0,
-          });
         }
       }
 
@@ -326,54 +338,59 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
           // Vector memory unavailable — continue without it
         }
 
-        // Graph search per dimension (all iterations — hybrid BM25+vector via shared searchGraph)
-        checkAbort(researchId);
-        emit("search.started", { query: dimension, source: "graph" });
-        const dimGraphSpan = tracing.createSpan("search:graph", {
-          query: dimension,
-          iteration,
-        });
+        // Graph search per dimension — skip entirely when graph is known empty
         let dimGraphResults: GraphSearchResult[] = [];
-        try {
-          dimGraphResults = await withRetry(() => searchGraph(dimension, 5));
-          trackSearch();
-          dimGraphSpan.end({ resultCount: dimGraphResults.length });
-          emit("search.completed", {
+        if (!graphIsEmpty) {
+          checkAbort(researchId);
+          emit("search.started", { query: dimension, source: "graph" });
+          const dimGraphSpan = tracing.createSpan("search:graph", {
             query: dimension,
-            source: "graph",
-            resultCount: dimGraphResults.length,
+            iteration,
           });
-          if (dimGraphResults.length > 0) {
-            for (const e of dimGraphResults) {
-              if (!allSources.find((s) => s.url === `#entity:${e.uid}`)) {
-                allSources.push({
-                  title: e.name,
-                  url: `#entity:${e.uid}`,
-                  type: "graph",
-                });
+          try {
+            dimGraphResults = await withRetry(() => searchGraph(dimension, 5));
+            trackSearch();
+            dimGraphSpan.end({ resultCount: dimGraphResults.length });
+            emit("search.completed", {
+              query: dimension,
+              source: "graph",
+              resultCount: dimGraphResults.length,
+            });
+            if (dimGraphResults.length > 0) {
+              for (const e of dimGraphResults) {
+                if (!allSources.find((s) => s.url === `#entity:${e.uid}`)) {
+                  allSources.push({
+                    title: e.name,
+                    url: `#entity:${e.uid}`,
+                    type: "graph",
+                  });
+                }
               }
             }
+          } catch {
+            dimGraphSpan.end({ resultCount: 0, error: true });
+            emit("search.completed", {
+              query: dimension,
+              source: "graph",
+              resultCount: 0,
+            });
           }
-        } catch {
-          dimGraphSpan.end({ resultCount: 0, error: true });
-          emit("search.completed", {
-            query: dimension,
-            source: "graph",
-            resultCount: 0,
-          });
-          /* continue without graph results */
         }
 
-        // Web search with retry
+        // Primary web search — on gap iterations (2+), advance the page to get
+        // genuinely different results from engines that support pagination.
         checkAbort(researchId);
         emit("search.started", { query: dimension, source: "web" });
         const webSearchSpan = tracing.createSpan("search:web", {
           query: dimension,
           iteration,
+          pageno: iteration,
         });
         let webResults: WebSearchResult[] = [];
         try {
-          webResults = await withRetry(() => searchWeb(dimension, 5));
+          webResults = await withRetry(() =>
+            searchWeb(dimension, 8, { pageno: iteration })
+          );
         } catch {
           /* continue without web results */
         }
@@ -392,6 +409,55 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
             type: "web",
             snippet: r.snippet,
           });
+        }
+
+        // Secondary web search — runs in two cases:
+        //   1. Graph is empty: replaces the skipped graph search slot.
+        //      Uses "social media,it" category → Reddit, HN, GitHub, SO for
+        //      community experience and code-level depth.
+        //   2. Gap-filling iterations (2+): even when graph has data, search
+        //      community + code sources to fill gaps the general web missed.
+        const runSecondary = graphIsEmpty || iteration > 1;
+        let secondaryWebResults: WebSearchResult[] = [];
+        if (runSecondary && query.toLowerCase() !== dimension.toLowerCase()) {
+          // Combine main topic + dimension for a focused angle query
+          const angleQuery = `${query} ${dimension}`;
+          checkAbort(researchId);
+          emit("search.started", {
+            query: angleQuery,
+            source: "web:community",
+          });
+          const secondaryWebSpan = tracing.createSpan("search:web:community", {
+            query: angleQuery,
+            iteration,
+            categories: "social media,it",
+          });
+          try {
+            const raw = await withRetry(() =>
+              searchWeb(angleQuery, 8, { categories: "social media,it" })
+            );
+            // Deduplicate against primary results
+            const seenUrls = new Set(webResults.map((r) => r.url));
+            secondaryWebResults = raw.filter((r) => !seenUrls.has(r.url));
+          } catch {
+            /* continue without secondary results */
+          }
+          trackSearch();
+          secondaryWebSpan.end({ resultCount: secondaryWebResults.length });
+          emit("search.completed", {
+            query: angleQuery,
+            source: "web:community",
+            resultCount: secondaryWebResults.length,
+          });
+
+          for (const r of secondaryWebResults) {
+            allSources.push({
+              title: r.title,
+              url: r.url,
+              type: "web",
+              snippet: r.snippet,
+            });
+          }
         }
 
         // Wikipedia with retry
@@ -443,6 +509,7 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
           graphNote,
           wiki?.text ?? "",
           ...webResults.map((r) => `${r.title}: ${r.snippet ?? ""}`),
+          ...secondaryWebResults.map((r) => `${r.title}: ${r.snippet ?? ""}`),
         ]
           .filter(Boolean)
           .join("\n\n");
