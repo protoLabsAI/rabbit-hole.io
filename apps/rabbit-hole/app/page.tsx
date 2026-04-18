@@ -238,11 +238,16 @@ export default function SearchPage() {
   /**
    * Follow-up from a completed deep research report.
    *
-   * - Deep research / due-diligence mode → start a fresh research job (no context injection)
-   * - Chat mode → inject the report as synthetic prior conversation, then stream a chat answer
-   *
-   * The injected assistant message gives the chat model full context so follow-up
-   * answers reference the report without re-running the full pipeline.
+   * Strategy:
+   * - Deep research / due-diligence mode → fresh pipeline, no context injection.
+   * - Chat mode:
+   *     1. Ingest the full report into the knowledge graph (fire-and-forget).
+   *        The agent's searchGraph tool retrieves these entities on demand —
+   *        no truncation, no data loss, arbitrarily deep retrieval.
+   *     2. Inject a compact structured summary (dimensions + key findings) as
+   *        prior context — NOT the raw report blob.
+   *     3. The summary directs the agent to searchGraph first so it finds the
+   *        indexed entities before falling back to the web.
    */
   const handleResearchFollowUp = useCallback(
     (query: string, _files?: any[], mode?: SearchMode) => {
@@ -251,8 +256,40 @@ export default function SearchPage() {
         return;
       }
 
-      // Inject research report as prior conversation context
       if (activeResearch && research?.report) {
+        // Ingest full report into KG — fire-and-forget, agent retrieves via searchGraph
+        fetch("/api/chat/ingest", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            query: activeResearch.query,
+            text: research.report,
+          }),
+        }).catch(() => {
+          /* best effort */
+        });
+
+        // Compact structured summary — no raw blob, no truncation
+        const summaryParts: string[] = [
+          `Deep research completed on: "${activeResearch.query}"`,
+        ];
+        if (research.dimensions.length) {
+          summaryParts.push(
+            `Dimensions covered: ${research.dimensions.join(" · ")}`
+          );
+        }
+        if (research.findings.length) {
+          const top = research.findings
+            .slice(0, 6)
+            .map((f) => `- ${f}`)
+            .join("\n");
+          summaryParts.push(`Key findings:\n${top}`);
+        }
+        summaryParts.push(
+          "All entities from this research are being indexed into the knowledge graph. " +
+            "Use searchGraph first to retrieve detailed entities, then supplement with web search as needed."
+        );
+
         setMessages([
           {
             id: `rctx-${Date.now()}-u`,
@@ -262,8 +299,7 @@ export default function SearchPage() {
           {
             id: `rctx-${Date.now()}-a`,
             role: "assistant",
-            // Truncate to avoid overwhelming the context window
-            parts: [{ type: "text", text: research.report.slice(0, 12000) }],
+            parts: [{ type: "text", text: summaryParts.join("\n\n") }],
           },
         ] as any);
       }
