@@ -29,7 +29,11 @@ export async function POST(request: NextRequest) {
   }
 
   const { query, text } = validation.data;
-  const rabbitHoleUrl = process.env.RABBIT_HOLE_URL || "http://localhost:3000";
+  const rabbitHoleUrl = (
+    process.env.RABBIT_HOLE_URL ||
+    process.env.NEXT_PUBLIC_APP_URL ||
+    "http://localhost:3000"
+  ).replace(/\/+$/, "");
 
   try {
     // Extract entities using fast model
@@ -82,7 +86,8 @@ Text:\n${text.slice(0, 8000)}`,
           uid: `evidence:search_${Date.now()}`,
           kind: "research",
           title: `Search: ${query}`,
-          publisher: "Rabbit Hole Search",
+          publisher: "Rabbit Hole",
+          url: `${rabbitHoleUrl}/`,
           date: new Date().toISOString().slice(0, 10),
           reliability: 0.7,
           notes: `User-triggered extraction from search for "${query}"`,
