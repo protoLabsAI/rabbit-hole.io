@@ -9,6 +9,7 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 permissions:
   contents: write
   pull-requests: write
+  issues: write
 
 jobs:
   release:
@@ -18,83 +19,26 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          # Use GH_PAT so the changesets-generated Version Packages PR
-          # triggers CI on its own branch. PRs opened via GITHUB_TOKEN are
-          # recursion-blocked from firing further workflows, which would
-          # otherwise leave the PR stuck "expecting 5 status checks".
+          # GH_PAT required so the tag push triggers downstream workflows
+          # (docker-build-release). Tags pushed by GITHUB_TOKEN are
+          # suppressed from triggering further workflows.
           token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v5
+      - uses: pnpm/action-setup@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: "pnpm"
+          node-version: 22
+          cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Generate custom domains
-        run: pnpm run scan:domains
-
-      - name: Build packages
-        run: pnpm run build:libs
-
-      - name: Create Release Pull Request
-        id: changesets
-        uses: changesets/action@v1
-        with:
-          version: pnpm release:version
-          # publish: pnpm release  # Disabled until private registry is configured
-          commit: "chore: version packages"
-          title: "chore: version packages"
+      - name: Release
         env:
-          # GH_PAT (fallback GITHUB_TOKEN) so the PR this action opens is
-          # authored by a user, not github-actions[bot] — only then do
-          # downstream workflows (CI, branch-protection checks) run on
-          # the PR. Without this, the Version Packages PR sits stuck
-          # "expecting 5 status checks" forever.
           GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-          # NPM_TOKEN: ${{ secrets.NPM_TOKEN }}  # Not needed until publishing enabled
-
-      - name: Tag release
-        if: steps.changesets.outputs.published == 'true'
-        id: version
-        env:
-          # Push the tag with a PAT (not GITHUB_TOKEN) so downstream
-          # workflows — docker-build-release.yml + release-notes.yml —
-          # actually fire. GitHub suppresses workflow triggers from tags
-          # pushed by the default GITHUB_TOKEN as recursion prevention.
-          TAG_PUSH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-        run: |
-          git config user.name github-actions[bot]
-          git config user.email github-actions[bot]@users.noreply.github.com
-          git remote set-url origin https://x-access-token:${TAG_PUSH_TOKEN}@github.com/${{ github.repository }}.git
-          VERSION=$(node -p "require('./package.json').version")
-          if [ "$VERSION" != "0.0.0" ]; then
-            git tag -a v${VERSION} -m "Release v${VERSION}"
-            git push --tags
-            echo "✅ Created tag v${VERSION} - will trigger Docker release + release-notes workflows"
-            echo "version=$VERSION" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Report release status
-        if: steps.changesets.outputs.published == 'true'
-        run: |
-          echo "## 🎉 Release v${{ steps.version.outputs.version }} Tagged" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Git tag \`v${{ steps.version.outputs.version }}\` created and pushed." >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Next:** Docker release workflow will automatically:" >> $GITHUB_STEP_SUMMARY
-          echo "1. Build all 5 services (rabbit-hole, agent, job-processor, langextract, youtube-processor)" >> $GITHUB_STEP_SUMMARY
-          echo "2. Run security scans (Trivy)" >> $GITHUB_STEP_SUMMARY
-          echo "3. Sign images (Cosign)" >> $GITHUB_STEP_SUMMARY
-          echo "4. Publish to ghcr.io with tags: \`v${{ steps.version.outputs.version }}\`, \`latest\`" >> $GITHUB_STEP_SUMMARY
-          echo "5. Create GitHub Release with Docker pull commands" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "🐳 Watch Docker build: [Actions](https://github.com/${{ github.repository }}/actions/workflows/docker-build-release.yml)" >> $GITHUB_STEP_SUMMARY
+        run: npx semantic-release
