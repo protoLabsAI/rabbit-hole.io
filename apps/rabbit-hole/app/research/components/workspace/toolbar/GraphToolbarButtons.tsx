@@ -1,7 +1,6 @@
 "use client";
 
 import { Icon } from "@protolabsai/icon-system";
-import { Popover, PopoverContent, PopoverTrigger } from "@protolabsai/ui/atoms";
 
 import { cn } from "@/lib/utils";
 
@@ -55,39 +54,6 @@ export function GraphToolbarButtons({
       {(onSaveVersion || onVersionBrowserOpen) && (
         <div className="h-4 w-px bg-border mx-1" />
       )}
-
-      {/* Drawing Tools - Coming Soon */}
-      <Popover>
-        <PopoverTrigger asChild>
-          <button
-            type="button"
-            className="p-2 rounded-md transition-colors text-muted-foreground/50 hover:text-muted-foreground hover:bg-muted/50"
-            title="Drawing Tools (Coming Soon)"
-          >
-            <Icon name="pencil" size={16} />
-          </button>
-        </PopoverTrigger>
-        <PopoverContent className="w-64 z-[70]" align="start" side="bottom">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-primary/10">
-                <Icon name="pencil" size={16} className="text-primary" />
-              </div>
-              <div>
-                <h4 className="font-medium text-sm">Drawing Tools</h4>
-                <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-                  Coming Soon
-                </span>
-              </div>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Freehand drawing, shapes, and annotations for your research
-              workspace.
-            </p>
-          </div>
-        </PopoverContent>
-      </Popover>
-      <div className="h-4 w-px bg-border mx-1" />
 
       {/* Filter Entity Types */}
       {filterPopover}

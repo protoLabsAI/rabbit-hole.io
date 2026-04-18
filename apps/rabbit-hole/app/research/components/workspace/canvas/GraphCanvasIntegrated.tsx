@@ -10,8 +10,7 @@
  * See: app/research/REACT_FLOW_DATA_FLOW.md for complete sequence diagram
  */
 
-import { useState, useCallback, useEffect, useMemo, useRef } from "react";
-import type { ImperativePanelHandle } from "react-resizable-panels";
+import { useState, useCallback, useEffect, useMemo } from "react";
 
 import type { UserTier } from "@protolabsai/auth/client";
 import { getEntityTypesByDomain } from "@protolabsai/forms";
@@ -20,14 +19,7 @@ import { getEntityTypesByDomain } from "@protolabsai/forms";
 import { Icon } from "@protolabsai/icon-system";
 import { logUserAction } from "@protolabsai/logger";
 import type { PartialBundle, RabbitHoleBundleData } from "@protolabsai/types";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-  ResizablePanel,
-  ResizablePanelGroup,
-  ResizableHandle,
-} from "@protolabsai/ui/atoms";
+import { Popover, PopoverContent, PopoverTrigger } from "@protolabsai/ui/atoms";
 import { useToast } from "@protolabsai/ui/hooks";
 import type { VersionMetadata } from "@protolabsai/yjs-history";
 
@@ -50,11 +42,8 @@ import { VersionBrowserDialog } from "../../VersionBrowserDialog";
 import { HorizontalToolbar } from "../HorizontalToolbar";
 import { CanvasNavigationToolbar } from "../toolbar/CanvasNavigationToolbar";
 import { GraphToolbarButtons } from "../toolbar/GraphToolbarButtons";
-import { UtilityPanel } from "../UtilityPanel";
 
-import { CANVAS_REGISTRY } from "./CanvasRegistry";
 import { GraphSettings } from "./GraphSettings";
-import { useGraphUtilityTabs } from "./GraphUtilityPanel";
 import { useGraphCanvasActions } from "./useGraphCanvasActions";
 import { useGraphCanvasBundleImport } from "./useGraphCanvasBundleImport";
 import { useGraphCanvasState } from "./useGraphCanvasState";
@@ -308,27 +297,6 @@ export function GraphCanvasIntegrated({
   );
   */
 
-  // Utility panel collapse state - start collapsed by default
-  const [isUtilityPanelCollapsed, setIsUtilityPanelCollapsed] = useState(true);
-  const utilityPanelRef = useRef<ImperativePanelHandle | null>(null);
-
-  // Utility panel toggle handler
-  const handleToggleUtilityPanel = useCallback(() => {
-    setIsUtilityPanelCollapsed((prev) => !prev);
-  }, []);
-
-  // Sync collapse state to panel ref (defer to avoid render-time updates)
-  useEffect(() => {
-    if (!utilityPanelRef.current) return;
-
-    if (isUtilityPanelCollapsed) {
-      utilityPanelRef.current.collapse();
-    } else {
-      // Expand to max height (75%)
-      utilityPanelRef.current.resize(75);
-    }
-  }, [isUtilityPanelCollapsed]);
-
   // Version management handlers
   const handleSaveVersion = useCallback(async () => {
     if (!saveVersion) return;
@@ -455,9 +423,6 @@ export function GraphCanvasIntegrated({
     () => new Set(research.hiddenTypes || []),
     [research.hiddenTypes]
   );
-
-  // Get capabilities from registry
-  const canvasCapabilities = CANVAS_REGISTRY.graph.capabilities;
 
   // Listen for layout settings changes from GraphSettings panel
   useEffect(() => {
@@ -693,19 +658,6 @@ export function GraphCanvasIntegrated({
     ]
   );
 
-  // Get utility panel tabs for graph
-  const utilityTabs = useGraphUtilityTabs({
-    graph,
-    hiddenEntityTypes,
-    expandedNodes,
-    readOnly,
-    onToggleEntityType: handleToggleEntityType,
-    onToggleDomain: handleToggleDomain,
-    onShowAll: handleShowAll,
-    onHideAll: handleHideAll,
-    onToggleNodeExpanded: handleToggleNodeExpanded,
-  });
-
   // Persist state changes to parent (will sync via Yjs)
   // ONLY persist node positions when in manual layout mode
   useEffect(() => {
@@ -778,39 +730,22 @@ export function GraphCanvasIntegrated({
       <div className="flex-1 flex flex-col min-w-0">
         {/* Horizontal Toolbar */}
         <HorizontalToolbar
-          capabilities={canvasCapabilities.toolbarButtons}
-          canvasType="graph"
           canvasSettings={<GraphSettings />}
-          canvasData={data}
           canvasButtonsSlot={
-            canvasCapabilities.toolbarButtons.layout ? (
-              <GraphToolbarButtons
-                currentLayout={currentLayout}
-                onLayoutChange={actions.handleLayoutChange}
-                onImport={handleImport}
-                onExport={handleExport}
-                filterPopover={filterPopover}
-                onSaveVersion={handleSaveVersion}
-                onVersionBrowserOpen={handleOpenVersionBrowser}
-              />
-            ) : null
+            <GraphToolbarButtons
+              currentLayout={currentLayout}
+              onLayoutChange={actions.handleLayoutChange}
+              onImport={handleImport}
+              onExport={handleExport}
+              filterPopover={filterPopover}
+              onSaveVersion={handleSaveVersion}
+              onVersionBrowserOpen={handleOpenVersionBrowser}
+            />
           }
-          onToggleChat={() => research.setChatOpen((prev) => !prev)}
-          canUseAIChat={canUseAIChat}
-          onToggleUtilityPanel={handleToggleUtilityPanel}
-          isUtilityPanelCollapsed={isUtilityPanelCollapsed}
           canUndo={canUndo}
           canRedo={canRedo}
           onUndo={onUndo}
           onRedo={onRedo}
-          workspaceId={workspaceId}
-          tabId={tabId}
-          tabName={tabName}
-          canUseCollaboration={canUseCollaboration}
-          workspaceReady={workspaceReady}
-          activeSessionId={activeSessionId}
-          onSessionCreated={onSessionCreated}
-          onSessionEnded={onSessionEnded}
         />
 
         {/* Bundle Import Dialog */}
@@ -826,80 +761,38 @@ export function GraphCanvasIntegrated({
         {/* Wizards (File Extraction, Research, Enrichment) */}
         {wizards.WizardComponents}
 
-        {/* Main content area: Graph + Utility Panel in vertical resizable layout */}
-        <ResizablePanelGroup
-          direction="vertical"
-          className="flex-1"
-          autoSaveId="workspace-graph-vertical-layout"
-        >
-          {/* Graph Panel (top) */}
-          <ResizablePanel defaultSize={100} minSize={25}>
-            <div className="relative h-full w-full overflow-hidden">
-              <ResearchEditorWrapper
-                graph={graph}
-                nodeCount={graph.order}
-                edgeCount={graph.size}
-                isInteractionLocked={readOnly || isInteractionLocked}
-                isDraggingEnabled={currentLayout === "manual"}
-                graphVersion={actions.optimisticGraphVersion}
-                onGraphChange={handleGraphChange}
-                onNodeClick={actions.handleNodeClick}
-                onNodeDoubleClick={actions.handleNodeDoubleClick}
-                onContextMenu={handleContextMenu}
-                hiddenEntityTypes={hiddenEntityTypes}
-                expandedNodes={expandedNodes}
-                provider={provider}
-                userId={userId}
-                updateCursor={updateCursor}
-                onCursorsUpdate={onCursorsUpdate}
-                onToggleNodeExpanded={handleToggleNodeExpanded}
-                onToggleEntityType={handleToggleEntityType}
-                onToggleDomain={handleToggleDomain}
-                ydoc={ydoc}
-                tabId={tabId}
-                userTier={userTier}
-                // DISABLED: Drawing tools - Coming Soon
-                // onFreehandReady={handleFreehandReady}
-                // onFreehandToggle={handleFreehandToggle}
-                // onFreehandToolChange={handleFreehandToolChange}
-                // onFreehandNodeCreated={handleFreehandNodeCreated}
-                // onFreehandError={handleFreehandError}
-                // onFreehandSettingsReady={handleFreehandSettingsReady}
-                // onFreehandToolChangeReady={handleFreehandToolChangeReady}
-                // onSelectedDrawingNodeChange={handleSelectedDrawingNodeChange}
-                // onSelectedDrawingNodeUpdateReady={handleSelectedDrawingNodeUpdateReady}
-              />
+        {/* Graph canvas — full height (utility panel + chat removed) */}
+        <div className="relative flex-1 w-full overflow-hidden">
+          <ResearchEditorWrapper
+            graph={graph}
+            nodeCount={graph.order}
+            edgeCount={graph.size}
+            isInteractionLocked={readOnly || isInteractionLocked}
+            isDraggingEnabled={currentLayout === "manual"}
+            graphVersion={actions.optimisticGraphVersion}
+            onGraphChange={handleGraphChange}
+            onNodeClick={actions.handleNodeClick}
+            onNodeDoubleClick={actions.handleNodeDoubleClick}
+            onContextMenu={handleContextMenu}
+            hiddenEntityTypes={hiddenEntityTypes}
+            expandedNodes={expandedNodes}
+            provider={provider}
+            userId={userId}
+            updateCursor={updateCursor}
+            onCursorsUpdate={onCursorsUpdate}
+            onToggleNodeExpanded={handleToggleNodeExpanded}
+            onToggleEntityType={handleToggleEntityType}
+            onToggleDomain={handleToggleDomain}
+            ydoc={ydoc}
+            tabId={tabId}
+            userTier={userTier}
+          />
 
-              {/* Canvas Navigation Toolbar (bottom-left) - positioned relative to graph panel */}
-              <CanvasNavigationToolbar
-                isLocked={isInteractionLocked}
-                onToggleLock={() =>
-                  setIsInteractionLocked(!isInteractionLocked)
-                }
-              />
-            </div>
-          </ResizablePanel>
-
-          {/* Resize Handle - hidden (utility panel is toggle-only via toolbar) */}
-          <ResizableHandle className="invisible pointer-events-none" />
-
-          {/* Utility Panel (bottom) */}
-          <ResizablePanel
-            ref={utilityPanelRef}
-            defaultSize={0}
-            minSize={5}
-            maxSize={50}
-            collapsible
-            collapsedSize={0}
-            onCollapse={() => setIsUtilityPanelCollapsed(true)}
-            onExpand={() => setIsUtilityPanelCollapsed(false)}
-          >
-            <UtilityPanel
-              canvasTabs={utilityTabs}
-              layoutId="workspace-graph-utility"
-            />
-          </ResizablePanel>
-        </ResizablePanelGroup>
+          <CanvasNavigationToolbar
+            isLocked={isInteractionLocked}
+            onToggleLock={() => setIsInteractionLocked(!isInteractionLocked)}
+          />
+        </div>
 
         {/* Entity Type Selector Popover */}
         <EntityTypeSelector

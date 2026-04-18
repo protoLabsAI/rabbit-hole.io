@@ -3,21 +3,16 @@
 /**
  * Research Client - Workspace Mode
  *
- * Single-canvas collaborative workspace with Yjs persistence.
- * - Yjs for persistence (replaces IndexedDB)
- * - Canvas support (Graph, Map, Timeline, etc.)
- * - Real-time collaboration with follow mode
- * - CopilotKit integration (chat panel)
+ * Single-user mode: chat + utility + collaboration removed. The page is now
+ * a single full-viewport canvas workspace with local Yjs persistence.
  */
 
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 import { logPageView, logWorkspaceOperation } from "@protolabsai/logger";
-import { ResizableChatLayout } from "@protolabsai/ui/templates";
 import type { CanvasType } from "@protolabsai/workspace";
 
 import { ConfirmDialogProvider } from "./components/ConfirmDialog";
-import { ResearchChatInterface } from "./components/ResearchChatInterface";
 import { WorkspaceContainer } from "./components/workspace/WorkspaceContainer";
 import { useResearchPageState } from "./hooks/useResearchPageState";
 import { QueryProvider } from "./providers";
@@ -25,16 +20,15 @@ import { QueryProvider } from "./providers";
 // Register context menu items for research routes
 import "../context-menu/registry/researchMenus.direct";
 
-// Single-user mode: auth/tier scaffolding removed. A stable module-level
-// userId avoids new-object-per-render churn that cascaded through the
-// workspace memo tree and pinned the page in a render loop.
+// Stable module-level userId avoids new-object-per-render churn that
+// cascaded through the workspace memo tree and pinned the page in a loop.
 const USER_ID = "local-user";
 
 export default function ResearchClientWorkspace() {
   const research = useResearchPageState();
   const [mounted, setMounted] = useState(false);
 
-  // Prepare pending import from URL parameters (memoized to prevent re-render loops)
+  // Pending entity import from URL params — memoized to prevent re-render loops.
   const pendingImport = useMemo(
     () =>
       research.entity
@@ -55,31 +49,19 @@ export default function ResearchClientWorkspace() {
     ]
   );
 
-  // Get canvas type from URL
   const [canvasType] = useState<CanvasType>(() => {
     if (typeof window === "undefined") return "graph";
     const urlParams = new URLSearchParams(window.location.search);
     return (urlParams.get("canvas") as CanvasType) || "graph";
   });
 
-  // Generate workspace ID only on client
   const [workspaceId, setWorkspaceId] = useState(() => {
     if (typeof window === "undefined") return "workspace-loading";
-
-    // Check for existing workspace ID in URL (takes priority)
     const urlParams = new URLSearchParams(window.location.search);
     const urlWorkspaceId = urlParams.get("workspaceId");
-    if (urlWorkspaceId) {
-      return urlWorkspaceId;
-    }
-
-    // Try to get from localStorage (avoids hydration issues)
+    if (urlWorkspaceId) return urlWorkspaceId;
     const savedWorkspaceId = localStorage.getItem("current-workspace-id");
-    if (savedWorkspaceId) {
-      return savedWorkspaceId;
-    }
-
-    // Default fallback
+    if (savedWorkspaceId) return savedWorkspaceId;
     return "workspace-loading";
   });
 
@@ -87,7 +69,6 @@ export default function ResearchClientWorkspace() {
     setMounted(true);
   }, []);
 
-  // Resolve the active workspace ID on mount: URL override → saved → default.
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -126,14 +107,6 @@ export default function ResearchClientWorkspace() {
     }
   }, [workspaceId, mounted]);
 
-  const setChatOpen = research.setChatOpen;
-  const handleChatCollapseChange = useCallback(
-    (collapsed: boolean) => {
-      setChatOpen(!collapsed);
-    },
-    [setChatOpen]
-  );
-
   const isWorkspaceReady = workspaceId !== "workspace-loading" && mounted;
 
   const content = !isWorkspaceReady ? (
@@ -145,35 +118,11 @@ export default function ResearchClientWorkspace() {
     </div>
   ) : (
     <div className="h-screen bg-background">
-      <div className="h-screen">
-        <ResizableChatLayout
-          chatTitle="Research Agent"
-          chatDescription="AI-powered research with collaborative workspace"
-          chatInterface={
-            <ResearchChatInterface
-              sessionConfig={research.sessionConfig}
-              onSessionConfigChange={research.setSessionConfig}
-            />
-          }
-          layoutId="research-workspace-layout"
-          collapsible={true}
-          defaultChatSize={33}
-          minChatSize={20}
-          maxChatSize={50}
-          showResizeHandle={false}
-          hideFloatingToggle={true}
-          defaultCollapsed={!research.chatOpen}
-          onCollapseChange={handleChatCollapseChange}
-          customChatHeader={undefined}
-          showChatHeader={false}
-        >
-          <WorkspaceContainer
-            workspaceId={workspaceId}
-            defaultCanvasType={canvasType}
-            pendingImport={pendingImport}
-          />
-        </ResizableChatLayout>
-      </div>
+      <WorkspaceContainer
+        workspaceId={workspaceId}
+        defaultCanvasType={canvasType}
+        pendingImport={pendingImport}
+      />
     </div>
   );
 
