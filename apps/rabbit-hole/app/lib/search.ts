@@ -100,6 +100,23 @@ const QDRANT_ENABLED = !!(
   process.env.QDRANT_URL && process.env.OLLAMA_ENDPOINT
 );
 
+/**
+ * Fast check — returns true if Neo4j has at least one entity node.
+ * Used to skip graph searches entirely when the KG is unpopulated.
+ * Much cheaper than a full fulltext query.
+ */
+export async function graphHasData(): Promise<boolean> {
+  try {
+    const client = getGlobalNeo4jClient();
+    const result = await client.executeRead(
+      "MATCH (n) RETURN count(n) > 0 AS hasData LIMIT 1"
+    );
+    return result[0]?.hasData === true;
+  } catch {
+    return false;
+  }
+}
+
 export async function searchGraph(
   query: string,
   limit = 10
@@ -260,9 +277,12 @@ export async function searchWeb(
     url.searchParams.set("time_range", options.timeRange);
   }
 
-  const res = await fetch(url.toString(), {
-    headers: { Accept: "application/json" },
-  });
+  const headers: Record<string, string> = { Accept: "application/json" };
+  const auth = process.env.SEARXNG_BASIC_AUTH;
+  if (auth)
+    headers.Authorization = `Basic ${Buffer.from(auth).toString("base64")}`;
+
+  const res = await fetch(url.toString(), { headers });
   if (!res.ok) return [];
 
   const data = (await res.json()) as {
