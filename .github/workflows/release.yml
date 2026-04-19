@@ -41,4 +41,7 @@ jobs:
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+          # Disable husky pre-push hooks in CI — they require dev tooling
+          # (prettier, eslint, tsc) that is not available in the release runner.
+          HUSKY: 0
         run: npx semantic-release

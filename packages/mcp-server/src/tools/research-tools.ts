@@ -179,18 +179,41 @@ export const researchTools: Tool[] = [
           properties: {
             maxAdditionalRounds: {
               type: "number",
-              description: "Maximum number of additional search rounds beyond the initial parallel round (default: 3)",
+              description:
+                "Maximum number of additional search rounds beyond the initial parallel round (default: 3)",
               default: 3,
             },
             maxTotalSources: {
               type: "number",
-              description: "Maximum total number of source queries across all rounds (default: 5)",
+              description:
+                "Maximum total number of source queries across all rounds (default: 5)",
               default: 5,
             },
           },
         },
       },
       required: ["query"],
+    },
+  },
+  {
+    name: "check_knowledge_freshness",
+    description:
+      "Check when a topic was last researched in the temporal knowledge graph and whether the knowledge is fresh. Returns fact count, age in days, and freshness status. Use this before running deep_research to avoid redundant work.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        topic: {
+          type: "string",
+          description: "The research topic or query to check freshness for",
+        },
+        maxAgeDays: {
+          type: "number",
+          description:
+            "Maximum age in days to consider knowledge fresh (default: 7)",
+          default: 7,
+        },
+      },
+      required: ["topic"],
     },
   },
 ];

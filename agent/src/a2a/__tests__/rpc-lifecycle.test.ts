@@ -172,6 +172,8 @@ describe("A2A RPC lifecycle", () => {
     // Default researcher skills are populated
     expect(c.skills.map((s) => s.id).sort()).toEqual([
       "deep_research",
+      "ingest_url",
+      "kg_facts",
       "search",
     ]);
     // Security scheme declared

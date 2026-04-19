@@ -73,19 +73,57 @@ Transcribe audio files (mp3, wav, flac, ogg). Requires `GROQ_API_KEY`.
 
 Extract text from PDF files.
 
+## HTTP Transport
+
+The MCP server runs on port 3398 with the Streamable HTTP transport (spec 2025-03-26). It uses **stateful sessions**: each client must `initialize` before calling tools.
+
+### Session flow
+
+```
+1. POST /mcp  {"method":"initialize", ...}
+   ← 200 + Mcp-Session-Id: <uuid> header
+
+2. POST /mcp  {"method":"tools/call", "params":{"name":"...", "arguments":{...}}}
+   Header: Mcp-Session-Id: <uuid>
+   ← 200 {"result":{"content":[{"type":"text","text":"..."}]}}
+
+3. DELETE /mcp  (optional teardown)
+   Header: Mcp-Session-Id: <uuid>
+```
+
+All responses are JSON when `enableJsonResponse: true` (the default).
+
+### Additional endpoints
+
+| Path | Purpose |
+|------|---------|
+| `GET /health` | Server health (uptime, session count, tool count) |
+| `GET /openapi.json` | Auto-generated OpenAPI 3.1 spec |
+| `GET /mcp` + `Mcp-Session-Id` | SSE stream for server-initiated messages |
+
+### Auth
+
+When `MCP_AUTH_TOKEN` is set, every request must include:
+```
+Authorization: Bearer <MCP_AUTH_TOKEN>
+```
+
 ## Environment Variables
 
-| Variable | Required | Used By |
-|----------|----------|---------|
-| `RABBIT_HOLE_URL` | No (default: `http://localhost:3000`) | `graph_search`, `ingest_bundle` |
-| `JOB_PROCESSOR_URL` | No (default: `http://localhost:8680`) | Media tools |
-| `ANTHROPIC_API_KEY` | For extraction | `extract_entities`, `research_entity` |
-| `TAVILY_API_KEY` | For Tavily | `tavily_search`, `research_entity` |
-| `GROQ_API_KEY` | For transcription | `transcribe_audio` |
+| Variable | Default | Used By |
+|----------|---------|---------|
+| `RABBIT_HOLE_URL` | `http://localhost:3000` | `graph_search`, `ingest_bundle` |
+| `JOB_PROCESSOR_URL` | `http://localhost:8680` | Media tools |
+| `MCP_AUTH_TOKEN` | _(empty)_ | Bearer token enforcement |
+| `MCP_PORT` | `3398` | HTTP listen port |
+| `ANTHROPIC_API_KEY` | _(required for extraction)_ | `extract_entities`, `research_entity` |
+| `TAVILY_API_KEY` | _(optional)_ | `tavily_search`, `research_entity` |
+| `GROQ_API_KEY` | _(optional)_ | `transcribe_audio` |
 
 ## Source
 
 - Tool definitions: `packages/mcp-server/src/tools/research-tools.ts`
 - Tool definitions: `packages/mcp-server/src/tools/media-tools.ts`
 - Handler: `packages/mcp-server/src/handler.ts`
-- Server entry: `packages/mcp-server/src/index.ts`
+- HTTP server: `packages/mcp-server/src/http-server.ts`
+- Stdio server: `packages/mcp-server/src/index.ts`

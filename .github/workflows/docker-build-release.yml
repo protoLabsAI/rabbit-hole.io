@@ -90,7 +90,11 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          # GH_PAT is needed to push to org-scoped GHCR packages (agent,
+          # job-processor) because GITHUB_TOKEN only gets write access to
+          # packages that already exist and are linked to this repository.
+          # A PAT with packages:write + read:org works for all three services.
+          password: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
 
       - name: Generate Docker metadata
         id: meta
