@@ -1,12 +1,14 @@
 "use client";
 
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 import { Icon } from "@protolabsai/icon-system";
 
 import type { DeepResearchState } from "../../hooks/useDeepResearch";
 
 import { ChatMarkdown } from "./ChatMarkdown";
+import type { AttachedFile, SearchMode } from "./SearchInput";
+import { SearchInput } from "./SearchInput";
 
 // ─── Table of Contents ──────────────────────────────────────────────
 
@@ -77,18 +79,81 @@ function ResearchPlanCard({
   );
 }
 
+// ─── Follow-up Section ───────────────────────────────────────────────
+
+function FollowUpSection({
+  dimensions,
+  onFollowUp,
+}: {
+  dimensions: string[];
+  onFollowUp: (
+    query: string,
+    files?: AttachedFile[],
+    mode?: SearchMode
+  ) => void;
+}) {
+  const [expanded, setExpanded] = useState(false);
+
+  const suggestions = useMemo(() => dimensions.slice(0, 3), [dimensions]);
+
+  return (
+    <div className="mt-8 pt-5 border-t border-border/40">
+      <button
+        onClick={() => setExpanded((v) => !v)}
+        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-3 group"
+      >
+        <Icon
+          name="MessageCirclePlus"
+          className="h-4 w-4 text-primary/60 group-hover:text-primary transition-colors"
+        />
+        <span className="font-medium">Continue exploring</span>
+        <Icon
+          name={expanded ? "ChevronUp" : "ChevronDown"}
+          className="h-3.5 w-3.5 ml-auto transition-transform"
+        />
+      </button>
+
+      {expanded && (
+        <div className="space-y-3 animate-in fade-in slide-in-from-top-1 duration-150">
+          {suggestions.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {suggestions.map((dim) => (
+                <button
+                  key={dim}
+                  onClick={() => onFollowUp(dim)}
+                  className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-full px-3 py-1.5 hover:bg-muted/50 transition-colors flex items-center gap-1.5"
+                >
+                  <Icon name="CornerDownRight" className="h-3 w-3 opacity-50" />
+                  {dim}
+                </button>
+              ))}
+            </div>
+          )}
+          <SearchInput onSearch={onFollowUp} autoFocus={false} />
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Panel ──────────────────────────────────────────────────────────
 
 interface DeepResearchPanelProps {
   research: DeepResearchState;
   query: string;
   onIngest?: (text: string, query: string) => void;
+  onFollowUp?: (
+    query: string,
+    files?: AttachedFile[],
+    mode?: SearchMode
+  ) => void;
 }
 
 export function DeepResearchPanel({
   research,
   query,
   onIngest,
+  onFollowUp,
 }: DeepResearchPanelProps) {
   const { report, sources, dimensions, brief, status, error } = research;
   const reportRef = useRef<HTMLDivElement>(null);
@@ -195,6 +260,15 @@ export function DeepResearchPanel({
                 </div>
               </div>
             )}
+
+            {/* Follow-up input — shown when research is done (complete or cancelled with partial) */}
+            {(status === "completed" || status === "cancelled") &&
+              onFollowUp && (
+                <FollowUpSection
+                  dimensions={dimensions}
+                  onFollowUp={onFollowUp}
+                />
+              )}
           </>
         ) : status === "running" ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
