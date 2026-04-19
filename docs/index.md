@@ -20,8 +20,11 @@ features:
     title: Deep Research
     details: SCOPE → RESEARCH → EVALUATE → SYNTHESIS pipeline. Decomposes any topic into dimensions, searches each exhaustively, and produces a structured report with inline citations.
   - icon: 🧠
-    title: Knowledge Graph
+    title: Living Knowledge Graph
     details: Every research session can feed Neo4j. Entities and relationships accumulate over time, making future searches faster and richer.
+  - icon: 🤖
+    title: Fleet A2A Agent
+    details: A spec-compliant A2A server (port 7870) exposes search, deep_research, ingest_url, and kg_facts skills — callable by Ava and other fleet agents via JSON-RPC 2.0.
   - icon: 🌐
     title: SearXNG-Powered
     details: Self-hosted meta-search across Google, Brave, DuckDuckGo, Reddit, GitHub, arXiv, Semantic Scholar, and more — no third-party API keys required.

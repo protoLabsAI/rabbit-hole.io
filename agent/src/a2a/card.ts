@@ -87,6 +87,32 @@ const RESEARCHER_SKILLS: Skill[] = [
     inputModes: ["text/plain"],
     outputModes: ["text/markdown"],
   },
+  {
+    id: "ingest_url",
+    name: "Ingest URL",
+    description:
+      "Fetch a URL (HTML page, PDF, audio, video, YouTube) and extract entities " +
+      "into the knowledge graph via the rabbit-hole media processing pipeline.",
+    tags: ["ingest", "media"],
+    examples: [
+      "https://arxiv.org/abs/2401.00001",
+      "https://www.youtube.com/watch?v=...",
+    ],
+    inputModes: ["text/plain"],
+    outputModes: ["application/json"],
+  },
+  {
+    id: "kg_facts",
+    name: "Knowledge Graph Facts",
+    description:
+      "Query the rabbit-hole knowledge graph for entities and relationships. " +
+      "Returns entity details, relationship counts, and connected entities. " +
+      "Use this to retrieve structured knowledge without triggering new research.",
+    tags: ["kg", "facts", "memory"],
+    examples: ["Anthropic", "Claude language model", "Sam Altman"],
+    inputModes: ["text/plain"],
+    outputModes: ["text/markdown"],
+  },
 ];
 
 export function buildAgentCard(cfg: AgentCardConfig): AgentCard {
