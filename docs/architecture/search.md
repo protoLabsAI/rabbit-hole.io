@@ -154,6 +154,24 @@ Each panel scrolls independently (viewport-constrained via `h-screen overflow-hi
 
 In-memory `Map<researchId, ResearchState>` on `globalThis.__researchStore` (survives Turbopack module isolation). Supports SSE reconnection via `Last-Event-ID` header. 2-hour TTL cleanup.
 
+### Follow-up Search After Research
+
+When a research report completes, a **"Continue exploring"** section appears at the bottom of the panel. It shows the top 3 research dimensions as clickable chips and a free-form search input.
+
+Clicking a chip or submitting a query transitions to chat mode:
+
+1. **Fire-and-forget ingest**: The full report is POSTed to `/api/chat/ingest` (entity extraction → Neo4j). This happens in the background — no blocking.
+2. **Compact prior context**: A synthetic assistant message is injected with:
+   - The original research query
+   - The list of dimensions covered
+   - Top 6 key findings as bullet points
+   - A note that entities from the research are in the knowledge graph
+3. **Chat continues**: The search agent picks up the query, uses `searchGraph` to pull the ingested entities, and answers with full graph context.
+
+This avoids truncating the raw report (which loses key details) in favour of structured graph-backed context — the same entity data in a retrieval-optimised form.
+
+**Key constraint**: If the follow-up query uses `/deep-research` or `/due-diligence` mode, the transition to chat is skipped and a new research run starts instead.
+
 ### Key Files
 
 | File | Purpose |
@@ -162,8 +180,7 @@ In-memory `Map<researchId, ResearchState>` on `globalThis.__researchStore` (surv
 | `app/api/research/deep/[id]/route.ts` | SSE stream + DELETE cancel handler |
 | `app/api/research/deep/[id]/status/route.ts` | Polling fallback |
 | `app/api/research/deep/research-store.ts` | In-memory state store with cancel support |
-| `app/components/search/DeepResearchPanel.tsx` | Three-panel research UI (embedded or overlay) |
-| `app/components/search/DeepResearchInline.tsx` | Compact inline research card (legacy) |
+| `app/components/search/DeepResearchPanel.tsx` | Three-panel research UI + follow-up section |
 
 ## Full-Text Index
 
