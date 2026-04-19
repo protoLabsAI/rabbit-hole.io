@@ -25,7 +25,7 @@ function getLangfuse(): any | null {
   if (!_langfuseClient) {
     try {
       // Dynamic require so the module is optional at startup.
-      // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { Langfuse } = require("langfuse");
       _langfuseClient = new Langfuse({
         publicKey: process.env.LANGFUSE_PUBLIC_KEY,
@@ -63,7 +63,10 @@ export function isSourceEnabled(source: string): boolean {
   if (!health) return true;
   if (!health.disabled) return true;
   // Auto-recover after the health window elapses
-  if (health.lastFailure !== null && Date.now() - health.lastFailure > HEALTH_WINDOW_MS) {
+  if (
+    health.lastFailure !== null &&
+    Date.now() - health.lastFailure > HEALTH_WINDOW_MS
+  ) {
     health.failures = 0;
     health.disabled = false;
     return true;
@@ -73,11 +76,18 @@ export function isSourceEnabled(source: string): boolean {
 
 export function recordSourceFailure(source: string): void {
   const existing = sourceHealth.get(source);
-  const health: SourceHealthState = existing ?? { failures: 0, lastFailure: null, disabled: false };
+  const health: SourceHealthState = existing ?? {
+    failures: 0,
+    lastFailure: null,
+    disabled: false,
+  };
   const now = Date.now();
 
   // Reset counter if the previous failure is outside the tracking window
-  if (health.lastFailure !== null && now - health.lastFailure > HEALTH_WINDOW_MS) {
+  if (
+    health.lastFailure !== null &&
+    now - health.lastFailure > HEALTH_WINDOW_MS
+  ) {
     health.failures = 0;
     health.disabled = false;
   }
@@ -111,7 +121,9 @@ export function resetSourceHealth(): void {
 }
 
 /** Expose health state for tests. */
-export function getSourceHealthState(source: string): SourceHealthState | undefined {
+export function getSourceHealthState(
+  source: string
+): SourceHealthState | undefined {
   return sourceHealth.get(source);
 }
 
@@ -187,6 +199,12 @@ export async function handleToolCall(
         config,
         (args.persist as boolean) ?? true,
         args.budget as ResearchBudget | undefined
+      );
+
+    case "check_knowledge_freshness":
+      return await checkKnowledgeFreshness(
+        args.topic as string,
+        (args.maxAgeDays as number) ?? 7
       );
 
     // ─── Media Tools ───────────────────────────────────────────────
@@ -543,7 +561,7 @@ async function researchEntity(
 
   // ── Langfuse trace ──────────────────────────────────────────────────
   const langfuse = getLangfuse();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   const trace = langfuse?.trace({
     name: "research_entity",
     input: { query, depth, entityType },
@@ -604,8 +622,7 @@ async function researchEntity(
           : "Wikipedia search failed",
     };
   }
-  const wikiResultCount =
-    wiki && !wiki.error && wiki.text ? 1 : 0;
+  const wikiResultCount = wiki && !wiki.error && wiki.text ? 1 : 0;
 
   // Build Wikipedia evidence node
   if (wiki && !wiki.error && wiki.url) {
@@ -848,7 +865,10 @@ async function researchEntity(
           "tavily"
         ).catch((err: unknown) => {
           recordSourceFailure("tavily");
-          return { error: err instanceof Error ? err.message : "Tavily follow-up failed" };
+          return {
+            error:
+              err instanceof Error ? err.message : "Tavily follow-up failed",
+          };
         });
         followUpResult = tavilyFollowUp as Record<string, unknown>;
         if (!followUpResult.error) recordSourceSuccess("tavily");
@@ -859,7 +879,12 @@ async function researchEntity(
           "duckduckgo"
         ).catch((err: unknown) => {
           recordSourceFailure("duckduckgo");
-          return { error: err instanceof Error ? err.message : "DuckDuckGo follow-up failed" };
+          return {
+            error:
+              err instanceof Error
+                ? err.message
+                : "DuckDuckGo follow-up failed",
+          };
         });
         followUpResult = ddgFollowUp as Record<string, unknown>;
         if (!followUpResult.error) recordSourceSuccess("duckduckgo");
@@ -874,19 +899,33 @@ async function researchEntity(
       // Merge follow-up Tavily results into the existing tavily result set
       // so entity extraction will incorporate the additional data
       if (followUpSource === "tavily" && !followUpResult.error) {
-        const existing = (results.tavilySearch as Record<string, unknown>) ?? {};
-        const existingItems = (existing.results as Array<Record<string, unknown>>) ?? [];
-        const newItems = (followUpResult.results as Array<Record<string, unknown>>) ?? [];
+        const existing =
+          (results.tavilySearch as Record<string, unknown>) ?? {};
+        const existingItems =
+          (existing.results as Array<Record<string, unknown>>) ?? [];
+        const newItems =
+          (followUpResult.results as Array<Record<string, unknown>>) ?? [];
         // Append new items to existing tavily results (de-dup by URL)
         const existingUrls = new Set(existingItems.map((r) => r.url as string));
-        const uniqueNew = newItems.filter((r) => !existingUrls.has(r.url as string));
-        results.tavilySearch = { ...existing, results: [...existingItems, ...uniqueNew] };
+        const uniqueNew = newItems.filter(
+          (r) => !existingUrls.has(r.url as string)
+        );
+        results.tavilySearch = {
+          ...existing,
+          results: [...existingItems, ...uniqueNew],
+        };
 
         // Build evidence nodes for new Tavily items
         for (let i = 0; i < uniqueNew.length; i++) {
           const item = uniqueNew[i];
-          if (item?.url && typeof item.url === "string" && item.url.startsWith("http")) {
-            const slug = toSlug((item.title as string) ?? `tavily_followup_${roundNum}_${i}`);
+          if (
+            item?.url &&
+            typeof item.url === "string" &&
+            item.url.startsWith("http")
+          ) {
+            const slug = toSlug(
+              (item.title as string) ?? `tavily_followup_${roundNum}_${i}`
+            );
             evidenceNodes.push({
               uid: `evidence:tavily_followup_${slug}_r${roundNum}_${i}`,
               kind: "major_media",
@@ -895,24 +934,38 @@ async function researchEntity(
               date: todayDate(),
               url: item.url,
               retrieved_at: nowIso(),
-              reliability: typeof item.score === "number" ? Math.min(item.score, 1) : 0.6,
+              reliability:
+                typeof item.score === "number" ? Math.min(item.score, 1) : 0.6,
             });
           }
         }
       } else if (followUpSource === "duckduckgo" && !followUpResult.error) {
         // Append DDG follow-up results to webSearch
         const existing = (results.webSearch as Record<string, unknown>) ?? {};
-        const existingItems = (existing.results as Array<Record<string, unknown>>) ?? [];
-        const newItems = (followUpResult.results as Array<Record<string, unknown>>) ?? [];
+        const existingItems =
+          (existing.results as Array<Record<string, unknown>>) ?? [];
+        const newItems =
+          (followUpResult.results as Array<Record<string, unknown>>) ?? [];
         const existingUrls = new Set(existingItems.map((r) => r.url as string));
-        const uniqueNew = newItems.filter((r) => !existingUrls.has(r.url as string));
-        results.webSearch = { ...existing, results: [...existingItems, ...uniqueNew] };
+        const uniqueNew = newItems.filter(
+          (r) => !existingUrls.has(r.url as string)
+        );
+        results.webSearch = {
+          ...existing,
+          results: [...existingItems, ...uniqueNew],
+        };
 
         // Build evidence nodes for new DDG items
         for (let i = 0; i < Math.min(uniqueNew.length, 2); i++) {
           const item = uniqueNew[i];
-          if (item?.url && typeof item.url === "string" && item.url.startsWith("http")) {
-            const slug = toSlug((item.title as string) ?? `web_followup_${roundNum}_${i}`);
+          if (
+            item?.url &&
+            typeof item.url === "string" &&
+            item.url.startsWith("http")
+          ) {
+            const slug = toSlug(
+              (item.title as string) ?? `web_followup_${roundNum}_${i}`
+            );
             evidenceNodes.push({
               uid: `evidence:web_followup_${slug}_r${roundNum}_${i}`,
               kind: "major_media",
@@ -1133,6 +1186,108 @@ async function graphSearch(
         score: r.similarity,
         matchReasons: r.matchReasons,
       })) ?? [],
+  };
+}
+
+// ─── Knowledge Freshness ────────────────────────────────────────────
+
+async function checkKnowledgeFreshness(
+  topic: string,
+  maxAgeDays = 7
+): Promise<unknown> {
+  const graphitiUrl = process.env.GRAPHITI_URL;
+  if (!graphitiUrl) {
+    return {
+      fresh: false,
+      reason:
+        "Graphiti not configured — set GRAPHITI_URL to enable freshness checks",
+      lastResearched: null,
+      ageDays: null,
+      factCount: 0,
+    };
+  }
+
+  const prefix = process.env.GRAPHITI_GROUP_PREFIX ?? "rh-research";
+  const hash = (await import("node:crypto"))
+    .createHash("sha256")
+    .update(topic.toLowerCase().trim())
+    .digest("hex")
+    .slice(0, 16);
+  const groupId = `${prefix}:${hash}`;
+
+  let facts: Array<{
+    created_at: string;
+    invalid_at?: string | null;
+    expired_at?: string | null;
+  }> = [];
+  try {
+    const res = await fetch(`${graphitiUrl.replace(/\/$/, "")}/search`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        query: topic,
+        group_ids: [groupId],
+        max_facts: 20,
+      }),
+      signal: AbortSignal.timeout(8_000),
+    });
+    if (res.ok) {
+      const data = (await res.json()) as { facts?: typeof facts };
+      facts = data.facts ?? [];
+    }
+  } catch {
+    return {
+      fresh: false,
+      reason: "Graphiti unreachable",
+      lastResearched: null,
+      ageDays: null,
+      factCount: 0,
+    };
+  }
+
+  if (facts.length === 0) {
+    return {
+      fresh: false,
+      reason: "No facts found",
+      lastResearched: null,
+      ageDays: null,
+      factCount: 0,
+    };
+  }
+
+  const now = Date.now();
+  const active = facts.filter((f) => {
+    if (f.invalid_at && new Date(f.invalid_at).getTime() <= now) return false;
+    if (f.expired_at && new Date(f.expired_at).getTime() <= now) return false;
+    return true;
+  });
+
+  if (active.length === 0) {
+    return {
+      fresh: false,
+      reason: "All facts are expired or invalidated",
+      lastResearched: null,
+      ageDays: null,
+      factCount: 0,
+    };
+  }
+
+  const latest = active.reduce(
+    (max, f) => (f.created_at > max ? f.created_at : max),
+    active[0]!.created_at
+  );
+  const ageDays = (now - new Date(latest).getTime()) / 86_400_000;
+
+  return {
+    fresh: ageDays <= maxAgeDays,
+    lastResearched: latest,
+    ageDays: Math.round(ageDays * 10) / 10,
+    factCount: active.length,
+    ...(ageDays > maxAgeDays
+      ? {
+          reason: `Knowledge is ${Math.round(ageDays)} days old (max: ${maxAgeDays})`,
+        }
+      : {}),
   };
 }
 

@@ -6,9 +6,14 @@
  *   GET  /api/research/deep/:id  → SSE stream of research events
  *   DELETE /api/research/deep/:id  → cancel
  *
+ * Graphiti integration (Phase 2):
+ *   BEFORE: check freshness — if topic researched < maxAgeDays ago, return
+ *           cached Graphiti facts instead of running the full pipeline.
+ *   AFTER:  fire-and-forget episode storage so every run feeds the temporal KG.
+ *
  * Event mapping:
  *   report.chunk        → ctx.pushText(data.text)   (streams report as it's written)
- *   state (completed)   → ctx.finish()
+ *   state (completed)   → store episode + ctx.finish()
  *   state (failed)      → ctx.fail(...)
  *   state (cancelled)   → ctx.fail(...)
  *   timeout             → ctx.fail(...)
@@ -17,15 +22,41 @@
  * An additional DELETE request is sent to cancel the server-side job.
  *
  * Env:
- *   RABBIT_HOLE_URL — Next.js app base URL (default http://localhost:3000)
+ *   RABBIT_HOLE_URL   — Next.js app base URL (default http://localhost:3000)
+ *   GRAPHITI_URL      — Graphiti service URL (default http://graphiti:8000)
+ *   GRAPHITI_GROUP_PREFIX — episode namespace (default rh-research)
  */
 
+import { GraphitiClient } from "../../lib/graphiti-client.js";
+import type { GraphitiFact } from "../../lib/graphiti-client.js";
 import type { ProducerFn } from "../store/task-store.js";
+
+const FRESHNESS_MAX_AGE_DAYS = 7;
 
 export const deepResearchProducer: ProducerFn = async (ctx, input) => {
   const base = (
     process.env["RABBIT_HOLE_URL"] ?? "http://localhost:3000"
   ).replace(/\/+$/, "");
+
+  // ── Freshness gate: skip pipeline if topic was recently researched ────
+  const graphiti = new GraphitiClient();
+  try {
+    const freshness = await graphiti.checkFreshness(
+      input,
+      FRESHNESS_MAX_AGE_DAYS
+    );
+    if (freshness.fresh && freshness.facts.length > 0) {
+      ctx.pushText(
+        formatCachedFacts(freshness.facts, input, freshness.ageDays)
+      );
+      ctx.finish();
+      return;
+    }
+  } catch {
+    // Graphiti unavailable — fall through to full pipeline (non-blocking)
+  }
+
+  if (ctx.signal.aborted) return;
 
   // ── Step 1: Start the research job ───────────────────────────────────
   let researchId: string;
@@ -68,12 +99,13 @@ export const deepResearchProducer: ProducerFn = async (ctx, input) => {
   const cancelServerJob = () => {
     void fetch(`${base}/api/research/deep/${researchId}`, {
       method: "DELETE",
-    }).catch(() => {
-      // Best-effort — ignore errors on cancel
-    });
+    }).catch(() => {});
   };
 
   ctx.signal.addEventListener("abort", cancelServerJob, { once: true });
+
+  // Track report text for Graphiti storage after completion
+  let accumulatedReport = "";
 
   // ── Step 2: Stream SSE events ─────────────────────────────────────────
   try {
@@ -116,12 +148,24 @@ export const deepResearchProducer: ProducerFn = async (ctx, input) => {
           continue;
         }
 
+        // Accumulate report chunks for Graphiti storage
+        if (event.type === "report.chunk") {
+          const d = event.data as { text?: string } | undefined;
+          if (d?.text) accumulatedReport += d.text;
+        }
+
+        // Capture full report from state event if available
+        if (event.type === "state") {
+          const d = event.data as { finalReport?: string } | undefined;
+          if (d?.finalReport) accumulatedReport = d.finalReport;
+        }
+
         finished = handleSseEvent(event, ctx);
         if (finished) break;
       }
     }
 
-    // SSE closed without a terminal event — treat as completion if we have content
+    // SSE closed without a terminal event — treat as completion
     if (!finished && !ctx.signal.aborted) {
       ctx.finish();
     }
@@ -131,8 +175,16 @@ export const deepResearchProducer: ProducerFn = async (ctx, input) => {
       code: -32603,
       message: err instanceof Error ? err.message : String(err),
     });
+    return;
   } finally {
     ctx.signal.removeEventListener("abort", cancelServerJob);
+  }
+
+  // ── Fire-and-forget: store episode in Graphiti ───────────────────────
+  if (accumulatedReport) {
+    void graphiti.addResearchEpisode(input, accumulatedReport).catch(() => {
+      // Non-blocking — Graphiti unavailability must not fail the task
+    });
   }
 };
 
@@ -211,4 +263,37 @@ function handleSseEvent(
     default:
       return false;
   }
+}
+
+// ── Cached facts formatter ────────────────────────────────────────────
+
+function formatCachedFacts(
+  facts: GraphitiFact[],
+  query: string,
+  ageDays: number
+): string {
+  const age =
+    ageDays < 1
+      ? "today"
+      : ageDays < 2
+        ? "yesterday"
+        : `${Math.round(ageDays)} days ago`;
+
+  const lines: string[] = [
+    `# Research: ${query}`,
+    ``,
+    `> *From knowledge graph — last researched ${age}. Running a new search would yield similar results.*`,
+    ``,
+    `## Key Facts`,
+    ``,
+  ];
+
+  for (const f of facts.slice(0, 20)) {
+    lines.push(`- ${f.fact}`);
+    if (f.valid_at) {
+      lines.push(`  *(valid from ${f.valid_at.slice(0, 10)})*`);
+    }
+  }
+
+  return lines.join("\n");
 }
