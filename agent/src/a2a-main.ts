@@ -13,9 +13,20 @@
  */
 
 import { startA2AServer } from "./a2a/index.js";
+import { deepResearchProducer } from "./a2a/skills/deep-research-producer.js";
+import { ingestUrlProducer } from "./a2a/skills/ingest-url-producer.js";
+import { kgFactsProducer } from "./a2a/skills/kg-facts-producer.js";
+import { searchProducer } from "./a2a/skills/search-producer.js";
 
 async function main(): Promise<void> {
-  const { port } = await startA2AServer();
+  const { port } = await startA2AServer({
+    producers: {
+      search: searchProducer,
+      deep_research: deepResearchProducer,
+      ingest_url: ingestUrlProducer,
+      kg_facts: kgFactsProducer,
+    },
+  });
 
   console.log(`[a2a] researcher listening on :${port}`);
 
