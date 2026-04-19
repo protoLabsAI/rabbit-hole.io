@@ -68,6 +68,10 @@ jobs:
             context: .
             dockerfile: services/job-processor/Dockerfile
             build-args: ""
+            # Package doesn't yet exist in GHCR — first push requires org admin
+            # to enable "Allow GitHub Actions to create packages" or create the
+            # package manually. Non-blocking until resolved.
+            allow-failure: true
 
     steps:
       - name: Checkout code
@@ -113,6 +117,7 @@ jobs:
 
       - name: Build and push
         id: build
+        continue-on-error: ${{ matrix.service.allow-failure == true }}
         uses: docker/build-push-action@v7
         timeout-minutes: 45  # Per-service timeout
         with:
