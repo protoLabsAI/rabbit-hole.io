@@ -261,11 +261,9 @@ export async function searchWeb(
   }
 
   const headers: Record<string, string> = { Accept: "application/json" };
-  const basicAuth = process.env.SEARXNG_BASIC_AUTH;
-  if (basicAuth) {
-    headers["Authorization"] =
-      `Basic ${Buffer.from(basicAuth).toString("base64")}`;
-  }
+  const auth = process.env.SEARXNG_BASIC_AUTH;
+  if (auth)
+    headers.Authorization = `Basic ${Buffer.from(auth).toString("base64")}`;
 
   const res = await fetch(url.toString(), { headers });
   if (!res.ok) return [];
