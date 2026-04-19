@@ -186,40 +186,40 @@ services:
   # SearXNG is provided by the homelab AI stack (port 8888 on host).
   # Containers reach it via host.docker.internal:8888.
 
-  langgraph-agent:
-    container_name: research-langgraph-agent
+  researcher:
+    container_name: research-a2a-agent
     build:
       context: .
       dockerfile: agent/Dockerfile
     restart: unless-stopped
     environment:
-      - PORT=8123
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
       - GROQ_API_KEY=${GROQ_API_KEY:-}
-      - SEARXNG_ENDPOINT=http://host.docker.internal:8888
-      - JOB_PROCESSOR_URL=http://job-processor:8680
-      - NEO4J_URI=bolt://neo4j:7687
-      - NEO4J_USER=neo4j
-      - NEO4J_PASSWORD=${NEO4J_PASSWORD:-changeme}
-      - QDRANT_URL=http://host.docker.internal:6333
-      - OLLAMA_ENDPOINT=http://host.docker.internal:11434
+      # A2A server
+      - A2A_PORT=7870
+      - A2A_ADVERTISE_URL=http://localhost:7870
+      # rabbit-hole services (Next.js + MCP run on host via pnpm dev)
+      - RABBIT_HOLE_URL=http://host.docker.internal:3000
+      - RABBIT_HOLE_MCP_URL=http://host.docker.internal:3398
+      - RABBIT_HOLE_MCP_TOKEN=${MCP_AUTH_TOKEN:-}
+      # Graphiti temporal KG (optional — gracefully skipped if unavailable)
+      - GRAPHITI_URL=${GRAPHITI_URL:-http://host.docker.internal:8000}
+      - GRAPHITI_GROUP_PREFIX=rh-research
       - LANGFUSE_SECRET_KEY=${LANGFUSE_SECRET_KEY:-}
       - LANGFUSE_PUBLIC_KEY=${LANGFUSE_PUBLIC_KEY:-}
       - LANGFUSE_BASE_URL=${LANGFUSE_BASE_URL:-https://cloud.langfuse.com}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
-      - "8123:8123"
+      - "7870:7870"
     networks:
       - research-stack
     depends_on:
       neo4j:
         condition: service_healthy
-      job-processor:
-        condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8123/ok"]
+      test: ["CMD", "curl", "-f", "http://localhost:7870/ok"]
       interval: 30s
       timeout: 10s
       retries: 5
