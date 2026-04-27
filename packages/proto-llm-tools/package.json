@@ -61,11 +61,11 @@
     "test:tools": "tsx ./test.ts"
   },
   "dependencies": {
-    "@copilotkit/sdk-js": "^1.9.1",
+    "@copilotkit/sdk-js": "^1.56.3",
     "@langchain/community": "^1.1.27",
-    "@langchain/core": "^1.1.32",
-    "@langchain/langgraph": "^1.2.8",
-    "@langchain/textsplitters": "^1.0.0",
+    "@langchain/core": "^1.1.42",
+    "@langchain/langgraph": "^1.2.9",
+    "@langchain/textsplitters": "^1.0.1",
     "@protolabsai/deepagent": "workspace:*",
     "@protolabsai/icon-system": "workspace:*",
     "@protolabsai/llm-providers": "workspace:*",
@@ -79,7 +79,7 @@
     "@tiptap/starter-kit": "^3.10.5",
     "deepagents": "^1.3.0",
     "dotenv": "^17.2.3",
-    "langchain": "^1.0.1",
+    "langchain": "^1.3.5",
     "lucide-react": "^0.544.0",
     "zod": "^4.3.6"
   },
