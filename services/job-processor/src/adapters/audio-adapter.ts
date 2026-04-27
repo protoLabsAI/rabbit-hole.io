@@ -199,7 +199,7 @@ export class GroqProvider implements TranscriptionProvider {
     }
 
     const audioBuffer = await readFile(wavFilePath);
-    const blob = new Blob([audioBuffer], { type: "audio/wav" });
+    const blob = new Blob([new Uint8Array(audioBuffer)], { type: "audio/wav" });
 
     const formData = new FormData();
     formData.append("file", blob, "audio.wav");
@@ -266,7 +266,7 @@ export class OpenAIProvider implements TranscriptionProvider {
     }
 
     const audioBuffer = await readFile(wavFilePath);
-    const blob = new Blob([audioBuffer], { type: "audio/wav" });
+    const blob = new Blob([new Uint8Array(audioBuffer)], { type: "audio/wav" });
 
     const formData = new FormData();
     formData.append("file", blob, "audio.wav");
@@ -328,7 +328,7 @@ export class LocalWhisperProvider implements TranscriptionProvider {
 
   async transcribe(wavFilePath: string): Promise<TranscriptionResult> {
     const audioBuffer = await readFile(wavFilePath);
-    const blob = new Blob([audioBuffer], { type: "audio/wav" });
+    const blob = new Blob([new Uint8Array(audioBuffer)], { type: "audio/wav" });
 
     const formData = new FormData();
     formData.append("audio_file", blob, "audio.wav");

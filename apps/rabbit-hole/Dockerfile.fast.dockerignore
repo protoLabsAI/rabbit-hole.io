@@ -1,0 +1,30 @@
+# Dockerignore for Dockerfile.fast — allows pre-built .next output
+# Used when COPYing .next/standalone and .next/static from a local build.
+
+.git/
+.github/
+.gitignore
+
+# Workspaces — node_modules and stale artifacts (we don't reinstall in fast image)
+**/node_modules
+**/dist
+**/.turbo
+**/coverage
+
+# Allow rabbit-hole .next standalone + static, exclude everything else under .next
+**/.next
+!apps/rabbit-hole/.next
+apps/rabbit-hole/.next/**
+!apps/rabbit-hole/.next/standalone
+!apps/rabbit-hole/.next/standalone/**
+!apps/rabbit-hole/.next/static
+!apps/rabbit-hole/.next/static/**
+
+storybook-static/
+docs/
+handoffs/
+*.md
+!README.md
+
+.env*
+!.env.example

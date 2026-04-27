@@ -209,7 +209,9 @@ export const transcribeAudioTool = tool(
 
     // Create FormData for upload (using native FormData)
     const formData = new FormData();
-    const audioBlob = new Blob([audioBuffer], { type: "audio/mpeg" });
+    const audioBlob = new Blob([new Uint8Array(audioBuffer)], {
+      type: "audio/mpeg",
+    });
     formData.append("file", audioBlob, "audio.mp3");
     formData.append("provider", provider);
     formData.append("model", model || "whisper-large-v3");
