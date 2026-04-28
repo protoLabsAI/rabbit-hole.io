@@ -50,6 +50,10 @@ export function GlobalUserMenu({ className = "" }: GlobalUserMenuProps) {
   const openUserProfile = () => {};
   const { branding } = useTheme();
   const pathname = usePathname();
+  // Hide the Research + Atlas nav entries in production until the new flow ships.
+  const researchAtlasEnabled =
+    process.env.NODE_ENV !== "production" ||
+    process.env.NEXT_PUBLIC_ENABLE_RESEARCH_ATLAS === "true";
   const [menuOpen, setMenuOpen] = useState(false);
   const [themePopoverOpen, setThemePopoverOpen] = useState(false);
 
@@ -148,25 +152,29 @@ export function GlobalUserMenu({ className = "" }: GlobalUserMenuProps) {
             Navigation
           </DropdownMenuLabel>
 
-          <DropdownMenuItem asChild>
-            <Link href="/atlas" className="cursor-pointer">
-              <Icon name="network" size={14} className="mr-2" />
-              Atlas
-              {pathname === "/atlas" && (
-                <span className="ml-auto text-xs text-primary">•</span>
-              )}
-            </Link>
-          </DropdownMenuItem>
+          {researchAtlasEnabled && (
+            <>
+              <DropdownMenuItem asChild>
+                <Link href="/atlas" className="cursor-pointer">
+                  <Icon name="network" size={14} className="mr-2" />
+                  Atlas
+                  {pathname === "/atlas" && (
+                    <span className="ml-auto text-xs text-primary">•</span>
+                  )}
+                </Link>
+              </DropdownMenuItem>
 
-          <DropdownMenuItem asChild>
-            <Link href="/research" className="cursor-pointer">
-              <Icon name="edit" size={14} className="mr-2" />
-              Research
-              {pathname === "/research" && (
-                <span className="ml-auto text-xs text-primary">•</span>
-              )}
-            </Link>
-          </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/research" className="cursor-pointer">
+                  <Icon name="edit" size={14} className="mr-2" />
+                  Research
+                  {pathname === "/research" && (
+                    <span className="ml-auto text-xs text-primary">•</span>
+                  )}
+                </Link>
+              </DropdownMenuItem>
+            </>
+          )}
 
           <DropdownMenuItem asChild>
             <Link href="/playground" className="cursor-pointer">

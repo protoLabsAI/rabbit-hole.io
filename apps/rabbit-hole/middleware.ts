@@ -2,7 +2,34 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { extractTenantIdentifiers } from "@protolabsai/utils/tenancy-edge";
 
+// Routes hidden from production builds while the new research / atlas
+// experience is being rebuilt. Set NEXT_PUBLIC_ENABLE_RESEARCH_ATLAS=true
+// to expose them on a preview / staging deployment.
+const DEV_ONLY_PATH_PREFIXES = [
+  "/research",
+  "/atlas",
+  "/api/research",
+  "/api/atlas",
+  "/api/atlas-crud",
+  "/api/atlas-details",
+];
+
+function isDevOnlyPath(pathname: string): boolean {
+  return DEV_ONLY_PATH_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
+  );
+}
+
 export default function middleware(request: NextRequest) {
+  // Hide research + atlas surfaces from prod until they're rebuilt.
+  if (
+    process.env.NODE_ENV === "production" &&
+    process.env.NEXT_PUBLIC_ENABLE_RESEARCH_ATLAS !== "true" &&
+    isDevOnlyPath(request.nextUrl.pathname)
+  ) {
+    return new NextResponse(null, { status: 404 });
+  }
+
   // Extract tenant identifiers from URL (no database calls - edge compatible)
   const tenantIds = extractTenantIdentifiers(request);
 
