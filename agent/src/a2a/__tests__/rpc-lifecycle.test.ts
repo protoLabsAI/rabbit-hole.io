@@ -170,12 +170,7 @@ describe("A2A RPC lifecycle", () => {
     // url always ends in /a2a per spec
     expect(c.url.endsWith("/a2a")).toBe(true);
     // Default researcher skills are populated
-    expect(c.skills.map((s) => s.id).sort()).toEqual([
-      "deep_research",
-      "ingest_url",
-      "kg_facts",
-      "search",
-    ]);
+    expect(c.skills.map((s) => s.id).sort()).toEqual(["ingest_url", "search"]);
     // Security scheme declared
     expect(c.securitySchemes["apiKey"]).toBeDefined();
   });
