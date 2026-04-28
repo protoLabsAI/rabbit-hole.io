@@ -37,6 +37,17 @@ import React, {
 
 import "@xyflow/react/dist/style.css";
 import type { UserTier } from "@protolabsai/auth/client";
+import {
+  CircleNode,
+  Freehand,
+  FreehandNode,
+  isDrawingNodeType,
+  LineNode,
+  RectangleNode,
+  TextNode,
+  type ToolType,
+  useFreehandDrawing,
+} from "@protolabsai/freehand-drawing";
 import { generateSecureUUID } from "@protolabsai/utils";
 import { getEntityColor, getEntityImage } from "@protolabsai/utils/atlas";
 
@@ -55,20 +66,14 @@ import { EdgeTypeSelector } from "./dialogs/EdgeTypeSelector";
 import { RelationEdge } from "./edges/RelationEdge";
 import { EntityCard } from "./nodes/EntityCard";
 import { EntityTypeSelector } from "./nodes/EntityTypeSelector";
-import {
-  DrawingLayer,
-  type DrawingStroke,
-  type DrawingTool,
-} from "./workspace/canvas/DrawingLayer";
 
 const nodeTypes = {
   entity: EntityCard,
-  // DISABLED: Drawing tools - Coming Soon
-  // freehand: FreehandNode,
-  // rectangle: RectangleNode,
-  // circle: CircleNode,
-  // line: LineNode,
-  // text: TextNode,
+  freehand: FreehandNode,
+  rectangle: RectangleNode,
+  circle: CircleNode,
+  line: LineNode,
+  text: TextNode,
 };
 
 const edgeTypes = {
@@ -119,11 +124,16 @@ interface ResearchEditorProps {
   ydoc?: any;
   tabId?: string;
   userTier?: UserTier;
-  // Drawing layer — pencil / eraser live inside the viewport.
-  drawingTool?: DrawingTool;
-  drawingStrokes?: DrawingStroke[];
-  onDrawingStrokeAdd?: (stroke: DrawingStroke) => void;
-  onDrawingStrokeRemove?: (strokeId: string) => void;
+  // Freehand drawing — exposes the toggle + active tool to the parent toolbar.
+  onFreehandReady?: (toggle: () => void) => void;
+  onFreehandToolChange?: (tool: ToolType) => void;
+  onFreehandToolChangeReady?: (handler: (tool: ToolType) => void) => void;
+  onFreehandSettingsReady?: (
+    settings: any,
+    onSettingsChange: (updates: any) => void
+  ) => void;
+  onSelectedDrawingNodeChange?: (node: Node | null) => void;
+  onSelectedDrawingNodeUpdateReady?: (handler: (updates: any) => void) => void;
 }
 
 export function ResearchEditor({
@@ -150,10 +160,12 @@ export function ResearchEditor({
   ydoc,
   tabId,
   userTier = "free",
-  drawingTool = null,
-  drawingStrokes = [],
-  onDrawingStrokeAdd,
-  onDrawingStrokeRemove,
+  onFreehandReady,
+  onFreehandToolChange,
+  onFreehandToolChangeReady,
+  onFreehandSettingsReady,
+  onSelectedDrawingNodeChange,
+  onSelectedDrawingNodeUpdateReady,
 }: ResearchEditorProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -206,32 +218,7 @@ export function ResearchEditor({
     getViewport,
   } = useReactFlow();
 
-  // DISABLED: Drawing tools - Coming Soon
-  // Freehand drawing hook and related logic is disabled to prevent memory loading
   const { deleteElements } = useReactFlow();
-
-  /*
-  // Memoize callbacks to prevent infinite loops
-  const handleFreehandNodeCreated = useCallback(
-    (nodeId: string) => {
-      onFreehandNodeCreated?.(nodeId);
-    },
-    [onFreehandNodeCreated]
-  );
-
-  const handleFreehandError = useCallback(
-    (error: Error) => {
-      onFreehandError?.(error);
-    },
-    [onFreehandError]
-  );
-
-  const handleInteractionLockChange = useCallback(
-    (locked: boolean) => {
-      onFreehandToggle?.(locked);
-    },
-    [onFreehandToggle]
-  );
 
   // Generic update function for freehand node data (position, dimensions, etc.)
   const updateDrawingNode = useCallback(
@@ -260,9 +247,6 @@ export function ResearchEditor({
       setEdges,
       deleteElements,
     },
-    onNodeCreated: handleFreehandNodeCreated,
-    onError: handleFreehandError,
-    onInteractionLockChange: handleInteractionLockChange,
     onResizeEnd: (nodeId, dimensions) => updateDrawingNode(nodeId, dimensions),
     onTextUpdate: (nodeId, text) => updateDrawingNode(nodeId, { text }),
     onNodeDelete: (nodeId) => {
@@ -275,35 +259,42 @@ export function ResearchEditor({
       }
     },
   });
-  */
 
-  // Simplified handleNodesChange - drawing tools disabled
   const handleNodesChange = useCallback(
     (changes: NodeChange[]) => {
-      // Apply changes to React Flow state
       onNodesChange(changes);
 
-      // DISABLED: Drawing tools - Coming Soon
-      // The freehand-specific selection tracking and Yjs sync is disabled.
-      // When re-enabling, restore the selection change handling and Yjs deletion sync.
-      /*
-      const selectionChanges = changes.filter((change) => change.type === "select");
+      // Sync drawing-node selection back into the freehand hook so the
+      // InspectorPanel can reflect the currently selected stroke.
+      const selectionChanges = changes.filter((c) => c.type === "select");
       if (selectionChanges.length > 0) {
-        // ... selection tracking for drawing nodes ...
+        const selected = nodes.find((n) =>
+          selectionChanges.some(
+            (c) => c.type === "select" && c.id === n.id && c.selected
+          )
+        );
+        const selectedDrawingId =
+          selected && isDrawingNodeType(selected.type ?? "")
+            ? selected.id
+            : null;
         freehand.handleNodeSelect(selectedDrawingId);
-        // ... update draggable state ...
       }
 
-      if (freehand.isApplyingYjsRef?.current) return;
-      // ... sync freehand deletions to Yjs ...
-      */
+      // Sync Delete-key removals of drawing nodes to Yjs.
+      const removeChanges = changes.filter((c) => c.type === "remove");
+      if (removeChanges.length > 0) {
+        const drawingIds = removeChanges
+          .map((c) => nodes.find((n) => n.id === c.id))
+          .filter((n): n is Node => !!n && isDrawingNodeType(n.type ?? ""))
+          .map((n) => n.id);
+        if (drawingIds.length > 0) {
+          freehand.handleEraseNodes(drawingIds);
+        }
+      }
     },
-    [onNodesChange]
+    [onNodesChange, nodes, freehand]
   );
 
-  // DISABLED: Drawing tools - Coming Soon
-  // All freehand useEffect hooks are disabled to prevent loading the drawing system.
-  /*
   useEffect(() => {
     if (onFreehandReady) {
       onFreehandReady(freehand.toggle);
@@ -318,7 +309,11 @@ export function ResearchEditor({
     if (onFreehandSettingsReady) {
       onFreehandSettingsReady(freehand.settings, freehand.handleSettingsChange);
     }
-  }, [freehand.settings, freehand.handleSettingsChange, onFreehandSettingsReady]);
+  }, [
+    freehand.settings,
+    freehand.handleSettingsChange,
+    onFreehandSettingsReady,
+  ]);
 
   useEffect(() => {
     if (onFreehandToolChangeReady) {
@@ -338,7 +333,6 @@ export function ResearchEditor({
       onSelectedDrawingNodeUpdateReady(freehand.handleUpdateSelectedNode);
     }
   }, [freehand.handleUpdateSelectedNode, onSelectedDrawingNodeUpdateReady]);
-  */
 
   // Helper: Calculate distance-based animation duration
   const getAnimationDuration = useCallback(
@@ -1152,11 +1146,16 @@ export function ResearchEditor({
     event.dataTransfer.dropEffect = "copy";
   }, []);
 
-  // Handle node context menu
+  // Handle node context menu — drawing nodes get deleted directly,
+  // entity nodes go through the parent context-menu router.
   const onNodeContextMenu = useCallback(
     (event: MouseEvent | React.MouseEvent, node: Node) => {
       event.preventDefault();
       event.stopPropagation();
+      if (isDrawingNodeType(node.type ?? "")) {
+        freehand.handleEraseNodes([node.id]);
+        return;
+      }
       onContextMenu?.(
         "node",
         event.clientX,
@@ -1164,7 +1163,7 @@ export function ResearchEditor({
         node.data as GraphNodeAttributes
       );
     },
-    [onContextMenu]
+    [onContextMenu, freehand]
   );
 
   // Handle background click - deselect nodes
@@ -1223,9 +1222,9 @@ export function ResearchEditor({
         minZoom={0.1}
         maxZoom={2}
         deleteKeyCode="Delete"
-        nodesDraggable={isDraggingEnabled && drawingTool === null}
-        nodesConnectable={isDraggingEnabled && drawingTool === null}
-        panOnDrag={!isInteractionLocked && drawingTool === null}
+        nodesDraggable={isDraggingEnabled && !freehand.isEnabled}
+        nodesConnectable={isDraggingEnabled && !freehand.isEnabled}
+        panOnDrag={!isInteractionLocked && !freehand.isEnabled}
         selectionKeyCode="Shift" // Shift+drag for box selection
         multiSelectionKeyCode="Shift" // Shift+click for multi-select
         zoomOnScroll={!isInteractionLocked}
@@ -1234,12 +1233,6 @@ export function ResearchEditor({
         proOptions={{ hideAttribution: true }}
       >
         <Background />
-        <DrawingLayer
-          activeTool={drawingTool}
-          strokes={drawingStrokes}
-          onStrokeAdd={(s) => onDrawingStrokeAdd?.(s)}
-          onStrokeRemove={(id) => onDrawingStrokeRemove?.(id)}
-        />
         <Controls
           position="top-left"
           showZoom={false}
@@ -1284,7 +1277,6 @@ export function ResearchEditor({
         />
       </ReactFlow>
 
-      {/* DISABLED: Drawing tools - Coming Soon
       {freehand.isEnabled && freehand.activeTool !== "move" && (
         <Freehand
           points={freehand.points}
@@ -1300,7 +1292,6 @@ export function ResearchEditor({
           onEraseEdges={freehand.handleEraseEdges}
         />
       )}
-      */}
 
       {/* Edge Type Selector Popover (node-to-node) */}
       {pendingConnection && (

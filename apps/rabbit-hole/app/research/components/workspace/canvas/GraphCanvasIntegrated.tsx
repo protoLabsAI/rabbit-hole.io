@@ -14,8 +14,7 @@ import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 
 import type { UserTier } from "@protolabsai/auth/client";
 import { getEntityTypesByDomain } from "@protolabsai/forms";
-// DISABLED: Drawing tools - Coming Soon
-// import { InspectorPanel, type ToolType } from "@protolabsai/freehand-drawing";
+import { InspectorPanel, type ToolType } from "@protolabsai/freehand-drawing";
 import { Icon } from "@protolabsai/icon-system";
 import { logUserAction } from "@protolabsai/logger";
 import type { PartialBundle, RabbitHoleBundleData } from "@protolabsai/types";
@@ -43,7 +42,6 @@ import { HorizontalToolbar } from "../HorizontalToolbar";
 import { CanvasNavigationToolbar } from "../toolbar/CanvasNavigationToolbar";
 import { GraphToolbarButtons } from "../toolbar/GraphToolbarButtons";
 
-import type { DrawingStroke, DrawingTool } from "./DrawingLayer";
 import { GraphSettings } from "./GraphSettings";
 import { useGraphCanvasActions } from "./useGraphCanvasActions";
 import { useGraphCanvasBundleImport } from "./useGraphCanvasBundleImport";
@@ -185,49 +183,9 @@ export function GraphCanvasIntegrated({
   // Filter popover state (not moved to state hook - simple local state)
   const [showFilterPopover, setShowFilterPopover] = useState(false);
 
-  // Drawing layer state — pencil / eraser live on top of the flow canvas.
-  const [drawingTool, setDrawingTool] = useState<DrawingTool>(null);
-  const initialStrokes = useMemo<DrawingStroke[]>(() => {
-    const fromData = (data as { strokes?: DrawingStroke[] } | undefined)
-      ?.strokes;
-    return Array.isArray(fromData) ? fromData : [];
-  }, [data]);
-  const [drawingStrokes, setDrawingStrokes] =
-    useState<DrawingStroke[]>(initialStrokes);
-  const persistStrokesRef = useRef(drawingStrokes);
-  persistStrokesRef.current = drawingStrokes;
-
-  const handleDrawingStrokeAdd = useCallback(
-    (stroke: DrawingStroke) => {
-      setDrawingStrokes((prev) => {
-        const next = [...prev, stroke];
-        onDataChange({ ...data, strokes: next });
-        return next;
-      });
-    },
-    [data, onDataChange]
-  );
-  const handleDrawingStrokeRemove = useCallback(
-    (strokeId: string) => {
-      setDrawingStrokes((prev) => {
-        const next = prev.filter((s) => s.id !== strokeId);
-        onDataChange({ ...data, strokes: next });
-        return next;
-      });
-    },
-    [data, onDataChange]
-  );
-  const handleDrawingToolChange = useCallback((tool: DrawingTool) => {
-    setDrawingTool((prev) => (prev === tool ? null : tool));
-  }, []);
-
   // Version browser dialog state
   const [showVersionBrowser, setShowVersionBrowser] = useState(false);
 
-  // DISABLED: Drawing tools - Coming Soon
-  // All freehand state, handlers, and components are commented out to prevent memory loading.
-  // To re-enable: uncomment the import, state, handlers, props, and InspectorPanel below.
-  /*
   const [freehandEnabled, setFreehandEnabled] = useState(false);
   const [inspectorPanelOpen, setInspectorPanelOpen] = useState(false);
   const freehandToggleFnRef = useRef<(() => void) | null>(null);
@@ -240,9 +198,15 @@ export function GraphCanvasIntegrated({
     thinning: 0.5,
     eraserSize: 20,
   });
-  const freehandSettingsChangeRef = useRef<((updates: any) => void) | null>(null);
-  const freehandToolChangeHandlerRef = useRef<((tool: ToolType) => void) | null>(null);
-  const updateSelectedDrawingNodeRef = useRef<((updates: any) => void) | null>(null);
+  const freehandSettingsChangeRef = useRef<((updates: any) => void) | null>(
+    null
+  );
+  const freehandToolChangeHandlerRef = useRef<
+    ((tool: ToolType) => void) | null
+  >(null);
+  const updateSelectedDrawingNodeRef = useRef<((updates: any) => void) | null>(
+    null
+  );
   const [selectedDrawingNode, setSelectedDrawingNode] = useState<any>(null);
   const canUseFreehand = true;
 
@@ -332,7 +296,6 @@ export function GraphCanvasIntegrated({
     },
     [toast]
   );
-  */
 
   // Version management handlers
   const handleSaveVersion = useCallback(async () => {
@@ -777,8 +740,10 @@ export function GraphCanvasIntegrated({
               filterPopover={filterPopover}
               onSaveVersion={handleSaveVersion}
               onVersionBrowserOpen={handleOpenVersionBrowser}
-              drawingTool={drawingTool}
-              onDrawingToolChange={handleDrawingToolChange}
+              freehandEnabled={freehandEnabled}
+              activeDrawingTool={activeDrawingTool}
+              onToggleFreehand={handleToggleFreehand}
+              onDrawingToolChange={handleFreehandToolChange}
             />
           }
           canUndo={canUndo}
@@ -825,10 +790,14 @@ export function GraphCanvasIntegrated({
             ydoc={ydoc}
             tabId={tabId}
             userTier={userTier}
-            drawingTool={drawingTool}
-            drawingStrokes={drawingStrokes}
-            onDrawingStrokeAdd={handleDrawingStrokeAdd}
-            onDrawingStrokeRemove={handleDrawingStrokeRemove}
+            onFreehandReady={handleFreehandReady}
+            onFreehandToolChange={(tool) => setActiveDrawingTool(tool)}
+            onFreehandToolChangeReady={handleFreehandToolChangeReady}
+            onFreehandSettingsReady={handleFreehandSettingsReady}
+            onSelectedDrawingNodeChange={setSelectedDrawingNode}
+            onSelectedDrawingNodeUpdateReady={(handler) => {
+              updateSelectedDrawingNodeRef.current = handler;
+            }}
           />
 
           <CanvasNavigationToolbar
@@ -878,7 +847,6 @@ export function GraphCanvasIntegrated({
       </div>
       {/* Close main content area */}
 
-      {/* DISABLED: Drawing tools - Coming Soon
       {freehandEnabled && (
         <InspectorPanel
           activeTool={activeDrawingTool}
@@ -891,7 +859,6 @@ export function GraphCanvasIntegrated({
           onToggle={handleToggleInspectorPanel}
         />
       )}
-      */}
     </div>
   );
 }
