@@ -1,29 +1,30 @@
 /**
- * Middleware configuration for the Rabbit Hole research agent.
+ * Middleware configuration for the Rabbit Hole search agent.
  *
- * Returns a singleton MiddlewareRegistry seeded with all research middleware.
- * Middleware execute in registration order. The ordering below is intentional:
+ * Returns a singleton MiddlewareRegistry seeded with the launch-stack
+ * middleware. Middleware execute in registration order:
  *
- *   1. EntityMemory    — beforeAgent: inject prior knowledge from Neo4j
- *   2. ResearchPlanner — beforeAgent: generate research plan for complex queries
- *   3. Clarification   — wrapToolCall: intercept askClarification tool
- *   4. LoopDetection   — wrapToolCall: detect/block repeated tool calls
- *   5. Reflection      — afterModel: evaluate evidence quality, guide gap-filling
- *   6. SubQueryDecomp  — beforeAgent: decompose complex queries into sub-queries
- *   7. StructuredExtr  — afterAgent: extract entities/relationships for graph preview
- *   8. DeferredTools   — beforeAgent: inject deferred tool names, intercept tool_search
+ *   1. ResearchPlanner — beforeAgent: generate research plan for complex queries
+ *   2. Clarification   — wrapToolCall: intercept askClarification tool
+ *   3. LoopDetection   — wrapToolCall: detect/block repeated tool calls
+ *   4. Reflection      — afterModel: evaluate evidence quality, guide gap-filling
+ *   5. SubQueryDecomp  — beforeAgent: decompose complex queries into sub-queries
+ *   6. DeferredTools   — beforeAgent: inject deferred tool names, intercept tool_search
+ *
+ * The graph-backed middleware (EntityMemory, StructuredExtraction) are
+ * disabled in the launch stack since the search agent no longer talks
+ * to Neo4j. Re-enable them in the research stack via a dedicated config
+ * if/when graph features come back.
  */
 
 import {
   ClarificationMiddleware,
   DeferredToolLoadingMiddleware,
-  EntityMemoryMiddleware,
   LoopDetectionMiddleware,
   MiddlewareRegistry,
   ParallelDecompositionMiddleware,
   ReflectionMiddleware,
   ResearchPlannerMiddleware,
-  StructuredExtractionMiddleware,
 } from "@protolabsai/research-middleware";
 
 let _registry: MiddlewareRegistry | null = null;
@@ -36,11 +37,6 @@ export function getMiddlewareRegistry(): MiddlewareRegistry {
   if (!_registry) {
     _registry = new MiddlewareRegistry({
       entries: [
-        {
-          id: "entity-memory",
-          enabled: true,
-          middleware: new EntityMemoryMiddleware(),
-        },
         {
           id: "research-planner",
           enabled: true,
@@ -65,11 +61,6 @@ export function getMiddlewareRegistry(): MiddlewareRegistry {
           id: "parallel-decomposition",
           enabled: true,
           middleware: new ParallelDecompositionMiddleware(),
-        },
-        {
-          id: "structured-extraction",
-          enabled: true,
-          middleware: new StructuredExtractionMiddleware(),
         },
         {
           id: "deferred-tools",

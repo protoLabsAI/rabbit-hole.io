@@ -1,0 +1,181 @@
+# rabbit-hole.io — self-hostable launch stack
+#
+#   docker compose up -d
+#
+# Pulls prebuilt images from ghcr.io/protolabsai/rabbit-hole/*:latest. To
+# build images from source, use docker-compose.research.yml instead (the
+# dev/research stack, which also bundles Neo4j + Qdrant for the graph
+# experience).
+#
+# Required environment (see .env.example):
+#   ANTHROPIC_API_KEY or OPENAI_API_KEY    one is required
+#
+# Optional:
+#   GROQ_API_KEY                           free Whisper transcription
+#   SEARXNG_ENDPOINT                       web search; falls back to wiki only
+#   LANGFUSE_PUBLIC_KEY / LANGFUSE_SECRET_KEY  observability
+#
+# Default ports:
+#   3399  rabbit-hole web UI
+#   8680  job-processor API (file/media ingest)
+#   7874  researcher A2A endpoint
+#   9001  MinIO console (admin UI)
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: rabbit-hole-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=rabbit_hole_app
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-changeme}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - rh
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  postgres-jobs:
+    image: postgres:17-alpine
+    container_name: rabbit-hole-postgres-jobs
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=sidequest
+      - POSTGRES_USER=jobqueue
+      - POSTGRES_PASSWORD=${POSTGRES_JOB_PASSWORD:-changeme}
+    volumes:
+      - postgres_jobs_data:/var/lib/postgresql/data
+    networks:
+      - rh
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jobqueue -d sidequest"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    container_name: rabbit-hole-minio
+    restart: unless-stopped
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER:-minio}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-changeme}
+    ports:
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - rh
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  minio-init:
+    image: minio/mc:RELEASE.2025-08-13T08-35-41Z
+    container_name: rabbit-hole-minio-init
+    restart: "no"
+    entrypoint: ["/bin/sh", "/scripts/setup-minio-buckets.sh"]
+    environment:
+      - MINIO_HOST=http://minio:9000
+      - MINIO_ACCESS_KEY=${MINIO_ROOT_USER:-minio}
+      - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD:-changeme}
+      - MINIO_ALIAS=local
+    volumes:
+      - ./scripts/setup-minio-buckets.sh:/scripts/setup-minio-buckets.sh:ro
+    networks:
+      - rh
+    depends_on:
+      minio:
+        condition: service_healthy
+
+  job-processor:
+    image: ghcr.io/protolabsai/rabbit-hole/job-processor:latest
+    pull_policy: always
+    container_name: rabbit-hole-job-processor
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://jobqueue:${POSTGRES_JOB_PASSWORD:-changeme}@postgres-jobs:5432/sidequest
+      - APP_DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD:-changeme}@postgres:5432/rabbit_hole_app
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ACCESS_KEY=${MINIO_ROOT_USER:-minio}
+      - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD:-changeme}
+      - MINIO_USE_SSL=false
+      - JOB_WORKERS=${JOB_WORKERS:-3}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - API_PORT=8680
+      - GROQ_API_KEY=${GROQ_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    ports:
+      - "8680:8680"
+    networks:
+      - rh
+    depends_on:
+      postgres-jobs:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8679/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  rabbit-hole:
+    image: ghcr.io/protolabsai/rabbit-hole/rabbit-hole:latest
+    pull_policy: always
+    container_name: rabbit-hole
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3399
+      - APP_DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD:-changeme}@postgres:5432/rabbit_hole_app
+      - JOB_PROCESSOR_URL=http://job-processor:8680
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ACCESS_KEY=${MINIO_ROOT_USER:-minio}
+      - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD:-changeme}
+      - MINIO_USE_SSL=false
+      - SEARXNG_ENDPOINT=${SEARXNG_ENDPOINT:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - LANGFUSE_PUBLIC_KEY=${LANGFUSE_PUBLIC_KEY:-}
+      - LANGFUSE_SECRET_KEY=${LANGFUSE_SECRET_KEY:-}
+      - LANGFUSE_BASE_URL=${LANGFUSE_BASE_URL:-https://cloud.langfuse.com}
+    ports:
+      - "3399:3399"
+    networks:
+      - rh
+    depends_on:
+      postgres:
+        condition: service_healthy
+      job-processor:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:3399/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  postgres_data:
+    driver: local
+  postgres_jobs_data:
+    driver: local
+  minio_data:
+    driver: local
+
+networks:
+  rh:
+    driver: bridge
