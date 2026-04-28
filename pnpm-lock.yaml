@@ -635,6 +635,9 @@ importers:
       '@protolabsai/forms':
         specifier: workspace:*
         version: link:../../packages/forms
+      '@protolabsai/freehand-drawing':
+        specifier: workspace:*
+        version: link:../../packages/freehand-drawing
       '@protolabsai/icon-system':
         specifier: workspace:*
         version: link:../../packages/icon-system
@@ -1212,6 +1215,46 @@ importers:
       zod:
         specifier: ^4.3.6
         version: 4.3.6
+    devDependencies:
+      '@protolabsai/config-typescript':
+        specifier: workspace:*
+        version: link:../config-typescript
+      '@types/react':
+        specifier: ^19.0.6
+        version: 19.1.13
+      tsup:
+        specifier: ^8.0.1
+        version: 8.5.0(jiti@2.6.1)(postcss@8.5.10)(tsx@4.20.5)(typescript@5.9.3)(yaml@2.8.3)
+      typescript:
+        specifier: ^5.6.3
+        version: 5.9.3
+
+  packages/freehand-drawing:
+    dependencies:
+      '@protolabsai/auth':
+        specifier: workspace:*
+        version: link:../auth
+      '@protolabsai/icon-system':
+        specifier: workspace:*
+        version: link:../icon-system
+      '@protolabsai/ui':
+        specifier: workspace:*
+        version: link:../ui
+      '@protolabsai/utils':
+        specifier: workspace:*
+        version: link:../utils
+      '@xyflow/react':
+        specifier: ^12.8.6
+        version: 12.8.6(@types/react@19.1.13)(immer@10.2.0)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      perfect-freehand:
+        specifier: ^1.2.2
+        version: 1.2.3
+      react:
+        specifier: ^19.0.0
+        version: 19.1.1
+      yjs:
+        specifier: ^13.6.21
+        version: 13.6.27
     devDependencies:
       '@protolabsai/config-typescript':
         specifier: workspace:*
@@ -13829,6 +13872,9 @@ packages:
 
   perfect-debounce@1.0.0:
     resolution: {integrity: sha512-xCy9V055GLEqoFaHoC1SoLIaLmWctgCUaBaWxDZ7/Zx4CTyX7cJQLJOok/orfjZAh9kEYpjJa4d0KcJmCbctZA==}
+
+  perfect-freehand@1.2.3:
+    resolution: {integrity: sha512-bHZSfqDHGNlPpgH2yxXgPHlQSPpEbo+qg7li0M78J9vNAi2yjwLeA4x79BEQhX44lEWpCLSFCeRZwpw0niiXPA==}
 
   performance-now@2.1.0:
     resolution: {integrity: sha512-7EAHlyLHI56VEIdK57uwHdHKIaAGbnXPiw0yWbarQZOKaKpvUIgW0jWRVLiatnM+XXlSwsanIBH/hzGMJulMow==}
@@ -31800,6 +31846,8 @@ snapshots:
   pend@1.2.0: {}
 
   perfect-debounce@1.0.0: {}
+
+  perfect-freehand@1.2.3: {}
 
   performance-now@2.1.0: {}
 

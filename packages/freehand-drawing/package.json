@@ -1,0 +1,41 @@
+{
+  "name": "@protolabsai/freehand-drawing",
+  "version": "0.1.7",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo node_modules"
+  },
+  "dependencies": {
+    "@protolabsai/auth": "workspace:*",
+    "@protolabsai/icon-system": "workspace:*",
+    "@protolabsai/ui": "workspace:*",
+    "@protolabsai/utils": "workspace:*",
+    "perfect-freehand": "^1.2.2"
+  },
+  "peerDependencies": {
+    "@xyflow/react": "^12.8.6",
+    "react": "^19.0.0",
+    "yjs": "^13.6.21"
+  },
+  "devDependencies": {
+    "@protolabsai/config-typescript": "workspace:*",
+    "@types/react": "^19.0.6",
+    "tsup": "^8.0.1",
+    "typescript": "^5.6.3"
+  }
+}

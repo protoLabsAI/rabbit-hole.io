@@ -27,6 +27,7 @@
     "@protolabsai/charts": "workspace:*",
     "@protolabsai/database": "workspace:*",
     "@protolabsai/forms": "workspace:*",
+    "@protolabsai/freehand-drawing": "workspace:*",
     "@protolabsai/icon-system": "workspace:*",
     "@protolabsai/llm-providers": "workspace:*",
     "@protolabsai/llm-tools": "workspace:*",

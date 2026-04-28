@@ -1,10 +1,9 @@
 "use client";
 
+import type { ToolType } from "@protolabsai/freehand-drawing";
 import { Icon } from "@protolabsai/icon-system";
 
 import { cn } from "@/lib/utils";
-
-import type { DrawingTool } from "../canvas/DrawingLayer";
 
 export type GraphLayout = "elk" | "force" | "manual";
 
@@ -16,8 +15,10 @@ interface GraphToolbarButtonsProps {
   filterPopover?: React.ReactNode;
   onSaveVersion?: () => void;
   onVersionBrowserOpen?: () => void;
-  drawingTool?: DrawingTool;
-  onDrawingToolChange?: (tool: DrawingTool) => void;
+  freehandEnabled?: boolean;
+  activeDrawingTool?: ToolType;
+  onToggleFreehand?: () => void;
+  onDrawingToolChange?: (tool: ToolType) => void;
 }
 
 export function GraphToolbarButtons({
@@ -28,7 +29,9 @@ export function GraphToolbarButtons({
   filterPopover,
   onSaveVersion,
   onVersionBrowserOpen,
-  drawingTool = null,
+  freehandEnabled = false,
+  activeDrawingTool = "move",
+  onToggleFreehand,
   onDrawingToolChange,
 }: GraphToolbarButtonsProps) {
   return (
@@ -60,21 +63,25 @@ export function GraphToolbarButtons({
         <div className="h-4 w-px bg-border mx-1" />
       )}
 
-      {/* Drawing tools — pencil toggles draw mode, eraser toggles erase mode.
-          Clicking the active tool again exits drawing. */}
-      {onDrawingToolChange && (
+      {/* Drawing tools — pencil/eraser toggle the freehand-drawing mode. */}
+      {onToggleFreehand && onDrawingToolChange && (
         <>
           <button
             type="button"
-            onClick={() => onDrawingToolChange("pencil")}
+            onClick={() => {
+              if (!freehandEnabled) onToggleFreehand();
+              onDrawingToolChange(
+                activeDrawingTool === "freehand" ? "move" : "freehand"
+              );
+            }}
             className={cn(
               "p-2 rounded-md transition-all",
-              drawingTool === "pencil"
+              freehandEnabled && activeDrawingTool === "freehand"
                 ? "bg-primary/20 text-primary ring-2 ring-primary/50"
                 : "text-muted-foreground hover:text-foreground hover:bg-muted"
             )}
             title={
-              drawingTool === "pencil"
+              freehandEnabled && activeDrawingTool === "freehand"
                 ? "Pencil (active — click to exit)"
                 : "Pencil — draw on the canvas"
             }
@@ -83,20 +90,25 @@ export function GraphToolbarButtons({
           </button>
           <button
             type="button"
-            onClick={() => onDrawingToolChange("eraser")}
+            onClick={() => {
+              if (!freehandEnabled) onToggleFreehand();
+              onDrawingToolChange(
+                activeDrawingTool === "eraser" ? "move" : "eraser"
+              );
+            }}
             className={cn(
               "p-2 rounded-md transition-all",
-              drawingTool === "eraser"
+              freehandEnabled && activeDrawingTool === "eraser"
                 ? "bg-primary/20 text-primary ring-2 ring-primary/50"
                 : "text-muted-foreground hover:text-foreground hover:bg-muted"
             )}
             title={
-              drawingTool === "eraser"
+              freehandEnabled && activeDrawingTool === "eraser"
                 ? "Eraser (active — click to exit)"
-                : "Eraser — click or drag over strokes to delete"
+                : "Eraser — drag over strokes to delete"
             }
           >
-            <Icon name="trash-2" size={16} />
+            <Icon name="eraser" size={16} />
           </button>
           <div className="h-4 w-px bg-border mx-1" />
         </>
