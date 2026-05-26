@@ -1111,6 +1111,31 @@ importers:
         specifier: ^3.2.4
         version: 3.2.4(@types/debug@4.1.12)(@types/node@25.6.0)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.3.0(canvas@3.2.0)(postcss@8.5.10))(lightningcss@1.30.2)(msw@2.11.5(@types/node@25.6.0)(typescript@5.9.3))(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.3)
 
+  packages/cli:
+    dependencies:
+      commander:
+        specifier: ^12.0.0
+        version: 12.1.0
+      yaml:
+        specifier: ^2.5.0
+        version: 2.8.3
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.17
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.0(jiti@2.6.1)(postcss@8.5.10)(tsx@4.20.5)(typescript@5.9.3)(yaml@2.8.3)
+      tsx:
+        specifier: ^4.0.0
+        version: 4.20.5
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+      vitest:
+        specifier: ^2.0.0
+        version: 2.1.9(@types/node@20.19.17)(happy-dom@20.0.10)(jsdom@27.3.0(canvas@3.2.0)(postcss@8.5.10))(lightningcss@1.30.2)(msw@2.11.5(@types/node@20.19.17)(typescript@5.9.3))(terser@5.44.0)
+
   packages/config-next: {}
 
   packages/config-tailwind:
@@ -9476,6 +9501,10 @@ packages:
   commander@11.1.0:
     resolution: {integrity: sha512-yPVavfyCcRhmorC7rWlkHn15b4wDVgVmBA7kV4QVBsF7kv/9TKJAbAXVTxvTnwP8HHKjRCJDClKbciiYS7p0DQ==}
     engines: {node: '>=16'}
+
+  commander@12.1.0:
+    resolution: {integrity: sha512-Vw8qHK3bZM9y/P10u3Vib8o/DdkvA2OtPtZvD871QKjy74Wj1WSKFILMPRPSdUSx5RFK1arlJzEtA4PkFgnbuA==}
+    engines: {node: '>=18'}
 
   commander@13.1.0:
     resolution: {integrity: sha512-/rFeCpNJQbhSZjGVwO9RFV3xPqbnERS8MmIQzCtD/zl6gpJuV/bMLuN92oG3F7d8oDEHHRrujSXNUr8fpjntKw==}
@@ -26574,6 +26603,8 @@ snapshots:
 
   commander@11.1.0: {}
 
+  commander@12.1.0: {}
+
   commander@13.1.0: {}
 
   commander@14.0.1: {}
@@ -29781,7 +29812,7 @@ snapshots:
       openapi-types: 12.1.3
       p-retry: 4.6.2
       uuid: 10.0.0
-      yaml: 2.8.1
+      yaml: 2.8.3
       zod: 4.3.6
     optionalDependencies:
       '@langchain/anthropic': 1.3.28(@langchain/core@1.1.42(@opentelemetry/api@1.9.0)(@opentelemetry/exporter-trace-otlp-proto@0.215.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.7.0(@opentelemetry/api@1.9.0))(openai@4.104.0(ws@8.18.3)(zod@4.3.6))(ws@8.18.3))
@@ -30008,7 +30039,7 @@ snapshots:
       nano-spawn: 1.0.3
       pidtree: 0.6.0
       string-argv: 0.3.2
-      yaml: 2.8.1
+      yaml: 2.8.3
 
   listr2@3.14.0(enquirer@2.4.1):
     dependencies:
@@ -32011,7 +32042,7 @@ snapshots:
   postcss-load-config@4.0.2(postcss@8.5.6):
     dependencies:
       lilconfig: 3.1.3
-      yaml: 2.8.1
+      yaml: 2.8.3
     optionalDependencies:
       postcss: 8.5.6
 

@@ -3,6 +3,7 @@ import { JobProcessorClient } from "../lib/job-processor.js";
 
 export type StatusOptions = {
   wait?: boolean;
+  result?: boolean;
 };
 
 export async function runStatus(
@@ -12,10 +13,16 @@ export async function runStatus(
   const cfg = loadConfig();
   const client = new JobProcessorClient(cfg.jobProcessorUrl);
 
-  const job = opts.wait
+  const s = opts.wait
     ? await client.waitFor(jobId)
     : await client.status(jobId);
-  process.stdout.write(JSON.stringify(job, null, 2) + "\n");
+  process.stdout.write(JSON.stringify(s, null, 2) + "\n");
 
-  if (job.status === "failed" || job.status === "cancelled") process.exit(1);
+  if (opts.result && s.status === "completed") {
+    const r = await client.result(jobId);
+    process.stdout.write("---\n");
+    process.stdout.write(JSON.stringify(r, null, 2) + "\n");
+  }
+
+  if (s.status === "failed" || s.status === "cancelled") process.exit(1);
 }

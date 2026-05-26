@@ -5,7 +5,7 @@ import { loadConfig } from "../config.js";
 import { JobProcessorClient } from "../lib/job-processor.js";
 
 export type IngestOptions = {
-  type?: string;
+  mediaType?: string;
   wait?: boolean;
 };
 
@@ -16,8 +16,7 @@ export async function runIngest(
   const cfg = loadConfig();
   const client = new JobProcessorClient(cfg.jobProcessorUrl);
 
-  // If `source` looks like a local path, resolve + verify it exists. URLs
-  // pass through untouched — the job-processor fetches them itself.
+  // Local-path inputs get verified before we read+base64 them.
   let finalSource = source;
   if (!/^https?:\/\//.test(source)) {
     const abs = resolve(source);
@@ -25,8 +24,7 @@ export async function runIngest(
       process.stderr.write(`rh: ${abs} does not exist\n`);
       process.exit(1);
     }
-    const st = statSync(abs);
-    if (!st.isFile()) {
+    if (!statSync(abs).isFile()) {
       process.stderr.write(
         `rh: ${abs} is not a file (only files supported in v1)\n`
       );
@@ -35,12 +33,15 @@ export async function runIngest(
     finalSource = abs;
   }
 
-  const job = await client.ingest({ source: finalSource, type: opts.type });
-  process.stdout.write(JSON.stringify(job, null, 2) + "\n");
+  const enq = await client.ingest({
+    source: finalSource,
+    mediaType: opts.mediaType,
+  });
+  process.stdout.write(JSON.stringify(enq, null, 2) + "\n");
 
   if (opts.wait) {
-    process.stderr.write(`rh: waiting for ${job.id}…\n`);
-    const finished = await client.waitFor(job.id);
+    process.stderr.write(`rh: waiting for ${enq.jobId}…\n`);
+    const finished = await client.waitFor(enq.jobId);
     process.stdout.write(JSON.stringify(finished, null, 2) + "\n");
     process.exit(finished.status === "completed" ? 0 : 1);
   }

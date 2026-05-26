@@ -52,7 +52,10 @@ program
     "Queue a file or URL to the job-processor for parsing / transcription."
   )
   .argument("<source>", "local file path or http(s) URL")
-  .option("-t, --type <type>", "processor hint (paper, audio, url, …)")
+  .option(
+    "-m, --media-type <type>",
+    "MIME type override (e.g. application/pdf, audio/mpeg)"
+  )
   .option("--wait", "block until the job finishes")
   .action((source: string, opts) =>
     runIngest(source, opts).catch((err) => fail(err))
@@ -63,6 +66,7 @@ program
   .description("Get current state of a job by id.")
   .argument("<job-id>", "job id returned by `rh ingest`")
   .option("--wait", "block until the job reaches a terminal state")
+  .option("--result", "also fetch /ingest/:id/result when status=completed")
   .action((jobId: string, opts) =>
     runStatus(jobId, opts).catch((err) => fail(err))
   );
