@@ -113,9 +113,12 @@ The agent decides tool order and iteration. `stopWhen: stepCountIs(5)`.
 The old `packages/mcp-server` HTTP MCP server (12 tools, port 3398, graph-bound) has been superseded by the **`@protolabsai/rabbit-hole-cli`** package (`packages/cli`, bin `rh`). Fleet agents shell out to `rh` rather than calling MCP/A2A over HTTP. It's a thin Tavily + LLM-gateway tool with no graph dependencies.
 
 Commands:
-- `rh search <query>` — web search via Tavily (with answer summary); JSON by default, `--text` for markdown, `-m/--max <n>` for result count.
+- `rh search <query>` — web search; prefers in-house SearXNG (`RH_SEARXNG_ENDPOINT`), falls back to Tavily. JSON by default, `--text` for markdown, `-m/--max <n>` for result count.
+- `rh recall <query>` — vector search over the ingested corpus (pgvector `corpus_chunks`, qwen3 1024-dim); embeds via the gateway, returns top-`k` cosine matches. `-k/--top-k <n>`, `--text`. Hits `GET {job_processor}/search`.
 - `rh research <topic>` — multi-step deep research: planner → fan-out searches → synthesized markdown report. `-d/--depth <n>`, `--max-results <n>`.
 - `rh ingest <source>` — queue a local file or URL to the job-processor for parsing/transcription. `-m/--media-type <type>`, `--wait`.
-- `rh status <job-id>` — get current state of an ingest job. `--wait`, `--result`.
+- `rh status <job-id>` — get current state of an ingest job (backed by the `media_ingestion_status` table). `--wait` polls to terminal; `--result` also fetches the stored extraction.
+
+Published to npm as `@protolabsai/rabbit-hole-cli`; the built `dist/index.js` is a self-contained single file (deps bundled).
 
 All model traffic points at the LiteLLM gateway by default (Langfuse-traced, cost-accounted). Env: `RH_LLM_URL` / `RH_LLM_KEY` / `RH_LLM_MODEL`, `TAVILY_API_KEY`, job-processor URL. See `packages/cli/src/`.

@@ -2,6 +2,20 @@
 
 > **Note:** The live ingestion surface is the `POST /ingest` HTTP API (`src/api/ingestion-routes.ts`) backed by `MediaIngestionJob`, with media adapters under `src/adapters/`. Extracted content is stored to MinIO/Postgres for the search corpus (pgvector). The Neo4j entity-write job classes under `jobs/` (`YouTubeProcessingJob`, `TextExtractionJob`, etc.) are **legacy** — the canonical `docker-compose.yml` stack has no Neo4j. Sections below that describe Neo4j writes or `docker-compose.neo4j.yml` / `docker-compose.jobs.yml` are historical.
 
+### Ingestion HTTP API (`src/api/ingestion-routes.ts`)
+
+The `rh` CLI and other callers use these endpoints (port `8680`):
+
+| Method / path | Purpose |
+|---|---|
+| `POST /ingest` | Enqueue a job. Body `{ jobId, request }` — `jobId` is the **caller-provided** id (echoed back; Sidequest's internal id is returned separately as `sidequestId`). Records initial `queued` status. |
+| `GET /ingest/:jobId/status` | Current state from `media_ingestion_status` (`queued`/`processing`/`completed`/`failed`); `404` + `status:"unknown"` for unknown ids. |
+| `GET /ingest/:jobId/result` | The stored `result.json` (fetched from MinIO `evidence-processed`) once `completed`; `null` otherwise. |
+| `GET /ingest` | Recent jobs (from `media_ingestion_status`, newest first). |
+| `GET /search?q=&topK=` | pgvector corpus search (`corpus_chunks`) — backs `rh recall`. |
+
+Job lifecycle is persisted to the **`media_ingestion_status`** table (rabbit_hole_app, migration `020`), keyed by the caller `jobId` — that's the durable record `status`/`result` read. `MediaIngestionJob` also emits an ephemeral `pg_notify` on `media_ingestion_progress` for live SSE listeners.
+
 Standalone Sidequest.js background job processor for async workflows (file/PDF/audio/video extraction and transcription).
 
 **Real-Time Notifications:** Job completions trigger PostgreSQL NOTIFY events, enabling sub-100ms client notifications via Server-Sent Events.
