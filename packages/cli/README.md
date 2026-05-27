@@ -94,3 +94,16 @@ The baked-in defaults (`http://job-processor:8680`, `http://searxng:8080`,
 the job-processor, SearXNG, and LiteLLM gateway are reachable by service
 hostname. From outside the network, override the URLs via env or the config
 file.
+
+## Teach an agent to use `rh` (Claude skill)
+
+The repo ships a loadable Claude skill that tells an agent when and how to use
+these commands. Drop it into your project- or user-scoped skills directory:
+
+```bash
+# from a clone of rabbit-hole.io
+cp -r .claude/skills/rabbit-hole <your-project>/.claude/skills/   # project-scoped
+cp -r .claude/skills/rabbit-hole ~/.claude/skills/                 # user-scoped
+```
+
+See [`.claude/skills/rabbit-hole/SKILL.md`](https://github.com/protoLabsAI/rabbit-hole.io/blob/main/.claude/skills/rabbit-hole/SKILL.md).
