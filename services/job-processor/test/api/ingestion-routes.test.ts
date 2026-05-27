@@ -11,7 +11,15 @@
 
 import { createServer, request as httpRequest, type Server } from "http";
 
-import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import {
+  afterAll,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 
 // ==================== Mock Sidequest before importing the handler ====================
 
@@ -26,6 +34,27 @@ vi.mock("sidequest", () => ({
     }),
   },
 }));
+
+// Mock the Postgres pool — status/result/list read media_ingestion_status,
+// and POST /ingest records the initial "queued" row.
+const queryMock = vi.fn();
+vi.mock("@protolabsai/database", () => ({
+  getGlobalPostgresPool: () => ({ query: queryMock }),
+}));
+
+// Mock MinIO — the result endpoint fetches result.json for completed jobs.
+const downloadFileMock = vi.fn();
+vi.mock("@protolabsai/utils/storage", () => ({
+  MinioService: class {
+    downloadFile = downloadFileMock;
+  },
+}));
+
+beforeEach(() => {
+  // Default: queries succeed with no rows; tests override per-case.
+  queryMock.mockReset().mockResolvedValue({ rows: [] });
+  downloadFileMock.mockReset();
+});
 
 // Mock MediaIngestionJob so the handler can be imported without a database
 vi.mock("../../jobs/MediaIngestionJob.js", async (importOriginal) => {
@@ -234,51 +263,94 @@ describe("POST /ingest", () => {
 // ==================== GET /ingest/:jobId/status ====================
 
 describe("GET /ingest/:jobId/status", () => {
-  it("returns 200 with jobId and status fields", async () => {
+  it("returns the persisted status for a known job", async () => {
+    queryMock.mockResolvedValueOnce({
+      rows: [
+        {
+          status: "completed",
+          category: "document",
+          error: null,
+          text_length: 1234,
+          artifacts_count: 2,
+          created_at: "2026-05-27T00:00:00Z",
+          updated_at: "2026-05-27T00:01:00Z",
+        },
+      ],
+    });
     const res = await httpGet(`${baseUrl}/ingest/job-xyz/status`);
     expect(res.status).toBe(200);
 
     const json = res.json();
     expect(json.jobId).toBe("job-xyz");
-    expect(json).toHaveProperty("status");
+    expect(json.status).toBe("completed");
+    expect(json.textLength).toBe(1234);
   });
 
-  it("reflects the jobId from the URL path", async () => {
-    const id = "unique-job-id-999";
-    const res = await httpGet(`${baseUrl}/ingest/${id}/status`);
-    const json = res.json();
-    expect(json.jobId).toBe(id);
+  it("returns 404 + status 'unknown' for an unknown job", async () => {
+    queryMock.mockResolvedValueOnce({ rows: [] });
+    const res = await httpGet(`${baseUrl}/ingest/nope-404/status`);
+    expect(res.status).toBe(404);
+    expect(res.json().status).toBe("unknown");
   });
 });
 
 // ==================== GET /ingest/:jobId/result ====================
 
 describe("GET /ingest/:jobId/result", () => {
-  it("returns 200 with jobId field", async () => {
+  it("returns the stored result for a completed job", async () => {
+    queryMock.mockResolvedValueOnce({
+      rows: [
+        { status: "completed", results_key: "ingestion-results/x/r.json" },
+      ],
+    });
+    downloadFileMock.mockResolvedValueOnce(
+      Buffer.from(JSON.stringify({ text: "extracted", category: "document" }))
+    );
     const res = await httpGet(`${baseUrl}/ingest/job-abc/result`);
     expect(res.status).toBe(200);
 
     const json = res.json();
     expect(json.jobId).toBe("job-abc");
+    expect(json.status).toBe("completed");
+    expect(json.result.text).toBe("extracted");
   });
 
-  it("reflects the jobId from the URL path", async () => {
-    const id = "result-job-555";
-    const res = await httpGet(`${baseUrl}/ingest/${id}/result`);
+  it("returns null result while the job is not yet completed", async () => {
+    queryMock.mockResolvedValueOnce({
+      rows: [{ status: "processing", results_key: null }],
+    });
+    const res = await httpGet(`${baseUrl}/ingest/job-pending/result`);
+    expect(res.status).toBe(200);
     const json = res.json();
-    expect(json.jobId).toBe(id);
+    expect(json.status).toBe("processing");
+    expect(json.result).toBeNull();
+    expect(downloadFileMock).not.toHaveBeenCalled();
   });
 });
 
 // ==================== GET /ingest (list) ====================
 
 describe("GET /ingest", () => {
-  it("returns 200 with a jobs array", async () => {
+  it("returns recent jobs from the status table", async () => {
+    queryMock.mockResolvedValueOnce({
+      rows: [
+        {
+          job_id: "j1",
+          status: "completed",
+          category: "document",
+          error: null,
+          created_at: "2026-05-27T00:00:00Z",
+          updated_at: "2026-05-27T00:01:00Z",
+        },
+      ],
+    });
     const res = await httpGet(`${baseUrl}/ingest`);
     expect(res.status).toBe(200);
 
     const json = res.json();
     expect(Array.isArray(json.jobs)).toBe(true);
+    expect(json.jobs[0].jobId).toBe("j1");
+    expect(json.jobs[0].status).toBe("completed");
   });
 });
 

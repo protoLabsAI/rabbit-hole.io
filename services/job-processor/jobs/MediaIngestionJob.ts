@@ -281,6 +281,11 @@ export class MediaIngestionJob extends Job {
       error,
       timestamp: new Date().toISOString(),
     });
+    await this.recordStatus(jobId, status, {
+      workspaceId: request.workspaceId,
+      requestedBy: request.requestedBy,
+      error,
+    });
   }
 
   /**
@@ -304,6 +309,69 @@ export class MediaIngestionJob extends Job {
       requestedBy: request.requestedBy,
       completedAt: new Date().toISOString(),
     });
+    await this.recordStatus(jobId, "completed", {
+      workspaceId: request.workspaceId,
+      requestedBy: request.requestedBy,
+      resultsKey,
+      category: result.category,
+      textLength: result.text.length,
+      artifactsCount: result.artifacts.length,
+    });
+  }
+
+  /**
+   * Persist the job's status to media_ingestion_status (rabbit_hole_app),
+   * keyed by the caller's jobId. Durable counterpart to the pg_notify above —
+   * this is what GET /ingest/:jobId/status and /result read. Best-effort:
+   * failures are logged, never thrown (the canonical result is in MinIO).
+   */
+  private async recordStatus(
+    jobId: string,
+    status: string,
+    fields: {
+      workspaceId?: string;
+      requestedBy?: string;
+      resultsKey?: string;
+      category?: string;
+      textLength?: number;
+      artifactsCount?: number;
+      error?: string;
+    } = {}
+  ): Promise<void> {
+    try {
+      await getGlobalPostgresPool().query(
+        `INSERT INTO media_ingestion_status
+           (job_id, status, workspace_id, requested_by, results_key,
+            category, text_length, artifacts_count, error, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, now())
+         ON CONFLICT (job_id) DO UPDATE SET
+           status          = EXCLUDED.status,
+           workspace_id    = COALESCE(EXCLUDED.workspace_id, media_ingestion_status.workspace_id),
+           requested_by    = COALESCE(EXCLUDED.requested_by, media_ingestion_status.requested_by),
+           results_key     = COALESCE(EXCLUDED.results_key, media_ingestion_status.results_key),
+           category        = COALESCE(EXCLUDED.category, media_ingestion_status.category),
+           text_length     = COALESCE(EXCLUDED.text_length, media_ingestion_status.text_length),
+           artifacts_count = COALESCE(EXCLUDED.artifacts_count, media_ingestion_status.artifacts_count),
+           error           = EXCLUDED.error,
+           updated_at      = now()`,
+        [
+          jobId,
+          status,
+          fields.workspaceId ?? null,
+          fields.requestedBy ?? null,
+          fields.resultsKey ?? null,
+          fields.category ?? null,
+          fields.textLength ?? null,
+          fields.artifactsCount ?? null,
+          fields.error ?? null,
+        ]
+      );
+    } catch (err) {
+      console.warn(
+        `⚠️ Failed to persist status for job ${jobId}:`,
+        err instanceof Error ? err.message : err
+      );
+    }
   }
 
   /**
