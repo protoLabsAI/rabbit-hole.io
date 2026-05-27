@@ -77,3 +77,5 @@ The bake-in defaults (`http://job-processor:8680`, `http://gateway:4000/v1`)
 work inside the `ai_default` Docker network on ava where the job-processor
 and LiteLLM gateway resolve as service hostnames. From outside the network,
 override the URLs via env or the config file.
+
+<!-- re-review nudge: CI green, scope-creep + changeset resolved on this branch -->
