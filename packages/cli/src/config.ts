@@ -15,6 +15,9 @@ import { parse as parseYaml } from "yaml";
  */
 export type Config = {
   jobProcessorUrl: string;
+  /** SearXNG JSON endpoint — our in-house web search. Preferred over Tavily. */
+  searxngEndpoint: string;
+  /** Optional external fallback when SearXNG is unreachable / unset. */
   tavilyApiKey?: string;
   llmBaseUrl: string;
   llmKey?: string;
@@ -23,9 +26,10 @@ export type Config = {
 
 const DEFAULTS: Config = {
   // Defaults assume the CLI is running inside the docker network where
-  // job-processor + gateway resolve as service hostnames. Override via env
-  // (e.g. http://ava:8680) when running from outside.
+  // job-processor + gateway + searxng resolve as service hostnames. Override
+  // via env (e.g. http://ava:8680) when running from outside.
   jobProcessorUrl: "http://job-processor:8680",
+  searxngEndpoint: "http://searxng:8080",
   llmBaseUrl: "http://gateway:4000/v1",
   llmModel: "protolabs/smart",
 };
@@ -38,6 +42,7 @@ function loadFile(): Partial<Config> {
     const raw = parseYaml(readFileSync(path, "utf8")) || {};
     return {
       jobProcessorUrl: raw.job_processor_url,
+      searxngEndpoint: raw.searxng_endpoint,
       tavilyApiKey: raw.tavily_api_key,
       llmBaseUrl: raw.llm_base_url,
       llmKey: raw.llm_key,
@@ -54,6 +59,8 @@ function loadFile(): Partial<Config> {
 function loadEnv(): Partial<Config> {
   return {
     jobProcessorUrl: process.env.RH_JOB_PROCESSOR_URL,
+    searxngEndpoint:
+      process.env.RH_SEARXNG_ENDPOINT || process.env.SEARXNG_ENDPOINT,
     tavilyApiKey: process.env.RH_TAVILY_API_KEY || process.env.TAVILY_API_KEY,
     llmBaseUrl: process.env.RH_LLM_BASE_URL || process.env.OPENAI_BASE_URL,
     llmKey: process.env.RH_LLM_KEY || process.env.OPENAI_API_KEY,

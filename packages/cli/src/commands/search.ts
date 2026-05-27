@@ -1,5 +1,5 @@
 import { loadConfig } from "../config.js";
-import { TavilyClient } from "../lib/tavily.js";
+import { webSearch } from "../lib/web-search.js";
 
 export type SearchOptions = {
   text?: boolean;
@@ -11,15 +11,12 @@ export async function runSearch(
   opts: SearchOptions
 ): Promise<void> {
   const cfg = loadConfig();
-  const client = new TavilyClient(cfg.tavilyApiKey ?? "");
-  const res = await client.search(query, {
-    maxResults: opts.max,
-    includeAnswer: true,
-  });
+  const res = await webSearch(cfg, query, { maxResults: opts.max });
 
   if (opts.text) {
+    process.stdout.write(`# ${res.query}  _(via ${res.provider})_\n\n`);
     if (res.answer) {
-      process.stdout.write(`# ${res.query}\n\n${res.answer}\n\n`);
+      process.stdout.write(`${res.answer}\n\n`);
     }
     process.stdout.write("## Sources\n\n");
     for (const r of res.results) {
