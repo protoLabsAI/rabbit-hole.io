@@ -16,7 +16,6 @@ export { useToast, toast } from "@protolabsai/ui/hooks";
 // UI Components now in @protolabsai/ui package
 // import from @protolabsai/ui/atoms, @protolabsai/ui/molecules, @protolabsai/ui/organisms, or @protolabsai/ui/templates
 // App-specific UI components:
-export { DialogRegistry } from "./ui/DialogRegistry";
 export { ThemeSelector } from "./ui/ThemeSelector";
 export { ThemedUserButton } from "./ui/ThemedUserButton";
 export { FileUploadButton } from "./ui/FileUploadButton";

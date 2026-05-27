@@ -1,7 +1,6 @@
 "use client";
 
 import type { UIMessage } from "ai";
-import Link from "next/link";
 import { useState, useCallback, useMemo, useRef } from "react";
 
 import { Icon } from "@protolabsai/icon-system";
@@ -888,41 +887,6 @@ export function ChatMessage({
                 />
                 {ingesting ? "Adding..." : "Add to Knowledge Graph"}
               </button>
-            )}
-
-            {/* View in Atlas — entity chips + view-all button */}
-            {graphEntities.length > 0 && (
-              <>
-                <div className="w-px h-4 bg-border/40 mx-1" />
-                <div className="flex items-center gap-1 flex-wrap">
-                  {graphEntities.slice(0, 5).map((entity) => (
-                    <Link
-                      key={entity.uid}
-                      href={`/atlas?centerEntity=${entity.uid}`}
-                      className="inline-flex items-center gap-1 text-[11px] text-muted-foreground/70 hover:text-foreground transition-colors px-2 py-0.5 rounded-md hover:bg-muted/50 border border-border/40 hover:border-primary/30"
-                    >
-                      <span
-                        className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                        style={{
-                          backgroundColor:
-                            ENTITY_TYPE_COLORS[entity.type?.toLowerCase()] ??
-                            "#6B7280",
-                        }}
-                      />
-                      {entity.name}
-                    </Link>
-                  ))}
-                  {graphEntities.length > 1 && (
-                    <Link
-                      href={`/atlas?entities=${graphEntities.map((e) => e.uid).join(",")}`}
-                      className="inline-flex items-center gap-1 text-[11px] text-primary/70 hover:text-primary transition-colors px-2 py-0.5 rounded-md hover:bg-primary/5 border border-primary/20 hover:border-primary/40"
-                    >
-                      <Icon name="Globe" className="h-3 w-3" />
-                      View all in Atlas
-                    </Link>
-                  )}
-                </div>
-              </>
             )}
           </div>
         )}

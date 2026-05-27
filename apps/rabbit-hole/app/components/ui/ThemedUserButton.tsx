@@ -13,7 +13,7 @@ interface ThemedUserButtonProps {
  * Simple avatar placeholder replacing Clerk's UserButton.
  */
 export function ThemedUserButton({
-  afterSignOutUrl = "/atlas",
+  afterSignOutUrl = "/",
   className = "",
 }: ThemedUserButtonProps) {
   return (
