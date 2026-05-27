@@ -11,13 +11,20 @@ export class MinioService {
   private bucketName = "evidence-raw";
 
   constructor() {
+    // minio-js validates `endPoint` as a bare hostname and rejects a
+    // colon-suffixed value ("Invalid endPoint : minio:9000"). Common env
+    // conventions (and this repo's docker-compose) set MINIO_ENDPOINT to a
+    // host:port or a full URL, so strip the scheme and split off any port.
+    // An explicit MINIO_PORT wins; otherwise fall back to a port embedded in
+    // the endpoint, then 9000. (#288)
+    const rawEndpoint = (process.env.MINIO_ENDPOINT || "localhost")
+      .replace("http://", "")
+      .replace("https://", "");
+    const [host, portFromEndpoint] = rawEndpoint.split(":");
+
     this.client = new Client({
-      endPoint:
-        process.env.MINIO_ENDPOINT?.replace("http://", "").replace(
-          "https://",
-          ""
-        ) || "localhost",
-      port: parseInt(process.env.MINIO_PORT || "9000"),
+      endPoint: host || "localhost",
+      port: parseInt(process.env.MINIO_PORT || portFromEndpoint || "9000", 10),
       useSSL: process.env.MINIO_USE_SSL === "true",
       accessKey: process.env.MINIO_ACCESS_KEY || "minio",
       secretKey: process.env.MINIO_SECRET_KEY || "",
