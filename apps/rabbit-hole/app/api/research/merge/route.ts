@@ -10,7 +10,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getGlobalNeo4jClient } from "@protolabsai/database";
 import { convertAllNeo4jParams } from "@protolabsai/utils";
 
-import type { ResearchBundle } from "../../../research/lib/bundle-validator";
+import type { ResearchBundle } from "../../../lib/bundle-validator";
 
 interface MergeResult {
   success: boolean;

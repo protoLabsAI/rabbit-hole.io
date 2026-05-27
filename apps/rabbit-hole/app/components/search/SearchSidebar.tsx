@@ -7,12 +7,7 @@ import { Icon } from "@protolabsai/icon-system";
 
 import type { SearchSession } from "../../hooks/useSearchSessions";
 
-const NAV_LINKS = [
-  { href: "/", icon: "Search", label: "Search" },
-  { href: "/atlas", icon: "Network", label: "Atlas" },
-  { href: "/research", icon: "FlaskConical", label: "Research" },
-  { href: "/evidence", icon: "FileStack", label: "Evidence" },
-] as const;
+const NAV_LINKS = [{ href: "/", icon: "Search", label: "Search" }] as const;
 
 interface SearchSidebarProps {
   sessions: SearchSession[];

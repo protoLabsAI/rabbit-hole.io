@@ -149,26 +149,6 @@ export function GlobalUserMenu({ className = "" }: GlobalUserMenuProps) {
           </DropdownMenuLabel>
 
           <DropdownMenuItem asChild>
-            <Link href="/atlas" className="cursor-pointer">
-              <Icon name="network" size={14} className="mr-2" />
-              Atlas
-              {pathname === "/atlas" && (
-                <span className="ml-auto text-xs text-primary">•</span>
-              )}
-            </Link>
-          </DropdownMenuItem>
-
-          <DropdownMenuItem asChild>
-            <Link href="/research" className="cursor-pointer">
-              <Icon name="edit" size={14} className="mr-2" />
-              Research
-              {pathname === "/research" && (
-                <span className="ml-auto text-xs text-primary">•</span>
-              )}
-            </Link>
-          </DropdownMenuItem>
-
-          <DropdownMenuItem asChild>
             <Link href="/playground" className="cursor-pointer">
               <Icon name="box" size={14} className="mr-2" />
               Playground

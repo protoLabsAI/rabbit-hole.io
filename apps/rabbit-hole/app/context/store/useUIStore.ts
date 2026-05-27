@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
 // Import types from the existing UIContext
-import type { ResearchBundle } from "../../research/lib/bundle-validator";
+import type { ResearchBundle } from "../../lib/bundle-validator";
 import type { UIState } from "../types";
 
 // Context Menu types (from context menu migration)
