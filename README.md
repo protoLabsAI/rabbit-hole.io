@@ -92,6 +92,20 @@ Opens on `http://localhost:3399`. You still need a Postgres + MinIO instance rea
 
 > The HTTP MCP server and standalone A2A endpoint from earlier versions are retired — fleet agents use the `rh` CLI instead.
 
+## Teach your agent to use it (skill)
+
+This repo ships a Claude **skill** at [`.claude/skills/rabbit-hole/`](./.claude/skills/rabbit-hole/SKILL.md) that teaches an agent how to drive `rh` — when to `search` vs `recall`, how to `ingest` and `research`, output shapes, and config. Load it into your own agent by copying the folder into your project or user skills dir:
+
+```bash
+# project-scoped (this repo already has it)
+cp -r .claude/skills/rabbit-hole <your-project>/.claude/skills/
+
+# or user-scoped, available everywhere
+cp -r .claude/skills/rabbit-hole ~/.claude/skills/
+```
+
+It loads automatically when the agent needs web/corpus search, research, or document ingestion (and `rh` is on PATH).
+
 ## License
 
 Apache 2.0 — see [LICENSE](./LICENSE).

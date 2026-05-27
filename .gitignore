@@ -103,8 +103,9 @@ apps/builder/.clerk/.tmp/
 *storybook.log
 storybook-static
 .worktrees/
-# Claude Code session state
-.claude/
+# Claude Code session state (but ship the bundled agent skills)
+.claude/*
+!.claude/skills/
 # Automaker — track project config, ignore runtime state
 .automaker/*
 !.automaker/spec.md
