@@ -1,5 +1,12 @@
 # @protolabsai/job-processor
 
+## 0.1.7
+
+### Patch Changes
+
+- Updated dependencies [3a92c0f]
+  - @protolabsai/llm-providers@0.2.0
+
 ## 0.1.6
 
 ### Patch Changes

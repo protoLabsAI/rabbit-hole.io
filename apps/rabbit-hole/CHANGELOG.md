@@ -1,5 +1,14 @@
 # @protolabsai/rabbit-hole
 
+## 0.4.3
+
+### Patch Changes
+
+- Updated dependencies [3a92c0f]
+  - @protolabsai/llm-providers@0.2.0
+  - @protolabsai/llm-tools@0.1.8
+  - @protolabsai/research-middleware@0.1.1
+
 ## 0.4.2
 
 ### Patch Changes
