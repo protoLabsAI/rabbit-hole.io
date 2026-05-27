@@ -184,7 +184,10 @@ describe("POST /ingest", () => {
     expect(res.status).toBe(202);
     const json = res.json();
     expect(json.success).toBe(true);
-    expect(json.jobId).toBe("mock-job-id");
+    // The response echoes the caller's jobId; Sidequest's internal id is
+    // surfaced separately as sidequestId. (#289)
+    expect(json.jobId).toBe("job-abc-123");
+    expect(json.sidequestId).toBe("mock-job-id");
   });
 
   it("returns 400 when jobId is missing", async () => {

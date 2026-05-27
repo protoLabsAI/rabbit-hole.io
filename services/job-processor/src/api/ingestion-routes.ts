@@ -57,11 +57,16 @@ export async function handleIngestionRequest(
         .queue("media-ingestion")
         .enqueue(body as unknown as IngestionJobData);
 
+      // Echo back the caller's jobId — that's the id the caller tracks and the
+      // one carried through the job payload (IngestionJobData.jobId). job.id is
+      // Sidequest's internal auto-increment (process-lifetime, collides across
+      // restarts/replicas); surface it separately for correlation only. (#289)
       res.writeHead(202, { "Content-Type": "application/json" });
       res.end(
         JSON.stringify({
           success: true,
-          jobId: job.id,
+          jobId: body.jobId,
+          sidequestId: job.id,
           queue: "media-ingestion",
         })
       );
