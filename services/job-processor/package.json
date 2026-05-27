@@ -12,6 +12,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@mozilla/readability": "^0.6.0",
     "@protolabsai/database": "workspace:*",
     "@protolabsai/llm-providers": "workspace:*",
     "@protolabsai/sidequest-utils": "workspace:*",
@@ -20,12 +21,14 @@
     "@protolabsai/vector": "workspace:*",
     "@sidequest/postgres-backend": "1.7.1",
     "busboy": "^1.6.0",
+    "jsdom": "^29.1.1",
     "mammoth": "^1.11.0",
     "sidequest": "1.7.1",
     "unpdf": "^1.4.0"
   },
   "devDependencies": {
     "@types/busboy": "^1.5.4",
+    "@types/jsdom": "^21.1.7",
     "@types/node": "^22.16.5",
     "tsx": "^4.20.5",
     "typescript": "^5.5.4"

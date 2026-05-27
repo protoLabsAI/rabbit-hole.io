@@ -6,6 +6,9 @@
  * <meta> tags as metadata.
  */
 
+import { Readability } from "@mozilla/readability";
+import { JSDOM } from "jsdom";
+
 import type {
   ExtractionResult,
   IngestSource,
@@ -84,6 +87,31 @@ function stripHtml(html: string): string {
   );
 }
 
+/**
+ * Extract the main article text via Mozilla Readability, dropping page chrome
+ * (nav, headers, footers, sidebars, reference lists). Returns null when the
+ * page isn't article-like or parsing fails, so the caller can fall back to the
+ * tag-stripping path. Real pages wrap chrome in div+class, not semantic tags,
+ * so a regex strip alone leaves it in — Readability is what keeps the corpus
+ * (and `rh recall`) free of boilerplate.
+ */
+function extractReadable(
+  html: string,
+  url?: string
+): { text: string; title?: string } | null {
+  try {
+    const dom = new JSDOM(html, url ? { url } : undefined);
+    const article = new Readability(dom.window.document).parse();
+    const text = article?.textContent?.trim() ?? "";
+    // Require a non-trivial amount of text — short results usually mean
+    // Readability bailed (login walls, JS-rendered pages, fragments).
+    if (text.length < 200) return null;
+    return { text, title: article?.title?.trim() || undefined };
+  } catch {
+    return null;
+  }
+}
+
 // ==================== HtmlAdapter ====================
 
 export class HtmlAdapter implements MediaAdapter {
@@ -95,9 +123,17 @@ export class HtmlAdapter implements MediaAdapter {
   async extract(source: IngestSource): Promise<ExtractionResult> {
     const html = await this.readText(source);
 
-    const title = extractTitle(html);
     const metaTags = extractMetaTags(html);
-    const text = stripHtml(html);
+
+    // Prefer Readability's main-content extraction; fall back to tag-stripping
+    // for non-article pages or parse failures.
+    const readable = extractReadable(
+      html,
+      source.type === "url" ? source.url : undefined
+    );
+    const text = readable?.text ?? stripHtml(html);
+    const title = readable?.title ?? extractTitle(html);
+    const extractedVia = readable ? "readability" : "striphtml";
 
     const words = text.trim() === "" ? [] : text.trim().split(/\s+/);
 
@@ -107,6 +143,7 @@ export class HtmlAdapter implements MediaAdapter {
         ...(title !== undefined ? { title } : {}),
         metaTags,
         wordCount: words.length,
+        extractedVia,
         mediaType: source.mediaType ?? "text/html",
         ...(source.type === "file" && source.fileName
           ? { fileName: source.fileName }

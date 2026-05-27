@@ -309,7 +309,11 @@ describe("GET /ingest/:jobId/result", () => {
     const res = await httpGet(`${baseUrl}/ingest/job-abc/result`);
     expect(res.status).toBe(200);
 
-    const json = res.json();
+    const json = res.json<{
+      jobId: string;
+      status: string;
+      result: { text: string };
+    }>();
     expect(json.jobId).toBe("job-abc");
     expect(json.status).toBe("completed");
     expect(json.result.text).toBe("extracted");
@@ -347,7 +351,7 @@ describe("GET /ingest", () => {
     const res = await httpGet(`${baseUrl}/ingest`);
     expect(res.status).toBe(200);
 
-    const json = res.json();
+    const json = res.json<{ jobs: Array<{ jobId: string; status: string }> }>();
     expect(Array.isArray(json.jobs)).toBe(true);
     expect(json.jobs[0].jobId).toBe("j1");
     expect(json.jobs[0].status).toBe("completed");
