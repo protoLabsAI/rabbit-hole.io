@@ -170,7 +170,16 @@ function toSerializedSource(
   mediaTypeHint?: string
 ): SerializedIngestSource {
   if (/^https?:\/\//.test(source)) {
-    return { type: "url", url: source, mediaType: mediaTypeHint };
+    // Default web URLs to text/html — the job-processor's HtmlAdapter only
+    // matches sources whose mediaType starts with "text/html", and most
+    // ingested URLs are web pages. Override with --media-type for PDFs,
+    // audio, etc. (e.g. application/pdf for a .pdf link).
+    let mediaType = mediaTypeHint;
+    if (!mediaType) {
+      const ext = source.split("?")[0].split(".").pop()?.toLowerCase() ?? "";
+      mediaType = MIME[ext as keyof typeof MIME] ?? "text/html";
+    }
+    return { type: "url", url: source, mediaType };
   }
   const buf = readFileSync(source);
   const fileName = basename(source);
