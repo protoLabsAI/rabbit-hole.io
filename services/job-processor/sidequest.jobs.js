@@ -12,6 +12,13 @@
  * @see https://docs.sidequestjs.com/jobs/manual-resolution
  */
 
+// Side-effect import: registers all media adapters (text/markdown/html/
+// audio/video) into the adapterRegistry singleton. Sidequest's worker
+// thread imports THIS file fresh, so without this the registry is empty in
+// the worker and MediaIngestionJob throws AdapterNotFoundError for every
+// source. Must run before any job executes.
+import "./dist/src/adapters/index.js";
+
 // Import all job classes from compiled output
 import { LangExtractJob } from "./dist/jobs/LangExtractJob.js";
 import { MediaIngestionJob } from "./dist/jobs/MediaIngestionJob.js";
