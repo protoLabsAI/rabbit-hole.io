@@ -95,14 +95,46 @@ function stripHtml(html: string): string {
  * so a regex strip alone leaves it in — Readability is what keeps the corpus
  * (and `rh recall`) free of boilerplate.
  */
+// Reference/citation/nav chrome that Readability otherwise keeps as article
+// body — bibliography lists are the main culprit, and their topically-worded
+// citation titles outrank real prose in corpus recall. Removed from the DOM
+// before extraction.
+const REFERENCE_SELECTORS = [
+  "sup.reference", // inline [1] markers
+  "ol.references",
+  ".references",
+  ".reflist",
+  ".mw-references-wrap", // Wikipedia bibliography
+  ".navbox",
+  ".mw-editsection",
+  ".citation",
+].join(",");
+
+/**
+ * Drop residual citation back-reference lines (Wikipedia renders reflist
+ * backlinks as `^ a b c …`) that survive DOM cleaning.
+ */
+function dropCitationLines(text: string): string {
+  return text
+    .split("\n")
+    .filter((line) => !/^\s*\^/.test(line))
+    .join("\n")
+    .trim();
+}
+
 function extractReadable(
   html: string,
   url?: string
 ): { text: string; title?: string } | null {
   try {
     const dom = new JSDOM(html, url ? { url } : undefined);
-    const article = new Readability(dom.window.document).parse();
-    const text = article?.textContent?.trim() ?? "";
+    const doc = dom.window.document;
+    // Strip reference/citation chrome before Readability so the corpus stores
+    // article prose, not bibliographies.
+    doc.querySelectorAll(REFERENCE_SELECTORS).forEach((el) => el.remove());
+
+    const article = new Readability(doc).parse();
+    const text = dropCitationLines(article?.textContent?.trim() ?? "");
     // Require a non-trivial amount of text — short results usually mean
     // Readability bailed (login walls, JS-rendered pages, fragments).
     if (text.length < 200) return null;

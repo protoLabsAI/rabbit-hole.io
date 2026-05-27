@@ -162,4 +162,51 @@ describe("HtmlAdapter", () => {
       expect(meta.byteSize).toBe(Buffer.from(content).length);
     });
   });
+
+  // Article-length pages go through Mozilla Readability, which drops nav/footer
+  // and (with our pre-cleaning) reference lists — so the corpus stores prose,
+  // not citation chrome. (#317 / #319)
+  describe("extract — Readability main content", () => {
+    const ARTICLE_HTML = `<!doctype html>
+<html><head><title>Understanding Widgets</title></head>
+<body>
+<nav><a href="/home">Home</a><a href="/about">About</a> Français Español</nav>
+<article>
+  <h1>Understanding Widgets</h1>
+  <p>Widgets are small interface components that reduce cognitive load and
+  improve clarity in dashboards. A well-designed widget surfaces a single
+  metric and avoids burying it under unrelated controls, which is the most
+  common failure mode in cluttered admin panels everywhere today.</p>
+  <p>Widget composition matters: small widgets compose into panels, and panels
+  compose into full dashboards. Keeping each widget focused lets teams
+  rearrange layouts without rewriting data plumbing, and keeps render cost
+  predictable across many concurrent dashboard views in production.</p>
+  <p>Lifecycle is the third consideration. A widget should fetch lazily, cache
+  sensibly, and degrade gracefully when its data source is slow, otherwise one
+  stalled query can block an entire dashboard from painting on screen.</p>
+  <p>Taken together, focus, composition, and lifecycle are the properties that
+  separate a maintainable widget system from an unmaintainable one over the
+  long life of a real product used by real teams.</p>
+  <ol class="references">
+    <li id="cite_note-1">^ "Why dashboards mislead". Journal of Confusion. 2024.</li>
+    <li id="cite_note-2">^ a b c "The hidden cost of clutter". Noise Quarterly. 2025.</li>
+  </ol>
+</article>
+<footer>© 2026 Widget Co. All rights reserved.</footer>
+</body></html>`;
+
+    it("keeps article prose and drops nav/footer + the reference list", async () => {
+      const result = await adapter.extract(makeFileSource(ARTICLE_HTML));
+
+      // Prose retained, Readability path taken.
+      expect(result.text).toContain("Widgets are small interface components");
+      expect(result.text).toContain("Lifecycle is the third consideration");
+      expect(result.metadata.extractedVia).toBe("readability");
+
+      // Reference list, citation backlinks, and footer chrome removed.
+      expect(result.text).not.toMatch(/Journal of Confusion|Noise Quarterly/);
+      expect(result.text).not.toMatch(/^\s*\^/m);
+      expect(result.text).not.toContain("All rights reserved");
+    });
+  });
 });
