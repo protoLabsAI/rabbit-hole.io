@@ -9,6 +9,9 @@ import http from "http";
 
 import { Sidequest } from "sidequest";
 
+import { getGlobalPostgresPool } from "@protolabsai/database";
+import { searchCorpus } from "@protolabsai/vector";
+
 import { TextExtractionJob } from "./jobs/TextExtractionJob.js";
 import { handleIngestionRequest } from "./src/api/ingestion-routes.js";
 
@@ -28,6 +31,38 @@ export function createAPIServer(port: number = 8680) {
     // Ingestion routes (POST /ingest, GET /ingest, GET /ingest/:jobId/stream)
     const handled = await handleIngestionRequest(req, res);
     if (handled) return;
+
+    // GET /search?q=<query>&topK=<n> — corpus search over ingested docs
+    // (pgvector cosine). Backs `rh recall` + the search UI.
+    if (req.method === "GET" && req.url?.startsWith("/search")) {
+      try {
+        const url = new URL(req.url, "http://localhost");
+        const q = url.searchParams.get("q")?.trim();
+        if (!q) {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "missing required query param: q" }));
+          return;
+        }
+        const topKRaw = parseInt(url.searchParams.get("topK") || "8", 10);
+        const topK = Number.isFinite(topKRaw)
+          ? Math.min(Math.max(topKRaw, 1), 50)
+          : 8;
+
+        const hits = await searchCorpus(getGlobalPostgresPool(), q, { topK });
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ query: q, count: hits.length, hits }));
+      } catch (error: any) {
+        console.error("❌ Corpus search failed:", error);
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({
+            error: "corpus search failed",
+            message: error.message,
+          })
+        );
+      }
+      return;
+    }
 
     // POST /enqueue/text-extraction
     if (req.method === "POST" && req.url === "/enqueue/text-extraction") {

@@ -1,12 +1,23 @@
 /**
- * Embedding helper — OpenAI-compatible /v1/embeddings endpoint
+ * Embedding helper — OpenAI-compatible /v1/embeddings endpoint.
  *
- * Works with Ollama (http://protolabs:11434) and any OpenAI-compatible
- * embedding server. Uses qwen3-embedding:0.6b (1024 dims) by default.
+ * Routes through the protoLabs LLM gateway (LiteLLM) by default, model
+ * `qwen3-embedding` (1024 dims). The old Ollama endpoint on ava was retired
+ * with the ava-evict; embeddings now go through the gateway so quota +
+ * observability land in Langfuse.
+ *
+ * Config (all optional — sensible gateway defaults):
+ *   EMBED_BASE_URL  (or OPENAI_BASE_URL) — default http://gateway:4000/v1
+ *   EMBED_API_KEY   (or OPENAI_API_KEY)  — gateway bearer token
+ *   EMBED_MODEL                          — default qwen3-embedding
  */
 
-const OLLAMA_ENDPOINT = process.env.OLLAMA_ENDPOINT || "http://localhost:11434";
-const EMBED_MODEL = process.env.EMBED_MODEL || "qwen3-embedding:0.6b";
+const BASE_URL =
+  process.env.EMBED_BASE_URL ||
+  process.env.OPENAI_BASE_URL ||
+  "http://gateway:4000/v1";
+const API_KEY = process.env.EMBED_API_KEY || process.env.OPENAI_API_KEY || "";
+const EMBED_MODEL = process.env.EMBED_MODEL || "qwen3-embedding";
 
 interface OpenAIEmbedResponse {
   object: "list";
@@ -16,9 +27,15 @@ interface OpenAIEmbedResponse {
 export async function embed(texts: string[]): Promise<number[][]> {
   if (texts.length === 0) return [];
 
-  const res = await fetch(`${OLLAMA_ENDPOINT}/v1/embeddings`, {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  // The gateway requires bearer auth; a bare Ollama server ignores it.
+  if (API_KEY) headers["Authorization"] = `Bearer ${API_KEY}`;
+
+  const res = await fetch(`${BASE_URL}/embeddings`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify({ model: EMBED_MODEL, input: texts }),
   });
 
