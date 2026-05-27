@@ -1,6 +1,7 @@
 {
   "name": "@protolabsai/utils",
   "version": "0.3.0",
+  "private": true,
   "description": "Design token utilities and color manipulation tools for Proto project",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

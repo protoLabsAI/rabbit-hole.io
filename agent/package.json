@@ -1,6 +1,7 @@
 {
   "name": "@protolabsai/agent",
   "version": "0.2.0",
+  "private": true,
   "type": "module",
   "description": "",
   "main": "index.js",
