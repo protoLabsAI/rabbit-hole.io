@@ -1,0 +1,73 @@
+name: protoPatch review
+
+# Advisory AI code review on every PR, using protoPatch (the studio's
+# clawpatch fork) with the `gateway` provider → our LiteLLM gateway.
+# Replaces CodeRabbit (removed as a required check 2026-05-27 after the
+# org ran out of CodeRabbit credits). Reviews only what the branch changed
+# (`--since origin/main`), writes a Markdown report, posts it as a PR
+# comment, and appends a summary to the run.
+#
+# Non-blocking by design: findings inform, they don't gate the merge (the
+# required gate is `Validate Code` in ci.yml). `|| true` keeps a provider
+# hiccup from failing the PR.
+#
+# Requires repo secret GATEWAY_API_KEY (LiteLLM gateway key, mirrored from
+# Infisical ai project). Set 2026-05-27.
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: protopatch-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    name: protoPatch review
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          # Full history so `--since origin/main` has a base to diff against.
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+
+      - name: Install protoPatch
+        run: pnpm add -g @protolabsai/protopatch
+
+      - name: Review changed code
+        env:
+          GATEWAY_API_KEY: ${{ secrets.GATEWAY_API_KEY }}
+          OPENAI_BASE_URL: https://api.proto-labs.ai/v1
+        run: |
+          clawpatch ci \
+            --provider gateway \
+            --model protolabs/smart \
+            --since origin/main \
+            --limit 20 --jobs 4 \
+            --output clawpatch-report.md || true
+
+      - name: Post report as PR comment
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -s clawpatch-report.md ]; then
+            gh pr comment "${{ github.event.pull_request.number }}" --body-file clawpatch-report.md
+          else
+            echo "protoPatch: no findings on the changed files." >> "$GITHUB_STEP_SUMMARY"
+          fi
