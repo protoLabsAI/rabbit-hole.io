@@ -1,44 +1,58 @@
 # @protolabsai/rabbit-hole-cli
 
-`rh` — Rabbit Hole CLI. Search the web, queue media to the processor, run
-deep research. Designed to be shelled out to by fleet agents (protoMaker,
-workstacean) instead of a long-lived MCP transport.
+`rh` — Rabbit Hole CLI. Search the web, search your ingested corpus, queue
+media to the processor, and run deep research. Designed to be shelled out to
+by fleet agents (protoMaker, workstacean) instead of a long-lived MCP
+transport.
 
 ## Install
 
 ```bash
-# from the monorepo, after `pnpm build`:
-npm link --workspaces --include-workspace-root --workspace=@protolabsai/rabbit-hole-cli
+# published to npm:
+npm i -g @protolabsai/rabbit-hole-cli
+rh --help
+```
 
-# in an agent container's Dockerfile, copy the build:
-COPY --from=cli-build /app/packages/cli/dist /opt/rh/dist
-COPY --from=cli-build /app/packages/cli/node_modules /opt/rh/node_modules
-RUN ln -s /opt/rh/dist/index.js /usr/local/bin/rh && chmod +x /opt/rh/dist/index.js
+The build is a self-contained single file (deps are bundled), so an agent
+image can also just drop in the binary — no `node_modules` alongside it:
+
+```dockerfile
+COPY --from=cli-build /app/packages/cli/dist/index.js /opt/rh/rh.mjs
+RUN ln -s /opt/rh/rh.mjs /usr/local/bin/rh && chmod +x /opt/rh/rh.mjs
 ```
 
 ## Commands
 
 ```
-rh search "<query>" [--text] [-m 5]
+rh search  "<query>"  [--text] [-m 5]
+rh recall  "<query>"  [--text] [-k 8]
 rh research "<topic>" [-d 2] [--max-results 4]
-rh ingest <path|url> [-t paper|audio|url|…] [--wait]
-rh status <job-id> [--wait]
+rh ingest  <path|url> [-m <mime-type>] [--wait]
+rh status  <job-id>   [--wait] [--result]
 ```
 
-`rh search` returns JSON by default (intended for agent consumption);
-add `--text` for a markdown human view.
+All commands emit JSON by default (for agent consumption); pass `--text` (where
+available) for a human-readable markdown view. Log lines go to stderr so JSON /
+reports on stdout pipe cleanly.
 
-`rh research` runs a 3-stage loop: LLM plans 2–N sub-queries, Tavily
-searches each, LLM synthesizes a markdown report with inline `[n]`
-citations. Output is markdown on stdout. Log lines go to stderr so the
-report can be piped into a file cleanly.
-
-`rh ingest` POSTs to `{job_processor_url}/jobs/ingest`. Local files are
-read + uploaded; URLs are passed through and fetched server-side. Returns
-the job document. With `--wait`, polls every 2s until terminal state.
-
-`rh status` GETs `{job_processor_url}/jobs/{id}`. With `--wait`, polls
-until terminal state.
+- **`rh search`** — web search. Prefers our in-house **SearXNG**
+  (`RH_SEARXNG_ENDPOINT`); falls back to **Tavily** when SearXNG is unset /
+  unreachable and a Tavily key is present.
+- **`rh recall`** — vector search over your ingested files (the pgvector
+  `corpus_chunks` corpus, qwen3 1024-dim embeddings). Embeds the query via the
+  gateway and returns the top-`k` cosine matches. Hits
+  `GET {job_processor_url}/search`.
+- **`rh research`** — a 3-stage loop: the LLM plans `--depth` sub-queries, each
+  is searched (SearXNG/Tavily), then the LLM synthesizes a markdown report with
+  inline `[n]` citations.
+- **`rh ingest`** — `POST {job_processor_url}/ingest`. Local files are read +
+  uploaded; URLs are fetched server-side. Returns `{ jobId, sidequestId,
+  queue }` where `jobId` is the caller-tracked id. With `--wait`, polls
+  `GET /ingest/:id/status` every 2s until a terminal state (`completed` /
+  `failed`), then exits non-zero on failure.
+- **`rh status`** — `GET {job_processor_url}/ingest/:id/status`. With `--wait`,
+  polls until terminal; with `--result`, also fetches
+  `GET /ingest/:id/result` (the stored extraction) when `status=completed`.
 
 ## Config
 
@@ -53,29 +67,30 @@ Sources, in priority order:
 
 | Var | Default | Purpose |
 | --- | --- | --- |
-| `RH_JOB_PROCESSOR_URL` | `http://job-processor:8680` | `ingest` / `status` target |
-| `RH_TAVILY_API_KEY` (or `TAVILY_API_KEY`) | _required for search/research_ | Tavily auth |
-| `RH_LLM_BASE_URL` (or `OPENAI_BASE_URL`) | `http://gateway:4000/v1` | OpenAI-compat endpoint |
-| `RH_LLM_KEY` (or `OPENAI_API_KEY`) | _required for research_ | Gateway / OpenAI key |
-| `RH_LLM_MODEL` | `protolabs/smart` | Model for the research loop |
-| `RH_CONFIG_PATH` | `~/.config/rh/config.yaml` | Override config file location |
+| `RH_JOB_PROCESSOR_URL` | `http://job-processor:8680` | `ingest` / `status` / `recall` target |
+| `RH_SEARXNG_ENDPOINT` (or `SEARXNG_ENDPOINT`) | `http://searxng:8080` | in-house web search (preferred) |
+| `RH_TAVILY_API_KEY` (or `TAVILY_API_KEY`) | _optional_ | Tavily fallback when SearXNG is unavailable |
+| `RH_LLM_BASE_URL` (or `OPENAI_BASE_URL`) | `http://gateway:4000/v1` | OpenAI-compatible endpoint |
+| `RH_LLM_KEY` (or `OPENAI_API_KEY`) | _required for recall/research_ | gateway / OpenAI key |
+| `RH_LLM_MODEL` | `protolabs/smart` | model for research synthesis |
+| `RH_CONFIG_PATH` | `~/.config/rh/config.yaml` | override config file location |
 
 ### Config file format
 
 ```yaml
 # ~/.config/rh/config.yaml
 job_processor_url: http://job-processor:8680
-tavily_api_key: tvly-xxx
+searxng_endpoint: http://searxng:8080
+tavily_api_key: tvly-xxx          # optional fallback
 llm_base_url: http://gateway:4000/v1
 llm_key: sk-…
-llm_model: protolabs/fast
+llm_model: protolabs/smart
 ```
 
 ## Defaults assume docker-network deployment
 
-The bake-in defaults (`http://job-processor:8680`, `http://gateway:4000/v1`)
-work inside the `ai_default` Docker network on ava where the job-processor
-and LiteLLM gateway resolve as service hostnames. From outside the network,
-override the URLs via env or the config file.
-
-<!-- re-review nudge: CI green, scope-creep + changeset resolved on this branch -->
+The baked-in defaults (`http://job-processor:8680`, `http://searxng:8080`,
+`http://gateway:4000/v1`) resolve inside the `ai_default` Docker network where
+the job-processor, SearXNG, and LiteLLM gateway are reachable by service
+hostname. From outside the network, override the URLs via env or the config
+file.
