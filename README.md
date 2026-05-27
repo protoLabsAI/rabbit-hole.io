@@ -1,158 +1,84 @@
 # Rabbit Hole
 
-A self-growing knowledge graph search engine. Every search makes the graph smarter.
+> AI search you can self-host. Web + Wikipedia + your files, with a clean multi-protocol API.
 
-## What Is This?
+Apache 2.0 — run it yourself, plug in your own LLM key, no subscription.
 
-Rabbit Hole is an AI search engine backed by a living knowledge graph. When you search, the graph expands — new entities, relationships, and evidence are discovered and ingested in real-time. Upload documents and they become part of the knowledge base. Every piece of knowledge is traceable to its source.
+## What you get
 
-### Product Roadmap
+- Perplexity-style web search agent (Anthropic Claude or OpenAI GPT) with streaming answers and inline citations.
+- File / audio / video / PDF ingestion via the bundled job processor — uploaded media gets transcribed, parsed, and fed into the search context.
+- The same search agent exposed over a chat UI **and** an OpenAI-compatible API, an MCP server, an A2A endpoint, and a CLI (some surfaces still in progress — see [Roadmap](#roadmap)).
+- Optional Langfuse tracing.
 
-| Phase | Product | Status |
-|-------|---------|--------|
-| **1** | **Search Engine** (`/`) — Perplexity-style AI search. Self-growing knowledge graph. | Active |
-| **2** | **3D Atlas** — 3D graph visualization for millions of nodes and communities. | In Progress |
-| **3** | **Research App** — Downloadable self-hostable app (Tauri/Electron) with full research workspace. | Planned |
+The full graph / research workspace from earlier versions is being rebuilt. They're not part of the launch surface and are gated out of production builds; set `NEXT_PUBLIC_ENABLE_RESEARCH_ATLAS=true` if you want to poke at them in dev.
 
-### Current Surfaces
+## Quick start (self-host)
 
-| Surface | Description |
-|---------|-------------|
-| **Search** (`/`) | AI search engine. Graph search + web research + streaming answers + user-triggered KG ingest + deep research mode. |
-| **Atlas** (`/atlas`) | 3D knowledge graph visualization (react-force-graph-3d) |
-| **Research** (`/research`) | Research workspace (React Flow canvas, entity cards, enrichment wizards). |
-
-## Quick Start
+You need Docker with the Compose plugin and an LLM provider key.
 
 ```bash
 git clone https://github.com/protoLabsAI/rabbit-hole.io.git
 cd rabbit-hole.io
+cp .env.example .env
+# edit .env — set ANTHROPIC_API_KEY (or OPENAI_API_KEY)
+docker compose up -d
+```
+
+Open `http://localhost:3399`.
+
+What's running:
+- `rabbit-hole` — the Next.js search app
+- `job-processor` — file/audio/video ingest pipeline
+- `postgres` + `postgres-jobs` — sessions and the job queue
+- `minio` + `minio-init` — object storage for uploaded files
+
+What's **not** running by default:
+- A web search backend. Without `SEARXNG_ENDPOINT` set, the agent only has Wikipedia. Run [SearXNG](https://docs.searxng.org/admin/installation-docker.html) on your network and point `SEARXNG_ENDPOINT` at it.
+
+## Configuration
+
+All env vars live in `.env`. The required ones:
+
+```dotenv
+ANTHROPIC_API_KEY=...        # one of these is required
+OPENAI_API_KEY=...
+
+POSTGRES_PASSWORD=...        # any string; defaults work for local
+POSTGRES_JOB_PASSWORD=...
+MINIO_ROOT_PASSWORD=...
+```
+
+Recommended additions:
+
+```dotenv
+SEARXNG_ENDPOINT=http://searxng:8080   # enables web search beyond Wikipedia
+GROQ_API_KEY=...                       # free Whisper transcription for audio uploads
+```
+
+See [`.env.example`](./.env.example) for the full list.
+
+## Local dev (without Docker)
+
+```bash
 pnpm install
-
-# Start infrastructure
-docker compose -f docker-compose.research.yml up -d
-
-# Start Next.js
-pnpm dev
-
-# Open search engine
-open http://localhost:3399
+pnpm run dev:rabbit-hole
 ```
 
-### Services
+Opens on `http://localhost:3399`. You still need a Postgres + MinIO instance reachable; the `docker-compose.yml` will give you those and you can run the Next.js app on the host.
 
-| Service | Port | Purpose |
-|---------|------|---------|
-| Next.js | 3399 | Web application + search engine |
-| Neo4j Browser | 7474 | Graph database UI |
-| Neo4j Bolt | 7687 | Graph database protocol |
-| MinIO Console | 9001 | Object storage UI |
-| Job Processor | 8680 | Media processing + job queue |
-| LangGraph Agent | 8123 | AI research agent |
+## Roadmap
 
-## How Search Works
-
-### Quick Search (`POST /api/chat`)
-
-```
-User query (+ optional file attachments)
-    │
-    ├─ searchGraph: Neo4j full-text search (sub-5ms via Lucene index)
-    ├─ searchWeb: Tavily advanced search (if graph is thin)
-    ├─ searchWikipedia: Wikipedia article fetch (for foundational context)
-    ├─ AI SDK v6 streamText with tool loop (up to 5 steps)
-    └─ Stream answer with inline citations
-```
-
-Users can click **"Add to Knowledge Graph"** on any answer to extract entities and ingest them — graph growth is user-controlled, not automatic.
-
-### Deep Research (`POST /api/research/deep`)
-
-```
-User query
-    │
-    ├─ SCOPE: generateObject → 3-6 research dimensions (structured output)
-    ├─ PLAN REVIEW: Show dimensions to user (auto-continues)
-    ├─ RESEARCH LOOP (per dimension, up to 3 iterations):
-    │   ├─ searchGraph + searchWeb + searchWikipedia (with retry)
-    │   ├─ Compress findings → extract key finding
-    │   └─ EVALUATE: LLM checks for coverage gaps → loop if gaps found
-    ├─ SYNTHESIS: streamText → report with inline citations [1][2]
-    └─ Stream report chunks to UI as they're generated
-```
-
-Three-panel UI: Activity feed (left) | Report with ToC + citations (center) | Source cards panel (right). Cancel button preserves partial reports.
-
-Sessions are stored locally and accessible via URL (`?s=<id>`). Conversation history provides context for follow-up questions.
-
-## Architecture
-
-```
-rabbit-hole.io/
-├── apps/rabbit-hole/          # Next.js application
-│   ├── app/                   # Search engine landing page
-│   ├── app/atlas/             # 3D knowledge graph visualization
-│   ├── app/research/          # Research workspace
-│   ├── app/evidence/          # Evidence management
-│   ├── app/lib/search.ts      # Shared search utilities (graph, web, wiki)
-│   ├── app/api/chat/          # AI SDK v6 agentic search + ingest
-│   ├── app/api/research/deep/ # Deep research pipeline (SSE + cancel)
-│   ├── app/api/entity-search/ # Full-text entity lookup
-│   └── app/api/ingest-bundle/ # Bundle ingestion
-├── packages/
-│   ├── @protolabsai/types               # Zod schemas, bundle format, entity types
-│   ├── @protolabsai/database            # Neo4j + PostgreSQL clients
-│   ├── @protolabsai/mcp-server          # MCP tools (stdio + HTTP, port 3398)
-│   ├── @protolabsai/research-middleware # AI SDK middleware chain (EntityMemory, Reflection, etc.)
-│   ├── @protolabsai/llm-providers       # LLM abstraction (Claude, GPT, Gemini)
-│   ├── @protolabsai/ui                  # Component library (atoms/molecules/organisms)
-│   └── @protolabsai/utils               # Graph algorithms, atlas config
-├── services/job-processor/    # Media ingestion + job queue (Sidequest)
-├── agent/                     # LangGraph agent server
-├── migrations/                # Neo4j schema migrations
-├── docs/                      # Technical documentation
-└── custom-domains/            # Entity type definitions
-```
-
-## MCP Integration
-
-The `@protolabsai/mcp-server` provides tools for Claude Code and other MCP clients:
-
-| Tool | Purpose |
-|------|---------|
-| `graph_search` | Search the knowledge graph for existing entities |
-| `research_entity` | Full research pipeline: search → extract → validate → persist |
-| `extract_entities` | LLM-based entity extraction from text |
-| `ingest_bundle` | Persist a bundle into Neo4j |
-| `validate_bundle` | Validate bundle structure |
-| `wikipedia_search` | Fetch Wikipedia articles |
-| `tavily_search` | Premium web search |
-| `web_search` | SearXNG self-hosted web search |
-| `ingest_url` | Fetch and ingest a URL into the knowledge graph |
-| `ingest_file` | Upload and ingest a local file |
-| `transcribe_audio` | Transcribe audio and ingest as evidence |
-| `extract_pdf` | Extract text from a PDF and ingest |
-
-## Tech Stack
-
-- **Search**: Neo4j full-text (Lucene), Tavily, Wikipedia, DuckDuckGo
-- **Graph database**: Neo4j 5 with APOC
-- **AI**: AI SDK v6 (`streamText`, `generateObject`), Claude via `@protolabsai/llm-providers`, LangGraph agents
-- **Framework**: Next.js 15, React 19, TypeScript
-- **UI**: Tailwind CSS, @protolabsai/ui component library, Lucide icons
-- **Media**: Job processor with adapters for PDF, audio, video, text, HTML
-- **Storage**: PostgreSQL (Sidequest job queue), MinIO (S3-compatible)
-- **Monorepo**: pnpm workspaces + Turborepo
-
-## Documentation
-
-See [`docs/`](docs/) for detailed technical documentation:
-- [Search System](docs/architecture/search.md) — full pipeline, self-growing graph, scaling roadmap
-- [Database & Schema](docs/architecture/database.md) — Neo4j schema, entity model, indexes
-- [Entity Search API](docs/api/entity-search.md) — endpoint reference
-- [MCP Tools](docs/api/mcp-tools.md) — all MCP tool interfaces
-- [Migrations](docs/operations/migrations.md) — Neo4j migration runbook
+| Surface | Status |
+|---|---|
+| Web search UI (`/`) | shipping |
+| Self-host docker-compose | shipping |
+| OpenAI-compatible API (`/v1/chat/completions`) | in progress |
+| MCP server (web/wiki/file tools) | in progress |
+| A2A skill endpoint | in progress |
+| CLI (`npx rabbit-hole`) | in progress |
+| Stripe-paid hosted tier | in progress |
 
 ## License
 
-Private — all rights reserved.
+Apache 2.0 — see [LICENSE](./LICENSE).

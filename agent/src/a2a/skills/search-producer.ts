@@ -1,41 +1,47 @@
 /**
  * Search Producer — A2A skill: "search"
  *
- * Calls the rabbit-hole MCP server's `research_entity` tool (depth: "basic")
- * and formats the result as a structured markdown bundle for fleet agents.
+ * Calls the rabbit-hole web app's OpenAI-compatible chat-completions
+ * endpoint to run the search agent end-to-end (web + Wikipedia + LLM
+ * synthesis with inline citations) and streams the assistant's
+ * response text back to A2A clients.
  *
  * Env:
- *   RABBIT_HOLE_MCP_URL   — MCP HTTP server base URL (default http://localhost:3398)
- *   RABBIT_HOLE_MCP_TOKEN — Bearer token (optional in dev, required in prod)
+ *   RABBIT_HOLE_URL       — web app base URL (default http://rabbit-hole:3399)
+ *   RABBIT_HOLE_API_KEY   — Bearer token for the API (optional in dev)
  */
 
 import type { ProducerFn } from "../store/task-store.js";
 
-import { callMcpTool } from "./mcp-client.js";
+interface OpenAIStreamChunk {
+  choices?: Array<{
+    delta?: { content?: string };
+    finish_reason?: string | null;
+  }>;
+}
 
 export const searchProducer: ProducerFn = async (ctx, input) => {
-  const mcpUrl = process.env["RABBIT_HOLE_MCP_URL"] ?? "http://localhost:3398";
-  const token = process.env["RABBIT_HOLE_MCP_TOKEN"] ?? "";
+  const baseUrl = process.env["RABBIT_HOLE_URL"] ?? "http://rabbit-hole:3399";
+  const apiKey = process.env["RABBIT_HOLE_API_KEY"] ?? "";
 
-  let result: unknown;
+  let response: Response;
   try {
-    const mcpResult = await callMcpTool(
-      mcpUrl,
-      token,
-      "research_entity",
-      { query: input, depth: "basic", persist: true },
-      ctx.signal
+    response = await fetch(
+      `${baseUrl.replace(/\/$/, "")}/v1/chat/completions`,
+      {
+        method: "POST",
+        signal: ctx.signal,
+        headers: {
+          "Content-Type": "application/json",
+          ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
+        },
+        body: JSON.stringify({
+          model: "rabbit-hole",
+          messages: [{ role: "user", content: input }],
+          stream: true,
+        }),
+      }
     );
-
-    if (mcpResult.isError) {
-      ctx.fail({
-        code: -32603,
-        message: `research_entity returned an error: ${mcpResult.rawText}`,
-      });
-      return;
-    }
-
-    result = mcpResult.data;
   } catch (err) {
     if (ctx.signal.aborted) return;
     ctx.fail({
@@ -45,98 +51,61 @@ export const searchProducer: ProducerFn = async (ctx, input) => {
     return;
   }
 
-  if (ctx.signal.aborted) return;
+  if (!response.ok) {
+    const body = await response.text().catch(() => "");
+    ctx.fail({
+      code: -32603,
+      message: `chat completions returned ${response.status}: ${body.slice(0, 200)}`,
+    });
+    return;
+  }
 
-  ctx.pushText(formatResearchBundle(result, input));
+  if (!response.body) {
+    ctx.fail({ code: -32603, message: "chat completions returned no body" });
+    return;
+  }
+
+  // Parse SSE stream. Each event is `data: {json}\n\n` with `data: [DONE]` terminator.
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  try {
+    while (true) {
+      if (ctx.signal.aborted) return;
+      const { value, done } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      const events = buffer.split("\n\n");
+      buffer = events.pop() ?? "";
+
+      for (const event of events) {
+        const line = event.trim();
+        if (!line.startsWith("data:")) continue;
+        const payload = line.slice(5).trim();
+        if (payload === "[DONE]") {
+          ctx.finish();
+          return;
+        }
+        let chunk: OpenAIStreamChunk;
+        try {
+          chunk = JSON.parse(payload) as OpenAIStreamChunk;
+        } catch {
+          continue;
+        }
+        const delta = chunk.choices?.[0]?.delta?.content;
+        if (delta) ctx.pushText(delta);
+      }
+    }
+  } catch (err) {
+    if (ctx.signal.aborted) return;
+    ctx.fail({
+      code: -32603,
+      message: err instanceof Error ? err.message : String(err),
+    });
+    return;
+  }
+
   ctx.finish();
 };
-
-// ── Formatting ───────────────────────────────────────────────────────
-
-interface ResearchEntityResult {
-  wikipedia?: { title?: string; text?: string; url?: string; error?: string };
-  webSearch?: {
-    results?: Array<{ title?: string; url?: string; snippet?: string }>;
-  };
-  extraction?: {
-    entities?: Array<{
-      name?: string;
-      type?: string;
-      aliases?: string[];
-      properties?: Record<string, unknown>;
-    }>;
-  };
-  bundle?: {
-    entities?: Array<{
-      name?: string;
-      type?: string;
-      uid?: string;
-    }>;
-  };
-  evidence?: Array<{ title?: string; url?: string; publisher?: string }>;
-  error?: string;
-}
-
-function formatResearchBundle(raw: unknown, query: string): string {
-  const r = (raw ?? {}) as ResearchEntityResult;
-  const lines: string[] = [];
-
-  lines.push(`# Search: ${query}\n`);
-
-  // ── Wikipedia ──────────────────────────────────────────────────────
-  if (r.wikipedia && !r.wikipedia.error) {
-    const title = r.wikipedia.title ?? query;
-    const text = r.wikipedia.text ?? "";
-    lines.push(`## ${title}\n`);
-    if (text) {
-      // First 600 chars — overview paragraph
-      lines.push(text.slice(0, 600).trim() + (text.length > 600 ? "…" : ""));
-      lines.push("");
-    }
-  }
-
-  // ── Extracted Entities ─────────────────────────────────────────────
-  const entities = r.extraction?.entities ?? r.bundle?.entities ?? [];
-  if (entities.length > 0) {
-    lines.push("## Key Entities\n");
-    for (const e of entities.slice(0, 10)) {
-      const name = e.name ?? "(unnamed)";
-      const type = e.type ?? "Entity";
-      const aliases = (e as { aliases?: string[] }).aliases;
-      const aliasStr = aliases?.length ? ` (also: ${aliases.join(", ")})` : "";
-      lines.push(`- **${name}** [${type}]${aliasStr}`);
-    }
-    lines.push("");
-  }
-
-  // ── Web Sources ────────────────────────────────────────────────────
-  const webResults = r.webSearch?.results ?? [];
-  const evidenceItems = r.evidence ?? [];
-
-  if (webResults.length > 0 || evidenceItems.length > 0) {
-    lines.push("## Sources\n");
-
-    for (const src of evidenceItems.slice(0, 4)) {
-      if (src.url) {
-        const publisher = src.publisher ? ` (${src.publisher})` : "";
-        lines.push(`- [${src.title ?? src.url}](${src.url})${publisher}`);
-      }
-    }
-
-    for (const res of webResults.slice(0, 4)) {
-      if (res.url) {
-        lines.push(`- [${res.title ?? res.url}](${res.url})`);
-        if (res.snippet) {
-          lines.push(`  ${res.snippet.slice(0, 200)}`);
-        }
-      }
-    }
-    lines.push("");
-  }
-
-  if (r.error && entities.length === 0) {
-    lines.push(`> Note: ${r.error}`);
-  }
-
-  return lines.join("\n");
-}

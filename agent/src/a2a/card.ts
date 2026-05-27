@@ -65,25 +65,11 @@ const RESEARCHER_SKILLS: Skill[] = [
     id: "search",
     name: "Search",
     description:
-      "Quick hybrid search across the web (SearXNG), knowledge graph (Neo4j), and Wikipedia. " +
-      "Returns a consolidated markdown summary with source attribution.",
+      "Agentic web search backed by the rabbit-hole search engine — runs " +
+      "the same agent as the chat UI and the OpenAI-compatible API. Returns " +
+      "a consolidated markdown answer with inline [N] citations.",
     tags: ["search", "fast"],
     examples: ["Search for Anthropic's latest papers", "Find X's biography"],
-    inputModes: ["text/plain"],
-    outputModes: ["text/markdown"],
-  },
-  {
-    id: "deep_research",
-    name: "Deep Research",
-    description:
-      "Multi-source deep research with entity extraction, relationship mapping, " +
-      "iterative gap-filling, and structured output. Runs the full rabbit-hole.io " +
-      "research pipeline (scope → plan → research → evaluate → synthesis).",
-    tags: ["research", "deep", "structured"],
-    examples: [
-      "Deep research on quantum error correction breakthroughs in 2026",
-      "Research the relationship between org X and org Y",
-    ],
     inputModes: ["text/plain"],
     outputModes: ["text/markdown"],
   },
@@ -91,8 +77,9 @@ const RESEARCHER_SKILLS: Skill[] = [
     id: "ingest_url",
     name: "Ingest URL",
     description:
-      "Fetch a URL (HTML page, PDF, audio, video, YouTube) and extract entities " +
-      "into the knowledge graph via the rabbit-hole media processing pipeline.",
+      "Submit a URL (HTML page, PDF, audio, video, YouTube) to the media " +
+      "processing pipeline. Returns the job ID + extracted text once " +
+      "processing completes.",
     tags: ["ingest", "media"],
     examples: [
       "https://arxiv.org/abs/2401.00001",
@@ -100,18 +87,6 @@ const RESEARCHER_SKILLS: Skill[] = [
     ],
     inputModes: ["text/plain"],
     outputModes: ["application/json"],
-  },
-  {
-    id: "kg_facts",
-    name: "Knowledge Graph Facts",
-    description:
-      "Query the rabbit-hole knowledge graph for entities and relationships. " +
-      "Returns entity details, relationship counts, and connected entities. " +
-      "Use this to retrieve structured knowledge without triggering new research.",
-    tags: ["kg", "facts", "memory"],
-    examples: ["Anthropic", "Claude language model", "Sam Altman"],
-    inputModes: ["text/plain"],
-    outputModes: ["text/markdown"],
   },
 ];
 
