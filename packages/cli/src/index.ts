@@ -1,5 +1,10 @@
 import { Command } from "commander";
 
+// Single source of truth for the version — tsup inlines this at build time, so
+// `rh --version` always matches the published package (it used to be a
+// hardcoded string that drifted behind package.json on every release).
+import pkg from "../package.json";
+
 import { runIngest } from "./commands/ingest.js";
 import { runRecall } from "./commands/recall.js";
 import { runResearch } from "./commands/research.js";
@@ -13,7 +18,7 @@ program
   .description(
     "Rabbit Hole CLI — search the web, ingest media, run deep research."
   )
-  .version("0.1.0");
+  .version(pkg.version);
 
 program
   .command("search")
