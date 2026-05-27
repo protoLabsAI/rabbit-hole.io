@@ -61,6 +61,21 @@ export type StatusResponse = {
   [k: string]: unknown;
 };
 
+export type CorpusHit = {
+  documentId: string;
+  source: string;
+  chunkIndex: number;
+  content: string;
+  score: number;
+  metadata: Record<string, unknown> | null;
+};
+
+export type CorpusSearchResponse = {
+  query: string;
+  count: number;
+  hits: CorpusHit[];
+};
+
 const MIME = {
   pdf: "application/pdf",
   txt: "text/plain",
@@ -115,6 +130,19 @@ export class JobProcessorClient {
     if (!r.ok)
       throw new Error(`result ${jobId} failed: ${r.status} ${await r.text()}`);
     return await r.json();
+  }
+
+  /** Corpus search over ingested docs (pgvector cosine) via GET /search. */
+  async recall(
+    query: string,
+    opts: { topK?: number } = {}
+  ): Promise<CorpusSearchResponse> {
+    const u = new URL(`${this.baseUrl}/search`);
+    u.searchParams.set("q", query);
+    if (opts.topK) u.searchParams.set("topK", String(opts.topK));
+    const r = await fetch(u);
+    if (!r.ok) throw new Error(`recall failed: ${r.status} ${await r.text()}`);
+    return (await r.json()) as CorpusSearchResponse;
   }
 
   async waitFor(

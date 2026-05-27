@@ -1,6 +1,7 @@
 import { Command } from "commander";
 
 import { runIngest } from "./commands/ingest.js";
+import { runRecall } from "./commands/recall.js";
 import { runResearch } from "./commands/research.js";
 import { runSearch } from "./commands/search.js";
 import { runStatus } from "./commands/status.js";
@@ -24,6 +25,22 @@ program
   .option("-m, --max <n>", "max results (default 5)", (v) => parseInt(v, 10))
   .action((query: string, opts) =>
     runSearch(query, opts).catch((err) => fail(err))
+  );
+
+program
+  .command("recall")
+  .description(
+    "Corpus search over your ingested files (pgvector cosine). JSON by default."
+  )
+  .argument("<query>", "what to recall from ingested docs")
+  .option("--text", "human-readable markdown instead of JSON")
+  .option("-k, --top-k <n>", "number of chunks to return (default 8)", (v) =>
+    parseInt(v, 10)
+  )
+  .action((query: string, opts) =>
+    runRecall(query, { text: opts.text, topK: opts.topK }).catch((err) =>
+      fail(err)
+    )
   );
 
 program
