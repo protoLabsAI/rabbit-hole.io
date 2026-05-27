@@ -88,11 +88,20 @@ export class MediaIngestionJob extends Job {
     await this.emitProgress(jobId, "processing", request);
 
     try {
+      // 0. Resolve adapters via a freshly-built registry. Sidequest runs
+      // jobs in worker threads that may load this module under a different
+      // instance than src/adapters/index.ts's `adapterRegistry` singleton —
+      // so the shared singleton can be empty in the job's context (caused
+      // AdapterNotFoundError for every source). buildAdapterRegistry()
+      // returns a self-contained populated registry, identity-safe.
+      const { buildAdapterRegistry } = await import("../src/adapters/index.js");
+      const registry = buildAdapterRegistry();
+
       // 1. Deserialize the ingest source
       const ingestSource = this.deserializeSource(request.source);
 
       // 2. Resolve the adapter
-      const adapter = adapterRegistry.resolve(ingestSource);
+      const adapter = registry.resolve(ingestSource);
       if (!adapter) {
         const sourceDesc =
           ingestSource.type === "file"

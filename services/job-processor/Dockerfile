@@ -54,22 +54,27 @@ FROM node:20-alpine AS production
 # yt-dlp is Python-based and pulled from Alpine's community repo.
 RUN apk add --no-cache curl ffmpeg yt-dlp
 
-WORKDIR /app
-
 ENV NODE_ENV=production
 ENV NODE_OPTIONS="--enable-source-maps"
 
 RUN addgroup --system --gid 1001 jobprocessor && \
     adduser --system --uid 1001 jobprocessor
 
-# Copy built app (includes node_modules with workspace packages)
-COPY --from=builder --chown=jobprocessor:jobprocessor /app/services/job-processor/dist ./dist
-COPY --from=builder --chown=jobprocessor:jobprocessor /app/services/job-processor/package.json ./package.json
-COPY --from=builder --chown=jobprocessor:jobprocessor /app/services/job-processor/sidequest.jobs.js ./sidequest.jobs.js
-COPY --from=builder --chown=jobprocessor:jobprocessor /app/node_modules ./node_modules
-COPY --from=builder --chown=jobprocessor:jobprocessor /app/packages ./packages
+# Copy the FULL monorepo from the builder, preserving the pnpm workspace
+# structure so every workspace symlink resolves. The job-processor depends
+# on @protolabsai/vector (corpus search, added with the pgvector pipeline)
+# and other workspace packages that pnpm does NOT hoist to the root
+# node_modules — they live in services/job-processor/node_modules and only
+# resolve when the monorepo layout is intact. The previous "flatten dist +
+# root node_modules into /app" approach dropped them, causing
+# `Cannot find package '@protolabsai/vector'` at runtime.
+COPY --from=builder --chown=jobprocessor:jobprocessor /app /app
 
-RUN mkdir -p /app/logs && chown -R jobprocessor:jobprocessor /app/logs
+# Run from the package dir so dist/, sidequest.jobs.js (manual job
+# resolution), and node_modules all resolve relative to the package.
+WORKDIR /app/services/job-processor
+
+RUN mkdir -p logs && chown -R jobprocessor:jobprocessor logs
 
 USER jobprocessor
 
