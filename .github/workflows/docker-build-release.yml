@@ -86,11 +86,14 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          # GH_PAT is needed to push to org-scoped GHCR packages (agent,
-          # job-processor) because GITHUB_TOKEN only gets write access to
-          # packages that already exist and are linked to this repository.
-          # A PAT with packages:write + read:org works for all three services.
-          password: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+          # Use the job's GITHUB_TOKEN (this workflow grants `packages: write`).
+          # The rabbit-hole/{rabbit-hole,agent,job-processor} + cache packages
+          # have this repo added under "Manage Actions access" (Write), so the
+          # token can push to all of them. Previously this preferred a GH_PAT,
+          # but a stale/under-scoped PAT silently took precedence over the
+          # working token and broke every push with "token does not match
+          # expected scopes" — see the 30-day red streak on this workflow.
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Generate Docker metadata
         id: meta
