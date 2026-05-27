@@ -3,6 +3,13 @@ name: Release Notes
 # Fires on v*.*.* tag push to post polished release notes to the
 # rabbit-hole.io Discord release channel (#releases-rabbit-hole).
 #
+# Uses the shared protoLabsAI/release-tools action — rewrites the commit
+# range through our own LLM gateway (api.proto-labs.ai/v1, model
+# protolabs/fast), then posts a Discord embed. Replaces the old DIY
+# scripts/post-release-notes.mjs which called the Anthropic API directly;
+# we route everything through our own models now, no external Anthropic
+# dependency.
+#
 # release.yml pushes tags with GH_PAT (PAT with workflows scope) so this
 # workflow fires automatically — GitHub's recursion block only applies to
 # tags pushed with GITHUB_TOKEN. workflow_dispatch is kept as a manual
@@ -15,7 +22,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Tag to post notes for (e.g. v0.1.0). Defaults to latest tag on the workflow's checked-out commit."
+        description: "Tag to post notes for (e.g. v0.1.0). Defaults to the ref the workflow ran on."
         type: string
         required: false
 
@@ -30,15 +37,29 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          fetch-depth: 0 # full history so git describe finds the previous tag
+          fetch-depth: 0 # full history so the prev-tag lookup has a base
           ref: ${{ inputs.tag || github.ref }}
 
-      - uses: actions/setup-node@v6
-        with:
-          node-version: "20"
+      - name: Resolve version + previous tag
+        id: version
+        run: |
+          # Current tag: the manual input, or the tag that triggered the push.
+          TAG="${{ inputs.tag }}"
+          if [ -z "$TAG" ]; then
+            TAG="${GITHUB_REF#refs/tags/}"
+          fi
+          # Previous tag: the most recent v* tag before this one. Empty on the
+          # first release — release-tools falls back to a sensible window.
+          PREV="$(git describe --tags --abbrev=0 "${TAG}^" 2>/dev/null || true)"
+          echo "tag=$TAG"   >> "$GITHUB_OUTPUT"
+          echo "prev=$PREV" >> "$GITHUB_OUTPUT"
+          echo "Resolved: $PREV -> $TAG"
 
-      - name: Post release notes to Discord
+      - name: Generate + post release notes
+        uses: protoLabsAI/release-tools@v1
+        with:
+          version: ${{ steps.version.outputs.tag }}
+          previous-version: ${{ steps.version.outputs.prev }}
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_RELEASE_WEBHOOK }}
-        run: node scripts/post-release-notes.mjs
+          GATEWAY_API_KEY: ${{ secrets.GATEWAY_API_KEY }}
+          DISCORD_RELEASE_WEBHOOK: ${{ secrets.DISCORD_RELEASE_WEBHOOK }}
