@@ -88,6 +88,15 @@ export class MediaIngestionJob extends Job {
     await this.emitProgress(jobId, "processing", request);
 
     try {
+      // 0. Ensure media adapters are registered. Sidequest runs jobs in
+      // worker threads that import this module without the startup side-effect
+      // that normally populates the registry (src/adapters/index.ts). Lazily
+      // import it here — the dynamic import resolves to the same cached module
+      // instance, so it registers into THIS adapterRegistry before resolve().
+      if (adapterRegistry.listAdapters().length === 0) {
+        await import("../src/adapters/index.js");
+      }
+
       // 1. Deserialize the ingest source
       const ingestSource = this.deserializeSource(request.source);
 
