@@ -1,6 +1,6 @@
 # Rabbit Hole — Project Status
 
-> Last updated: 2026-04-28
+> Last updated: 2026-05-26
 
 ## Direction
 
@@ -10,7 +10,7 @@ The graph / atlas / research workspace is being rebuilt; gated out of production
 
 ## Launch surface — feature status
 
-### Search agent (`/api/chat`, `/v1/chat/completions`, A2A `search`, MCP `web_search`)
+### Search agent (`/api/chat`, `/v1/chat/completions`, `rh search`)
 
 | Feature | Status | Notes |
 |---|---|---|
@@ -27,11 +27,11 @@ The graph / atlas / research workspace is being rebuilt; gated out of production
 
 | Surface | Status | Notes |
 |---|---|---|
-| Web UI (`/`) | ✅ shipping | |
+| Web UI (`/`) | ✅ shipping | research/atlas gated behind `NEXT_PUBLIC_ENABLE_RESEARCH_ATLAS` (rebuilding) |
 | OpenAI-compat REST (`/v1/chat/completions`) | ✅ | streaming + non-streaming, usage tokens reported. No auth yet. |
-| MCP server (web/wiki/tavily + media tools) | ✅ trimmed | dropped 6 graph-bound tools, 1808→586 lines |
-| A2A skill (`search`, `ingest_url`) | ✅ trimmed | searchProducer rewired through `/v1/chat/completions` |
-| CLI (`npx rabbit-hole`) | ⏸ deferred | will wrap REST once auth lands |
+| `rh` CLI (`@protolabsai/rabbit-hole-cli`) | ✅ shipped (2026-05) | `search`/`research`/`ingest`/`status`; Tavily + gateway, shelled out to by fleet agents ([#287](https://github.com/protoLabsAI/rabbit-hole.io/pull/287)) |
+| MCP server (HTTP, port 3398) | ❌ retired (2026-05) | replaced by the `rh` CLI |
+| A2A skill endpoint | ❌ retired (2026-05) | replaced by the `rh` CLI |
 
 ### Self-host stack
 
@@ -66,8 +66,9 @@ The graph / atlas / research workspace is being rebuilt; gated out of production
 
 | # | Title | Status |
 |---|---|---|
-| [#272](https://github.com/protoLabsAI/rabbit-hole.io/pull/272) | gate `/research` and `/atlas` behind dev flag | open, awaiting CI |
-| [#273](https://github.com/protoLabsAI/rabbit-hole.io/pull/273) | search-only stack — Phase 0 + 1 + 3 (no CLI) | open, awaiting CI |
+| [#272](https://github.com/protoLabsAI/rabbit-hole.io/pull/272) | gate `/research` and `/atlas` behind dev flag | merged |
+| [#273](https://github.com/protoLabsAI/rabbit-hole.io/pull/273) | search-only stack — Phase 0 + 1 + 3 (no CLI) | merged |
+| [#287](https://github.com/protoLabsAI/rabbit-hole.io/pull/287) | new `@protolabsai/rabbit-hole-cli` package | merged |
 
 ## Released images (GHCR `:0.4.0` + `:latest`)
 
@@ -81,7 +82,7 @@ CI Docker Build workflow has been failing since v0.2.0 (GHCR perms issue intermi
 
 ## What's next
 
-1. **Now**: end-to-end test of the launch stack — search query, file upload, OpenAI client compatibility, A2A skill, MCP tools.
+1. **Now**: end-to-end test of the launch stack — search query, file upload, OpenAI client compatibility, `rh` CLI commands.
 2. **After tests pass**: triage anything broken, commit fixes.
 3. **When you have accounts ready**: Phase 2 (hosted launch).
 4. **Whenever**: CLI (Phase 3 remainder), provisioner (Phase 4), repo cleanup of dead `/research`/`/atlas` code.

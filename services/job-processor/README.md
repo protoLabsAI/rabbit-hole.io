@@ -1,6 +1,8 @@
 # Job Processor Service
 
-Standalone Sidequest.js background job processor for async workflows (YouTube, transcription, file extraction).
+> **Note:** The live ingestion surface is the `POST /ingest` HTTP API (`src/api/ingestion-routes.ts`) backed by `MediaIngestionJob`, with media adapters under `src/adapters/`. Extracted content is stored to MinIO/Postgres for the search corpus (pgvector). The Neo4j entity-write job classes under `jobs/` (`YouTubeProcessingJob`, `TextExtractionJob`, etc.) are **legacy** — the canonical `docker-compose.yml` stack has no Neo4j. Sections below that describe Neo4j writes or `docker-compose.neo4j.yml` / `docker-compose.jobs.yml` are historical.
+
+Standalone Sidequest.js background job processor for async workflows (file/PDF/audio/video extraction and transcription).
 
 **Real-Time Notifications:** Job completions trigger PostgreSQL NOTIFY events, enabling sub-100ms client notifications via Server-Sent Events.
 
@@ -151,7 +153,7 @@ Standalone Sidequest.js background job processor for async workflows (YouTube, t
 - Sidequest auto-creates tables in `public` schema (`sidequest_jobs`, `sidequest_queues`)
 - Job completion cache added via migration (`sidequest_job_completions`)
 - All services on shared Docker network (`evidence-stack`) for inter-service communication
-- Job processor can reach: youtube-processor, minio, neo4j, postgres (app database)
+- Job processor can reach: minio, postgres (app database), postgres-jobs (queue)
 - Separate Docker service from Next.js app
 - Multi-app compatible (can serve rabbit-hole, portfolio, blog, etc.)
 - Horizontal scaling ready
@@ -159,19 +161,18 @@ Standalone Sidequest.js background job processor for async workflows (YouTube, t
 
 ## Quick Start
 
-**1. Start the full infrastructure stack:**
+**1. Start the infrastructure stack:**
 
 ```bash
-docker compose -f docker-compose.neo4j.yml up -d
+docker compose up -d
 ```
 
-This starts all services on shared `evidence-stack` network:
+This starts the canonical lean stack:
 
+- postgres (5432) - App database
 - postgres-jobs (5433) - Job queue database
-- postgres-complete (5432) - App database
 - job-processor (8678/8679/8680)
-- youtube-processor (8001)
-- neo4j, minio, redis, etc.
+- minio + minio-init - object storage
 
 **2. Run migrations:**
 
@@ -212,7 +213,7 @@ curl -X POST http://localhost:3000/api/jobs/enqueue-youtube \
 - Dashboard: http://localhost:8678
 - Health Check: http://localhost:8679/health
 - Job API: http://localhost:8680/health
-- All services running: `docker compose -f docker-compose.neo4j.yml ps`
+- All services running: `docker compose ps`
 
 **Services:**
 
@@ -230,11 +231,6 @@ DATABASE_URL=postgresql://jobqueue:changeme@postgres-jobs:5432/sidequest
 
 # Application database (user data, share tokens, etc.)
 APP_DATABASE_URL=postgresql://app_user:changeme@host.docker.internal:5432/rabbit_hole_app
-
-# Neo4j (for entity creation)
-NEO4J_URI=bolt://host.docker.internal:7687
-NEO4J_USER=neo4j
-NEO4J_PASSWORD=changeme
 
 # MinIO (file storage)
 MINIO_ENDPOINT=host.docker.internal:9000
@@ -561,9 +557,9 @@ const sidequest = new Sidequest({
 
 **Jobs not processing:**
 
-- Check worker logs: `docker-compose -f docker-compose.jobs.yml logs -f job-processor`
+- Check worker logs: `docker compose logs -f job-processor`
 - Verify queue names match
-- Check service connectivity (Neo4j, MinIO, youtube-processor)
+- Check service connectivity (MinIO, postgres-jobs)
 
 **Connection refused from Next.js:**
 
@@ -637,12 +633,12 @@ Job processor handles shutdown signals automatically:
 
 ```bash
 # Send SIGTERM (Docker stop, Kubernetes scale down)
-docker-compose -f docker-compose.jobs.yml stop job-processor
+docker compose stop job-processor
 
 # What happens:
 # 1. Sidequest stops accepting new jobs
 # 2. Running jobs continue until completion (up to timeout)
-# 3. Connections cleaned up (PostgreSQL, Neo4j)
+# 3. Connections cleaned up (PostgreSQL, MinIO)
 # 4. Process exits gracefully
 ```
 

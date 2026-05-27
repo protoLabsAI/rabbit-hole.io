@@ -1,5 +1,7 @@
 # Handoff: Atlas Live Research Pipeline
 
+> **Historical — superseded.** This describes the MCP→Neo4j→Atlas research pipeline, which has since been removed (no more Neo4j/Qdrant/graph layer; MCP server replaced by the `rh` CLI). See [handoff 003](./003-launch-stack-rescope.md) and `CLAUDE.md` for current reality. Kept for history.
+
 **Date**: 2026-03-14
 **Handoff Number**: 001
 

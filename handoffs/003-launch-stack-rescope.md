@@ -89,7 +89,7 @@ Once those are in hand: ~3–5 days of code to wire them all together with a Pos
 
 | Item | Notes |
 |---|---|
-| CLI (`npx rabbit-hole`) | Deferred per your call. Trivial — wraps `/v1/chat/completions` once auth is in place. |
+| CLI (`npx rabbit-hole`) | ✅ **Shipped** (May 2026, [#287](https://github.com/protoLabsAI/rabbit-hole.io/pull/287)) — not the trivial REST wrapper anticipated here. Landed as the standalone `@protolabsai/rabbit-hole-cli` package (bin `rh`: `search`/`research`/`ingest`/`status`), a direct Tavily + LLM-gateway tool that fleet agents shell out to. |
 
 ### Phase 4 — auto-provisioning prototype
 

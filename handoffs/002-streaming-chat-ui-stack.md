@@ -1,5 +1,7 @@
 # Handoff: Streaming Chat UI Stack
 
+> **Historical — point-in-time (2026-03-24).** Captures the streaming chat UI work as of that date; later rescopes (see [handoff 003](./003-launch-stack-rescope.md)) and the current `status.md` supersede specifics here.
+
 **Date**: 2026-03-24
 **Handoff Number**: 002
 

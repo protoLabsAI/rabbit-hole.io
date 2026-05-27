@@ -1,5 +1,7 @@
 # Agent Server
 
+> **⚠️ DEPRECATED — retired in deployment.** This standalone A2A LangGraph researcher is no longer part of the deployed stack; its dependencies are unmaintained. Fleet agents now use the `rh` CLI (`@protolabsai/rabbit-hole-cli`) instead of this A2A endpoint. Kept for reference only.
+
 A modular LangGraph agent with CopilotKit integration for building conversational AI applications.
 
 ## Overview

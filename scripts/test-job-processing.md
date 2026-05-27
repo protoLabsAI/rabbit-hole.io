@@ -1,33 +1,34 @@
 # Job Processing System Test Guide
 
+> **Note:** Neo4j has been removed; the canonical stack is `docker-compose.yml` (no `docker-compose.dev.yml`, no Neo4j browser). Extracted content now feeds the search corpus (pgvector on Postgres), not a graph. Steps below have been pointed at the current stack.
+
 ## Quick Validation Steps
 
 ### 1. Start Services
 
 ```bash
 # Start all services
-docker compose -f docker-compose.dev.yml up -d
+docker compose up -d
 
 # Install dependencies
 pnpm install
 
 # Check service status
-docker ps | grep -E "(postgres|job-processor|neo4j|minio)"
+docker ps | grep -E "(postgres|job-processor|minio)"
 ```
 
 ### 2. Verify Dashboard Access
 
 - **Sidequest Dashboard:** http://localhost:8678
-- **Neo4j Browser:** http://localhost:7474
-- **Next.js App:** http://localhost:3000
+- **Next.js App:** http://localhost:3399
 - **MinIO Console:** http://localhost:9001
 
 ### 3. Test File Upload Workflow
 
-1. **Navigate to Atlas:** http://localhost:3000/atlas
-2. **Click Upload Button** (📎 in header)
+1. **Open the app:** http://localhost:3399
+2. **Click Upload Button** (📎 in the search input)
 3. **Upload a PDF file** or text document
-4. **Check Success Dialog** - should show file entity created
+4. **Check Success Dialog** - should show the file queued for ingestion
 
 ### 4. Monitor Job Processing
 
@@ -38,33 +39,33 @@ docker ps | grep -E "(postgres|job-processor|neo4j|minio)"
 
 ### 5. Verify State Updates
 
-**In Neo4j Browser (http://localhost:7474):**
+Check the ingest job result via the job-processor API:
 
-```cypher
-// Check file processing states
-MATCH (f:File)
-RETURN f.name, f.processingState, f.extractedText, f.processedAt
-ORDER BY f.uploadedAt DESC
-LIMIT 10
+```bash
+# List recent ingestion jobs
+curl http://localhost:8680/ingest
+
+# Inspect a completed job's extraction result
+curl http://localhost:8680/ingest/<jobId>/result
 ```
 
 **Expected Results:**
 
-- Files should show `processingState: "processed"`
-- Text files should have `extractedText` populated
-- `processedAt` timestamp should be set
+- Job status transitions to `completed`
+- Text files have extracted content in the result payload
+- Extracted content is stored to MinIO/Postgres for the search corpus
 
 ### 6. Check Job Logs
 
 ```bash
 # Job processor logs
-docker logs job-processor-dev
+docker compose logs job-processor
 
 # Next.js application logs
-docker logs rabbit-hole-ui-dev
+docker compose logs rabbit-hole
 
-# PostgreSQL logs
-docker logs postgres-jobs-dev
+# PostgreSQL (job queue) logs
+docker compose logs postgres-jobs
 ```
 
 ## Test Cases
@@ -101,7 +102,7 @@ docker logs postgres-jobs-dev
 
 ### State Not Updating
 
-- Check Neo4j connectivity from job processor
+- Check Postgres/MinIO connectivity from job processor
 - Verify API endpoint accessibility
 - Check authentication/authorization
 
