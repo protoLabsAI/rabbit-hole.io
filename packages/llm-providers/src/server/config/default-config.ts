@@ -1,10 +1,37 @@
 import { LLMProvidersConfig } from "../../types/config";
 
 export const defaultConfig: LLMProvidersConfig = {
-  defaultProvider: "anthropic",
+  defaultProvider: "protolabs",
   defaultCategory: "fast",
 
   providers: {
+    // protoLabs gateway (OpenAI-compatible). Routes every category through the
+    // gateway's tiered aliases so no provider-specific API keys are needed —
+    // the gateway holds the upstream credentials. Base URL + key are overridable
+    // via PROTOLABS_BASE_URL / PROTOLABS_API_KEY (defaults assume the in-cluster
+    // gateway hostname, matching the rabbit-hole CLI default).
+    protolabs: {
+      enabled: true,
+      baseURL: "http://gateway:4000/v1",
+      models: {
+        fast: [{ name: "protolabs/fast", temperature: 0.7, maxTokens: 8192 }],
+        smart: [{ name: "protolabs/smart", temperature: 0.5, maxTokens: 8192 }],
+        reasoning: [
+          { name: "protolabs/reasoning", temperature: 0.3, maxTokens: 8192 },
+        ],
+        vision: [{ name: "protolabs/smart", temperature: 0.5, maxTokens: 8192 }],
+        coding: [{ name: "protolabs/smart", temperature: 0.3, maxTokens: 8192 }],
+        long: [
+          { name: "protolabs/reasoning", temperature: 0.5, maxTokens: 8192 },
+        ],
+      },
+      metadata: {
+        priority: 0,
+        timeout: 60000,
+        maxRetries: 3,
+      },
+    },
+
     openai: {
       enabled: true,
       models: {
