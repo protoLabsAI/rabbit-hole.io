@@ -405,8 +405,11 @@ describe("LRUCache", () => {
       }
       const end = performance.now();
 
-      // Should be very fast (< 10ms for 1000 operations)
-      expect(end - start).toBeLessThan(10);
+      // 1000 O(1) gets are sub-millisecond locally; the generous ceiling is
+      // headroom for loaded/shared CI runners (a tight 10ms wall-clock flaked
+      // — #304). Still catches an accidental O(n) regression by orders of
+      // magnitude, which is the actual point of this test.
+      expect(end - start).toBeLessThan(200);
     });
 
     it("should perform set operations in O(1) time", () => {
@@ -419,8 +422,8 @@ describe("LRUCache", () => {
       }
       const end = performance.now();
 
-      // Should be very fast (< 10ms for 1000 operations)
-      expect(end - start).toBeLessThan(10);
+      // Generous ceiling for loaded CI runners — see the get test above (#304).
+      expect(end - start).toBeLessThan(200);
     });
   });
 });
