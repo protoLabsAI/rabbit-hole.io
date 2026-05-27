@@ -36,6 +36,17 @@ What's running:
 What's **not** running by default:
 - A web search backend. Without `SEARXNG_ENDPOINT` set, the agent only has Wikipedia. Run [SearXNG](https://docs.searxng.org/admin/installation-docker.html) on your network and point `SEARXNG_ENDPOINT` at it.
 
+### Minimum (ingest + CLI, no web UI)
+
+For headless / fleet use — agents shell out to the `rh` CLI and never touch the web app — bring up just the ingest backend and install the CLI from npm:
+
+```bash
+docker compose up -d postgres postgres-jobs minio minio-init job-processor
+npm i -g @protolabsai/rabbit-hole-cli
+```
+
+The CLI talks to the job-processor (default `http://localhost:8680`) and your LLM gateway; run `rh --help` for `search`, `research`, `ingest`, and `status`. This is the supported path for the fleet deployment — the `rabbit-hole` web service stays available in the full stack above for self-hosters who want the UI.
+
 ## Configuration
 
 All env vars live in `.env`. The required ones:

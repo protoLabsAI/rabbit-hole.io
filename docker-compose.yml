@@ -4,8 +4,8 @@
 #
 # Pulls prebuilt images from ghcr.io/protolabsai/rabbit-hole/*:latest. To
 # build images from source, use docker-compose.research.yml instead (the
-# dev/research stack, which also bundles Neo4j + Qdrant for the graph
-# experience).
+# from-source dev stack; it also carries the legacy Neo4j graph services,
+# which are retired from the app and kept only for opt-in experiments).
 #
 # Required environment (see .env.example):
 #   ANTHROPIC_API_KEY or OPENAI_API_KEY    one is required
@@ -18,7 +18,6 @@
 # Default ports:
 #   3399  rabbit-hole web UI
 #   8680  job-processor API (file/media ingest)
-#   7874  researcher A2A endpoint
 #   9001  MinIO console (admin UI)
 
 services:
