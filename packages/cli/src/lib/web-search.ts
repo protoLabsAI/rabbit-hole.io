@@ -26,6 +26,8 @@ export type WebSearchResponse = {
   provider: "searxng" | "tavily";
 };
 
+const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 export async function webSearch(
   cfg: Config,
   query: string,
@@ -35,8 +37,21 @@ export async function webSearch(
   const hasTavily = !!cfg.tavilyApiKey;
 
   if (hasSearxng) {
+    const searxng = new SearxngClient(cfg.searxngEndpoint);
     try {
-      return await new SearxngClient(cfg.searxngEndpoint).search(query, opts);
+      let res = await searxng.search(query, opts);
+      // SearXNG intermittently returns HTTP 200 with zero results when its
+      // upstream engines time out / rate-limit on a query. That's transient —
+      // retry once before giving up on it.
+      if (res.results.length === 0) {
+        await delay(500);
+        res = await searxng.search(query, opts);
+      }
+      // Got results, or nothing else to try → return what we have.
+      if (res.results.length > 0 || !hasTavily) return res;
+      process.stderr.write(
+        "rh: searxng returned no results; falling back to tavily\n"
+      );
     } catch (err) {
       // Only fall back if Tavily is actually configured; otherwise surface
       // the SearXNG error so the operator knows their own search is down.
