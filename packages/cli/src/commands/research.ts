@@ -1,6 +1,6 @@
 import { loadConfig } from "../config.js";
 import { LlmClient, type ChatMessage } from "../lib/llm.js";
-import { TavilyClient } from "../lib/tavily.js";
+import { webSearch } from "../lib/web-search.js";
 
 export type ResearchOptions = {
   depth?: number;
@@ -25,7 +25,6 @@ export async function runResearch(
   const cfg = loadConfig();
   const depth = opts.depth ?? 2;
   const llm = new LlmClient(cfg.llmBaseUrl, cfg.llmKey, cfg.llmModel);
-  const tavily = new TavilyClient(cfg.tavilyApiKey ?? "");
 
   // 1. Plan: ask the LLM to break the topic into sub-queries.
   process.stderr.write(`rh: planning (depth=${depth})…\n`);
@@ -44,14 +43,11 @@ export async function runResearch(
     subQueries.push(topic);
   }
 
-  // 2. Search: hit Tavily for each sub-query in parallel.
+  // 2. Search: run each sub-query in parallel (SearXNG, Tavily fallback).
   process.stderr.write(`rh: searching ${subQueries.length} sub-queries…\n`);
   const searches = await Promise.all(
     subQueries.map((q) =>
-      tavily.search(q, {
-        maxResults: opts.maxResults ?? 4,
-        includeAnswer: true,
-      })
+      webSearch(cfg, q, { maxResults: opts.maxResults ?? 4 })
     )
   );
 
@@ -60,7 +56,7 @@ export async function runResearch(
   const evidence = searches
     .map((s, i) => {
       const lines = [`### sub-query ${i + 1}: ${s.query}`];
-      if (s.answer) lines.push(`tavily answer: ${s.answer}`);
+      if (s.answer) lines.push(`provider answer: ${s.answer}`);
       s.results.forEach((r, j) => {
         lines.push(`- [${i + 1}.${j + 1}] ${r.title} — ${r.url}`);
         if (r.content) lines.push(`  ${r.content.slice(0, 400)}`);
