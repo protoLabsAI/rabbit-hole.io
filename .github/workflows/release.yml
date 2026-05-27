@@ -45,3 +45,48 @@ jobs:
           # (prettier, eslint, tsc) that is not available in the release runner.
           HUSKY: 0
         run: npx semantic-release
+
+  # Publishes versioned workspace packages (e.g. @protolabsai/rabbit-hole-cli)
+  # to npm via Changesets. semantic-release above only cuts GitHub releases for
+  # the (private) repo root — it never published packages, which is why the CLI
+  # never landed on npm. This job runs the two-phase Changesets flow:
+  #   1. changesets present  -> opens/updates a "Version Packages" PR
+  #   2. no changesets left  -> runs `changeset publish` to push to npm
+  # Requires the NPM_TOKEN secret (automation token with publish rights).
+  publish:
+    name: Publish packages (npm)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+
+      - uses: pnpm/action-setup@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Create Version PR or publish to npm
+        uses: changesets/action@v1
+        with:
+          # `pnpm release:version` -> changeset version + lockfile-only install
+          version: pnpm release:version
+          # `pnpm release` -> build:libs + changeset publish
+          publish: pnpm release
+          commit: "chore(release): version packages"
+          title: "chore(release): version packages"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          HUSKY: 0
