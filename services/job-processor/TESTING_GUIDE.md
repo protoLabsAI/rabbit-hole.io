@@ -1,25 +1,18 @@
 # Job Processor Testing Guide
 
+> **Note:** This guide documents the legacy `jobs/`-class flow (YouTube/text-extraction jobs that wrote to Neo4j). Neo4j has been removed and `docker-compose.neo4j.yml` / `docker-compose.jobs.yml` no longer exist — the canonical stack is `docker-compose.yml`. The current ingestion surface is the `POST /ingest` HTTP API (`src/api/ingestion-routes.ts`) with adapters under `src/adapters/`. Treat Neo4j and Clerk-auth steps below as historical.
+
 ## Overview
 
-This guide covers how to test the Sidequest.js job processor for YouTube video processing and text extraction.
+This guide covers how to test the Sidequest.js job processor for media ingestion (file/PDF/audio/video extraction and transcription).
 
 ## Prerequisites
 
 1. **Required Services Running:**
 
    ```bash
-   # PostgreSQL (for Sidequest job queue)
-   docker-compose up -d postgres
-
-   # Neo4j (for entity storage)
-   docker-compose -f docker-compose.neo4j.yml up -d
-
-   # MinIO (for file storage)
-   docker-compose up -d minio
-
-   # YouTube Processor microservice (for YouTube jobs)
-   docker-compose up -d youtube-processor
+   # Bring up the canonical stack (postgres, postgres-jobs, minio, job-processor)
+   docker compose up -d
    ```
 
 2. **Environment Variables:**
@@ -27,11 +20,6 @@ This guide covers how to test the Sidequest.js job processor for YouTube video p
    ```bash
    # PostgreSQL (Sidequest backend)
    DATABASE_URL=postgresql://user:password@localhost:5432/rabbit_hole
-
-   # Neo4j
-   NEO4J_URI=bolt://localhost:7687
-   NEO4J_USER=neo4j
-   NEO4J_PASSWORD=changeme
 
    # MinIO
    MINIO_ENDPOINT=http://localhost:9000
@@ -51,13 +39,13 @@ This guide covers how to test the Sidequest.js job processor for YouTube video p
 **Start the job processor service:**
 
 ```bash
-docker-compose -f docker-compose.jobs.yml up job-processor
+docker compose up job-processor
 ```
 
 **View logs:**
 
 ```bash
-docker-compose -f docker-compose.jobs.yml logs -f job-processor
+docker compose logs -f job-processor
 ```
 
 **Expected output:**
@@ -196,10 +184,10 @@ Open http://localhost:8678 to monitor:
 
 ```bash
 # Real-time logs
-docker-compose -f docker-compose.jobs.yml logs -f job-processor
+docker compose logs -f job-processor
 
 # Last 100 lines
-docker-compose -f docker-compose.jobs.yml logs --tail=100 job-processor
+docker compose logs --tail=100 job-processor
 ```
 
 ### Expected Log Output
@@ -266,7 +254,7 @@ LIMIT 10;
 **Check processor is running:**
 
 ```bash
-docker-compose -f docker-compose.jobs.yml ps job-processor
+docker compose ps job-processor
 ```
 
 **Check queue names match:**
@@ -370,7 +358,7 @@ done
 **Stop job processor:**
 
 ```bash
-docker-compose -f docker-compose.jobs.yml down
+docker compose down
 ```
 
 **Clear job queue:**
@@ -410,4 +398,4 @@ DETACH DELETE v;
 
 - [Sidequest.js Documentation](https://github.com/valtech-sd/sidequest.js)
 - [Job Processor README](./README.md)
-- [Docker Compose Configuration](../../docker-compose.jobs.yml)
+- [Docker Compose Configuration](../../docker-compose.yml)

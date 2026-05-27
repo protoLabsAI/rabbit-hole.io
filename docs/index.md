@@ -2,8 +2,8 @@
 layout: home
 hero:
   name: Rabbit Hole
-  text: AI Search + Living Knowledge Graph
-  tagline: Perplexity-style search backed by SearXNG, Wikipedia, and a self-growing Neo4j knowledge graph. Deep research mode for comprehensive cited reports.
+  text: AI search you can self-host
+  tagline: Perplexity-style search over the web (Tavily), Wikipedia, and your own ingested files. Plug in your LLM key, run it yourself.
   actions:
     - theme: brand
       text: Get Started
@@ -15,19 +15,19 @@ hero:
 features:
   - icon: 🔍
     title: Agentic Search Chat
-    details: Multi-step tool-calling agent searches SearXNG (Reddit, GitHub, Google, arXiv), Wikipedia, and your knowledge graph — then synthesizes a cited answer.
+    details: Multi-step tool-calling agent searches the web (Tavily), Wikipedia, and your ingested corpus — then synthesizes a cited answer.
   - icon: 📄
-    title: Deep Research
-    details: SCOPE → RESEARCH → EVALUATE → SYNTHESIS pipeline. Decomposes any topic into dimensions, searches each exhaustively, and produces a structured report with inline citations.
-  - icon: 🧠
-    title: Living Knowledge Graph
-    details: Every research session can feed Neo4j. Entities and relationships accumulate over time, making future searches faster and richer.
-  - icon: 🤖
-    title: Fleet A2A Agent
-    details: A spec-compliant A2A server (port 7870) exposes search, deep_research, ingest_url, and kg_facts skills — callable by Ava and other fleet agents via JSON-RPC 2.0.
+    title: File & Media Ingestion
+    details: Upload PDFs, docs, audio, and video via the bundled job processor. Files get parsed/transcribed and embedded into a pgvector corpus the agent can search (ingest→embed pipeline landing — see issue #291).
+  - icon: 🧪
+    title: Research Workspace (coming back)
+    details: The deep-research / Atlas workspace is being rebuilt and gated behind the NEXT_PUBLIC_ENABLE_RESEARCH_ATLAS dev flag. Wanted and returning — not the always-on surface today.
+  - icon: 🦫
+    title: rh CLI
+    details: The @protolabsai/rabbit-hole-cli (bin rh) exposes search, research, ingest, and status commands. Designed to be shelled out to by fleet agents.
   - icon: 🌐
-    title: SearXNG-Powered
-    details: Self-hosted meta-search across Google, Brave, DuckDuckGo, Reddit, GitHub, arXiv, Semantic Scholar, and more — no third-party API keys required.
+    title: BYOK & Self-host
+    details: Apache 2.0 docker-compose stack. Bring your own LLM key, optionally point at SearXNG for self-hosted meta-search. No subscription.
 ---
 
 ## Documentation Structure

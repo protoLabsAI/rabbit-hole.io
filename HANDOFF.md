@@ -1,5 +1,7 @@
 # Rabbit Hole — Developer Handoff
 
+> **⚠️ HISTORICAL — SUPERSEDED.** This document describes the original (March 2026) architecture: Neo4j graph, LangGraph agent, CopilotKit chat, React Flow board, Clerk/Hocuspocus. **None of that is the live architecture anymore.** The project pivoted to a search-only, distribution-first stack (web Tavily + pgvector corpus, the `rh` CLI, no Neo4j/Qdrant). The "Rip Out Clerk + Hocuspocus" TODO below is no longer the priority. See [`handoffs/003-launch-stack-rescope.md`](./handoffs/003-launch-stack-rescope.md) and the current `CLAUDE.md` / `status.md` for reality. Kept for history.
+
 **Date:** 2026-03-13
 **Repo:** https://github.com/protoLabsAI/rabbit-hole.io
 **Branch:** `main`

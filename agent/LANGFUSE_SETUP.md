@@ -1,5 +1,7 @@
 # Langfuse Integration Guide
 
+> **⚠️ DEPRECATED — retired in deployment.** Covers the standalone `agent/` LangGraph server, which is no longer deployed (deps unmaintained). Current model traffic is traced via the LLM gateway. Kept for reference only.
+
 ## Overview
 
 Both LangGraph agents are instrumented with Langfuse for LLM observability:

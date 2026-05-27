@@ -10,12 +10,12 @@ Test the complete YouTube → Transcription → Summarization pipeline.
 
 1. **Job Processor Running:**
    ```bash
-   docker compose -f docker-compose.jobs.yml up -d
+   docker compose up -d
    ```
 
 2. **MinIO Running:**
    ```bash
-   docker compose -f docker-compose.dev.yml up -d minio
+   docker compose up -d minio
    ```
 
 3. **Next.js App Running:**
@@ -178,7 +178,7 @@ Error: Failed to check job status: connect ECONNREFUSED 127.0.0.1:3000
 **Solution:**
 ```bash
 # Start job processor
-docker compose -f docker-compose.jobs.yml up -d
+docker compose up -d
 
 # Start Next.js app (required for API routes)
 cd apps/rabbit-hole && pnpm dev
@@ -204,7 +204,7 @@ Error: getaddrinfo ENOTFOUND localhost
 
 **Solution:**
 ```bash
-docker compose -f docker-compose.dev.yml up -d minio
+docker compose up -d minio
 # Check MinIO is accessible
 curl http://localhost:9000/minio/health/live
 ```

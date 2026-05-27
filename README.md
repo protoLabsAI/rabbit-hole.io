@@ -6,9 +6,9 @@ Apache 2.0 — run it yourself, plug in your own LLM key, no subscription.
 
 ## What you get
 
-- Perplexity-style web search agent (Anthropic Claude or OpenAI GPT) with streaming answers and inline citations.
-- File / audio / video / PDF ingestion via the bundled job processor — uploaded media gets transcribed, parsed, and fed into the search context.
-- The same search agent exposed over a chat UI **and** an OpenAI-compatible API, an MCP server, an A2A endpoint, and a CLI (some surfaces still in progress — see [Roadmap](#roadmap)).
+- Perplexity-style web search agent (bring your own LLM — our gateway, or any OpenAI-compatible/Anthropic key) with streaming answers and inline citations.
+- File / audio / video / PDF ingestion via the bundled job processor — uploaded media gets transcribed, parsed, and embedded into a searchable corpus (pgvector; ingest→embed pipeline landing, see issue #291).
+- Two distribution surfaces: the chat **Web UI** and the **`rh` CLI** (`@protolabsai/rabbit-hole-cli`: `search`, `research`, `ingest`, `status`) for fleet agents to shell out to. An OpenAI-compatible API is also exposed.
 - Optional Langfuse tracing.
 
 The full graph / research workspace from earlier versions is being rebuilt. They're not part of the launch surface and are gated out of production builds; set `NEXT_PUBLIC_ENABLE_RESEARCH_ATLAS=true` if you want to poke at them in dev.
@@ -73,11 +73,13 @@ Opens on `http://localhost:3399`. You still need a Postgres + MinIO instance rea
 |---|---|
 | Web search UI (`/`) | shipping |
 | Self-host docker-compose | shipping |
+| `rh` CLI (`@protolabsai/rabbit-hole-cli`) | shipping |
 | OpenAI-compatible API (`/v1/chat/completions`) | in progress |
-| MCP server (web/wiki/file tools) | in progress |
-| A2A skill endpoint | in progress |
-| CLI (`npx rabbit-hole`) | in progress |
+| Corpus search (pgvector) | in progress ([#291](https://github.com/protoLabsAI/rabbit-hole.io/issues/291)) |
+| Research / Atlas workspace | rebuilding (dev flag) |
 | Stripe-paid hosted tier | in progress |
+
+> The HTTP MCP server and standalone A2A endpoint from earlier versions are retired — fleet agents use the `rh` CLI instead.
 
 ## License
 
