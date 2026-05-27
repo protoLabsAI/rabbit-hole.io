@@ -1,6 +1,6 @@
 {
   "name": "@protolabsai/llm-tools",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "private": true,
   "description": "LLM workflow tools and graph operations for Proto project",
   "main": "dist/index.js",

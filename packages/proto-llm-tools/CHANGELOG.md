@@ -1,5 +1,13 @@
 # @protolabsai/llm-tools
 
+## 0.1.8
+
+### Patch Changes
+
+- Updated dependencies [3a92c0f]
+  - @protolabsai/llm-providers@0.2.0
+  - @protolabsai/deepagent@0.1.1
+
 ## 0.1.7
 
 ### Patch Changes

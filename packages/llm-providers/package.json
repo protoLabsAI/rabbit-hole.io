@@ -1,6 +1,6 @@
 {
   "name": "@protolabsai/llm-providers",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Multi-provider LLM configuration system with category-based model selection",
   "main": "./dist/index.js",
