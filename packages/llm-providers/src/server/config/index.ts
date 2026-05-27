@@ -72,6 +72,7 @@ function applyEnvironmentOverrides(
 
   // Override API keys
   const envMappings: Record<string, string> = {
+    PROTOLABS_API_KEY: "protolabs",
     OPENAI_API_KEY: "openai",
     ANTHROPIC_API_KEY: "anthropic",
     GOOGLE_API_KEY: "google",
@@ -88,6 +89,12 @@ function applyEnvironmentOverrides(
   }
 
   // Override base URLs
+  const protolabsBaseUrl =
+    process.env.PROTOLABS_BASE_URL || process.env.OPENAI_BASE_URL;
+  if (protolabsBaseUrl && config.providers.protolabs) {
+    config.providers.protolabs.baseURL = protolabsBaseUrl;
+  }
+
   if (process.env.OLLAMA_BASE_URL) {
     config.providers.ollama.baseURL = process.env.OLLAMA_BASE_URL;
   }
