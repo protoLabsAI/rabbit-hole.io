@@ -31,11 +31,14 @@ export class MinioService {
     });
   }
 
-  async downloadFile(canonicalKey: string): Promise<Buffer> {
+  async downloadFile(
+    canonicalKey: string,
+    bucket: string = this.bucketName
+  ): Promise<Buffer> {
     try {
-      console.log(`📥 Downloading file from MinIO: ${canonicalKey}`);
+      console.log(`📥 Downloading file from MinIO: ${bucket}/${canonicalKey}`);
 
-      const stream = await this.client.getObject(this.bucketName, canonicalKey);
+      const stream = await this.client.getObject(bucket, canonicalKey);
 
       // Convert stream to buffer
       const chunks: Buffer[] = [];
