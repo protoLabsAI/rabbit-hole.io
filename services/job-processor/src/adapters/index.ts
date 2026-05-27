@@ -6,10 +6,11 @@
  * text, markdown, HTML, and audio ingestion support.
  */
 
+import type { AdapterRegistry } from "@protolabsai/types";
+
 import {
   SimpleAdapterRegistry,
   adapterRegistry,
-  type AdapterRegistry,
 } from "../../jobs/MediaIngestionJob.js";
 
 import { AudioAdapter } from "./audio-adapter.js";
