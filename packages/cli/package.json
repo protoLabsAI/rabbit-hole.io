@@ -1,10 +1,21 @@
 {
   "name": "@protolabsai/rabbit-hole-cli",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "type": "module",
   "description": "Rabbit Hole CLI — search the web, ingest media, run deep research. Designed to be shelled out to by fleet agents.",
   "bin": {
     "rh": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/protoLabsAI/rabbit-hole.io.git",
+    "directory": "packages/cli"
   },
   "scripts": {
     "build": "tsup",
