@@ -1,6 +1,7 @@
 {
   "name": "@protolabsai/research-middleware",
   "version": "0.1.0",
+  "private": true,
   "description": "DeerFlow-inspired middleware pipeline for AI SDK streamText tool calls",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

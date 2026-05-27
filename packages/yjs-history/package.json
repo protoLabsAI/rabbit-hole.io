@@ -1,6 +1,7 @@
 {
   "name": "@protolabsai/yjs-history",
   "version": "0.1.2",
+  "private": true,
   "description": "Advanced undo/redo and versioning system for Yjs with React Flow integration",
   "type": "module",
   "exports": {

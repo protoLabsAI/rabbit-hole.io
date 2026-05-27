@@ -1,6 +1,7 @@
 {
   "name": "@protolabsai/forms",
   "version": "0.3.3",
+  "private": true,
   "type": "module",
   "description": "Domain entity form system with dynamic generation from Zod schemas",
   "exports": {
