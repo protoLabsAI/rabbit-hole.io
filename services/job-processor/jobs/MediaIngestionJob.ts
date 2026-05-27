@@ -21,6 +21,7 @@ import type {
   MediaAdapter,
   SerializedIngestSource,
 } from "@protolabsai/types";
+import { chunkText, upsertCorpusChunks } from "@protolabsai/vector";
 
 // ==================== Simple AdapterRegistry Implementation ====================
 
@@ -117,6 +118,12 @@ export class MediaIngestionJob extends Job {
       const resultsKey = `ingestion-results/${jobId}/result.json`;
       await this.storeResults(resultsKey, result);
 
+      // 4b. Index the extracted text into the pgvector corpus so `rh recall`
+      // (and the search UI) can find this document. Best-effort: a failure
+      // here must NOT fail the ingest — the parsed result is already safe in
+      // MinIO and can be re-indexed later.
+      await this.indexCorpus(jobId, ingestSource, result);
+
       console.log(`✅ Media ingestion completed for job ${jobId}`);
 
       // 5. Emit completion notification
@@ -148,6 +155,44 @@ export class MediaIngestionJob extends Job {
   }
 
   // ==================== Private Helpers ====================
+
+  /**
+   * Chunk + embed the extracted text and upsert it into the pgvector corpus
+   * (corpus_chunks). Keyed by the ingest jobId as document_id so a re-ingest
+   * replaces prior chunks. Best-effort: logs and returns on failure rather
+   * than throwing — the canonical result is already in MinIO.
+   */
+  private async indexCorpus(
+    jobId: string,
+    source: IngestSource,
+    result: ExtractionResult
+  ): Promise<void> {
+    try {
+      const chunks = chunkText(result.text);
+      if (chunks.length === 0) {
+        console.log(`📭 No text to index for job ${jobId}; skipping corpus`);
+        return;
+      }
+
+      const sourceLabel =
+        source.type === "url"
+          ? source.url
+          : (source.fileName ?? `file:${source.mediaType}`);
+
+      const count = await upsertCorpusChunks(getGlobalPostgresPool(), {
+        documentId: jobId,
+        source: sourceLabel,
+        chunks: chunks.map((content, chunkIndex) => ({ chunkIndex, content })),
+        metadata: { category: result.category, ...result.metadata },
+      });
+
+      console.log(`🔎 Indexed ${count} corpus chunks for job ${jobId}`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      // Non-fatal — the ingest still succeeds; corpus can be rebuilt later.
+      console.error(`⚠️  Corpus indexing failed for job ${jobId}: ${msg}`);
+    }
+  }
 
   /**
    * Convert a serialized queue payload back to a live IngestSource.

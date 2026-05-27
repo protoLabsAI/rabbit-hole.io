@@ -1,4 +1,13 @@
 export { embed, embedOne } from "./embed";
+export { chunkText, type ChunkOptions } from "./chunk";
+export {
+  upsertCorpusChunks,
+  searchCorpus,
+  deleteCorpusDocument,
+  CORPUS_EMBED_DIMS,
+  type CorpusChunkInput,
+  type CorpusSearchHit,
+} from "./corpus";
 export {
   getQdrantClient,
   EMBED_DIMS,

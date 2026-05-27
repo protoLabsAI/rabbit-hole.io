@@ -2,7 +2,7 @@
   "name": "@protolabsai/vector",
   "version": "0.1.0",
   "private": true,
-  "description": "Qdrant vector search + Ollama embedding utilities",
+  "description": "pgvector corpus search + gateway embedding utilities (Qdrant/graph legacy)",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -29,6 +29,8 @@
   },
   "devDependencies": {
     "@types/node": "^22.18.3",
+    "@types/pg": "^8.11.0",
+    "pg": "^8.16.3",
     "tsup": "^8.0.1",
     "typescript": "^5.5.4"
   }
