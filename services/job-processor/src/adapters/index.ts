@@ -3,7 +3,7 @@
  *
  * Imports and registers all document-type MediaAdapters with the shared
  * adapterRegistry singleton. Import this module at startup to activate
- * text, markdown, HTML, and audio ingestion support.
+ * text, markdown, HTML, PDF, DOCX, audio, and video ingestion support.
  */
 
 import type { AdapterRegistry } from "@protolabsai/types";
@@ -14,8 +14,10 @@ import {
 } from "../../jobs/MediaIngestionJob.js";
 
 import { AudioAdapter } from "./audio-adapter.js";
+import { DocxAdapter } from "./docx-adapter.js";
 import { HtmlAdapter } from "./html-adapter.js";
 import { MarkdownAdapter } from "./markdown-adapter.js";
+import { PdfAdapter } from "./pdf-adapter.js";
 import { TextAdapter } from "./text-adapter.js";
 import { VideoAdapter } from "./video-adapter.js";
 
@@ -31,6 +33,8 @@ export function buildAdapterRegistry(): AdapterRegistry {
   registry.register(new TextAdapter());
   registry.register(new MarkdownAdapter());
   registry.register(new HtmlAdapter());
+  registry.register(new PdfAdapter());
+  registry.register(new DocxAdapter());
   registry.register(new AudioAdapter());
   registry.register(new VideoAdapter());
   return registry;
@@ -40,13 +44,17 @@ export function buildAdapterRegistry(): AdapterRegistry {
 adapterRegistry.register(new TextAdapter());
 adapterRegistry.register(new MarkdownAdapter());
 adapterRegistry.register(new HtmlAdapter());
+adapterRegistry.register(new PdfAdapter());
+adapterRegistry.register(new DocxAdapter());
 adapterRegistry.register(new AudioAdapter());
 adapterRegistry.register(new VideoAdapter());
 
 export {
   AudioAdapter,
+  DocxAdapter,
   HtmlAdapter,
   MarkdownAdapter,
+  PdfAdapter,
   TextAdapter,
   VideoAdapter,
 };
