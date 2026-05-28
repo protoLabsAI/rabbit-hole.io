@@ -8,7 +8,7 @@ import { describe, expect, it } from "vitest";
 
 import type { IngestSource } from "@protolabsai/types";
 
-import { buildAdapterRegistry } from "../index";
+import { buildAdapterRegistry } from "../index.js";
 
 const registry = buildAdapterRegistry();
 
