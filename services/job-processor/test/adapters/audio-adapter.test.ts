@@ -16,9 +16,8 @@ import type { FileSource, UrlSource } from "@protolabsai/types";
 import { SimpleAdapterRegistry } from "../../jobs/MediaIngestionJob.js";
 import {
   AudioAdapter,
-  GroqProvider,
+  GatewayProvider,
   LocalWhisperProvider,
-  OpenAIProvider,
   type TranscriptionProvider,
   type TranscriptionResult,
 } from "../../src/adapters/audio-adapter.js";
@@ -170,46 +169,23 @@ describe("AudioAdapter.canHandle (URL sources)", () => {
   });
 });
 
-// ==================== GroqProvider ====================
+// ==================== GatewayProvider ====================
 
-describe("GroqProvider", () => {
-  const originalKey = process.env.GROQ_API_KEY;
-
-  afterEach(() => {
-    process.env.GROQ_API_KEY = originalKey;
-  });
-
-  it("can be instantiated", () => {
-    process.env.GROQ_API_KEY = "test-key";
-    expect(new GroqProvider()).toBeInstanceOf(GroqProvider);
-  });
-
-  it("throws when apiKey is absent and GROQ_API_KEY env var is not set", async () => {
-    delete process.env.GROQ_API_KEY;
-    const provider = new GroqProvider("");
-    await expect(provider.transcribe("/any/path")).rejects.toThrow(
-      /GROQ_API_KEY/i
-    );
-  });
-});
-
-// ==================== OpenAIProvider ====================
-
-describe("OpenAIProvider", () => {
+describe("GatewayProvider", () => {
   const originalKey = process.env.OPENAI_API_KEY;
 
   afterEach(() => {
     process.env.OPENAI_API_KEY = originalKey;
   });
 
-  it("can be instantiated", () => {
-    process.env.OPENAI_API_KEY = "test-key";
-    expect(new OpenAIProvider()).toBeInstanceOf(OpenAIProvider);
+  it("can be instantiated against the gateway", () => {
+    process.env.OPENAI_API_KEY = "gw-key";
+    expect(new GatewayProvider()).toBeInstanceOf(GatewayProvider);
   });
 
-  it("throws when apiKey is absent and OPENAI_API_KEY env var is not set", async () => {
+  it("throws when the gateway key is absent", async () => {
     delete process.env.OPENAI_API_KEY;
-    const provider = new OpenAIProvider("");
+    const provider = new GatewayProvider({ apiKey: "" });
     await expect(provider.transcribe("/any/path")).rejects.toThrow(
       /OPENAI_API_KEY/i
     );
