@@ -25,6 +25,18 @@ describe("buildAdapterRegistry — adapter resolution", () => {
     ["text/plain", "TextAdapter"],
     ["text/markdown", "MarkdownAdapter"],
     ["text/html", "HtmlAdapter"],
+    [
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      "OfficeAdapter",
+    ],
+    [
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "OfficeAdapter",
+    ],
+    ["text/csv", "OfficeAdapter"],
+    ["application/rtf", "OfficeAdapter"],
+    ["image/png", "ImageAdapter"],
+    ["image/jpeg", "ImageAdapter"],
     ["audio/mpeg", "AudioAdapter"],
     ["video/mp4", "VideoAdapter"],
   ])("resolves %s → %s", (mediaType, expected) => {
