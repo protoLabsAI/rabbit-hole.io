@@ -13,7 +13,13 @@
 
 import { extname } from "node:path";
 
-import { recognize } from "tesseract.js";
+// tesseract.js is CommonJS — a named ESM import (`{ recognize }`) resolves
+// under vitest but throws "does not provide an export named 'recognize'" in the
+// worker's Node ESM runtime, breaking the whole adapter module. Default-import
+// the module object and pull the function off it.
+import Tesseract from "tesseract.js";
+
+const { recognize } = Tesseract;
 
 import type {
   ExtractionResult,
