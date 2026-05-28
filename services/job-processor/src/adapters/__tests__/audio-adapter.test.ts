@@ -4,9 +4,8 @@ import type { FileSource, UrlSource } from "@protolabsai/types";
 
 import {
   AudioAdapter,
-  GroqProvider,
+  GatewayProvider,
   LocalWhisperProvider,
-  OpenAIProvider,
   type TranscriptionProvider,
   type TranscriptionResult,
 } from "../audio-adapter.js";
@@ -159,40 +158,28 @@ describe("AudioAdapter.canHandle", () => {
   });
 });
 
-// ==================== GroqProvider configuration ====================
+// ==================== GatewayProvider configuration ====================
 
-describe("GroqProvider", () => {
-  it("uses GROQ_API_KEY from environment", () => {
-    const originalEnv = process.env.GROQ_API_KEY;
-    process.env.GROQ_API_KEY = "test-key";
-    const provider = new GroqProvider();
-    // Just verify it can be constructed and uses the env var
-    expect(provider).toBeInstanceOf(GroqProvider);
-    process.env.GROQ_API_KEY = originalEnv;
+describe("GatewayProvider", () => {
+  it("defaults base URL to the gateway and uses OPENAI_API_KEY", () => {
+    const originalKey = process.env.OPENAI_API_KEY;
+    const originalBase = process.env.OPENAI_BASE_URL;
+    delete process.env.OPENAI_BASE_URL;
+    process.env.OPENAI_API_KEY = "gw-key";
+    const provider = new GatewayProvider();
+    expect(provider).toBeInstanceOf(GatewayProvider);
+    process.env.OPENAI_API_KEY = originalKey;
+    process.env.OPENAI_BASE_URL = originalBase;
   });
 
-  it("throws when apiKey is empty and GROQ_API_KEY is unset", async () => {
-    const originalEnv = process.env.GROQ_API_KEY;
-    delete process.env.GROQ_API_KEY;
-    const provider = new GroqProvider("");
-    await expect(provider.transcribe("/any/path")).rejects.toThrow(
-      /GROQ_API_KEY/
-    );
-    process.env.GROQ_API_KEY = originalEnv;
-  });
-});
-
-// ==================== OpenAIProvider configuration ====================
-
-describe("OpenAIProvider", () => {
-  it("throws when apiKey is empty and OPENAI_API_KEY is unset", async () => {
-    const originalEnv = process.env.OPENAI_API_KEY;
+  it("throws when the gateway key is unset", async () => {
+    const originalKey = process.env.OPENAI_API_KEY;
     delete process.env.OPENAI_API_KEY;
-    const provider = new OpenAIProvider("");
+    const provider = new GatewayProvider({ apiKey: "" });
     await expect(provider.transcribe("/any/path")).rejects.toThrow(
       /OPENAI_API_KEY/
     );
-    process.env.OPENAI_API_KEY = originalEnv;
+    process.env.OPENAI_API_KEY = originalKey;
   });
 });
 
