@@ -11,7 +11,8 @@
 #   ANTHROPIC_API_KEY or OPENAI_API_KEY    one is required
 #
 # Optional:
-#   GROQ_API_KEY                           free Whisper transcription
+#   OPENAI_BASE_URL                        OpenAI-compatible endpoint (gateway)
+#                                          for LLM + Whisper transcription
 #   SEARXNG_ENDPOINT                       web search; falls back to wiki only
 #   LANGFUSE_PUBLIC_KEY / LANGFUSE_SECRET_KEY  observability
 #
@@ -114,7 +115,10 @@ services:
       - JOB_WORKERS=${JOB_WORKERS:-3}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
       - API_PORT=8680
-      - GROQ_API_KEY=${GROQ_API_KEY:-}
+      # Transcription (audio/video) routes through an OpenAI-compatible
+      # endpoint, same as all model traffic — set OPENAI_BASE_URL to your
+      # gateway (or https://api.openai.com/v1) and OPENAI_API_KEY to its key.
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL:-}
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
     ports:
       - "8680:8680"

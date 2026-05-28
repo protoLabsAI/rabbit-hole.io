@@ -6,9 +6,10 @@
  * channels) and FFmpeg to convert to 16 kHz mono WAV before transcription.
  *
  * Three built-in TranscriptionProvider implementations are included:
- *   - GroqProvider       — free, uses GROQ_API_KEY (default)
- *   - OpenAIProvider     — uses OPENAI_API_KEY
- *   - LocalWhisperProvider — faster-whisper HTTP server at port 8020
+ *   - GatewayProvider      — OpenAI-compatible LLM gateway (default; uses
+ *                            OPENAI_BASE_URL + OPENAI_API_KEY)
+ *   - LocalWhisperProvider — opt-in faster-whisper HTTP server (port 8020)
+ *                            via TRANSCRIPTION_PROVIDER=local
  *
  * When the source is a URL the audio file is downloaded via streaming to
  * MinIO (evidence-temp bucket) and then retrieved for local processing.
@@ -175,26 +176,40 @@ export interface TranscriptionProvider {
   transcribe(wavFilePath: string): Promise<TranscriptionResult>;
 }
 
-// ==================== GroqProvider ====================
+// ==================== GatewayProvider ====================
 
 /**
- * GroqProvider — transcribes audio using the Groq Whisper API (free tier).
- * Requires the GROQ_API_KEY environment variable.
+ * GatewayProvider — transcribes audio via the OpenAI-compatible LLM gateway
+ * (LiteLLM). All model traffic — including Whisper — goes through the gateway
+ * so it's quota-accounted and Langfuse-traced, with no direct Groq/OpenAI
+ * dependency.
+ *
+ * Config (the same env the rest of the service uses for the gateway):
+ *   OPENAI_BASE_URL    — default http://gateway:4000/v1
+ *   OPENAI_API_KEY     — the gateway key
+ *   TRANSCRIPTION_MODEL — default "whisper-1" (must be served by the gateway)
  */
-export class GroqProvider implements TranscriptionProvider {
+export class GatewayProvider implements TranscriptionProvider {
+  private readonly baseUrl: string;
   private readonly apiKey: string;
   private readonly model: string;
 
-  constructor(apiKey?: string, model = "whisper-large-v3") {
-    this.apiKey = apiKey ?? process.env.GROQ_API_KEY ?? "";
-    this.model = model;
+  constructor(
+    opts: { baseUrl?: string; apiKey?: string; model?: string } = {}
+  ) {
+    this.baseUrl = (
+      opts.baseUrl ||
+      process.env.OPENAI_BASE_URL ||
+      "http://gateway:4000/v1"
+    ).replace(/\/$/, "");
+    this.apiKey = opts.apiKey ?? process.env.OPENAI_API_KEY ?? "";
+    this.model = opts.model || process.env.TRANSCRIPTION_MODEL || "whisper-1";
   }
 
   async transcribe(wavFilePath: string): Promise<TranscriptionResult> {
     if (!this.apiKey) {
       throw new Error(
-        "GroqProvider: GROQ_API_KEY is not set. " +
-          "Set the environment variable or pass an API key to the constructor."
+        "GatewayProvider: OPENAI_API_KEY (gateway key) is not set."
       );
     }
 
@@ -207,86 +222,16 @@ export class GroqProvider implements TranscriptionProvider {
     formData.append("response_format", "verbose_json");
     formData.append("timestamp_granularities[]", "segment");
 
-    const response = await fetch(
-      "https://api.groq.com/openai/v1/audio/transcriptions",
-      {
-        method: "POST",
-        headers: { Authorization: `Bearer ${this.apiKey}` },
-        body: formData,
-      }
-    );
+    const response = await fetch(`${this.baseUrl}/audio/transcriptions`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${this.apiKey}` },
+      body: formData,
+    });
 
     if (!response.ok) {
       const error = await response.text();
       throw new Error(
-        `GroqProvider: transcription failed (HTTP ${response.status}): ${error}`
-      );
-    }
-
-    const data = (await response.json()) as {
-      text: string;
-      segments?: Array<{ start: number; end: number; text: string }>;
-      language?: string;
-    };
-
-    return {
-      text: data.text,
-      segments:
-        data.segments?.map((s) => ({
-          start: s.start,
-          end: s.end,
-          text: s.text,
-        })) ?? [],
-      language: data.language,
-    };
-  }
-}
-
-// ==================== OpenAIProvider ====================
-
-/**
- * OpenAIProvider — transcribes audio using the OpenAI Whisper API.
- * Requires the OPENAI_API_KEY environment variable.
- */
-export class OpenAIProvider implements TranscriptionProvider {
-  private readonly apiKey: string;
-  private readonly model: string;
-
-  constructor(apiKey?: string, model = "whisper-1") {
-    this.apiKey = apiKey ?? process.env.OPENAI_API_KEY ?? "";
-    this.model = model;
-  }
-
-  async transcribe(wavFilePath: string): Promise<TranscriptionResult> {
-    if (!this.apiKey) {
-      throw new Error(
-        "OpenAIProvider: OPENAI_API_KEY is not set. " +
-          "Set the environment variable or pass an API key to the constructor."
-      );
-    }
-
-    const audioBuffer = await readFile(wavFilePath);
-    const blob = new Blob([new Uint8Array(audioBuffer)], { type: "audio/wav" });
-
-    const formData = new FormData();
-    formData.append("file", blob, "audio.wav");
-    formData.append("model", this.model);
-    formData.append("response_format", "verbose_json");
-    formData.append("timestamp_granularities[]", "segment");
-
-    const response = await fetch(
-      "https://api.openai.com/v1/audio/transcriptions",
-      {
-        method: "POST",
-        headers: { Authorization: `Bearer ${this.apiKey}` },
-        body: formData,
-      }
-    );
-
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(
-        `OpenAIProvider: transcription failed (HTTP ${response.status}): ${error}`
+        `GatewayProvider: transcription failed (HTTP ${response.status}): ${error}`
       );
     }
 
@@ -370,11 +315,12 @@ export class LocalWhisperProvider implements TranscriptionProvider {
 // ==================== Provider factory ====================
 
 function createDefaultProvider(): TranscriptionProvider {
-  const providerName = process.env.TRANSCRIPTION_PROVIDER?.toLowerCase();
-  if (providerName === "openai") return new OpenAIProvider();
-  if (providerName === "local") return new LocalWhisperProvider();
-  // Default: Groq (free)
-  return new GroqProvider();
+  // Self-hosted faster-whisper is the only opt-in alternative; everything else
+  // routes through the gateway (no direct Groq/OpenAI dependency).
+  if (process.env.TRANSCRIPTION_PROVIDER?.toLowerCase() === "local") {
+    return new LocalWhisperProvider();
+  }
+  return new GatewayProvider();
 }
 
 // ==================== MinIO helpers ====================
