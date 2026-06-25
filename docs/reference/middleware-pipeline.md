@@ -25,14 +25,12 @@ Middleware is wired in `app/lib/middleware-config.ts`.
 
 | Middleware | Hook | Purpose |
 |-----------|------|---------|
-| `EntityMemory` | `beforeAgent` | Queries Neo4j for entities related to the query. Flags stale entities (> 30 days). Injects summary into system prompt. |
 | `ResearchPlanner` | `beforeAgent` | For complex queries, generates a 3–5 step research plan and injects it into context. |
 | `ParallelDecomposition` | `beforeAgent` | Decomposes compound queries into focused sub-queries. Runs sub-queries concurrently. |
 | `DeferredToolLoading` | `beforeAgent` | Lazy-loads tool schemas. Disabled by default. |
 | `Clarification` | `wrapToolCall` | Intercepts `askClarification` tool calls. Returns the question to the client as a stream annotation. Pauses the agent loop. |
 | `LoopDetection` | `wrapToolCall` | Hashes each tool call. Warns the agent at the 2nd repeat of the same call. Blocks at 3rd repeat. |
 | `Reflection` | `afterModel` | Evaluates evidence quality after each LLM call. Guides the agent to fill gaps if sources are thin. |
-| `StructuredExtraction` | `afterAgent` | Extracts entities and relationships from the full research context. Stores as a preview for the "Add to Graph" button. |
 
 ## Hook signatures
 
@@ -67,7 +65,7 @@ interface AgentContext {
 }
 ```
 
-`metadata` is a mutable bag shared across all middleware in a request. Use it to pass state between hooks (e.g., `graphIsEmpty`, `researchPlan`).
+`metadata` is a mutable bag shared across all middleware in a request. Use it to pass state between hooks (e.g., `researchPlan`).
 
 ## `ToolContext`
 
@@ -86,12 +84,11 @@ When `LANGFUSE_PUBLIC_KEY` is set, every hook, tool call, and LLM call produces 
 
 ```
 Trace: search session
-  Span: EntityMemory.beforeAgent
+  Span: ResearchPlanner.beforeAgent
   Span: streamText agent loop
     Span: tool/searchWeb
     Span: tool/searchWikipedia
     Span: Reflection.afterModel
-  Span: StructuredExtraction.afterAgent
 ```
 
 Configure:
@@ -111,7 +108,7 @@ LANGFUSE_BASE_URL=https://cloud.langfuse.com  # or self-hosted
 import { MyMiddleware } from "@protolabsai/research-middleware";
 
 export const middlewareChain = createMiddlewareChain([
-  new EntityMemory(),
+  new ResearchPlanner(),
   new MyMiddleware({ option: "value" }),
   // ...
 ]);

@@ -12,10 +12,8 @@ const base = process.env.DOCS_BASE || "/rabbit-hole.io/";
 // Shared domain vocabulary — the same groups recur across every mode.
 const D = {
   search: "Search",
-  research: "Deep research (Atlas)",
+  research: "Deep research",
   ingestion: "Ingestion & search backends",
-  operate: "Operate & self-host",
-  fleet: "Fleet & agents",
 };
 
 export default defineConfig({
@@ -116,16 +114,6 @@ export default defineConfig({
           collapsed: false,
           items: [{ text: "SearXNG configuration", link: "/reference/searxng-config" }],
         },
-        {
-          text: D.operate,
-          collapsed: false,
-          items: [{ text: "Database migrations", link: "/reference/migrations" }],
-        },
-        {
-          text: D.fleet,
-          collapsed: true,
-          items: [{ text: "A2A agent", link: "/reference/a2a-agent" }],
-        },
       ],
 
       "/explanation/": [
@@ -143,14 +131,6 @@ export default defineConfig({
           collapsed: false,
           items: [
             { text: "Deep research pipeline", link: "/explanation/deep-research-pipeline" },
-          ],
-        },
-        {
-          text: D.operate,
-          collapsed: false,
-          items: [
-            { text: "Database", link: "/explanation/database" },
-            { text: "Fleet agent", link: "/explanation/fleet-agent" },
           ],
         },
       ],

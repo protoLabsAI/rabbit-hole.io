@@ -45,7 +45,6 @@ For each dimension, the agent searches:
 
 1. **Web** — SearXNG general category, then social media/IT categories for depth
 2. **Wikipedia** — foundational context
-3. **Knowledge graph** — prior sessions if available
 
 You'll see per-dimension progress cards as each completes.
 
@@ -75,10 +74,6 @@ The right panel (toggle with the **Sources** button) lists all sources numbered 
 ## Step 5 — Download the report
 
 Click **Download** (top right of the center panel) to export the report as Markdown.
-
-## Step 6 — Add to knowledge graph
-
-If the research produced useful entities, click **Add to Graph** on any message to extract and ingest entities into Neo4j. Future searches will find this knowledge.
 
 ## What's next
 
