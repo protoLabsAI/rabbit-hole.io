@@ -16,15 +16,16 @@ export const SITE_NAME = "rabbit-hole.io";
 export const SITE_TAGLINE = "Alice was on to something";
 
 /** <title> default — descriptive for SEO; template applied to nested routes. */
-export const SITE_TITLE = "rabbit-hole.io — AI search across the web & your files";
+export const SITE_TITLE =
+  "rabbit-hole.io — a self-hostable AI search engine you run yourself";
 
 /** Meta description — descriptive, keyword-bearing, ~1–2 sentences. */
 export const SITE_DESCRIPTION =
-  "rabbit-hole.io is an open-source, self-hostable AI search engine over the open web and your own files. Bring your own key, no walled garden.";
+  "rabbit-hole.io is an open-source, self-hostable AI search engine — a reference pattern you run yourself, over the open web and your own files. Bring your own key, no walled garden.";
 
 /** Tight value-prop rendered on the 1200×630 OG image. */
 export const SITE_OG_LEDE =
-  "AI search across the open web and your own files — self-hostable, no walled garden.";
+  "An open, self-hostable AI-search pattern — runs over the web and your own files. BYOK.";
 
 export const SITE_KEYWORDS = [
   "AI search",
