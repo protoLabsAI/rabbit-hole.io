@@ -1,7 +1,8 @@
-import protoTheme from "@protolabsai/vitepress-theme";
 import type { Theme } from "vitepress";
 import DefaultTheme from "vitepress/theme";
 import { h } from "vue";
+
+import protoTheme from "@protolabsai/vitepress-theme";
 
 import StudioFooter from "./StudioFooter.vue";
 // rabbit-hole brand token overrides — loaded AFTER the shared theme so they win.
