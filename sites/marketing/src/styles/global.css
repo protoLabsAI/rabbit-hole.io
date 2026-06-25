@@ -1,0 +1,147 @@
+/*
+ * rabbit-hole.io marketing — brand tokens + base.
+ *
+ * Built on @protolabsai/design (the shared --pl-* token system) but recolored to
+ * rabbit-hole's own warm/slate identity so it matches docs.rabbit-hole.io
+ * (warm off-white + off-black, slate accent). Light by default (editorial),
+ * dark via prefers-color-scheme.
+ */
+@import "@protolabsai/design/css";
+
+:root {
+  color-scheme: light;
+
+  --pl-color-bg: #f8f7f4;
+  --pl-color-bg-raised: #ffffff;
+  --pl-color-bg-subtle: #f1f0ec;
+  --pl-color-bg-inset: #edebe6;
+  --pl-color-bg-hover: #efede8;
+
+  --pl-color-fg: #1c1c1e;
+  --pl-color-fg-muted: #5b5b5e;
+  --pl-color-fg-subtle: #8a8a8d;
+
+  --pl-color-border: #e7e5e0;
+  --pl-color-border-strong: #d8d5ce;
+
+  --pl-color-accent: #475569;
+  --pl-color-accent-hover: #334155;
+  --pl-color-fg-on-accent: #ffffff;
+  --pl-color-focus: #475569;
+
+  --pl-gradient-brand: linear-gradient(135deg, #475569 0%, #334155 100%);
+  --pl-shadow-glow: 0 1px 2px rgba(28, 28, 30, 0.05),
+    0 12px 40px rgba(28, 28, 30, 0.07);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --pl-color-bg: #141414;
+    --pl-color-bg-raised: #1c1c1c;
+    --pl-color-bg-subtle: #1a1a1a;
+    --pl-color-bg-inset: #0f0f0f;
+    --pl-color-bg-hover: #222222;
+
+    --pl-color-fg: #e0e0e0;
+    --pl-color-fg-muted: #a0a0a0;
+    --pl-color-fg-subtle: #777777;
+
+    --pl-color-border: #2a2a2a;
+    --pl-color-border-strong: #3a3a3a;
+
+    --pl-color-accent: #94a3b8;
+    --pl-color-accent-hover: #cbd5e1;
+
+    --pl-gradient-brand: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+    --pl-shadow-glow: 0 0 80px rgba(148, 163, 184, 0.06);
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--pl-color-bg);
+  color: var(--pl-color-fg);
+  font-family: var(--pl-font-sans, "Inter", system-ui, sans-serif);
+  font-size: var(--pl-font-base-size, 16px);
+  line-height: var(--pl-font-line-height-body, 1.6);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3 {
+  line-height: var(--pl-font-line-height-heading, 1.2);
+  font-weight: var(--pl-font-weight-semibold, 600);
+  margin: 0 0 var(--pl-space-4, 1rem);
+  letter-spacing: -0.02em;
+}
+
+a {
+  color: var(--pl-color-accent);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+code,
+pre {
+  font-family: var(--pl-font-mono, ui-monospace, "SF Mono", Menlo, monospace);
+}
+
+.container {
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 var(--pl-space-6, 1.5rem);
+}
+
+.gradient-text {
+  background: var(--pl-gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pl-space-2, 0.5rem);
+  padding: var(--pl-space-3, 0.75rem) var(--pl-space-5, 1.25rem);
+  border-radius: var(--pl-radius, 8px);
+  font-weight: var(--pl-font-weight-medium, 500);
+  font-size: 0.95rem;
+  border: 1px solid transparent;
+  transition: all 160ms ease;
+}
+.btn:hover {
+  text-decoration: none;
+}
+.btn-primary {
+  background: var(--pl-color-accent);
+  color: var(--pl-color-fg-on-accent, #fff);
+}
+.btn-primary:hover {
+  background: var(--pl-color-accent-hover);
+}
+.btn-ghost {
+  background: var(--pl-color-bg-raised);
+  border-color: var(--pl-color-border-strong);
+  color: var(--pl-color-fg);
+}
+.btn-ghost:hover {
+  border-color: var(--pl-color-fg-subtle);
+}
