@@ -7,7 +7,10 @@ import { defineConfig } from "vitepress";
 // Styling comes from @protolabsai/vitepress-theme with rabbit-hole's token
 // overrides in .vitepress/theme/custom.css.
 
-const base = process.env.DOCS_BASE || "/rabbit-hole.io/";
+// Default base is "/" — docs ship to the subdomain root docs.rabbit-hole.io
+// (Cloudflare Pages). DOCS_BASE can still override it (e.g. "/rabbit-hole.io/"
+// for a GitHub Pages project-path build).
+const base = process.env.DOCS_BASE || "/";
 
 // Shared domain vocabulary — the same groups recur across every mode.
 const D = {
