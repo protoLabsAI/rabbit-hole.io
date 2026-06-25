@@ -51,24 +51,32 @@ updates:
   # removed for exactly this reason.)
 
   # ==================== DOCKER ====================
+  #
+  # NOTE: each entry must point at a directory that CONTAINS a Dockerfile.
+  # Dependabot's docker ecosystem only bumps Dockerfiles and Kubernetes
+  # manifests — it does NOT update `image:` pins in docker-compose*.yml. A
+  # root entry (directory: "/") fails with "No Dockerfiles found" because the
+  # repo root has only compose files. The compose image pins (postgres, neo4j,
+  # minio, cloudflared, ...) are therefore bumped by hand.
 
-  # Main Docker Compose files
+  # Web app Dockerfiles (apps/rabbit-hole/Dockerfile + Dockerfile.fast)
   - package-ecosystem: "docker"
-    directory: "/"
+    directory: "/apps/rabbit-hole"
     schedule:
       interval: "weekly"
       day: "thursday"
       time: "09:00"
     groups:
-      docker-images:
+      docker-app:
         patterns:
           - "*"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 3
     labels:
       - "dependencies"
       - "docker"
+      - "web"
     commit-message:
-      prefix: "chore(deps-docker)"
+      prefix: "chore(deps-docker-app)"
 
   # Agent Dockerfiles
   - package-ecosystem: "docker"
@@ -89,7 +97,7 @@ updates:
     commit-message:
       prefix: "chore(deps-docker-agent)"
 
-  # Job-processor Dockerfile (the one live service)
+  # Job-processor service Dockerfile
   - package-ecosystem: "docker"
     directory: "/services/job-processor"
     schedule:
@@ -107,6 +115,25 @@ updates:
       - "services"
     commit-message:
       prefix: "chore(deps-docker-job-processor)"
+
+  # Custom Postgres image (docker/postgres/Dockerfile — pgvector base)
+  - package-ecosystem: "docker"
+    directory: "/docker/postgres"
+    schedule:
+      interval: "weekly"
+      day: "thursday"
+      time: "09:00"
+    groups:
+      docker-postgres:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 2
+    labels:
+      - "dependencies"
+      - "docker"
+      - "database"
+    commit-message:
+      prefix: "chore(deps-docker-postgres)"
 
   # ==================== GITHUB ACTIONS ====================
 
