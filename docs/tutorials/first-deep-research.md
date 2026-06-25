@@ -83,5 +83,4 @@ If the research produced useful entities, click **Add to Graph** on any message 
 ## What's next
 
 - [Use deep research modes](../how-to/deep-research-modes) — standard vs. comprehensive vs. quick
-- [Ingest to knowledge graph](../how-to/ingest-to-graph) — build your personal knowledge base
 - [Deep research pipeline](../explanation/deep-research-pipeline) — how SCOPE → RESEARCH → EVALUATE → SYNTHESIS works

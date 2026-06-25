@@ -1,0 +1,79 @@
+/*
+ * rabbit-hole brand token overrides on @protolabsai/vitepress-theme.
+ *
+ * The shared theme maps VitePress's --vp-* variables from these --pl-* design
+ * tokens, so recoloring the tokens here re-skins the whole docs site to
+ * rabbit-hole's warm identity — warm off-white + off-black with a slate accent
+ * — instead of the fleet-default lavender/indigo. Light + dark.
+ *
+ * Palette mirrors the app theme (prod-environment) and the OG card:
+ *   light  bg #F8F7F4  text #1C1C1E
+ *   dark   bg #141414  text #E0E0E0
+ *   accent slate (#475569 light / #94A3B8 dark)
+ */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+:root {
+  /* match the app + OG card typography */
+  --pl-font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ── Light — warm off-white / off-black ───────────────────────────────── */
+:root:not(.dark) {
+  --pl-color-bg: #f8f7f4;
+  --pl-color-bg-raised: #ffffff;
+  --pl-color-bg-subtle: #f1f0ec;
+  --pl-color-bg-inset: #edebe6;
+  --pl-color-bg-hover: #efede8;
+
+  --pl-color-fg: #1c1c1e;
+  --pl-color-fg-muted: #5b5b5e;
+  --pl-color-fg-subtle: #8a8a8d;
+
+  --pl-color-border: #e7e5e0;
+  --pl-color-border-strong: #d8d5ce;
+
+  --pl-color-accent: #475569;
+  --pl-color-accent-hover: #334155;
+  --pl-color-accent-fg: #ffffff;
+  --pl-color-fg-on-accent: #ffffff;
+  --pl-color-focus: #475569;
+
+  /* brand ramp the theme maps --vp-c-brand-1/2/3 from */
+  --pl-color-brand-indigo-deep: #334155;
+  --pl-color-brand-indigo: #475569;
+  --pl-color-brand-lavender: #64748b;
+  --pl-color-brand-lavender-light: #94a3b8;
+
+  --pl-gradient-brand: linear-gradient(135deg, #475569 0%, #334155 100%);
+}
+
+/* ── Dark — near-black / off-white ────────────────────────────────────── */
+:root.dark {
+  --pl-color-bg: #141414;
+  --pl-color-bg-raised: #1c1c1c;
+  --pl-color-bg-subtle: #1a1a1a;
+  --pl-color-bg-inset: #0f0f0f;
+  --pl-color-bg-hover: #222222;
+
+  --pl-color-fg: #e0e0e0;
+  --pl-color-fg-muted: #a0a0a0;
+  --pl-color-fg-subtle: #777777;
+
+  --pl-color-border: #2a2a2a;
+  --pl-color-border-strong: #3a3a3a;
+
+  --pl-color-accent: #94a3b8;
+  --pl-color-accent-hover: #cbd5e1;
+  --pl-color-accent-fg: #141414;
+  --pl-color-fg-on-accent: #141414;
+  --pl-color-focus: #94a3b8;
+
+  --pl-color-brand-indigo-deep: #cbd5e1;
+  --pl-color-brand-indigo: #94a3b8;
+  --pl-color-brand-lavender: #64748b;
+  --pl-color-brand-lavender-light: #94a3b8;
+
+  --pl-gradient-brand: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+}
