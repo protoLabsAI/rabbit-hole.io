@@ -44,7 +44,9 @@ export default defineConfig({
   ],
 
   themeConfig: {
-    logo: "/favicon.svg",
+    // Light/dark pair — the mark is dark ink, so it needs a light variant to be
+    // visible on the dark theme.
+    logo: { light: "/favicon.svg", dark: "/favicon-dark.svg" },
 
     nav: [
       { text: "Tutorials", link: "/tutorials/" },
