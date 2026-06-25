@@ -18,6 +18,4 @@ export { useToast, toast } from "@protolabsai/ui/hooks";
 // App-specific UI components:
 export { ThemeSelector } from "./ui/ThemeSelector";
 export { ThemedUserButton } from "./ui/ThemedUserButton";
-export { FileUploadButton } from "./ui/FileUploadButton";
-export { DialogHistoryNavigation } from "./ui/DialogHistoryNavigation";
 export { UserStatsPage } from "./ui/UserStatsPage";
