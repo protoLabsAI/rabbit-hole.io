@@ -39,7 +39,7 @@ Deep research breaks the problem into four phases that mirror how a human resear
 2. **Wikipedia** — foundational context if the dimension is well-documented
 3. **Secondary web search** — `social media,it` categories, angle query combining topic + dimension
 
-Graph search is skipped on a fresh installation (`graphIsEmpty` flag). When the graph has relevant content, it's searched here too.
+A corpus search over your ingested files (pgvector) runs alongside web search as the ingest→embed pipeline lands (see [#291](https://github.com/protoLabsAI/rabbit-hole.io/issues/291)).
 
 After collecting sources, a `generateObject` call compresses findings into:
 - `summary` — 2–3 sentence synthesis of what was found
