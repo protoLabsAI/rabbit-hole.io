@@ -7,7 +7,7 @@ These docs follow [Diátaxis](https://diataxis.fr): four modes (below), with pag
 ## Product Vision
 
 1. **Search Engine** (NOW) — Perplexity-style AI search at `/` over the web (Tavily/SearXNG) + your ingested corpus (pgvector). BYOK, self-hostable.
-2. **Research workspace** (COMING BACK) — gated behind `NEXT_PUBLIC_ENABLE_RESEARCH_ATLAS` while it's rebuilt.
+2. **Deep research** (NOW) — multi-step pipeline (scope → research → evaluate → synthesis) that produces a cited report. Available alongside search.
 3. **Research App** (FUTURE) — Downloadable Tauri/Electron app. Self-hostable local search engine.
 
 ## Start here
@@ -24,8 +24,8 @@ These docs follow [Diátaxis](https://diataxis.fr): four modes (below), with pag
 | Endpoint | Method | Purpose |
 |----------|--------|---------|
 | `/api/chat` | POST | Agentic search — AI SDK `streamText` with tools (BYOK via `x-llm-api-key`) |
-| `/api/research/deep` | POST | Start deep research job (gated behind `NEXT_PUBLIC_ENABLE_RESEARCH_ATLAS`) |
-| `/api/research/deep/:id` | GET | SSE stream for research progress (gated) |
-| `/api/research/deep/:id` | DELETE | Cancel a running research job (gated) |
-| `/api/research/deep/:id/status` | GET | Polling fallback for research status (gated) |
+| `/api/research/deep` | POST | Start a deep research job |
+| `/api/research/deep/:id` | GET | SSE stream for research progress |
+| `/api/research/deep/:id` | DELETE | Cancel a running research job |
+| `/api/research/deep/:id/status` | GET | Polling fallback for research status |
 | `/v1/chat/completions` | POST | OpenAI-compatible endpoint (BYOK via `Authorization: Bearer`) |

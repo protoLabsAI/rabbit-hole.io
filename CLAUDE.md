@@ -4,9 +4,9 @@
 
 The active surface is the **Search Engine** at `/`. Search is now **web (Tavily) + a corpus search over your ingested files** (pgvector on Postgres, 1024-dim qwen3 embeddings via the LLM gateway). The pgvector corpus ingest→embed pipeline is partly landed — tracked in [#291](https://github.com/protoLabsAI/rabbit-hole.io/issues/291).
 
-The research + deep-research workspace (Atlas) is **wanted and coming back**, currently gated behind the `NEXT_PUBLIC_ENABLE_RESEARCH_ATLAS` dev flag while it's rebuilt. It is not the always-on primary surface today, but it is not dead either — treat it as gated/in-progress.
+**Deep research is live** — `POST /api/research/deep` runs the scope → research → evaluate → synthesis pipeline. The old `NEXT_PUBLIC_ENABLE_RESEARCH_ATLAS` gate was removed; the flag is gone from app code. ("Atlas" was the removed Neo4j workspace — a separate thing; don't conflate it with deep research.)
 
-The old Neo4j/Qdrant knowledge-graph layer was cut from the **live search** surface — `/api/chat` has no graph/community tools, and the "Living Knowledge Graph" UI is gone. But Neo4j + Qdrant are **still wired in the codebase**: the gated Atlas deep-research (`/api/research/deep`) depends on them via `searchGraph`/`searchCommunities` in `app/lib/search.ts`. So the graph isn't gone — it's parked behind the Atlas gate. Don't expand it back into live search, and don't rip out Neo4j/Qdrant without first deciding Atlas's fate. (The orphaned entity-extraction HTTP routes — `app/api/research/{graph,entity,enrich-entity,extract-from-file,biographical,merge,relationships,report}` and `app/api/extraction*` — were deleted as dead code; the gated `searchGraph`/`searchCommunities` path was kept.)
+The old Neo4j/Qdrant knowledge-graph layer was cut from **both** live search and deep research — `searchGraph`/`searchCommunities` and the Neo4j/Qdrant imports were removed from `app/lib/search.ts` (#351), so neither `/api/chat` nor `/api/research/deep` touches the graph; both run web + wiki (+ corpus, landing per #291). The "Living Knowledge Graph" UI is gone. Neo4j/Qdrant **package** code (`@protolabsai/database`, `@protolabsai/vector`) still exists but is unused by the app — the full package-level drop is deferred. Don't reintroduce the graph. (The orphaned entity-extraction HTTP routes — `app/api/research/{graph,entity,enrich-entity,extract-from-file,biographical,merge,relationships,report}` and `app/api/extraction*` — were deleted as dead code.)
 
 ## Git Workflow
 
@@ -32,7 +32,7 @@ The old Neo4j/Qdrant knowledge-graph layer was cut from the **live search** surf
 
 **Frontend**: `useChat` from `@ai-sdk/react` + `DefaultChatTransport` → `POST /api/chat`
 
-**Backend**: AI SDK v6 `streamText`. The live search agent has **no** graph/community tools — those stayed behind with the gated Atlas deep-research path, not the live `/api/chat` agent. Current tools:
+**Backend**: AI SDK v6 `streamText`. The search agent has **no** graph/community tools — the graph was removed from the codebase's live paths (#351). Current tools:
 - `searchWeb` — web search (Tavily; SearXNG self-hosted also supported when `SEARXNG_ENDPOINT` is set)
 - `searchWikipedia` — Wikipedia article fetch
 - `askClarification` — Ask user a clarifying question (intercepted by middleware)
@@ -58,7 +58,7 @@ The agent decides tool order and iteration. `stopWhen: stepCountIs(5)`.
 
 **File ingestion** flows through the job-processor (`rh ingest` / file upload) → parse/transcribe → corpus storage. The old "Add to Knowledge Graph" entity-extraction path was removed with the graph layer.
 
-**Shared search utilities**: `app/lib/search.ts` holds `searchWeb`, `searchWikipedia`, `withRetry`, and the graph-backed `searchGraph`/`searchCommunities` (Neo4j fulltext + Qdrant vector, fused with RRF). `/api/chat` calls only web/wiki; the gated `/api/research/deep` additionally calls `searchGraph`/`searchCommunities`, so this module still imports `@protolabsai/database` (Neo4j) and `@protolabsai/vector` (Qdrant). These are **not** dead — they're the Atlas dependency.
+**Shared search utilities**: `app/lib/search.ts` holds `searchWeb`, `searchWikipedia`, and `withRetry` only — `searchGraph`/`searchCommunities` and the Neo4j/Qdrant imports were removed (#351). Both `/api/chat` and `/api/research/deep` use web + wiki (+ corpus, landing per #291); neither touches the graph.
 
 **Key files:**
 - `app/page.tsx` — Search engine UI (useChat + ChatMessage)
@@ -78,7 +78,7 @@ The agent decides tool order and iteration. `stopWhen: stepCountIs(5)`.
 
 ## Deep Research Architecture
 
-> Gated behind `NEXT_PUBLIC_ENABLE_RESEARCH_ATLAS` while the research workspace is rebuilt. Wanted and coming back — not a live production surface today.
+> Deep research is **live**. The old `NEXT_PUBLIC_ENABLE_RESEARCH_ATLAS` gate was removed (the flag is gone from app code). Per-dimension research uses web + wiki (+ corpus, landing per #291) — no graph.
 
 **Agentic pipeline**: SCOPE → PLAN REVIEW → RESEARCH (per dimension) → EVALUATE (gap analysis) → [loop?] → SYNTHESIS (streamed)
 
@@ -105,7 +105,7 @@ The agent decides tool order and iteration. `stopWhen: stepCountIs(5)`.
 ## Product Vision
 
 1. **Search Engine** (NOW) — Perplexity-style AI search over web (Tavily) + your ingested corpus (pgvector).
-2. **Research / Atlas workspace** (COMING BACK) — gated behind `NEXT_PUBLIC_ENABLE_RESEARCH_ATLAS`; being rebuilt.
+2. **Deep research** (NOW) — the `/api/research/deep` pipeline (scope → research → evaluate → synthesis), live alongside search.
 3. **Research App** (FUTURE) — Downloadable Tauri/Electron self-hostable app.
 
 ## `rh` CLI

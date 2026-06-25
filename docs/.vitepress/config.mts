@@ -17,7 +17,6 @@ const D = {
   search: "Search",
   research: "Deep research",
   ingestion: "Ingestion & search backends",
-  operate: "Operate & self-host",
 };
 
 export default defineConfig({
@@ -115,13 +114,6 @@ export default defineConfig({
           text: D.ingestion,
           collapsed: false,
           items: [{ text: "Configure SearXNG", link: "/how-to/configure-searxng" }],
-        },
-        {
-          text: D.operate,
-          collapsed: false,
-          items: [
-            { text: "Host a public BYOK demo", link: "/how-to/host-byok-demo" },
-          ],
         },
       ],
 
