@@ -17,8 +17,8 @@ features:
     details: Multi-step tool-calling agent searches the web (Tavily), Wikipedia, and your ingested corpus — then synthesizes a cited answer.
   - title: File & Media Ingestion
     details: Upload PDFs, docs, audio, and video via the bundled job processor. Files get parsed/transcribed and embedded into a pgvector corpus the agent can search (ingest→embed pipeline landing — see issue #291).
-  - title: Deep Research Workspace (coming back)
-    details: The deep-research workspace is being rebuilt and gated behind the NEXT_PUBLIC_ENABLE_RESEARCH_ATLAS flag. Wanted and returning — not the always-on surface today.
+  - title: Deep Research
+    details: Launch a multi-step research job — scope a topic into dimensions, search each one, evaluate coverage, and stream a cited report with a table of contents.
   - title: rh CLI
     details: The @protolabsai/rabbit-hole-cli (bin rh) exposes search, research, ingest, and status commands. Designed to be shelled out to by fleet agents.
   - title: BYOK & Self-host
