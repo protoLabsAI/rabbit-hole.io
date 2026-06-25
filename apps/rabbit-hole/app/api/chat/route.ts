@@ -21,7 +21,7 @@ import {
   type UIMessage,
 } from "ai";
 
-import { getAIModel } from "@protolabsai/llm-providers/server";
+import { getAIModelForRequest } from "@protolabsai/llm-providers/server";
 import {
   createTracingContext,
   DeferredToolLoadingMiddleware,
@@ -32,14 +32,47 @@ import { generateSecureId } from "@protolabsai/utils";
 
 import { SEARXNG_ENABLED, SYSTEM_PROMPT, searchTools } from "../../lib/agent";
 import { getMiddlewareRegistry } from "../../lib/middleware-config";
+import { clientIp, rateLimit } from "../../lib/rate-limit";
 
 // ─── Route Handler ──────────────────────────────────────────────────
 
 export async function POST(request: Request) {
+  // Public-demo rate limit — no-op unless RH_RATE_LIMIT_ENABLED=true.
+  const rl = rateLimit(`chat:${clientIp(request.headers)}`);
+  if (!rl.ok) {
+    return new Response(
+      JSON.stringify({ error: "Rate limit exceeded. Try again shortly." }),
+      {
+        status: 429,
+        headers: {
+          "content-type": "application/json",
+          "retry-after": String(rl.retryAfter),
+        },
+      }
+    );
+  }
+
   const body = await request.json();
   const messages: UIMessage[] = body.messages ?? [];
 
-  const model = getAIModel("smart");
+  // BYOK: honor a per-request key (x-llm-api-key); fall back to the server's
+  // env-configured provider. No key + no server key → friendly 401.
+  const model = (() => {
+    try {
+      return getAIModelForRequest(request.headers, "smart");
+    } catch {
+      return null;
+    }
+  })();
+  if (!model) {
+    return new Response(
+      JSON.stringify({
+        error:
+          "No LLM key available. Add your own key to use this demo (Bring Your Own Key).",
+      }),
+      { status: 401, headers: { "content-type": "application/json" } }
+    );
+  }
 
   // ── Middleware setup ──────────────────────────────────────────────
   const agentId = generateSecureId();

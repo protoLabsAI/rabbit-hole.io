@@ -15,7 +15,14 @@ export {
 } from "./factory/convenience";
 
 // AI SDK adapter (Vercel AI SDK v6)
-export { getAIModel, getAIModelByName, resetAIProvider } from "./ai-sdk";
+export {
+  getAIModel,
+  getAIModelByName,
+  getAIModelForRequest,
+  readRequestKey,
+  resetAIProvider,
+  type RequestKeyOverride,
+} from "./ai-sdk";
 
 // Configuration (uses fs)
 export { loadConfig, getConfig } from "./config";

@@ -19,10 +19,11 @@
 import { streamText, stepCountIs, type ModelMessage } from "ai";
 import { z } from "zod";
 
-import { getAIModel } from "@protolabsai/llm-providers/server";
+import { getAIModelForRequest } from "@protolabsai/llm-providers/server";
 import { generateSecureId } from "@protolabsai/utils";
 
 import { searchTools, SYSTEM_PROMPT } from "../../../lib/agent";
+import { clientIp, rateLimit } from "../../../lib/rate-limit";
 
 // ─── Schemas ────────────────────────────────────────────────────────
 
@@ -82,6 +83,20 @@ function toModelMessages(
 // ─── Route handler ──────────────────────────────────────────────────
 
 export async function POST(request: Request) {
+  // Public-demo rate limit — no-op unless RH_RATE_LIMIT_ENABLED=true.
+  const rl = rateLimit(`v1:${clientIp(request.headers)}`);
+  if (!rl.ok) {
+    return Response.json(
+      {
+        error: {
+          message: "Rate limit exceeded. Try again shortly.",
+          type: "rate_limit_error",
+        },
+      },
+      { status: 429, headers: { "retry-after": String(rl.retryAfter) } }
+    );
+  }
+
   let body: unknown;
   try {
     body = await request.json();
@@ -111,7 +126,27 @@ export async function POST(request: Request) {
   const completionId = `chatcmpl-${generateSecureId()}`;
   const created = Math.floor(Date.now() / 1000);
 
-  const model = getAIModel("smart");
+  // BYOK: honor Authorization: Bearer <key> (or x-llm-api-key); fall back to
+  // the server's env-configured provider. No key anywhere → friendly 401.
+  const model = (() => {
+    try {
+      return getAIModelForRequest(request.headers, "smart");
+    } catch {
+      return null;
+    }
+  })();
+  if (!model) {
+    return Response.json(
+      {
+        error: {
+          message:
+            "No LLM key available. Pass your key as 'Authorization: Bearer <key>' (Bring Your Own Key).",
+          type: "invalid_request_error",
+        },
+      },
+      { status: 401 }
+    );
+  }
   const modelMessages = toModelMessages(messages);
 
   const result = streamText({

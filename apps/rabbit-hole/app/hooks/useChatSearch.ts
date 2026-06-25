@@ -4,8 +4,22 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { useCallback, useMemo } from "react";
 
+import { readByokKey } from "./useByokKey";
+
 const transport = new DefaultChatTransport({
   api: "/api/chat",
+  // BYOK: attach the visitor's own key (from localStorage) per request, read
+  // fresh each time so it picks up changes without a reload.
+  prepareSendMessagesRequest: ({ headers, body }) => {
+    const key = readByokKey();
+    return {
+      body: body ?? {},
+      headers: {
+        ...(headers as Record<string, string> | undefined),
+        ...(key ? { "x-llm-api-key": key } : {}),
+      },
+    };
+  },
 });
 
 export function useChatSearch() {
