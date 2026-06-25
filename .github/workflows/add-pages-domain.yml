@@ -1,0 +1,98 @@
+name: Attach Cloudflare Pages custom domain
+
+# One-shot helper. Attaches a custom domain to a Cloudflare Pages project and
+# creates the proxied CNAME for it. Idempotent — safe to re-run.
+#
+# Run it twice to wire both surfaces:
+#   project=rabbit-hole-marketing  domain=rabbit-hole.io
+#   project=rabbit-hole-docs       domain=docs.rabbit-hole.io
+#
+# Needs CLOUDFLARE_PAGES_API (Pages:Edit + Zone DNS:Edit). Falls back to
+# CLOUDFLARE_API_TOKEN, but that usually lacks Zone DNS:Edit, so the DNS step
+# is best-effort and prints a manual-fix hint if it can't write the record.
+
+on:
+  workflow_dispatch:
+    inputs:
+      project:
+        description: "Cloudflare Pages project name"
+        required: true
+        type: choice
+        options:
+          - rabbit-hole-marketing
+          - rabbit-hole-docs
+      domain:
+        description: "Custom domain to attach (e.g. rabbit-hole.io or docs.rabbit-hole.io)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  attach:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CF_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_API || secrets.CLOUDFLARE_API_TOKEN }}
+      PROJECT: ${{ inputs.project }}
+      DOMAIN: ${{ inputs.domain }}
+    steps:
+      - name: Attach domain to Pages project
+        run: |
+          set -euo pipefail
+          echo "Attaching $DOMAIN to Pages project $PROJECT ..."
+          resp=$(curl -sS -X POST \
+            "https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/pages/projects/${PROJECT}/domains" \
+            -H "Authorization: Bearer ${CF_TOKEN}" \
+            -H "Content-Type: application/json" \
+            --data "{\"name\":\"${DOMAIN}\"}")
+          echo "$resp" | jq -e '.success == true' >/dev/null 2>&1 && echo "  attached." && exit 0
+          # Tolerate "already exists" (8000000-ish) without failing the run.
+          if echo "$resp" | jq -e '.errors[]?.message | test("already"; "i")' >/dev/null 2>&1; then
+            echo "  already attached — ok."
+            exit 0
+          fi
+          echo "  Pages domain attach response:"
+          echo "$resp" | jq .
+          exit 1
+
+      - name: Create proxied CNAME
+        run: |
+          set -euo pipefail
+          # Zone = last two labels of the domain (docs.rabbit-hole.io -> rabbit-hole.io).
+          ZONE_NAME=$(echo "$DOMAIN" | awk -F. '{print $(NF-1)"."$NF}')
+          echo "Resolving zone $ZONE_NAME ..."
+          zone_id=$(curl -sS \
+            "https://api.cloudflare.com/client/v4/zones?name=${ZONE_NAME}" \
+            -H "Authorization: Bearer ${CF_TOKEN}" \
+            -H "Content-Type: application/json" | jq -r '.result[0].id // empty')
+
+          if [ -z "$zone_id" ]; then
+            echo "::warning::Could not read zone '$ZONE_NAME' with this token."
+            echo "::warning::Add a PROXIED CNAME manually: $DOMAIN -> ${PROJECT}.pages.dev"
+            exit 0
+          fi
+
+          target="${PROJECT}.pages.dev"
+          existing=$(curl -sS \
+            "https://api.cloudflare.com/client/v4/zones/${zone_id}/dns_records?type=CNAME&name=${DOMAIN}" \
+            -H "Authorization: Bearer ${CF_TOKEN}" \
+            -H "Content-Type: application/json" | jq -r '.result[0].id // empty')
+
+          payload="{\"type\":\"CNAME\",\"name\":\"${DOMAIN}\",\"content\":\"${target}\",\"proxied\":true}"
+          if [ -n "$existing" ]; then
+            echo "Updating CNAME $DOMAIN -> $target"
+            curl -sS -X PUT \
+              "https://api.cloudflare.com/client/v4/zones/${zone_id}/dns_records/${existing}" \
+              -H "Authorization: Bearer ${CF_TOKEN}" \
+              -H "Content-Type: application/json" --data "$payload" | jq -e '.success' >/dev/null
+          else
+            echo "Creating CNAME $DOMAIN -> $target"
+            curl -sS -X POST \
+              "https://api.cloudflare.com/client/v4/zones/${zone_id}/dns_records" \
+              -H "Authorization: Bearer ${CF_TOKEN}" \
+              -H "Content-Type: application/json" --data "$payload" | jq -e '.success' >/dev/null
+          fi
+          echo "DNS record set: $DOMAIN -> $target (proxied)"
