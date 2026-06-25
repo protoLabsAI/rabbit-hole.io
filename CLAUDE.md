@@ -106,7 +106,6 @@ The agent decides tool order and iteration. `stopWhen: stepCountIs(5)`.
 
 1. **Search Engine** (NOW) — Perplexity-style AI search over web (Tavily) + your ingested corpus (pgvector).
 2. **Deep research** (NOW) — the `/api/research/deep` pipeline (scope → research → evaluate → synthesis), live alongside search.
-3. **Research App** (FUTURE) — Downloadable Tauri/Electron self-hostable app.
 
 ## `rh` CLI
 

@@ -8,7 +8,6 @@ These docs follow [Diátaxis](https://diataxis.fr): four modes (below), with pag
 
 1. **Search Engine** (NOW) — Perplexity-style AI search at `/` over the web (Tavily/SearXNG) + your ingested corpus (pgvector). BYOK, self-hostable.
 2. **Deep research** (NOW) — multi-step pipeline (scope → research → evaluate → synthesis) that produces a cited report. Available alongside search.
-3. **Research App** (FUTURE) — Downloadable Tauri/Electron app. Self-hostable local search engine.
 
 ## Start here
 

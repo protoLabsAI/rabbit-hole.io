@@ -26,19 +26,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
 
-    <!-- Adaptive favicon: dark-ink mark on light, off-white on dark tab bars. -->
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href="/favicon.svg"
-      media="(prefers-color-scheme: light)"
-    />
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href="/favicon-dark.svg"
-      media="(prefers-color-scheme: dark)"
-    />
+    <!-- Single self-adapting favicon — the SVG recolors via an internal
+         prefers-color-scheme media query (same file drives the nav mark). -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />

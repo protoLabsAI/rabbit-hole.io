@@ -29,26 +29,10 @@ export default defineConfig({
   ignoreDeadLinks: "localhostLinks",
 
   head: [
-    // Browser-tab favicon adapts to the OS scheme, same reasoning as the nav
-    // logo: the mark is dark ink, so a dark tab bar needs the light variant.
-    [
-      "link",
-      {
-        rel: "icon",
-        type: "image/svg+xml",
-        href: `${base}favicon.svg`,
-        media: "(prefers-color-scheme: light)",
-      },
-    ],
-    [
-      "link",
-      {
-        rel: "icon",
-        type: "image/svg+xml",
-        href: `${base}favicon-dark.svg`,
-        media: "(prefers-color-scheme: dark)",
-      },
-    ],
+    // Single self-adapting favicon — the SVG recolors via an internal
+    // prefers-color-scheme media query, so it stays visible on light and dark
+    // tab bars without swapping files.
+    ["link", { rel: "icon", type: "image/svg+xml", href: `${base}favicon.svg` }],
     ["meta", { name: "theme-color", content: "#F8F7F4" }],
     ["meta", { property: "og:type", content: "website" }],
     ["meta", { property: "og:title", content: "rabbit-hole.io — docs" }],
@@ -66,9 +50,9 @@ export default defineConfig({
   ],
 
   themeConfig: {
-    // Light/dark pair — the mark is dark ink, so it needs a light variant to be
-    // visible on the dark theme.
-    logo: { light: "/favicon.svg", dark: "/favicon-dark.svg" },
+    // Single self-adapting SVG (recolors via prefers-color-scheme) — no need
+    // for a light/dark file pair.
+    logo: "/favicon.svg",
 
     nav: [
       { text: "Tutorials", link: "/tutorials/" },
