@@ -1,4 +1,4 @@
-FROM postgres:15
+FROM postgres:18
 
 # Copy migrations into container (eliminates volume mount issues)
 COPY migrations/postgresql/*.sh /docker-entrypoint-initdb.d/
