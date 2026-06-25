@@ -26,7 +26,26 @@ export default defineConfig({
   ignoreDeadLinks: "localhostLinks",
 
   head: [
-    ["link", { rel: "icon", type: "image/svg+xml", href: `${base}favicon.svg` }],
+    // Browser-tab favicon adapts to the OS scheme, same reasoning as the nav
+    // logo: the mark is dark ink, so a dark tab bar needs the light variant.
+    [
+      "link",
+      {
+        rel: "icon",
+        type: "image/svg+xml",
+        href: `${base}favicon.svg`,
+        media: "(prefers-color-scheme: light)",
+      },
+    ],
+    [
+      "link",
+      {
+        rel: "icon",
+        type: "image/svg+xml",
+        href: `${base}favicon-dark.svg`,
+        media: "(prefers-color-scheme: dark)",
+      },
+    ],
     ["meta", { name: "theme-color", content: "#F8F7F4" }],
     ["meta", { property: "og:type", content: "website" }],
     ["meta", { property: "og:title", content: "rabbit-hole.io — docs" }],
