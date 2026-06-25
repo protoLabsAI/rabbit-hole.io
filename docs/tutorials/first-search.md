@@ -6,7 +6,6 @@ This tutorial walks you through a complete search session — from typing a quer
 
 - Rabbit Hole running locally (`pnpm dev`)
 - SearXNG reachable at `SEARXNG_ENDPOINT` (e.g. `http://ava:8888`)
-- Neo4j running (results will be empty but search still works)
 
 ## Step 1 — Open the search page
 

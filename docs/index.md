@@ -13,20 +13,15 @@ hero:
       link: /reference/
 
 features:
-  - icon: 🔍
-    title: Agentic Search Chat
+  - title: Agentic Search Chat
     details: Multi-step tool-calling agent searches the web (Tavily), Wikipedia, and your ingested corpus — then synthesizes a cited answer.
-  - icon: 📄
-    title: File & Media Ingestion
+  - title: File & Media Ingestion
     details: Upload PDFs, docs, audio, and video via the bundled job processor. Files get parsed/transcribed and embedded into a pgvector corpus the agent can search (ingest→embed pipeline landing — see issue #291).
-  - icon: 🧪
-    title: Research Workspace (coming back)
-    details: The deep-research / Atlas workspace is being rebuilt and gated behind the NEXT_PUBLIC_ENABLE_RESEARCH_ATLAS dev flag. Wanted and returning — not the always-on surface today.
-  - icon: 🦫
-    title: rh CLI
+  - title: Deep Research Workspace (coming back)
+    details: The deep-research workspace is being rebuilt and gated behind the NEXT_PUBLIC_ENABLE_RESEARCH_ATLAS flag. Wanted and returning — not the always-on surface today.
+  - title: rh CLI
     details: The @protolabsai/rabbit-hole-cli (bin rh) exposes search, research, ingest, and status commands. Designed to be shelled out to by fleet agents.
-  - icon: 🌐
-    title: BYOK & Self-host
+  - title: BYOK & Self-host
     details: Apache 2.0 docker-compose stack. Bring your own LLM key, optionally point at SearXNG for self-hosted meta-search. No subscription.
 ---
 
