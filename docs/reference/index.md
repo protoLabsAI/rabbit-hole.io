@@ -9,4 +9,5 @@ Reference docs are **information-oriented** — complete, accurate specification
 | [Search functions](./search-functions) | `searchGraph`, `searchWeb`, `searchWikipedia` signatures |
 | [Middleware pipeline](./middleware-pipeline) | All middleware, hooks, execution order, tracing |
 | [SearXNG configuration](./searxng-config) | Complete `settings.yml` reference |
+| [Database migrations](./migrations) | Migration system and how to run them |
 | [A2A Agent](./a2a-agent) | A2A skills, JSON-RPC methods, env vars, smoke tests |

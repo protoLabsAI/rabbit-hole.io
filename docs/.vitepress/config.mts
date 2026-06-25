@@ -1,12 +1,49 @@
 import { defineConfig } from "vitepress";
 
-export default defineConfig({
-  title: "Rabbit Hole",
-  description:
-    "AI-powered search engine with a living knowledge graph — deep research, citations, and SearXNG-backed web search.",
-  base: "/rabbit-hole.io/",
+// Docs IA follows the fleet's Diátaxis × domain pattern (see protoAgent / ORBIS):
+//   - top level = the four Diátaxis modes (Tutorials / How-to / Reference / Explanation)
+//   - within each mode, pages are grouped by DOMAIN (the sidebar groups below),
+//     using one shared domain vocabulary that recurs across all four modes.
+// Styling comes from @protolabsai/vitepress-theme with rabbit-hole's token
+// overrides in .vitepress/theme/custom.css.
 
-  head: [["link", { rel: "icon", href: "/rabbit-hole.io/favicon.svg" }]],
+const base = process.env.DOCS_BASE || "/rabbit-hole.io/";
+
+// Shared domain vocabulary — the same groups recur across every mode.
+const D = {
+  search: "Search",
+  research: "Deep research (Atlas)",
+  ingestion: "Ingestion & search backends",
+  operate: "Operate & self-host",
+  fleet: "Fleet & agents",
+};
+
+export default defineConfig({
+  title: "rabbit-hole.io",
+  description:
+    "A self-hostable AI search engine over the open web and your own files — docs for the search agent, deep research, ingestion, and self-hosting.",
+  base,
+  cleanUrls: true,
+  lastUpdated: true,
+  ignoreDeadLinks: "localhostLinks",
+
+  head: [
+    ["link", { rel: "icon", type: "image/svg+xml", href: `${base}favicon.svg` }],
+    ["meta", { name: "theme-color", content: "#F8F7F4" }],
+    ["meta", { property: "og:type", content: "website" }],
+    ["meta", { property: "og:title", content: "rabbit-hole.io — docs" }],
+    [
+      "meta",
+      {
+        property: "og:description",
+        content:
+          "A self-hostable AI search engine over the open web and your own files.",
+      },
+    ],
+    ["meta", { property: "og:image", content: "https://rabbit-hole.io/og-image.png" }],
+    ["meta", { name: "twitter:card", content: "summary_large_image" }],
+    ["meta", { name: "twitter:image", content: "https://rabbit-hole.io/og-image.png" }],
+  ],
 
   themeConfig: {
     logo: "/favicon.svg",
@@ -20,107 +57,114 @@ export default defineConfig({
 
     sidebar: {
       "/tutorials/": [
+        { text: "Tutorials", items: [{ text: "Overview", link: "/tutorials/" }] },
         {
-          text: "Tutorials",
+          text: D.search,
+          collapsed: false,
+          items: [{ text: "Your first search", link: "/tutorials/first-search" }],
+        },
+        {
+          text: D.research,
+          collapsed: false,
           items: [
-            { text: "Overview", link: "/tutorials/" },
-            {
-              text: "Your first search",
-              link: "/tutorials/first-search",
-            },
-            {
-              text: "Your first deep research",
-              link: "/tutorials/first-deep-research",
-            },
+            { text: "Your first deep research", link: "/tutorials/first-deep-research" },
           ],
         },
       ],
 
       "/how-to/": [
+        { text: "How-to", items: [{ text: "Overview", link: "/how-to/" }] },
         {
-          text: "How-to Guides",
+          text: D.search,
+          collapsed: false,
           items: [
-            { text: "Overview", link: "/how-to/" },
-            {
-              text: "Search with categories",
-              link: "/how-to/search-with-categories",
-            },
-            {
-              text: "Use deep research modes",
-              link: "/how-to/deep-research-modes",
-            },
-            {
-              text: "Ingest to knowledge graph",
-              link: "/how-to/ingest-to-graph",
-            },
-            {
-              text: "Configure SearXNG",
-              link: "/how-to/configure-searxng",
-            },
+            { text: "Search with categories", link: "/how-to/search-with-categories" },
           ],
+        },
+        {
+          text: D.research,
+          collapsed: false,
+          items: [
+            { text: "Use deep research modes", link: "/how-to/deep-research-modes" },
+          ],
+        },
+        {
+          text: D.ingestion,
+          collapsed: false,
+          items: [{ text: "Configure SearXNG", link: "/how-to/configure-searxng" }],
         },
       ],
 
       "/reference/": [
+        { text: "Reference", items: [{ text: "Overview", link: "/reference/" }] },
         {
-          text: "Reference",
+          text: D.search,
+          collapsed: false,
           items: [
-            { text: "Overview", link: "/reference/" },
-            {
-              text: "Search Chat API",
-              link: "/reference/search-chat-api",
-            },
-            {
-              text: "Deep Research API",
-              link: "/reference/deep-research-api",
-            },
-            {
-              text: "Search functions",
-              link: "/reference/search-functions",
-            },
-            {
-              text: "Middleware pipeline",
-              link: "/reference/middleware-pipeline",
-            },
-            {
-              text: "SearXNG configuration",
-              link: "/reference/searxng-config",
-            },
+            { text: "Search Chat API", link: "/reference/search-chat-api" },
+            { text: "Search functions", link: "/reference/search-functions" },
+            { text: "Middleware pipeline", link: "/reference/middleware-pipeline" },
           ],
+        },
+        {
+          text: D.research,
+          collapsed: false,
+          items: [{ text: "Deep Research API", link: "/reference/deep-research-api" }],
+        },
+        {
+          text: D.ingestion,
+          collapsed: false,
+          items: [{ text: "SearXNG configuration", link: "/reference/searxng-config" }],
+        },
+        {
+          text: D.operate,
+          collapsed: false,
+          items: [{ text: "Database migrations", link: "/reference/migrations" }],
+        },
+        {
+          text: D.fleet,
+          collapsed: true,
+          items: [{ text: "A2A agent", link: "/reference/a2a-agent" }],
         },
       ],
 
       "/explanation/": [
+        { text: "Explanation", items: [{ text: "Overview", link: "/explanation/" }] },
         {
-          text: "Explanation",
+          text: D.search,
+          collapsed: false,
           items: [
-            { text: "Overview", link: "/explanation/" },
-            {
-              text: "Search agent design",
-              link: "/explanation/search-agent-design",
-            },
-            {
-              text: "Deep research pipeline",
-              link: "/explanation/deep-research-pipeline",
-            },
-            {
-              text: "Graph and web search",
-              link: "/explanation/graph-web-relationship",
-            },
+            { text: "Search agent design", link: "/explanation/search-agent-design" },
+            { text: "Search architecture", link: "/explanation/search-architecture" },
+          ],
+        },
+        {
+          text: D.research,
+          collapsed: false,
+          items: [
+            { text: "Deep research pipeline", link: "/explanation/deep-research-pipeline" },
+          ],
+        },
+        {
+          text: D.operate,
+          collapsed: false,
+          items: [
+            { text: "Database", link: "/explanation/database" },
+            { text: "Fleet agent", link: "/explanation/fleet-agent" },
           ],
         },
       ],
     },
 
     socialLinks: [
-      {
-        icon: "github",
-        link: "https://github.com/protoLabsAI/rabbit-hole.io",
-      },
+      { icon: "github", link: "https://github.com/protoLabsAI/rabbit-hole.io" },
     ],
 
-    search: {
-      provider: "local",
+    search: { provider: "local" },
+
+    editLink: {
+      pattern: "https://github.com/protoLabsAI/rabbit-hole.io/edit/main/docs/:path",
+      text: "Edit this page on GitHub",
     },
 
     footer: {
