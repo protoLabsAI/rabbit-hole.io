@@ -29,7 +29,7 @@ curl -X POST http://localhost:3399/api/chat \
   -H "Content-Type: application/json" \
   -d '{
     "messages": [
-      { "role": "user", "content": "What is GraphRAG?" }
+      { "role": "user", "content": "What is retrieval-augmented generation?" }
     ]
   }'
 ```
@@ -56,30 +56,8 @@ When the agent calls a tool, a `2:` data event carries:
 {
   "type": "tool_call",
   "toolName": "searchWeb",
-  "args": { "query": "GraphRAG explained", "categories": "general" },
+  "args": { "query": "retrieval-augmented generation explained", "categories": "general" },
   "result": [ ... ]
-}
-```
-
-## Query graph tool
-
-**Tool name**: `searchGraph`
-
-Runs hybrid BM25 + vector search against Neo4j. Only called if the knowledge graph has content.
-
-**Input**:
-```typescript
-{ query: string }
-```
-
-**Output**: Array of `GraphSearchResult`:
-```typescript
-{
-  title: string;
-  content: string;
-  url: string;
-  score: number;
-  entityType?: string;
 }
 ```
 
@@ -128,35 +106,6 @@ When the agent is uncertain about query intent, it calls this tool. The `Clarifi
 { question: string }
 ```
 
-## Communities tool
-
-**Tool name**: `searchCommunities`
-
-Searches GraphRAG community summaries in Neo4j. Only called for broad thematic questions when the graph has community data.
-
-**Input**:
-```typescript
-{ query: string }
-```
-
-## Ingest endpoint
-
-```
-POST /api/chat/ingest
-```
-
-Extracts entities from a message and ingests them into Neo4j. Called when the user clicks **Add to Knowledge Graph**.
-
-**Request**:
-```typescript
-{
-  messageId: string;
-  sessionId: string;
-}
-```
-
-The `StructuredExtractionMiddleware` pre-computes extraction previews during the search, so this call is fast.
-
 ## Step limit
 
-The agent stops after **7 tool-call steps** (`stopWhen: stepCountIs(7)`).
+The agent stops after **5 tool-call steps** (`stopWhen: stepCountIs(5)`).

@@ -7,7 +7,7 @@ These docs follow [Diátaxis](https://diataxis.fr): four modes (below), with pag
 ## Product Vision
 
 1. **Search Engine** (NOW) — Perplexity-style AI search at `/` over the web (Tavily/SearXNG) + your ingested corpus (pgvector). BYOK, self-hostable.
-2. **Research / Atlas workspace** (COMING BACK) — gated behind `NEXT_PUBLIC_ENABLE_RESEARCH_ATLAS` while it's rebuilt.
+2. **Research workspace** (COMING BACK) — gated behind `NEXT_PUBLIC_ENABLE_RESEARCH_ATLAS` while it's rebuilt.
 3. **Research App** (FUTURE) — Downloadable Tauri/Electron app. Self-hostable local search engine.
 
 ## Start here

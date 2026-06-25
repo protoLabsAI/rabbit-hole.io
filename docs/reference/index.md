@@ -6,8 +6,6 @@ Reference docs are **information-oriented** — complete, accurate specification
 |-----------|---------------|
 | [Search Chat API](./search-chat-api) | `POST /api/chat` request/response, SSE event types |
 | [Deep Research API](./deep-research-api) | `POST /api/research/deep`, SSE event types, cancel |
-| [Search functions](./search-functions) | `searchGraph`, `searchWeb`, `searchWikipedia` signatures |
+| [Search functions](./search-functions) | `searchWeb`, `searchWikipedia`, `withRetry` signatures |
 | [Middleware pipeline](./middleware-pipeline) | All middleware, hooks, execution order, tracing |
 | [SearXNG configuration](./searxng-config) | Complete `settings.yml` reference |
-| [Database migrations](./migrations) | Migration system and how to run them |
-| [A2A Agent](./a2a-agent) | A2A skills, JSON-RPC methods, env vars, smoke tests |

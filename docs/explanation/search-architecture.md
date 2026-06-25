@@ -11,17 +11,16 @@ User types query
 useChat (DefaultChatTransport) → POST /api/chat
     │
     ▼
-[middleware chain: EntityMemory, ResearchPlanner, ParallelDecomposition]
+[middleware chain: ResearchPlanner, ParallelDecomposition, ...]
     │
     ▼
 streamText({
   model: getAIModel("smart"),
-  tools: { searchGraph, searchWeb, searchWikipedia, searchCommunities, askClarification },
-  stopWhen: stepCountIs(7)
+  tools: { searchWeb, searchWikipedia, askClarification },
+  stopWhen: stepCountIs(5)
 })
     │
-    ├─ LLM starts with searchWeb (SearXNG) — web-first when graph is empty
-    ├─ searchGraph skipped until graph has content (graphIsEmpty flag)
+    ├─ LLM starts with searchWeb (Tavily, or self-hosted SearXNG)
     ├─ searchWeb category routing: general / social media / it / science
     └─ Streams answer as UIMessage parts (text + tool calls)
 ```
@@ -39,20 +38,14 @@ Type `/` in the search input to toggle modes:
 
 Selected mode shows as a colored pill badge in the input. Keyboard navigation: arrows to select, tab/enter to confirm, esc to dismiss, backspace to clear mode.
 
-### Graph Ingestion
-
-User-controlled, not automatic. "Add to Knowledge Graph" button on each message calls `POST /api/chat/ingest` → extract entities via `getAIModel("fast")` → ingest bundle to Neo4j.
-
 ### Shared Search Utilities
 
 `app/lib/search.ts` is the single source of truth for search functions. Both `/api/chat` and `/api/research/deep` import from here.
 
 | Function | Purpose |
 |----------|---------|
-| `searchGraph(query, limit)` | Neo4j hybrid BM25 + vector search with RRF fusion |
-| `searchWeb(query, maxResults, options?)` | SearXNG meta-search (categories: general/social media/it/science/news) |
+| `searchWeb(query, maxResults, options?)` | Web meta-search (Tavily, or self-hosted SearXNG; categories: general/social media/it/science/news) |
 | `searchWikipedia(query)` | Wikipedia article fetch |
-| `buildLuceneQuery(rawQuery)` | Escape and wildcard-suffix for Lucene |
 | `withRetry(fn, options)` | Retry wrapper with exponential backoff |
 
 `WebSearchOptions`: `categories`, `engines`, `pageno`, `timeRange`
@@ -61,9 +54,8 @@ User-controlled, not automatic. "Add to Knowledge Graph" button on each message 
 
 | File | Purpose |
 |------|---------|
-| `app/lib/search.ts` | Shared search utilities (graph, web, wiki, retry) |
-| `app/api/chat/route.ts` | Agentic search (streamText + 3 tools) |
-| `app/api/chat/ingest/route.ts` | Manual entity extraction + ingest |
+| `app/lib/search.ts` | Shared search utilities (web, wiki, retry) |
+| `app/api/chat/route.ts` | Agentic search (streamText + tools) |
 | `app/hooks/useChatSearch.ts` | useChat wrapper |
 | `app/components/search/ChatMessage.tsx` | UIMessage parts renderer |
 | `app/components/search/ChatMarkdown.tsx` | Markdown renderer with inline citation support |
@@ -95,8 +87,7 @@ Phase 2: PLAN REVIEW
   └─ Dimensions shown to user (auto-continues after 1.5s)
 
 Phase 3: RESEARCH LOOP (per dimension, up to 3 iterations)
-  ├─ searchGraph → check existing knowledge, skip when graphIsEmpty (with retry)
-  ├─ searchWeb → SearXNG (categories: general + social media/it on gap iterations) (with retry)
+  ├─ searchWeb → web search (categories: general + social media/it on gap iterations) (with retry)
   ├─ searchWikipedia → article text (with retry)
   ├─ Compress findings via generateObject (summary + keyFinding)
   └─ EVALUATE: LLM checks coverage gaps
@@ -121,7 +112,7 @@ Key differences from a simple pipeline:
 |-------|------|
 | `phase.started` | phase name, label |
 | `phase.completed` | phase name |
-| `search.started` | query, source (graph/web/wikipedia) |
+| `search.started` | query, source (web/wikipedia) |
 | `search.completed` | query, source, resultCount |
 | `research.dimension` | index, total, dimension, iteration |
 | `research.finding` | key finding text |
@@ -148,7 +139,7 @@ Each panel scrolls independently (viewport-constrained via `h-screen overflow-hi
 
 **Inline citations**: The synthesis prompt instructs the LLM to cite sources as `[1]`, `[2]`. ChatMarkdown pre-processes these into links, rendering as superscript badges with hover tooltips showing source favicon, title, domain, and snippet.
 
-**Actions**: Add to Knowledge Graph, Copy Report, Download Markdown, Stop (cancel).
+**Actions**: Copy Report, Download Markdown, Stop (cancel).
 
 ### State Persistence
 
@@ -160,15 +151,13 @@ When a research report completes, a **"Continue exploring"** section appears at 
 
 Clicking a chip or submitting a query transitions to chat mode:
 
-1. **Fire-and-forget ingest**: The full report is POSTed to `/api/chat/ingest` (entity extraction → Neo4j). This happens in the background — no blocking.
-2. **Compact prior context**: A synthetic assistant message is injected with:
+1. **Compact prior context**: A synthetic assistant message is injected with:
    - The original research query
    - The list of dimensions covered
    - Top 6 key findings as bullet points
-   - A note that entities from the research are in the knowledge graph
-3. **Chat continues**: The search agent picks up the query, uses `searchGraph` to pull the ingested entities, and answers with full graph context.
+2. **Chat continues**: The search agent picks up the query with the compacted research context already in the conversation, and answers — searching the web or Wikipedia for anything new.
 
-This avoids truncating the raw report (which loses key details) in favour of structured graph-backed context — the same entity data in a retrieval-optimised form.
+This avoids truncating the raw report (which loses key details) in favour of a structured summary that carries the report's key findings into the follow-up conversation.
 
 **Key constraint**: If the follow-up query uses `/deep-research` or `/due-diligence` mode, the transition to chat is skipped and a new research run starts instead.
 
@@ -181,22 +170,6 @@ This avoids truncating the raw report (which loses key details) in favour of str
 | `app/api/research/deep/[id]/status/route.ts` | Polling fallback |
 | `app/api/research/deep/research-store.ts` | In-memory state store with cancel support |
 | `app/components/search/DeepResearchPanel.tsx` | Three-panel research UI + follow-up section |
-
-## Full-Text Index
-
-```cypher
-CREATE FULLTEXT INDEX idx_entity_name_fulltext IF NOT EXISTS
-FOR (n:Entity)
-ON EACH [n.name, n.aliases, n.tags]
-OPTIONS {
-  indexConfig: {
-    `fulltext.analyzer`: 'standard-no-stop-words',
-    `fulltext.eventually_consistent`: true
-  }
-};
-```
-
-Sub-5ms at any scale. Migration 006.
 
 ## Sessions
 
@@ -221,5 +194,4 @@ Run `node scripts/generate-icons.mjs` to regenerate all assets from the source S
 ## Scaling Roadmap
 
 1. **Meilisearch sidecar** — for typo-tolerance and sub-10ms latency
-2. **Vector search** — embedding-based semantic search
-3. **3D Atlas** — replace Cytoscape with modern 3D for millions of nodes
+2. **Corpus vector search** — embedding-based semantic search over ingested files (pgvector on Postgres, qwen3 embeddings); landing per issue #291

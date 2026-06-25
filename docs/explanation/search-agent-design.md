@@ -12,12 +12,10 @@ A tool-calling agent solves all three. The LLM decides which tools to call, in w
 
 ## Tool choice
 
-The agent has five tools:
+The agent has three tools:
 
-- **`searchGraph`** — queries the personal knowledge graph (Neo4j). Fast, zero-latency results from prior research sessions. Only called when the graph has content.
-- **`searchWeb`** — calls SearXNG with a category hint. The agent picks the category based on query intent (`general`, `social media`, `it`, `science`).
+- **`searchWeb`** — calls the web search backend (Tavily, or self-hosted SearXNG) with a category hint. The agent picks the category based on query intent (`general`, `social media`, `it`, `science`).
 - **`searchWikipedia`** — fetches a Wikipedia article. Useful for foundational definitions and historical context.
-- **`searchCommunities`** — searches GraphRAG community summaries. For broad thematic questions when the graph has community data.
 - **`askClarification`** — pauses the loop to ask the user a question. Intercepted by middleware before reaching the LLM.
 
 The agent chooses which tools to call — no hard-coded pipeline. But the system prompt provides a preferred workflow:
@@ -25,8 +23,6 @@ The agent chooses which tools to call — no hard-coded pipeline. But the system
 1. Web search first (precise query)
 2. Wikipedia for foundational context if needed
 3. Web search again with a different angle if coverage is thin
-4. Graph search only if prior sessions likely have relevant data
-5. Communities for broad thematic synthesis
 
 ## Why not search all tools in parallel?
 
@@ -34,9 +30,9 @@ Parallel search would be faster but wastes tokens and API calls. The agent's seq
 
 ## The step limit
 
-The agent stops after 7 tool-call steps. This is a hard ceiling to prevent runaway loops and manage cost. The `LoopDetection` middleware provides a softer check: it warns the agent on the second repeated identical tool call and blocks the third.
+The agent stops after 5 tool-call steps. This is a hard ceiling to prevent runaway loops and manage cost. The `LoopDetection` middleware provides a softer check: it warns the agent on the second repeated identical tool call and blocks the third.
 
-7 steps is enough for:
+5 steps is enough for:
 - 1 web search
 - 1 Wikipedia lookup
 - 1–2 targeted follow-up searches
@@ -46,24 +42,18 @@ The agent stops after 7 tool-call steps. This is a hard ceiling to prevent runaw
 
 The middleware chain lets search behavior be configured independently of the LLM call. Each middleware hook is a policy:
 
-- **`EntityMemory.beforeAgent`**: "check what we already know before searching"
 - **`ResearchPlanner.beforeAgent`**: "for complex queries, plan before searching"
+- **`ParallelDecomposition.beforeAgent`**: "decompose compound queries into focused sub-queries"
 - **`Reflection.afterModel`**: "after each LLM response, check if sources are adequate"
 - **`LoopDetection.wrapToolCall`**: "never repeat the exact same search twice"
 
 This separation means you can add, remove, or tune policies without touching the core agent loop.
 
-## Web-first when the graph is empty
+## Why web search the way we do it?
 
-A new installation has an empty knowledge graph. Calling `searchGraph` on an empty graph returns nothing and wastes a tool step. The agent detects this: when `searchGraph` returns zero results, it sets a `graphIsEmpty` flag and skips all subsequent graph calls in that session.
+The web backend defaults to Tavily, with self-hosted SearXNG supported when `SEARXNG_ENDPOINT` is set. SearXNG aggregates multiple engines (Google, Brave, Reddit, GitHub, arXiv) under one API with a consistent JSON format and no per-query API fees or third-party data sharing.
 
-This makes the agent effectively web-first until the graph has meaningful content — which is the right behavior for a fresh installation.
-
-## Why SearXNG?
-
-SearXNG is self-hosted, so there are no per-query API fees and no third-party data sharing. It aggregates multiple engines (Google, Brave, Reddit, GitHub, arXiv) under one API with a consistent JSON format.
-
-The key insight is that different engines serve different information types. A technical question benefits from Stack Overflow and GitHub. A social question benefits from Reddit. SearXNG's `categories` parameter routes to the right engine set without multiple API integrations.
+The key insight is that different engines serve different information types. A technical question benefits from Stack Overflow and GitHub. A social question benefits from Reddit. The `categories` parameter routes to the right engine set without multiple API integrations.
 
 ## Cited answers
 

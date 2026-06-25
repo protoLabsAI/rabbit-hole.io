@@ -46,38 +46,6 @@ interface WebSearchResult {
 
 ---
 
-## `searchGraph`
-
-Hybrid BM25 + vector search against Neo4j, with RRF fusion.
-
-```typescript
-async function searchGraph(
-  query: string,
-  maxResults?: number   // default: 10
-): Promise<GraphSearchResult[]>
-```
-
-### `GraphSearchResult`
-
-```typescript
-interface GraphSearchResult {
-  title: string;
-  content: string;
-  url: string;
-  score: number;
-  entityType?: string;
-}
-```
-
-### Notes
-
-- Calls Neo4j fulltext index for BM25, Qdrant for vector similarity
-- Fuses scores with RRF: `score += 1 / (rank + 60)`
-- Returns empty array if Neo4j is unreachable or indexes are empty
-- The chat route detects an empty first result and sets a `graphIsEmpty` flag to skip subsequent graph calls
-
----
-
 ## `searchWikipedia`
 
 Fetches a Wikipedia article summary.
@@ -101,18 +69,6 @@ interface WikipediaResult {
 
 ---
 
-## `buildLuceneQuery`
-
-Constructs a Lucene query string for Neo4j fulltext search.
-
-```typescript
-function buildLuceneQuery(query: string): string
-```
-
-Escapes special characters, quotes multi-word phrases, and removes stop words.
-
----
-
 ## `withRetry`
 
 Wraps any async function with exponential backoff.
@@ -128,4 +84,4 @@ async function withRetry<T>(
 ): Promise<T>
 ```
 
-Used internally by `searchGraph` and `searchWeb` to retry transient failures.
+Used internally by `searchWeb` and the other search utilities to retry transient failures.
