@@ -81,7 +81,7 @@ migrations/
 └── 006_fulltext_entity_index.cypher
 ```
 
-All use `IF NOT EXISTS` — safe to re-run. See [operations/migrations.md](../operations/migrations.md) for how to apply them.
+All use `IF NOT EXISTS` — safe to re-run. See [Database migrations](../reference/migrations) for how to apply them.
 
 ## Tenant Isolation
 
