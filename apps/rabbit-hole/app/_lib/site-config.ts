@@ -39,5 +39,5 @@ export const SITE_KEYWORDS = [
   "rabbit-hole",
 ];
 
-/** Set when the account exists (e.g. "@rabbitholeio"). Empty → the tag is omitted. */
-export const TWITTER_HANDLE = process.env.NEXT_PUBLIC_TWITTER_HANDLE || "";
+/** Org handle (shared across proto properties). Override per-env with NEXT_PUBLIC_TWITTER_HANDLE. */
+export const TWITTER_HANDLE = process.env.NEXT_PUBLIC_TWITTER_HANDLE || "@protoLabsAI";
