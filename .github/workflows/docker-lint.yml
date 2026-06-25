@@ -31,7 +31,7 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       
       - name: Run Hadolint on ${{ matrix.dockerfile }}
         uses: hadolint/hadolint-action@v3.3.0
@@ -54,7 +54,7 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       
       - name: Install yamllint
         run: pip install yamllint
