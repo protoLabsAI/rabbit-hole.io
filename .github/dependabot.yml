@@ -9,7 +9,8 @@ enable-beta-ecosystems: true
 updates:
   # ==================== NPM/PNPM ====================
 
-  # Root workspace
+  # Root entry — covers the ENTIRE pnpm workspace (apps/*, packages/*, agent,
+  # services/*) and the single root pnpm-lock.yaml.
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
@@ -40,98 +41,14 @@ updates:
       prefix: "chore(deps)"
       include: "scope"
 
-  # Agent directory (separate npm project)
-  - package-ecosystem: "npm"
-    directory: "/agent"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
-    groups:
-      agent-dependencies:
-        patterns:
-          - "*"
-        update-types:
-          - "minor"
-          - "patch"
-    open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-      - "npm"
-      - "agent"
-    commit-message:
-      prefix: "chore(deps-agent)"
-
-  # YJS Collaboration Service
-  - package-ecosystem: "npm"
-    directory: "/services/yjs-collaboration-server"
-    schedule:
-      interval: "weekly"
-      day: "tuesday"
-      time: "09:00"
-    groups:
-      yjs-service-dependencies:
-        patterns:
-          - "*"
-        update-types:
-          - "minor"
-          - "patch"
-    open-pull-requests-limit: 3
-    labels:
-      - "dependencies"
-      - "npm"
-      - "services"
-      - "yjs"
-    commit-message:
-      prefix: "chore(deps-yjs)"
-
-  # ==================== PYTHON ====================
-
-  # LangExtract Service
-  - package-ecosystem: "pip"
-    directory: "/services/langextract-service"
-    schedule:
-      interval: "weekly"
-      day: "wednesday"
-      time: "09:00"
-    groups:
-      python-langextract:
-        patterns:
-          - "*"
-        update-types:
-          - "minor"
-          - "patch"
-    open-pull-requests-limit: 3
-    labels:
-      - "dependencies"
-      - "python"
-      - "services"
-      - "langextract"
-    commit-message:
-      prefix: "chore(deps-langextract)"
-
-  # YouTube Processor Service
-  - package-ecosystem: "pip"
-    directory: "/services/youtube-processor-service"
-    schedule:
-      interval: "weekly"
-      day: "wednesday"
-      time: "09:00"
-    groups:
-      python-youtube:
-        patterns:
-          - "*"
-        update-types:
-          - "minor"
-          - "patch"
-    open-pull-requests-limit: 3
-    labels:
-      - "dependencies"
-      - "python"
-      - "services"
-      - "youtube"
-    commit-message:
-      prefix: "chore(deps-youtube)"
+  # NOTE: do NOT add per-member npm entries for workspace packages (e.g.
+  # directory: "/agent"). `agent` and `services/*` are pnpm workspace members
+  # sharing the single root pnpm-lock.yaml, which the root entry above already
+  # maintains. A sub-directory entry updates only that member's package.json
+  # and cannot touch the root lockfile, so CI's `pnpm install --frozen-lockfile`
+  # fails with ERR_PNPM_OUTDATED_LOCKFILE and the PR can never merge.
+  # (The old "/agent" and "/services/yjs-collaboration-server" npm entries were
+  # removed for exactly this reason.)
 
   # ==================== DOCKER ====================
 
@@ -171,63 +88,6 @@ updates:
       - "agent"
     commit-message:
       prefix: "chore(deps-docker-agent)"
-
-  # LangExtract Service Docker
-  - package-ecosystem: "docker"
-    directory: "/services/langextract-service"
-    schedule:
-      interval: "weekly"
-      day: "thursday"
-      time: "09:00"
-    groups:
-      docker-langextract:
-        patterns:
-          - "*"
-    open-pull-requests-limit: 2
-    labels:
-      - "dependencies"
-      - "docker"
-      - "services"
-    commit-message:
-      prefix: "chore(deps-docker-langextract)"
-
-  # YouTube Processor Service Docker
-  - package-ecosystem: "docker"
-    directory: "/services/youtube-processor-service"
-    schedule:
-      interval: "weekly"
-      day: "thursday"
-      time: "09:00"
-    groups:
-      docker-youtube:
-        patterns:
-          - "*"
-    open-pull-requests-limit: 2
-    labels:
-      - "dependencies"
-      - "docker"
-      - "services"
-    commit-message:
-      prefix: "chore(deps-docker-youtube)"
-
-  # YJS Service Docker
-  - package-ecosystem: "docker"
-    directory: "/services/yjs-collaboration-server"
-    schedule:
-      interval: "weekly"
-      day: "thursday"
-      time: "09:00"
-    groups:
-      docker-yjs:
-        patterns:
-          - "*"
-    open-pull-requests-limit: 2
-    labels:
-      - "dependencies"
-      - "docker"
-      - "yjs"
-    commit-message:
-      prefix: "chore(deps-docker-yjs)"
 
   # ==================== GITHUB ACTIONS ====================
 
