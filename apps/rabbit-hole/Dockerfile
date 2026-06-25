@@ -6,7 +6,7 @@
 # ============================================
 # BASE - Shared dependencies
 # ============================================
-FROM node:20-alpine AS base
+FROM node:26-alpine AS base
 
 RUN apk add --no-cache libc6-compat curl
 
@@ -53,7 +53,7 @@ RUN cd apps/rabbit-hole && npx next build
 # ============================================
 # PRODUCTION
 # ============================================
-FROM node:20-alpine AS production
+FROM node:26-alpine AS production
 
 RUN apk add --no-cache curl
 
