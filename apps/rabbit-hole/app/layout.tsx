@@ -9,6 +9,14 @@ import {
   ThemeGenerator,
 } from "@protolabsai/ui/theme";
 
+import {
+  SITE_DESCRIPTION,
+  SITE_KEYWORDS,
+  SITE_NAME,
+  SITE_TITLE,
+  SITE_URL,
+  TWITTER_HANDLE,
+} from "./_lib/site-config";
 import { DebugUtilsInitializer } from "./components/DebugUtilsInitializer";
 import { DomainRegistryInitializer } from "./components/DomainRegistryInitializer";
 import { DynamicBranding } from "./components/DynamicBranding";
@@ -20,22 +28,27 @@ import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
-// Generate metadata dynamically based on theme
+// Site metadata — identity lives in `_lib/site-config`, shared with the
+// dynamic OG/Twitter images, robots, and sitemap. The OG/Twitter image URLs
+// are auto-injected by `opengraph-image.tsx` / `twitter-image.tsx`.
 export function generateMetadata(): Metadata {
-  const themeName = getValidatedThemeName(
-    process.env.NEXT_PUBLIC_DEFAULT_THEME,
-    "default"
-  );
-  const theme = getTheme(themeName);
-
-  // All themes must have branding, but TypeScript doesn't know that
-  if (!theme.branding) {
-    throw new Error(`Theme ${themeName} missing branding configuration`);
-  }
+  const twitter: Metadata["twitter"] = {
+    card: "summary_large_image",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    ...(TWITTER_HANDLE ? { site: TWITTER_HANDLE, creator: TWITTER_HANDLE } : {}),
+  };
 
   return {
-    title: theme.branding.name,
-    description: theme.branding.tagline || "Knowledge graph platform",
+    metadataBase: new URL(SITE_URL),
+    title: {
+      default: SITE_TITLE,
+      template: `%s — ${SITE_NAME}`,
+    },
+    description: SITE_DESCRIPTION,
+    keywords: SITE_KEYWORDS,
+    applicationName: SITE_NAME,
+    alternates: { canonical: "/" },
     icons: {
       icon: [
         { url: "/favicon.svg", type: "image/svg+xml" },
@@ -44,13 +57,20 @@ export function generateMetadata(): Metadata {
       apple: "/apple-touch-icon.png",
     },
     openGraph: {
-      images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+      type: "website",
+      siteName: SITE_NAME,
+      url: SITE_URL,
+      title: SITE_TITLE,
+      description: SITE_DESCRIPTION,
+      locale: "en_US",
+      // image auto-injected from app/opengraph-image.tsx
     },
+    twitter,
     manifest: "/manifest.json",
     appleWebApp: {
       capable: true,
       statusBarStyle: "default",
-      title: theme.branding.name,
+      title: SITE_NAME,
     },
   };
 }
@@ -78,12 +98,40 @@ export default function RootLayout({
   // prevents the flash of unstyled content before client JS hydrates.
   const themeCSS = ThemeGenerator.generateCSSVariables(getTheme(defaultTheme));
 
+  // Structured data for search engines. WebSite + Organization only — no
+  // SearchAction yet, since there's no `?q=` query entrypoint to honor.
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": `${SITE_URL}/#website`,
+        url: SITE_URL,
+        name: SITE_NAME,
+        description: SITE_DESCRIPTION,
+        publisher: { "@id": `${SITE_URL}/#org` },
+        inLanguage: "en",
+      },
+      {
+        "@type": "Organization",
+        "@id": `${SITE_URL}/#org`,
+        name: SITE_NAME,
+        url: SITE_URL,
+        logo: `${SITE_URL}/icons/icon-512.png`,
+      },
+    ],
+  };
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <style
           id="dynamic-theme"
           dangerouslySetInnerHTML={{ __html: themeCSS }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
       <body className={inter.className}>

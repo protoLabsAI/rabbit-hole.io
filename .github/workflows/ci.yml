@@ -8,17 +8,17 @@
 # - Next.js cache: Uses lock file hash for dependency-based caching
 #
 # Monitoring:
-# - notify-failure: Auto-creates issues for failures on main/develop branches
+# - notify-failure: Auto-creates issues for failures on main/dev branches
 
 name: CI
 
 "on":
   pull_request:
-    branches: [main, develop]
+    branches: [main, dev]
   push:
     branches:
       - main
-      - develop
+      - dev
       - "changeset-release/**"
 
 concurrency:
@@ -313,7 +313,7 @@ jobs:
   notify-failure:
     name: Notify on Failure
     runs-on: ubuntu-latest
-    if: failure() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    if: failure() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
     needs: [validate, build-packages, build-app, test, changeset-check]
     permissions:
       issues: write
@@ -324,7 +324,7 @@ jobs:
           echo "::notice::CI pipeline failed on ${{ github.ref_name }} branch"
           echo "::notice::Failed jobs: See workflow run at ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
-      - name: Create issue on failure (main/develop only)
+      - name: Create issue on failure (main/dev only)
         if: github.event_name == 'push'
         uses: actions/github-script@v9
         with:

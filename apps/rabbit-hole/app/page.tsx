@@ -4,6 +4,7 @@ import { useCallback, useRef, useEffect, useState, useMemo } from "react";
 
 import { Icon } from "@protolabsai/icon-system";
 
+import { ByokKeyButton } from "./components/search/ByokKeyButton";
 import { ChatMessage } from "./components/search/ChatMessage";
 import { ChatSourcePanel } from "./components/search/ChatSourcePanel";
 import { DeepResearchPanel } from "./components/search/DeepResearchPanel";
@@ -384,6 +385,8 @@ export default function SearchPage() {
             <Icon name="PanelLeft" className="h-5 w-5" />
           </button>
         )}
+
+        <ByokKeyButton />
 
         <SearchSidebar
           sessions={sessionMgr.sessions}
