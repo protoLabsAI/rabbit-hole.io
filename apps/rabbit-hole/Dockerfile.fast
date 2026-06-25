@@ -1,7 +1,7 @@
 # Fast Dockerfile for rabbit-hole
 # Assumes you've already built locally: pnpm run build
 
-FROM node:20-alpine AS production
+FROM node:26-alpine AS production
 
 RUN apk add --no-cache curl
 

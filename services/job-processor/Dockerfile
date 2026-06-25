@@ -4,7 +4,7 @@
 # ============================================
 # BASE
 # ============================================
-FROM node:20-alpine AS base
+FROM node:26-alpine AS base
 
 RUN apk add --no-cache libc6-compat curl
 
@@ -42,7 +42,7 @@ RUN NODE_OPTIONS="--max-old-space-size=4096" pnpm turbo run build --filter=@prot
 # ============================================
 # PRODUCTION
 # ============================================
-FROM node:20-alpine AS production
+FROM node:26-alpine AS production
 
 # Runtime binaries for the media ingestion adapters (this service is the
 # consolidated media pipeline — what proto-starter kept as separate
