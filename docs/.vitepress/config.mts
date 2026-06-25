@@ -7,13 +7,17 @@ import { defineConfig } from "vitepress";
 // Styling comes from @protolabsai/vitepress-theme with rabbit-hole's token
 // overrides in .vitepress/theme/custom.css.
 
-const base = process.env.DOCS_BASE || "/rabbit-hole.io/";
+// Default base is "/" — docs ship to the subdomain root docs.rabbit-hole.io
+// (Cloudflare Pages). DOCS_BASE can still override it (e.g. "/rabbit-hole.io/"
+// for a GitHub Pages project-path build).
+const base = process.env.DOCS_BASE || "/";
 
 // Shared domain vocabulary — the same groups recur across every mode.
 const D = {
   search: "Search",
   research: "Deep research",
   ingestion: "Ingestion & search backends",
+  operate: "Operate & self-host",
 };
 
 export default defineConfig({
@@ -111,6 +115,13 @@ export default defineConfig({
           text: D.ingestion,
           collapsed: false,
           items: [{ text: "Configure SearXNG", link: "/how-to/configure-searxng" }],
+        },
+        {
+          text: D.operate,
+          collapsed: false,
+          items: [
+            { text: "Host a public BYOK demo", link: "/how-to/host-byok-demo" },
+          ],
         },
       ],
 

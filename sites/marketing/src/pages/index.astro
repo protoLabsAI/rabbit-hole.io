@@ -1,0 +1,262 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Terminal from "../components/Terminal.astro";
+
+const spec = [
+  { k: "search", v: "Tavily, or self-hosted SearXNG" },
+  { k: "corpus", v: "your files, embedded in pgvector (qwen3, 1024-dim)" },
+  { k: "models", v: "bring your own key — any OpenAI-compatible gateway" },
+  { k: "cli", v: "rh — search, recall, research, ingest" },
+  { k: "deploy", v: "docker compose, one stack" },
+  { k: "license", v: "Apache-2.0" },
+];
+
+const caps = [
+  {
+    n: "01",
+    title: "Agentic search, with citations",
+    body: "A multi-step tool-calling agent searches the web, Wikipedia, and your own corpus, then synthesizes a single cited answer. It decides which sources to reach for and when to stop.",
+  },
+  {
+    n: "02",
+    title: "Your files, made searchable",
+    body: "Ingest PDFs, documents, audio, and video. The bundled job processor parses and transcribes them, embeds the chunks into a pgvector corpus, and the agent searches it alongside the open web.",
+  },
+  {
+    n: "03",
+    title: "Bring your own key",
+    body: "Point it at any OpenAI-compatible gateway and pay for your own inference. No subscription, no per-seat pricing, no vendor lock-in. The same key drives the web app and the CLI.",
+  },
+  {
+    n: "04",
+    title: "Self-host the whole thing",
+    body: "One docker-compose stack: Postgres with pgvector, object storage, the job processor, and the app. Run it on a laptop or a homelab box. Your data and queries stay on your infrastructure.",
+  },
+  {
+    n: "05",
+    title: "A CLI built to be scripted",
+    body: "rh exposes search, recall, research, and ingest from the terminal. It is a thin tool over your search backends and LLM gateway — easy to pipe, automate, and shell out to from other agents.",
+  },
+];
+---
+
+<BaseLayout>
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">Self-hostable AI search</p>
+        <h1>AI search you can <span class="gradient-text">self-host</span></h1>
+        <p class="lead">
+          Perplexity-style search over the open web and your own files. Plug in
+          your LLM key, run the whole stack yourself. This is a pattern and a
+          working self-host example, not a hosted product.
+        </p>
+        <div class="cta">
+          <a class="btn btn-primary" href="https://docs.rabbit-hole.io"
+            >Read the docs</a
+          >
+          <a class="btn btn-ghost" href="https://demo.rabbit-hole.io"
+            >Try the demo</a
+          >
+          <a
+            class="btn btn-ghost"
+            href="https://github.com/protoLabsAI/rabbit-hole.io">GitHub</a
+          >
+        </div>
+      </div>
+      <div class="hero-term">
+        <Terminal />
+      </div>
+    </div>
+  </section>
+
+  <section class="stack">
+    <div class="container">
+      <div class="spec">
+        <div class="spec-cmd"><span class="prompt">$</span> rh --whoami</div>
+        {
+          spec.map((row) => (
+            <div class="spec-row">
+              <span class="spec-k">{row.k}</span>
+              <span class="spec-v">{row.v}</span>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="caps-wrap">
+    <div class="container">
+      {
+        caps.map((c) => (
+          <article class="cap">
+            <div class="cap-num">{c.n}</div>
+            <div class="cap-body">
+              <h3>{c.title}</h3>
+              <p>{c.body}</p>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="install">
+    <div class="container install-inner">
+      <h2>Bring it up</h2>
+      <pre class="install-cmd"><code>git clone https://github.com/protoLabsAI/rabbit-hole.io
+cd rabbit-hole.io
+cp .env.example .env   # add your LLM key
+docker compose up</code></pre>
+      <p class="install-note">
+        Then open <a href="https://docs.rabbit-hole.io">the docs</a> for the
+        quickstart, or poke the <a href="https://demo.rabbit-hole.io">live BYOK
+        demo</a> — you bring the key, it runs on a homelab box behind a
+        Cloudflare tunnel.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .eyebrow {
+    font-family: var(--pl-font-mono, monospace);
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--pl-color-accent);
+    margin: 0 0 var(--pl-space-3, 0.75rem);
+  }
+
+  .hero {
+    padding: clamp(3rem, 8vw, 6rem) 0 clamp(2.5rem, 6vw, 4rem);
+    border-bottom: 1px solid var(--pl-color-border);
+    background:
+      radial-gradient(
+        60% 60% at 80% 0%,
+        color-mix(in oklab, var(--pl-color-accent) 8%, transparent),
+        transparent 70%
+      );
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: center;
+  }
+  .hero-copy h1 {
+    font-size: clamp(2.2rem, 5.5vw, 3.6rem);
+    margin-bottom: var(--pl-space-4, 1rem);
+  }
+  .lead {
+    font-size: 1.12rem;
+    color: var(--pl-color-fg-muted);
+    max-width: 34rem;
+    margin: 0 0 var(--pl-space-6, 1.5rem);
+  }
+  .cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--pl-space-3, 0.75rem);
+  }
+
+  .stack {
+    padding: clamp(2.5rem, 6vw, 4rem) 0 0;
+  }
+  .spec {
+    border: 1px solid var(--pl-color-border);
+    border-left: 3px solid var(--pl-color-accent);
+    border-radius: var(--pl-radius, 10px);
+    background: var(--pl-color-bg-raised);
+    padding: var(--pl-space-5, 1.25rem) var(--pl-space-6, 1.5rem);
+    font-family: var(--pl-font-mono, monospace);
+    font-size: 0.9rem;
+  }
+  .spec-cmd {
+    color: var(--pl-color-fg-subtle);
+    margin-bottom: var(--pl-space-3, 0.75rem);
+  }
+  .prompt {
+    color: var(--pl-color-accent);
+  }
+  .spec-row {
+    display: grid;
+    grid-template-columns: 7rem 1fr;
+    gap: var(--pl-space-4, 1rem);
+    padding: 4px 0;
+  }
+  .spec-k {
+    color: var(--pl-color-accent);
+  }
+  .spec-v {
+    color: var(--pl-color-fg-muted);
+  }
+
+  .caps-wrap {
+    padding: clamp(2rem, 5vw, 3.5rem) 0;
+  }
+  .cap {
+    display: grid;
+    grid-template-columns: 4rem 1fr;
+    gap: var(--pl-space-5, 1.25rem);
+    padding: var(--pl-space-7, 1.75rem) 0;
+    border-top: 1px solid var(--pl-color-border);
+  }
+  .cap:first-child {
+    border-top: none;
+  }
+  .cap-num {
+    font-family: var(--pl-font-mono, monospace);
+    font-size: 0.95rem;
+    color: var(--pl-color-fg-subtle);
+    padding-top: 0.2rem;
+  }
+  .cap-body h3 {
+    font-size: 1.2rem;
+    margin-bottom: var(--pl-space-2, 0.5rem);
+  }
+  .cap-body p {
+    color: var(--pl-color-fg-muted);
+    max-width: 46rem;
+    margin: 0;
+  }
+
+  .install {
+    padding: clamp(2rem, 5vw, 3.5rem) 0;
+    border-top: 1px solid var(--pl-color-border);
+  }
+  .install-inner {
+    text-align: center;
+  }
+  .install h2 {
+    font-size: clamp(1.5rem, 3.5vw, 2rem);
+  }
+  .install-cmd {
+    display: inline-block;
+    text-align: left;
+    margin: var(--pl-space-5, 1.25rem) auto;
+    padding: var(--pl-space-5, 1.25rem) var(--pl-space-6, 1.5rem);
+    border: 1px solid var(--pl-color-border);
+    border-radius: var(--pl-radius, 10px);
+    background: var(--pl-color-bg-inset);
+    font-size: 0.88rem;
+    line-height: 1.8;
+    color: var(--pl-color-fg);
+    overflow-x: auto;
+  }
+  .install-note {
+    color: var(--pl-color-fg-muted);
+    max-width: 36rem;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 820px) {
+    .hero-grid {
+      grid-template-columns: 1fr;
+    }
+    .hero-term {
+      order: -1;
+    }
+  }
+</style>
