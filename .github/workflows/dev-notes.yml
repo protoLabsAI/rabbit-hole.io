@@ -24,7 +24,7 @@ jobs:
     # optional and should never block a main push.
     if: vars.DEV_NOTES_ENABLED == 'true'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1 # only the commit that triggered the push
 
