@@ -1,0 +1,80 @@
+---
+// A small, static terminal mock showing the rh CLI in use. Concrete and
+// on-brand without a screenshot to maintain.
+const lines = [
+  { kind: "cmd", text: "rh search \"how does RRF rank fusion work\"" },
+  { kind: "out", text: "web      6 results (tavily)" },
+  { kind: "out", text: "corpus   3 chunks (pgvector, qwen3-1024)" },
+  { kind: "cmd", text: "rh recall \"our embeddings config\" -k 3" },
+  { kind: "out", text: "0.91  infra/embeddings.md#L12" },
+  { kind: "out", text: "0.88  notes/ingest-pipeline.md#L40" },
+];
+---
+
+<div class="term" role="img" aria-label="Terminal running the rh CLI">
+  <div class="term-bar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="term-title">rh</span>
+  </div>
+  <pre class="term-body">{
+    lines.map((l) =>
+      l.kind === "cmd" ? (
+        <div class="ln"><span class="prompt">$</span> <span class="cmd">{l.text}</span></div>
+      ) : (
+        <div class="ln out">{l.text}</div>
+      )
+    )
+  }</pre>
+</div>
+
+<style>
+  .term {
+    border: 1px solid var(--pl-color-border-strong);
+    border-radius: var(--pl-radius, 10px);
+    background: var(--pl-color-bg-raised);
+    box-shadow: var(--pl-shadow-glow);
+    overflow: hidden;
+  }
+  .term-bar {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--pl-color-border);
+    background: var(--pl-color-bg-subtle);
+  }
+  .dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--pl-color-border-strong);
+  }
+  .term-title {
+    margin-left: 8px;
+    font-family: var(--pl-font-mono, monospace);
+    font-size: 0.78rem;
+    color: var(--pl-color-fg-subtle);
+  }
+  .term-body {
+    margin: 0;
+    padding: var(--pl-space-5, 1.25rem);
+    font-family: var(--pl-font-mono, monospace);
+    font-size: 0.84rem;
+    line-height: 1.85;
+    color: var(--pl-color-fg);
+    overflow-x: auto;
+  }
+  .ln {
+    white-space: pre;
+  }
+  .prompt {
+    color: var(--pl-color-accent);
+    user-select: none;
+  }
+  .cmd {
+    color: var(--pl-color-fg);
+  }
+  .out {
+    color: var(--pl-color-fg-muted);
+  }
+</style>

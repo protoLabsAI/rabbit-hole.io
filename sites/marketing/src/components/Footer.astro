@@ -1,0 +1,60 @@
+---
+const year = 2026;
+---
+
+<footer class="footer">
+  <div class="footer-top container">
+    <span class="built"
+      >Built by <a href="https://protolabs.studio">protoLabs.studio</a></span
+    >
+    <nav class="footer-links">
+      <a href="https://docs.rabbit-hole.io">Docs</a>
+      <a href="https://demo.rabbit-hole.io">Demo</a>
+      <a href="https://github.com/protoLabsAI/rabbit-hole.io">GitHub</a>
+    </nav>
+  </div>
+  <div class="copyright">
+    Apache-2.0 &middot; &copy; {year} protoLabs.studio
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--pl-color-border);
+    margin-top: var(--pl-space-12, 4rem);
+  }
+  .footer-top {
+    padding: var(--pl-space-8, 2rem) var(--pl-space-6, 1.5rem);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--pl-space-4, 1rem);
+    color: var(--pl-color-fg-muted);
+    font-size: 0.88rem;
+  }
+  .built a {
+    color: var(--pl-color-fg);
+  }
+  .built a:hover {
+    color: var(--pl-color-accent);
+    text-decoration: none;
+  }
+  .footer-links {
+    display: flex;
+    gap: var(--pl-space-5, 1.25rem);
+  }
+  .footer-links a {
+    color: var(--pl-color-fg-muted);
+  }
+  .footer-links a:hover {
+    color: var(--pl-color-fg);
+    text-decoration: none;
+  }
+  .copyright {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--pl-color-fg-subtle);
+    padding-bottom: var(--pl-space-8, 2rem);
+  }
+</style>

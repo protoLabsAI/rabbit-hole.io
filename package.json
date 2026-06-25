@@ -283,7 +283,8 @@
   "pnpm": {
     "overrides": {
       "@langchain/community@<0.3.3": ">=0.3.3",
-      "zod": "^4.3.6"
+      "zod": "^4.3.6",
+      "astro>zod": "^3.25.76"
     },
     "ignoredBuiltDependencies": [
       "canvas"

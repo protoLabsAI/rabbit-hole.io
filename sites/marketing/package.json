@@ -1,0 +1,16 @@
+{
+  "name": "rabbit-hole-marketing",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Marketing site for rabbit-hole.io — self-hostable AI search",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@protolabsai/design": "^0.7.0",
+    "astro": "^5.7.0"
+  }
+}

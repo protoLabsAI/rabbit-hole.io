@@ -3,6 +3,7 @@ packages:
   - "packages/*"
   - "agent"
   - "services/*"
+  - "sites/*"
 
 exclude:
   - "external/**"
