@@ -159,7 +159,7 @@ jobs:
           category: "trivy-${{ matrix.service.name }}"
 
       - name: Install Cosign
-        uses: sigstore/cosign-installer@v4.1.1
+        uses: sigstore/cosign-installer@v4.1.2
         with:
           cosign-release: 'v2.4.1'
 
