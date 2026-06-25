@@ -25,14 +25,9 @@ import {
 } from "@protolabsai/vector";
 
 import {
-  searchCommunities,
-  graphHasData,
-  searchGraph,
   searchWeb,
   searchWikipedia,
   withRetry,
-  type CommunitySearchResult,
-  type GraphSearchResult,
   type WebSearchResult,
   type WikiSearchResult,
 } from "../../../lib/search";
@@ -102,9 +97,6 @@ async function runResearch(
   const allNotes: string[] = [];
   const allFindings: string[] = [];
   let totalSearches = 0;
-  // Fast upfront check — if Neo4j has no nodes, skip ALL graph searches.
-  // Checked once silently before any research loop; no UI event emitted.
-  const graphIsEmpty = !(await graphHasData().catch(() => false));
 
   const trackSearch = () => {
     totalSearches++;
@@ -210,46 +202,6 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
         dimensionCount: dimensionsToResearch.length,
       });
 
-      // Search community summaries only when the graph has data
-      if (!graphIsEmpty) {
-        checkAbort(researchId);
-        emit("search.started", { query, source: "communities" });
-        const communitySearchSpan = tracing.createSpan("search:communities", {
-          query,
-        });
-        let communityResults: CommunitySearchResult[] = [];
-        try {
-          communityResults = await withRetry(() => searchCommunities(query, 5));
-          trackSearch();
-          communitySearchSpan.end({ resultCount: communityResults.length });
-          emit("search.completed", {
-            query,
-            source: "communities",
-            resultCount: communityResults.length,
-          });
-          if (communityResults.length > 0) {
-            const communityNote = `Community themes: ${communityResults
-              .map(
-                (c) =>
-                  `Community ${c.communityId} (${c.entityCount} entities — ${c.topEntities.slice(0, 3).join(", ")}): ${c.summary}`
-              )
-              .join("\n")}`;
-            allNotes.push(communityNote);
-            const finding = `Found ${communityResults.length} relevant community clusters with thematic context`;
-            allFindings.push(finding);
-            updateResearch(researchId, { findings: allFindings });
-            emit("research.finding", { text: finding });
-          }
-        } catch {
-          communitySearchSpan.end({ resultCount: 0, error: true });
-          emit("search.completed", {
-            query,
-            source: "communities",
-            resultCount: 0,
-          });
-        }
-      }
-
       // Research each dimension
       for (let i = 0; i < Math.min(dimensionsToResearch.length, 6); i++) {
         const dimension = dimensionsToResearch[i];
@@ -289,45 +241,6 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
           // Vector memory unavailable — continue without it
         }
 
-        // Graph search per dimension — skip entirely when graph is known empty
-        let dimGraphResults: GraphSearchResult[] = [];
-        if (!graphIsEmpty) {
-          checkAbort(researchId);
-          emit("search.started", { query: dimension, source: "graph" });
-          const dimGraphSpan = tracing.createSpan("search:graph", {
-            query: dimension,
-            iteration,
-          });
-          try {
-            dimGraphResults = await withRetry(() => searchGraph(dimension, 5));
-            trackSearch();
-            dimGraphSpan.end({ resultCount: dimGraphResults.length });
-            emit("search.completed", {
-              query: dimension,
-              source: "graph",
-              resultCount: dimGraphResults.length,
-            });
-            if (dimGraphResults.length > 0) {
-              for (const e of dimGraphResults) {
-                if (!allSources.find((s) => s.url === `#entity:${e.uid}`)) {
-                  allSources.push({
-                    title: e.name,
-                    url: `#entity:${e.uid}`,
-                    type: "graph",
-                  });
-                }
-              }
-            }
-          } catch {
-            dimGraphSpan.end({ resultCount: 0, error: true });
-            emit("search.completed", {
-              query: dimension,
-              source: "graph",
-              resultCount: 0,
-            });
-          }
-        }
-
         // Primary web search — on gap iterations (2+), advance the page to get
         // genuinely different results from engines that support pagination.
         checkAbort(researchId);
@@ -362,13 +275,9 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
           });
         }
 
-        // Secondary web search — runs in two cases:
-        //   1. Graph is empty: replaces the skipped graph search slot.
-        //      Uses "social media,it" category → Reddit, HN, GitHub, SO for
-        //      community experience and code-level depth.
-        //   2. Gap-filling iterations (2+): even when graph has data, search
-        //      community + code sources to fill gaps the general web missed.
-        const runSecondary = graphIsEmpty || iteration > 1;
+        // Secondary web search — community + code sources ("social media,it" →
+        // Reddit, HN, GitHub, SO) for real-world experience and code-level depth.
+        const runSecondary = true;
         let secondaryWebResults: WebSearchResult[] = [];
         if (runSecondary && query.toLowerCase() !== dimension.toLowerCase()) {
           // Combine main topic + dimension for a focused angle query
@@ -441,23 +350,8 @@ Each dimension should be a focused sub-topic that, combined, gives comprehensive
         }
 
         // Compress dimension findings
-        const graphNote =
-          dimGraphResults.length > 0
-            ? `Knowledge graph entities for "${dimension}": ${dimGraphResults
-                .map(
-                  (e) =>
-                    `${e.name} (${e.type})${
-                      e.connectedEntities.length > 0
-                        ? ` — related: ${e.connectedEntities.map((c) => c.name).join(", ")}`
-                        : ""
-                    }`
-                )
-                .join("; ")}`
-            : "";
-
         const corpus = [
           memoryNote,
-          graphNote,
           wiki?.text ?? "",
           ...webResults.map((r) => `${r.title}: ${r.snippet ?? ""}`),
           ...secondaryWebResults.map((r) => `${r.title}: ${r.snippet ?? ""}`),
