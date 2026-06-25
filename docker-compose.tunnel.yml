@@ -1,0 +1,27 @@
+# Cloudflare Tunnel overlay — exposes the homelab rabbit-hole app to the public
+# internet for the BYOK live demo, with NO inbound ports and no public IP.
+# Cloudflare terminates TLS and proxies to the container over an outbound-only
+# tunnel; the app stays on the LAN.
+#
+# Prereqs (one-time, in your Cloudflare account — see .notes/byok-demo-plan.md):
+#   1. Zero Trust → Networks → Tunnels → Create a tunnel → copy the TOKEN.
+#   2. Add a public hostname (e.g. demo.rabbit-hole.io) routing to the
+#      service URL  http://rabbit-hole:3399  (the container, on the `rh`
+#      network — NOT the host's 3399 mapping).
+#   3. Put the token in .env:  CLOUDFLARE_TUNNEL_TOKEN=...
+#
+# Run (compose merges this overlay onto the base stack):
+#   docker compose -f docker-compose.yml -f docker-compose.tunnel.yml up -d
+#
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: rabbit-hole-cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:?set CLOUDFLARE_TUNNEL_TOKEN in .env}
+    depends_on:
+      - rabbit-hole
+    networks:
+      - rh
