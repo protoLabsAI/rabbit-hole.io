@@ -26,7 +26,6 @@ export const contentType = "image/png";
 const BG = "#F8F7F4";
 const INK = "#1C1C1E";
 const MUTED = "#5b5b5e";
-const FAINT = "#9ca3af";
 const EYEBROW = "#6b7280";
 
 const asset = (p: string) => readFile(join(process.cwd(), "public", p));
@@ -60,7 +59,7 @@ export default async function OpengraphImage() {
           src={markUri}
           width={470}
           height={470}
-          style={{ position: "absolute", right: -50, bottom: -80, opacity: 0.05 }}
+          style={{ position: "absolute", right: -50, bottom: -80, opacity: 0.11 }}
         />
 
         {/* mark + wordmark */}
@@ -116,8 +115,8 @@ export default async function OpengraphImage() {
           </div>
         </div>
 
-        {/* eyebrow + url */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        {/* eyebrow */}
+        <div style={{ display: "flex", alignItems: "center" }}>
           <div
             style={{
               display: "flex",
@@ -127,10 +126,7 @@ export default async function OpengraphImage() {
               color: EYEBROW,
             }}
           >
-            open source&nbsp;&nbsp;·&nbsp;&nbsp;self-hostable&nbsp;&nbsp;·&nbsp;&nbsp;byok
-          </div>
-          <div style={{ display: "flex", fontSize: 23, fontWeight: 500, color: FAINT }}>
-            {SITE_NAME}
+            open source&nbsp;&nbsp;·&nbsp;&nbsp;self-hostable
           </div>
         </div>
       </div>
