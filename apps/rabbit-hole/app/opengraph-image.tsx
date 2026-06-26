@@ -23,10 +23,12 @@ export const alt = `${SITE_NAME} — ${SITE_TAGLINE}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-const BG = "#F8F7F4";
-const INK = "#1C1C1E";
-const MUTED = "#5b5b5e";
-const EYEBROW = "#6b7280";
+// Dark-mode-first brand. Dark canvas, light ink; the corner watermark + mark
+// use the light variant of the rabbit hat so they read on the dark ground.
+const BG = "#141414";
+const INK = "#ededed";
+const MUTED = "#a0a0a0";
+const EYEBROW = "#8b8b90";
 
 const asset = (p: string) => readFile(join(process.cwd(), "public", p));
 
@@ -34,7 +36,7 @@ export default async function OpengraphImage() {
   const [inter400, inter600, mark] = await Promise.all([
     asset("fonts/inter-latin-400-normal.woff"),
     asset("fonts/inter-latin-600-normal.woff"),
-    asset("og/rabbit-mark.png"),
+    asset("og/rabbit-mark-light.png"),
   ]);
   const markUri = `data:image/png;base64,${mark.toString("base64")}`;
 
