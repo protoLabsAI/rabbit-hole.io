@@ -1,3 +1,9 @@
+<p align="center">
+  <a href="https://rabbit-hole.io">
+    <img src="sites/marketing/public/og-image.png" alt="rabbit-hole.io — AI search you can self-host" width="800" />
+  </a>
+</p>
+
 # Rabbit Hole
 
 > AI search you can self-host. Web + Wikipedia + your files, with a clean multi-protocol API.
@@ -8,10 +14,11 @@ Apache 2.0 — run it yourself, plug in your own LLM key, no subscription.
 
 - Perplexity-style web search agent (bring your own LLM — our gateway, or any OpenAI-compatible/Anthropic key) with streaming answers and inline citations.
 - File / audio / video / PDF ingestion via the bundled job processor — uploaded media gets transcribed, parsed, and embedded into a searchable corpus (pgvector; ingest→embed pipeline landing, see issue #291).
+- **Deep research** — a multi-step pipeline (scope → research → evaluate → synthesis) that produces a cited, sourced report on a topic.
 - Two distribution surfaces: the chat **Web UI** and the **`rh` CLI** (`@protolabsai/rabbit-hole-cli`: `search`, `recall`, `research`, `ingest`, `status`) for fleet agents to shell out to. An OpenAI-compatible API is also exposed.
 - Optional Langfuse tracing.
 
-The full graph / research workspace from earlier versions is being rebuilt. They're not part of the launch surface and are gated out of production builds; set `NEXT_PUBLIC_ENABLE_RESEARCH_ATLAS=true` if you want to poke at them in dev.
+> Earlier versions had a Neo4j/Qdrant knowledge-graph workspace; it was removed and neither search nor deep research depends on it.
 
 ## Quick start (self-host)
 
@@ -87,8 +94,7 @@ Opens on `http://localhost:3399`. You still need a Postgres + MinIO instance rea
 | `rh` CLI (`@protolabsai/rabbit-hole-cli`) | shipping |
 | OpenAI-compatible API (`/v1/chat/completions`) | in progress |
 | Corpus search (pgvector) | in progress ([#291](https://github.com/protoLabsAI/rabbit-hole.io/issues/291)) |
-| Research / Atlas workspace | rebuilding (dev flag) |
-| Stripe-paid hosted tier | in progress |
+| Deep research (`/api/research/deep`) | shipping |
 
 > The HTTP MCP server and standalone A2A endpoint from earlier versions are retired — fleet agents use the `rh` CLI instead.
 
